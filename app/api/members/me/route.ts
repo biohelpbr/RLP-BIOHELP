@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import type { Member, ShopifyCustomer } from '@/types/database'
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar membro com sponsor
-    const { data: member, error: memberError } = await supabase
+    const { data: memberData, error: memberError } = await supabase
       .from('members')
       .select(`
         id,
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
       .eq('id', memberId)
       .single()
 
-    if (memberError || !member) {
+    if (memberError || !memberData) {
       console.error('[me] Member not found:', memberError)
       return NextResponse.json(
         { error: 'NOT_FOUND', message: 'Membro não encontrado' },
@@ -52,17 +53,21 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Type assertion para garantir tipagem correta
+    const member = memberData as Member
+
     // Buscar dados do sponsor se existir
     let sponsorName: string | null = null
     let sponsorRefCode: string | null = null
 
     if (member.sponsor_id) {
-      const { data: sponsor } = await supabase
+      const { data: sponsorData } = await supabase
         .from('members')
         .select('name, ref_code')
         .eq('id', member.sponsor_id)
         .single()
 
+      const sponsor = sponsorData as Pick<Member, 'name' | 'ref_code'> | null
       if (sponsor) {
         sponsorName = sponsor.name
         sponsorRefCode = sponsor.ref_code
@@ -70,11 +75,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar status de sync Shopify
-    const { data: shopifySync } = await supabase
+    const { data: syncData } = await supabase
       .from('shopify_customers')
       .select('last_sync_status')
       .eq('member_id', memberId)
       .single()
+    
+    const shopifySync = syncData as Pick<ShopifyCustomer, 'last_sync_status'> | null
 
     return NextResponse.json({
       member: {

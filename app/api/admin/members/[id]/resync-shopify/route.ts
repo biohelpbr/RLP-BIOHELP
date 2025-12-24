@@ -9,10 +9,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { syncMemberToShopify } from '@/lib/shopify/sync'
+import type { Member } from '@/types/database'
 
 interface RouteParams {
   params: Promise<{ id: string }>
 }
+
+// Tipo para o retorno da query
+type MemberQueryResult = Pick<Member, 'id' | 'name' | 'email' | 'ref_code' | 'sponsor_id'>
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
@@ -31,7 +35,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Buscar membro
-    const { data: member, error: memberError } = await supabase
+    const { data: memberData, error: memberError } = await supabase
       .from('members')
       .select(`
         id,
@@ -43,12 +47,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .eq('id', memberId)
       .single()
 
-    if (memberError || !member) {
+    if (memberError || !memberData) {
       return NextResponse.json(
         { error: 'NOT_FOUND', message: 'Membro não encontrado' },
         { status: 404 }
       )
     }
+
+    // Type assertion para garantir tipagem correta
+    const member = memberData as MemberQueryResult
 
     // Buscar ref_code do sponsor
     let sponsorRefCode: string | null = null
@@ -58,7 +65,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         .select('ref_code')
         .eq('id', member.sponsor_id)
         .single()
-      sponsorRefCode = sponsor?.ref_code || null
+      sponsorRefCode = (sponsor as Pick<Member, 'ref_code'> | null)?.ref_code || null
     }
 
     // Executar resync

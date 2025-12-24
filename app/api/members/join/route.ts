@@ -16,7 +16,7 @@ import { z } from 'zod'
 import { createServiceClient } from '@/lib/supabase/server'
 import { generateRefCode } from '@/lib/utils/ref-code'
 import { syncMemberToShopify } from '@/lib/shopify/sync'
-import type { UtmParams } from '@/types/database'
+import type { UtmParams, Member } from '@/types/database'
 
 // Schema de validação do body (SPEC 7.1)
 const JoinRequestSchema = z.object({
@@ -89,11 +89,13 @@ export async function POST(request: NextRequest) {
 
     if (ref) {
       // SPEC 4.1: Cadastro com link
-      const { data: sponsor } = await supabase
+      const { data: sponsorData } = await supabase
         .from('members')
         .select('id, ref_code')
         .eq('ref_code', ref)
         .single()
+
+      const sponsor = sponsorData as Pick<Member, 'id' | 'ref_code'> | null
 
       if (sponsor) {
         sponsorId = sponsor.id
@@ -130,13 +132,13 @@ export async function POST(request: NextRequest) {
 
     // Garantir unicidade do ref_code
     while (refCodeAttempts < maxAttempts) {
-      const { data: existingRefCode } = await supabase
+      const { data: existingRefCodeData } = await supabase
         .from('members')
         .select('id')
         .eq('ref_code', newRefCode)
         .single()
 
-      if (!existingRefCode) break
+      if (!existingRefCodeData) break
       
       newRefCode = generateRefCode()
       refCodeAttempts++
@@ -155,7 +157,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Criar membro (SPEC 9.1)
-    const { data: newMember, error: memberError } = await supabase
+    const { data: newMemberData, error: memberError } = await supabase
       .from('members')
       .insert({
         name: name.trim(),
@@ -167,7 +169,7 @@ export async function POST(request: NextRequest) {
       .select()
       .single()
 
-    if (memberError || !newMember) {
+    if (memberError || !newMemberData) {
       console.error('[join] Failed to create member:', memberError)
       return NextResponse.json(
         {
@@ -178,6 +180,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    // Type assertion para garantir tipagem correta
+    const newMember = newMemberData as Member
 
     // 6. Registrar referral_event com UTMs (SPEC 9.2)
     const utmJson: UtmParams | null = utm && Object.keys(utm).length > 0 ? utm : null

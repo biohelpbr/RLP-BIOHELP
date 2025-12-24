@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import type { Member, ShopifyCustomer } from '@/types/database'
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,27 +72,30 @@ export async function GET(request: NextRequest) {
     // Buscar sponsors para cada membro
     const membersWithSponsors = await Promise.all(
       (members || []).map(async (member) => {
-        let sponsor = null
-        if (member.sponsor_id) {
+        // Type assertion para garantir tipagem correta
+        const typedMember = member as Member
+        let sponsor: Pick<Member, 'id' | 'name' | 'ref_code'> | null = null
+        
+        if (typedMember.sponsor_id) {
           const { data: sponsorData } = await supabase
             .from('members')
             .select('id, name, ref_code')
-            .eq('id', member.sponsor_id)
+            .eq('id', typedMember.sponsor_id)
             .single()
-          sponsor = sponsorData
+          sponsor = sponsorData as Pick<Member, 'id' | 'name' | 'ref_code'> | null
         }
 
         // Buscar status de sync
         const { data: syncData } = await supabase
           .from('shopify_customers')
           .select('last_sync_status, last_sync_at, last_sync_error')
-          .eq('member_id', member.id)
+          .eq('member_id', typedMember.id)
           .single()
 
         return {
-          ...member,
+          ...typedMember,
           sponsor,
-          shopify_sync: syncData || null,
+          shopify_sync: (syncData as Pick<ShopifyCustomer, 'last_sync_status' | 'last_sync_at' | 'last_sync_error'> | null) || null,
         }
       })
     )
