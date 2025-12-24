@@ -1,0 +1,22 @@
+---
+description: "Regras quando editar integração Shopify (Admin API, customer/tags, webhooks)."
+globs:
+  - "**/*shopify*.*"
+  - "lib/**/*"
+  - "app/api/**/*"
+alwaysApply: false
+---
+
+# Shopify Integration
+
+## Segurança
+- Token Shopify apenas no servidor (env var).
+- Nunca retornar token, headers ou payload sensível ao client.
+
+## Operações Sprint 1
+- Customer upsert por e-mail
+- Aplicar tags do SPEC (ou da decisão TBD-003 quando definida)
+- Registrar last_sync_status e last_sync_error
+
+## Falhas
+- Se Shopify falhar: não bloquear criação do member; permitir reprocesso via admin.

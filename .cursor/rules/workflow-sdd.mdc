@@ -1,0 +1,45 @@
+---
+description: "SDD Workflow obrigatório — anti-escopo infinito, rastreabilidade e validação por evidência"
+alwaysApply: true
+---
+
+# Workflow obrigatório (Spec-Driven Development)
+
+## Regra #1 — Anti-escopo infinito
+Se uma funcionalidade, regra ou comportamento **não estiver explicitamente descrita** em `docs/SPEC.md`, então:
+- ❌ NÃO implemente
+- ✅ Registre em `docs/DECISOES_TBD.md` (se for decisão pendente)
+- ✅ OU registre em `docs/CHANGELOG.md` como proposta/mudança de escopo
+- ⛔ Pare a implementação até aprovação do cliente
+
+## Regra #2 — Toda task deve apontar para o SPEC
+Antes de escrever código, TODA task deve declarar:
+- qual seção do `docs/SPEC.md` está sendo implementada
+- qual checklist de aceite será validado (`docs/ACCEPTANCE.md`)
+
+Se não for possível apontar:
+- a task é inválida
+- trate como escopo fora do sprint
+
+## Regra #3 — Proibição de inferência
+O agente:
+- NÃO pode inferir regras
+- NÃO pode “completar” regras faltantes
+- NÃO pode assumir comportamentos implícitos
+
+Ausência de regra = bloqueio + registro em TBD.
+
+## Regra #4 — Definition of Done (obrigatório em TODA task)
+Ao concluir qualquer tarefa, o agente deve SEMPRE entregar:
+
+1) Seção do SPEC implementada (ex.: 7.1, 4.4 etc.)
+2) Lista de arquivos alterados/criados
+3) Checklist do `docs/ACCEPTANCE.md` atendido (itens marcados)
+4) Como testar manualmente (passo a passo)
+5) Evidências esperadas (o que o humano deve ver):
+   - no Shopify Admin (customer/tags/metacampos) quando aplicável
+   - no Supabase (linhas em tabelas / status de sync / logs)
+6) Edge cases + riscos
+7) Plano de rollback/reversão (como desfazer ou desativar com segurança)
+
+Sem isso, a task é considerada **INCOMPLETA**.

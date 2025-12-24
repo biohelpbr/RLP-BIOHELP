@@ -1,0 +1,22 @@
+---
+description: "Regras quando editar banco Supabase (schema, migrations, RLS)."
+globs:
+  - "**/*.sql"
+  - "supabase/**/*"
+  - "db/**/*"
+alwaysApply: false
+---
+
+# Supabase DB + RLS
+
+## Regras
+- RLS ativo em todas as tabelas com dados de usuário.
+- Member só lê seu próprio registro; admin lê tudo.
+- Toda tabela nova deve ter política de leitura/escrita explícita.
+
+## Migrações
+- Preferir migrações idempotentes e reversíveis.
+- Nunca quebrar dados existentes sem plano de migração.
+
+## Auditoria
+- Campos de sync Shopify devem registrar status e erro (sem vazar segredos).

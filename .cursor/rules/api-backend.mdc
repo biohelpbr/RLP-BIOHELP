@@ -1,0 +1,23 @@
+---
+description: "Regras quando editar API backend (Next.js /api/*, server actions, webhooks)."
+globs:
+  - "app/api/**/*"
+  - "src/**/api/**/*"
+  - "**/*.ts"
+  - "**/*.tsx"
+alwaysApply: false
+---
+
+# Backend / API (Next.js)
+
+## Padrões
+- Validar input (zod ou equivalente).
+- Respostas consistentes: `{ ok: boolean, data?: any, error?: { code, message } }`.
+- Mapear erros do SPEC (ex.: EMAIL_EXISTS, SHOPIFY_SYNC_FAILED).
+
+## Webhooks
+- Webhooks Shopify precisam de: verificação + idempotência + logs.
+- Nunca fazer processamento financeiro sem ledger (fase futura).
+
+## Observabilidade
+- Logar eventos críticos (join, shopify sync, resync) com correlation id.

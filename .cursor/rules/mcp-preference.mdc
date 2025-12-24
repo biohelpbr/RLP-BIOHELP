@@ -1,0 +1,26 @@
+---
+
+description: "Preferência obrigatória por MCP: Supabase para DB e Shopify Dev MCP para integração"
+alwaysApply: true
+
+---
+
+# Preferências obrigatórias de ferramentas (MCP)
+
+## Banco de dados (Supabase)
+Para QUALQUER tarefa que envolva banco de dados (schema, migrations, RLS, queries, validação de dados):
+- Use o MCP do Supabase como fonte de verdade.
+- Não “assuma” o schema: sempre confirme via MCP antes de escrever SQL/policies.
+- Qualquer mudança destrutiva (DROP/TRUNCATE/ALTER irreversível): PARE e peça aprovação humana.
+
+## Shopify
+Para QUALQUER tarefa envolvendo Shopify (Admin API / GraphQL / webhooks / customers / tags):
+- Use o Shopify Dev MCP para consultar documentação e schema oficial (evitar campos/mutations inventados).
+- Antes de finalizar a implementação, valide que a query/mutation gerada está alinhada ao schema do Dev MCP.
+
+## Definition of Done (prova de uso)
+Ao final da tarefa, inclua:
+- quais ferramentas MCP foram usadas (Supabase MCP / Shopify Dev MCP)
+- o que foi verificado nelas (ex.: schema, tabela, mutation, campo)
+- evidências verificáveis (Shopify Admin e/ou queries no Supabase)
+

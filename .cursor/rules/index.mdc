@@ -1,0 +1,25 @@
+---
+description: "Biohelp LRP — regras centrais (SDD). Sempre siga o SPEC. Sem escopo extra."
+alwaysApply: true
+---
+
+# Regras centrais (SDD)
+
+## Fonte de verdade
+- **Sempre** ler e seguir: `docs/SPEC.md` (ou `SPEC_Biohelp_LRP.md` no root).
+- Se algo não estiver no SPEC: **não implementar**. Registrar em `docs/DECISOES_TBD.md` ou abrir mudança de escopo.
+
+## Escopo (Sprint 1)
+Implementar apenas: cadastro + rede + auth + dashboard v1 + admin mínimo + Shopify customer/tags.
+**Proibido no Sprint 1:** CV, níveis, comissões, saques, BI avançado, mover rede.
+
+## Qualidade e segurança
+- Nunca expor token Shopify no client.
+- RLS do Supabase deve estar ativo desde o início.
+- Preferir mudanças pequenas e testáveis; sempre listar como validar.
+
+## Entrega
+Ao finalizar uma tarefa:
+1) indicar a seção do SPEC implementada
+2) marcar checklist correspondente em `docs/ACCEPTANCE.md`
+3) sugerir testes manuais (passo a passo)
