@@ -180,7 +180,6 @@ export default function DashboardPage() {
               <span className={styles.statIcon}>⚡</span>
             </div>
             <div className={styles.statValue}>Ativa</div>
-            <div className={styles.statChange}>Parabéns! Você está ativa</div>
           </div>
 
           <div className={`${styles.statCard} ${styles.statCardPurple}`}>
@@ -189,7 +188,6 @@ export default function DashboardPage() {
               <span className={styles.statIcon}>👥</span>
             </div>
             <div className={styles.statValue}>0</div>
-            <div className={styles.statChange}>Convide amigos!</div>
           </div>
 
           <div className={`${styles.statCard} ${styles.statCardYellow}`}>
@@ -198,16 +196,12 @@ export default function DashboardPage() {
               <span className={styles.statIcon}>🔗</span>
             </div>
             <div className={styles.statValue}>{displayMember.ref_code}</div>
-            <div className={styles.statChange}>Compartilhe seu código</div>
           </div>
         </div>
 
         {/* Invite Card */}
         <div className={styles.inviteCard}>
-          <h2 className={styles.inviteTitle}>Convide seus amigos</h2>
-          <p className={styles.inviteSubtitle}>
-            Compartilhe seu link de convite e ganhe recompensas por cada indicação
-          </p>
+          <h2 className={styles.inviteTitle}>Link de convite</h2>
           
           <div className={styles.inviteLinkWrapper}>
             <div className={styles.inviteLink}>

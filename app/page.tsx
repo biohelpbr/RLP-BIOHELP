@@ -25,12 +25,8 @@ export default function HomePage() {
 
         {/* Título */}
         <h1 className={styles.title}>
-          Entre no Nutrition Club
+          Biohelp LRP
         </h1>
-        
-        <p className={styles.subtitle}>
-          Você no controle do seu ritmo.
-        </p>
 
         {/* Card de login */}
         <div className={styles.card}>
@@ -63,14 +59,6 @@ export default function HomePage() {
             <span className={styles.btnArrow}>→</span>
           </Link>
 
-          {/* Info box */}
-          <div className={styles.infoBox}>
-            <span className={styles.infoIcon}>✨</span>
-            <div>
-              <strong>Programa de Fidelidade</strong>
-              <p>Faça parte da nossa comunidade e aproveite benefícios exclusivos.</p>
-            </div>
-          </div>
         </div>
 
         {/* Link de cadastro */}

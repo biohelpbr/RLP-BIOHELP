@@ -68,12 +68,8 @@ export default function LoginPage() {
 
         {/* Título */}
         <h1 className={styles.title}>
-          Entre no Nutrition Club
+          Login
         </h1>
-        
-        <p className={styles.subtitle}>
-          Você no controle do seu ritmo.
-        </p>
 
         {/* Card de login */}
         <div className={styles.card}>

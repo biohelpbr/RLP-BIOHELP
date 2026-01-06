@@ -8,7 +8,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Biohelp LRP',
-  description: 'Programa de Fidelidade Biohelp',
+  description: 'Biohelp LRP - Área do Membro',
 }
 
 export default function RootLayout({

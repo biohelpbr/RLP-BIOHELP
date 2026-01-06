@@ -103,10 +103,7 @@ export default function JoinPage() {
           {/* Header */}
           <div className={styles.header}>
             <div className={styles.logo}>B</div>
-            <h1 className={styles.title}>Criar minha conta</h1>
-            <p className={styles.subtitle}>
-              Faça parte do Nutrition Club Biohelp
-            </p>
+            <h1 className={styles.title}>Criar conta</h1>
           </div>
 
           {/* Alerta se não tiver ref */}
@@ -205,33 +202,6 @@ export default function JoinPage() {
           )}
         </div>
 
-        {/* Sidebar de benefícios */}
-        <aside className={styles.sidebar}>
-          <h2 className={styles.sidebarTitle}>Por que participar?</h2>
-          <ul className={styles.benefits}>
-            <li className={styles.benefit}>
-              <span className={styles.benefitIcon}>💚</span>
-              <div className={styles.benefitContent}>
-                <strong>Preços exclusivos</strong>
-                <p>Acesse valores especiais para membros</p>
-              </div>
-            </li>
-            <li className={styles.benefit}>
-              <span className={styles.benefitIcon}>🎁</span>
-              <div className={styles.benefitContent}>
-                <strong>Indique e ganhe</strong>
-                <p>Convide amigos e seja recompensado</p>
-              </div>
-            </li>
-            <li className={styles.benefit}>
-              <span className={styles.benefitIcon}>⭐</span>
-              <div className={styles.benefitContent}>
-                <strong>Benefícios crescentes</strong>
-                <p>Quanto mais ativo, mais vantagens</p>
-              </div>
-            </li>
-          </ul>
-        </aside>
       </div>
     </div>
   )
