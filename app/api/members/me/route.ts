@@ -77,6 +77,15 @@ export async function GET(request: NextRequest) {
     
     const shopifySync = syncData as Pick<ShopifyCustomer, 'last_sync_status'> | null
 
+    // Verificar se é admin
+    const { data: roleData } = await supabase
+      .from('roles')
+      .select('role')
+      .eq('member_id', member.id)
+      .single()
+    
+    const isAdmin = roleData?.role === 'admin'
+
     return NextResponse.json({
       member: {
         id: member.id,
@@ -91,6 +100,7 @@ export async function GET(request: NextRequest) {
         created_at: member.created_at,
         shopify_sync_status: shopifySync?.last_sync_status || null,
       },
+      isAdmin,
     })
   } catch (error) {
     console.error('[me] Unexpected error:', error)

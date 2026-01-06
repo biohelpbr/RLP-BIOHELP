@@ -31,6 +31,7 @@ export default function DashboardPage() {
   const [member, setMember] = useState<MemberData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     fetchMemberData()
@@ -42,6 +43,13 @@ export default function DashboardPage() {
       if (response.ok) {
         const data = await response.json()
         setMember(data.member)
+        
+        // Verificar se é admin e redirecionar automaticamente
+        if (data.isAdmin) {
+          setIsAdmin(true)
+          router.push('/admin')
+          return
+        }
       } else if (response.status === 401) {
         // Não autenticado - redireciona para login
         router.push('/login')

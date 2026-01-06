@@ -60,8 +60,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Se autenticado e tentando acessar login/join, redireciona para dashboard
-  if (user && (pathname === '/login' || pathname === '/join')) {
+  // Se autenticado e tentando acessar login/join, não interferir
+  // O redirecionamento será feito pelo frontend após o login
+  // Isso permite que o login redirecione corretamente para /admin ou /dashboard
+  if (user && pathname === '/login') {
+    // Verificar se há um redirect pendente na query string
+    const redirectTo = request.nextUrl.searchParams.get('redirect')
+    if (redirectTo && (redirectTo === '/admin' || redirectTo === '/dashboard')) {
+      return NextResponse.redirect(new URL(redirectTo, request.url))
+    }
+    // Se não há redirect específico, deixar o frontend decidir
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
