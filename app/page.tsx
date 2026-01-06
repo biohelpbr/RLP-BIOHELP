@@ -1,22 +1,31 @@
 /**
  * Landing Page
  * SPEC: Seção 6.1 - GET / (landing simples ou redirect)
- * Design: Estilo roxo/violeta baseado nas referências
+ * Design: Clean, sem emojis, baseado no frontend Biohelp
  */
 
 import Link from 'next/link'
 import styles from './page.module.css'
 
+// Ícones SVG
+const Icons = {
+  mail: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+  ),
+  arrowRight: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  ),
+}
+
 export default function HomePage() {
   return (
     <div className={styles.container}>
-      {/* Decoração de fundo */}
-      <div className={styles.bgDecoration} aria-hidden="true">
-        <div className={styles.bgBlob1} />
-        <div className={styles.bgBlob2} />
-        <div className={styles.bgBlob3} />
-      </div>
-
       <main className={styles.main}>
         {/* Logo */}
         <div className={styles.logo}>
@@ -24,9 +33,8 @@ export default function HomePage() {
         </div>
 
         {/* Título */}
-        <h1 className={styles.title}>
-          Biohelp LRP
-        </h1>
+        <h1 className={styles.title}>Biohelp LRP</h1>
+        <p className={styles.subtitle}>Portal de Parceiras</p>
 
         {/* Card de login */}
         <div className={styles.card}>
@@ -42,9 +50,9 @@ export default function HomePage() {
 
           {/* Form simplificado */}
           <div className={styles.formGroup}>
-            <label className={styles.label}>Seu e-mail</label>
+            <label className={styles.label}>E-mail</label>
             <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>✉️</span>
+              <span className={styles.inputIcon}>{Icons.mail}</span>
               <input 
                 type="email" 
                 placeholder="seu@email.com"
@@ -56,7 +64,7 @@ export default function HomePage() {
 
           <Link href="/login" className={styles.btnPrimary}>
             Entrar na minha conta
-            <span className={styles.btnArrow}>→</span>
+            <span className={styles.btnIcon}>{Icons.arrowRight}</span>
           </Link>
 
         </div>

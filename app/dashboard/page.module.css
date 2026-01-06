@@ -113,9 +113,12 @@
 }
 
 .navIcon {
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
-  text-align: center;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 /* Sidebar footer */
@@ -261,7 +264,7 @@
   justify-content: center;
   background: var(--gray-50);
   border-radius: var(--radius-md);
-  font-size: 1rem;
+  color: var(--gray-500);
 }
 
 .statValue {
@@ -401,6 +404,26 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--gray-900);
+}
+
+/* Status badges inline */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+}
+
+.statusActive {
+  background: var(--accent-green-light);
+  color: #16a34a;
+}
+
+.statusPending {
+  background: var(--accent-yellow-light);
+  color: #b45309;
 }
 
 /* Loading */

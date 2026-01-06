@@ -13,6 +13,35 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
+// Ícones SVG
+const Icons = {
+  mail: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+  ),
+  lock: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  ),
+  alertCircle: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  ),
+  arrowRight: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  ),
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -53,13 +82,6 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
-      {/* Decoração de fundo */}
-      <div className={styles.bgDecoration} aria-hidden="true">
-        <div className={styles.bgBlob1} />
-        <div className={styles.bgBlob2} />
-        <div className={styles.bgBlob3} />
-      </div>
-
       <main className={styles.main}>
         {/* Logo */}
         <div className={styles.logo}>
@@ -67,9 +89,8 @@ export default function LoginPage() {
         </div>
 
         {/* Título */}
-        <h1 className={styles.title}>
-          Login
-        </h1>
+        <h1 className={styles.title}>Login</h1>
+        <p className={styles.subtitle}>Acesse sua conta</p>
 
         {/* Card de login */}
         <div className={styles.card}>
@@ -77,16 +98,16 @@ export default function LoginPage() {
             {/* Mensagem de erro */}
             {error && (
               <div className={styles.errorBox}>
-                <span>⚠️</span>
+                {Icons.alertCircle}
                 <p>{error}</p>
               </div>
             )}
 
             {/* Campo de email */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Seu e-mail</label>
+              <label className={styles.label}>E-mail</label>
               <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>✉️</span>
+                <span className={styles.inputIcon}>{Icons.mail}</span>
                 <input 
                   type="email" 
                   placeholder="seu@email.com"
@@ -101,9 +122,9 @@ export default function LoginPage() {
 
             {/* Campo de senha */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Sua senha</label>
+              <label className={styles.label}>Senha</label>
               <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>🔒</span>
+                <span className={styles.inputIcon}>{Icons.lock}</span>
                 <input 
                   type="password" 
                   placeholder="••••••••"
@@ -123,7 +144,7 @@ export default function LoginPage() {
               disabled={isLoading}
             >
               {isLoading ? 'Entrando...' : 'Entrar'}
-              <span className={styles.btnArrow}>→</span>
+              <span className={styles.btnIcon}>{Icons.arrowRight}</span>
             </button>
           </form>
         </div>

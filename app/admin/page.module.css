@@ -113,9 +113,12 @@
 }
 
 .navIcon {
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
-  text-align: center;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .logoutBtn {
@@ -172,16 +175,27 @@
 
 /* Search */
 .searchBox {
+  position: relative;
   background: var(--white);
   border-radius: var(--radius-xl);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   box-shadow: var(--shadow-sm);
   margin-bottom: var(--space-xl);
 }
 
+.searchIcon {
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+}
+
 .searchInput {
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: 0.875rem 1rem 0.875rem 3rem;
   font-size: 0.9375rem;
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
@@ -275,15 +289,20 @@
 .statusBadge {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   padding: 4px 10px;
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: var(--radius-full);
 }
 
+.statusBadge svg {
+  flex-shrink: 0;
+}
+
 .statusSynced {
   background: var(--accent-green-light);
-  color: var(--accent-green);
+  color: #16a34a;
 }
 
 .statusPending {
@@ -296,11 +315,27 @@
   color: #dc2626;
 }
 
+.noSponsor {
+  color: var(--gray-400);
+}
+
+.errorInfo {
+  margin-left: 4px;
+  color: var(--gray-400);
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+}
+
+.errorInfo:hover {
+  color: var(--gray-600);
+}
+
 /* Resync button */
 .resyncBtn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 6px;
   padding: 6px 12px;
   font-size: 0.8125rem;
   font-weight: 500;
@@ -312,14 +347,27 @@
   transition: all 0.2s ease;
 }
 
+.resyncBtn svg {
+  flex-shrink: 0;
+}
+
 .resyncBtn:hover:not(:disabled) {
   background: var(--primary);
   color: white;
 }
 
 .resyncBtn:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Empty state */
@@ -330,8 +378,20 @@
 }
 
 .emptyIcon {
-  font-size: 3rem;
-  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--space-md);
+  background: var(--gray-100);
+  border-radius: var(--radius-full);
+  color: var(--gray-400);
+}
+
+.emptyIcon svg {
+  width: 32px;
+  height: 32px;
 }
 
 .emptyState h3 {

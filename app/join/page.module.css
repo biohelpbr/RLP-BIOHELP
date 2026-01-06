@@ -124,8 +124,10 @@
 }
 
 .alertIcon {
-  font-size: 1.25rem;
   flex-shrink: 0;
+  color: #b45309;
+  display: flex;
+  align-items: center;
 }
 
 .alert strong {
@@ -172,13 +174,14 @@
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1rem;
   color: var(--gray-400);
+  display: flex;
+  align-items: center;
 }
 
 .input {
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
   font-size: 0.9375rem;
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
@@ -210,8 +213,8 @@
   width: 100%;
   padding: 1rem 1.5rem;
   margin-top: var(--space-sm);
-  background: var(--primary);
-  color: var(--white);
+  background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
+  color: var(--gray-900);
   font-size: 1rem;
   font-weight: 600;
   border-radius: var(--radius-lg);
@@ -220,10 +223,14 @@
   transition: all 0.2s ease;
 }
 
+.btnIcon {
+  display: flex;
+  align-items: center;
+}
+
 .btnSubmit:hover:not(:disabled) {
-  background: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 8px 20px rgba(163, 230, 53, 0.3);
 }
 
 .btnSubmit:disabled {
@@ -273,7 +280,9 @@
 }
 
 .sponsorIcon {
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  color: var(--primary);
 }
 
 .sponsorInfo span {

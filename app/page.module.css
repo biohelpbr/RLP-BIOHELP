@@ -174,8 +174,9 @@
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1rem;
   color: var(--gray-400);
+  display: flex;
+  align-items: center;
 }
 
 .input {
@@ -223,8 +224,9 @@
   box-shadow: 0 8px 20px rgba(163, 230, 53, 0.3);
 }
 
-.btnArrow {
-  font-size: 1.25rem;
+.btnIcon {
+  display: flex;
+  align-items: center;
 }
 
 /* Info box */

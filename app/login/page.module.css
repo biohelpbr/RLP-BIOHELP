@@ -176,8 +176,9 @@
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1rem;
   color: var(--gray-400);
+  display: flex;
+  align-items: center;
 }
 
 .input {
@@ -229,8 +230,9 @@
   cursor: not-allowed;
 }
 
-.btnArrow {
-  font-size: 1.25rem;
+.btnIcon {
+  display: flex;
+  align-items: center;
 }
 
 /* Info box */
@@ -245,10 +247,11 @@
   text-align: left;
   margin-bottom: var(--space-lg);
   align-items: center;
+  color: #dc2626;
 }
 
-.errorBox span {
-  font-size: 1.25rem;
+.errorBox svg {
+  flex-shrink: 0;
 }
 
 .errorBox p {
