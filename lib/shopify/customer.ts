@@ -1,6 +1,11 @@
 /**
- * Operações de Customer na Shopify Admin API
+ * Operações de Customer na Shopify Admin API (REST)
  * SPEC: Seção 4.4, 8.2 - Customer create/update + tags
+ * 
+ * NOTA: Usando REST API ao invés de GraphQL porque:
+ * - Planos Basic/Starter da Shopify bloqueiam acesso a PII via GraphQL para custom apps
+ * - REST API permite criar/atualizar customers mesmo em planos básicos
+ * - Tags são aplicadas corretamente via REST
  * 
  * Tags aplicadas (SPEC 4.4):
  * - lrp_member
@@ -9,9 +14,8 @@
  * - lrp_status:pending (Sprint 1)
  */
 
-import { shopifyGraphQL } from './client'
-
-// Tipos de resposta da Shopify
+// Versão da API
+const SHOPIFY_API_VERSION = '2024-10'
 
 // Parâmetros para sync
 export interface CustomerSyncParams {
@@ -29,114 +33,198 @@ export interface CustomerSyncResult {
   error: string | null
 }
 
+// Tipos da REST API
+interface ShopifyCustomerResponse {
+  customer?: {
+    id: number
+    email: string
+    first_name: string
+    last_name: string
+    tags: string
+  }
+  errors?: Record<string, string[]> | string
+}
+
+interface ShopifyCustomersSearchResponse {
+  customers: Array<{
+    id: number
+    email: string
+    first_name: string
+    last_name: string
+    tags: string
+  }>
+}
+
 /**
  * Gera as tags do membro conforme SPEC 4.4
  */
-function generateMemberTags(params: CustomerSyncParams): string[] {
+function generateMemberTags(params: CustomerSyncParams): string {
   const tags: string[] = [
     'lrp_member',
     `lrp_ref:${params.refCode}`,
     `lrp_sponsor:${params.sponsorRefCode ?? 'none'}`,
     'lrp_status:pending', // SPEC: pending no Sprint 1
   ]
-  return tags
+  return tags.join(', ')
 }
 
 /**
- * Busca customer por email
+ * Executa uma requisição REST na Shopify Admin API
+ * SPEC 8.1: Token apenas em variáveis de ambiente no servidor
  */
-const FIND_CUSTOMER_QUERY = `
-  query findCustomerByEmail($query: String!) {
-    customers(first: 1, query: $query) {
-      edges {
-        node {
-          id
-          email
-          tags
-        }
-      }
+async function shopifyRest<T>(
+  endpoint: string,
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+  body?: Record<string, unknown>
+): Promise<{ data: T | null; errors: string[] }> {
+  const shopDomain = process.env.SHOPIFY_STORE_DOMAIN
+  const accessToken = process.env.SHOPIFY_ADMIN_API_TOKEN
+
+  if (!shopDomain || !accessToken) {
+    return {
+      data: null,
+      errors: ['Missing Shopify credentials (SHOPIFY_STORE_DOMAIN or SHOPIFY_ADMIN_API_TOKEN)'],
     }
   }
-`
 
-/**
- * Mutation para criar customer
- */
-const CUSTOMER_CREATE_MUTATION = `
-  mutation customerCreate($input: CustomerInput!) {
-    customerCreate(input: $input) {
-      customer {
-        id
-        email
-        tags
-      }
-      userErrors {
-        field
-        message
+  const url = `https://${shopDomain}/admin/api/${SHOPIFY_API_VERSION}${endpoint}`
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': accessToken,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      return {
+        data: null,
+        errors: [`Shopify API error: ${response.status} ${response.statusText} - ${errorText}`],
       }
     }
-  }
-`
 
-/**
- * Mutation para atualizar customer
- */
-const CUSTOMER_UPDATE_MUTATION = `
-  mutation customerUpdate($input: CustomerInput!, $id: ID!) {
-    customerUpdate(input: $input, id: $id) {
-      customer {
-        id
-        email
-        tags
-      }
-      userErrors {
-        field
-        message
-      }
+    const json = await response.json() as T
+    return {
+      data: json,
+      errors: [],
     }
-  }
-`
-
-interface FindCustomerResponse {
-  customers: {
-    edges: Array<{
-      node: {
-        id: string
-        email: string
-        tags: string[]
-      }
-    }>
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return {
+      data: null,
+      errors: [`Shopify request failed: ${message}`],
+    }
   }
 }
 
-interface CustomerCreateResponse {
-  customerCreate: {
-    customer: {
-      id: string
-      email: string
-      tags: string[]
-    } | null
-    userErrors: Array<{
-      field: string[] | null
-      message: string
-      code: string | null
-    }>
+/**
+ * Busca customer por email usando REST API
+ */
+async function findCustomerByEmail(email: string): Promise<number | null> {
+  const result = await shopifyRest<ShopifyCustomersSearchResponse>(
+    `/customers/search.json?query=email:${encodeURIComponent(email)}`
+  )
+
+  if (result.errors.length > 0) {
+    console.error('[shopify] Error searching customer:', result.errors)
+    return null
   }
+
+  const customers = result.data?.customers || []
+  if (customers.length > 0) {
+    return customers[0].id
+  }
+
+  return null
 }
 
-interface CustomerUpdateResponse {
-  customerUpdate: {
-    customer: {
-      id: string
-      email: string
-      tags: string[]
-    } | null
-    userErrors: Array<{
-      field: string[] | null
-      message: string
-      code: string | null
-    }>
+/**
+ * Cria um novo customer usando REST API
+ */
+async function createCustomer(
+  params: CustomerSyncParams
+): Promise<{ id: number | null; error: string | null }> {
+  const nameParts = params.firstName.trim().split(' ')
+  const firstName = nameParts[0] || params.firstName
+  const lastName = nameParts.slice(1).join(' ') || params.lastName || ''
+
+  const result = await shopifyRest<ShopifyCustomerResponse>(
+    '/customers.json',
+    'POST',
+    {
+      customer: {
+        email: params.email,
+        first_name: firstName,
+        last_name: lastName || undefined,
+        tags: generateMemberTags(params),
+        // Não enviar senha - customer pode criar conta depois
+        send_email_welcome: false,
+      },
+    }
+  )
+
+  if (result.errors.length > 0) {
+    return { id: null, error: result.errors.join('; ') }
   }
+
+  if (result.data?.errors) {
+    const errorMsg = typeof result.data.errors === 'string'
+      ? result.data.errors
+      : Object.entries(result.data.errors)
+          .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+          .join('; ')
+    return { id: null, error: errorMsg }
+  }
+
+  if (!result.data?.customer?.id) {
+    return { id: null, error: 'Customer not returned from Shopify' }
+  }
+
+  return { id: result.data.customer.id, error: null }
+}
+
+/**
+ * Atualiza um customer existente usando REST API
+ */
+async function updateCustomer(
+  customerId: number,
+  params: CustomerSyncParams
+): Promise<{ success: boolean; error: string | null }> {
+  const nameParts = params.firstName.trim().split(' ')
+  const firstName = nameParts[0] || params.firstName
+  const lastName = nameParts.slice(1).join(' ') || params.lastName || ''
+
+  const result = await shopifyRest<ShopifyCustomerResponse>(
+    `/customers/${customerId}.json`,
+    'PUT',
+    {
+      customer: {
+        id: customerId,
+        first_name: firstName,
+        last_name: lastName || undefined,
+        tags: generateMemberTags(params),
+      },
+    }
+  )
+
+  if (result.errors.length > 0) {
+    return { success: false, error: result.errors.join('; ') }
+  }
+
+  if (result.data?.errors) {
+    const errorMsg = typeof result.data.errors === 'string'
+      ? result.data.errors
+      : Object.entries(result.data.errors)
+          .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+          .join('; ')
+    return { success: false, error: errorMsg }
+  }
+
+  return { success: true, error: null }
 }
 
 /**
@@ -144,155 +232,62 @@ interface CustomerUpdateResponse {
  * SPEC 4.4: Ao cadastrar (ou re-sincronizar), garantir customer existe + tags aplicadas
  * SPEC 8.2: Customer create/update por e-mail
  * 
- * Nota: Usa customerCreate/customerUpdate porque customerSet não está disponível
- * para esta loja/token. Implementação alternativa com busca por email primeiro.
+ * Usa REST API ao invés de GraphQL para compatibilidade com planos Basic/Starter
  */
 export async function syncCustomerToShopify(
   params: CustomerSyncParams
 ): Promise<CustomerSyncResult> {
-  const tags = generateMemberTags(params)
-
-  // Separar nome em firstName e lastName
-  const nameParts = params.firstName.trim().split(' ')
-  const firstName = nameParts[0] || params.firstName
-  const lastName = nameParts.slice(1).join(' ') || params.lastName || ''
-
   // 1. Buscar customer existente por email
-  const findResult = await shopifyGraphQL<FindCustomerResponse>(
-    FIND_CUSTOMER_QUERY,
-    { query: `email:${params.email}` }
-  )
-
-  if (findResult.errors.length > 0) {
-    console.error('[shopify] Error finding customer:', findResult.errors)
-    return {
-      success: false,
-      shopifyCustomerId: null,
-      error: findResult.errors.join('; '),
-    }
-  }
-
-  const existingCustomer = findResult.data?.customers.edges[0]?.node
-
-  const customerInput = {
-    email: params.email,
-    firstName,
-    lastName: lastName || undefined,
-    tags,
-  }
+  const existingCustomerId = await findCustomerByEmail(params.email)
 
   // 2. Se existe, atualizar; senão, criar
-  if (existingCustomer) {
-    // Atualizar customer existente
-    const updateResult = await shopifyGraphQL<CustomerUpdateResponse>(
-      CUSTOMER_UPDATE_MUTATION,
-      {
-        input: customerInput,
-        id: existingCustomer.id,
-      }
-    )
-
-    if (updateResult.errors.length > 0) {
-      console.error('[shopify] GraphQL errors on update:', updateResult.errors)
+  if (existingCustomerId) {
+    console.info('[shopify] Updating existing customer:', existingCustomerId)
+    
+    const updateResult = await updateCustomer(existingCustomerId, params)
+    
+    if (!updateResult.success) {
+      console.error('[shopify] Error updating customer:', updateResult.error)
       return {
         success: false,
         shopifyCustomerId: null,
-        error: updateResult.errors.join('; '),
+        error: updateResult.error,
       }
     }
 
-    const payload = updateResult.data?.customerUpdate
-    if (!payload) {
-      return {
-        success: false,
-        shopifyCustomerId: null,
-        error: 'Empty response from Shopify on update',
-      }
-    }
-
-    if (payload.userErrors && payload.userErrors.length > 0) {
-      const errorMessages = payload.userErrors.map((e) => e.message).join('; ')
-      console.error('[shopify] User errors on update:', payload.userErrors)
-      return {
-        success: false,
-        shopifyCustomerId: null,
-        error: errorMessages,
-      }
-    }
-
-    if (!payload.customer) {
-      return {
-        success: false,
-        shopifyCustomerId: null,
-        error: 'Customer not returned from Shopify on update',
-      }
-    }
-
-    console.info('[shopify] Customer updated:', {
-      id: payload.customer.id,
-      email: payload.customer.email,
-      tags: payload.customer.tags,
+    console.info('[shopify] Customer updated successfully:', {
+      id: existingCustomerId,
+      tags: generateMemberTags(params),
     })
 
     return {
       success: true,
-      shopifyCustomerId: payload.customer.id,
+      shopifyCustomerId: `gid://shopify/Customer/${existingCustomerId}`,
       error: null,
     }
   } else {
-    // Criar novo customer
-    const createResult = await shopifyGraphQL<CustomerCreateResponse>(
-      CUSTOMER_CREATE_MUTATION,
-      { input: customerInput }
-    )
-
-    if (createResult.errors.length > 0) {
-      console.error('[shopify] GraphQL errors on create:', createResult.errors)
+    console.info('[shopify] Creating new customer for:', params.email)
+    
+    const createResult = await createCustomer(params)
+    
+    if (!createResult.id) {
+      console.error('[shopify] Error creating customer:', createResult.error)
       return {
         success: false,
         shopifyCustomerId: null,
-        error: createResult.errors.join('; '),
+        error: createResult.error,
       }
     }
 
-    const payload = createResult.data?.customerCreate
-    if (!payload) {
-      return {
-        success: false,
-        shopifyCustomerId: null,
-        error: 'Empty response from Shopify on create',
-      }
-    }
-
-    if (payload.userErrors && payload.userErrors.length > 0) {
-      const errorMessages = payload.userErrors.map((e) => e.message).join('; ')
-      console.error('[shopify] User errors on create:', payload.userErrors)
-      return {
-        success: false,
-        shopifyCustomerId: null,
-        error: errorMessages,
-      }
-    }
-
-    if (!payload.customer) {
-      return {
-        success: false,
-        shopifyCustomerId: null,
-        error: 'Customer not returned from Shopify on create',
-      }
-    }
-
-    console.info('[shopify] Customer created:', {
-      id: payload.customer.id,
-      email: payload.customer.email,
-      tags: payload.customer.tags,
+    console.info('[shopify] Customer created successfully:', {
+      id: createResult.id,
+      tags: generateMemberTags(params),
     })
 
     return {
       success: true,
-      shopifyCustomerId: payload.customer.id,
+      shopifyCustomerId: `gid://shopify/Customer/${createResult.id}`,
       error: null,
     }
   }
 }
-

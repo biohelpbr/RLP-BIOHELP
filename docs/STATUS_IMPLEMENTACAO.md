@@ -57,7 +57,7 @@ O projeto está na **Fase 1 (Sprint 1)**, focando no MVP operacional: cadastro, 
 
 | Funcionalidade | Status | Detalhes |
 |----------------|--------|----------|
-| **Customer Create/Update** | ✅ Implementado | Upsert por e-mail |
+| **Customer Create/Update** | ✅ Implementado | Upsert por e-mail via REST API |
 | **Tags aplicadas** | ✅ Implementado | Tags conforme SPEC 4.4 |
 | **Tratamento de falhas** | ✅ Implementado | Registra erro sem bloquear cadastro |
 | **Resync manual** | ✅ Implementado | Admin pode reprocessar |
@@ -67,6 +67,8 @@ O projeto está na **Fase 1 (Sprint 1)**, focando no MVP operacional: cadastro, 
 - `lrp_ref:<ref_code>`
 - `lrp_sponsor:<sponsor_ref_code|none>`
 - `lrp_status:pending`
+
+**Nota técnica (Jan/2026):** Migrado de GraphQL para REST API devido a limitações do plano Basic da Shopify (acesso a PII bloqueado via GraphQL para custom apps). REST API funciona corretamente em todos os planos.
 
 **Especificação:** SPEC seções 4.4, 8.2, 12
 
@@ -104,7 +106,7 @@ O projeto está na **Fase 1 (Sprint 1)**, focando no MVP operacional: cadastro, 
 |------------|--------|--------|
 | `generateRefCode()` | ✅ Implementado | Gera código único de 8 caracteres |
 | `syncMemberToShopify()` | ✅ Implementado | Sincroniza membro com Shopify |
-| `syncCustomerToShopify()` | ✅ Implementado | Operações GraphQL na Shopify API |
+| `syncCustomerToShopify()` | ✅ Implementado | Operações REST na Shopify API |
 | Validação de formulários | ✅ Implementado | Validação client-side |
 
 ---
