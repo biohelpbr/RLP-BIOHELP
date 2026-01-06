@@ -1,19 +1,13 @@
 /**
- * Página Admin (/admin)
- * SPEC: Seção 5.3, 6.3 - Admin lista/busca membros
- * Sprint: 1
- * 
- * Funcionalidades:
- * - Lista de membros com paginação
- * - Busca por email/ref_code
- * - Ver sponsor
- * - Resync Shopify
+ * Painel Admin
+ * SPEC: Seção 6.6 - GET /admin
+ * Design: Estilo roxo/violeta com sidebar
  */
 
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import styles from './page.module.css'
 
 interface Member {
@@ -23,296 +17,213 @@ interface Member {
   ref_code: string
   status: string
   created_at: string
-  sponsor: {
-    id: string
+  sponsor?: {
     name: string
     ref_code: string
-  } | null
-  shopify_sync: {
-    last_sync_status: string
-    last_sync_at: string | null
-    last_sync_error: string | null
-  } | null
-}
-
-interface Pagination {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
+  }
+  shopify_sync_status?: string
+  shopify_error?: string
 }
 
 export default function AdminPage() {
-  const router = useRouter()
   const [members, setMembers] = useState<Member[]>([])
-  const [pagination, setPagination] = useState<Pagination>({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0,
-  })
+  const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [resyncingId, setResyncingId] = useState<string | null>(null)
+  const [syncingId, setSyncingId] = useState<string | null>(null)
 
-  // Buscar membros
-  const fetchMembers = useCallback(async (page = 1, searchQuery = '') => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '20',
-      })
-      if (searchQuery) {
-        params.set('search', searchQuery)
-      }
-
-      const response = await fetch(`/api/admin/members?${params}`)
-      
-      if (response.status === 401) {
-        router.push('/login')
-        return
-      }
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar membros')
-      }
-
-      const data = await response.json()
-      setMembers(data.members)
-      setPagination(data.pagination)
-    } catch (err) {
-      console.error('Fetch error:', err)
-      setError('Não foi possível carregar os membros')
-    } finally {
-      setLoading(false)
-    }
-  }, [router])
-
-  // Carregar membros inicialmente
   useEffect(() => {
-    // Setar cookie de admin para testes (TODO: substituir por auth real)
-    document.cookie = 'is_admin=true; path=/'
     fetchMembers()
-  }, [fetchMembers])
+  }, [search])
 
-  // Buscar com debounce
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchMembers(1, search)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [search, fetchMembers])
+  const fetchMembers = async () => {
+    try {
+      const params = new URLSearchParams()
+      if (search) params.set('search', search)
+      
+      const response = await fetch(`/api/admin/members?${params}`)
+      if (response.ok) {
+        const data = await response.json()
+        setMembers(data.members || [])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar membros:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-  // Resync Shopify
   const handleResync = async (memberId: string) => {
-    setResyncingId(memberId)
-    
+    setSyncingId(memberId)
     try {
       const response = await fetch(`/api/admin/members/${memberId}/resync-shopify`, {
         method: 'POST',
       })
-      
-      const data = await response.json()
-      
-      if (data.ok) {
-        // Recarregar lista para ver novo status
-        fetchMembers(pagination.page, search)
-        alert('Sync realizado com sucesso!')
-      } else {
-        alert(`Sync falhou: ${data.error || data.message}`)
+      if (response.ok) {
+        await fetchMembers()
       }
-    } catch (err) {
-      console.error('Resync error:', err)
-      alert('Erro ao executar sync')
+    } catch (error) {
+      console.error('Erro ao resync:', error)
     } finally {
-      setResyncingId(null)
+      setSyncingId(null)
     }
   }
 
-  // Status badge
-  const getSyncStatusBadge = (sync: Member['shopify_sync']) => {
-    if (!sync) return <span className={styles.badgePending}>Pendente</span>
-    
-    switch (sync.last_sync_status) {
-      case 'ok':
-        return <span className={styles.badgeSuccess}>OK</span>
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR')
+  }
+
+  const getStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'synced':
+        return <span className={`${styles.statusBadge} ${styles.statusSynced}`}>Sincronizado</span>
+      case 'pending':
+        return <span className={`${styles.statusBadge} ${styles.statusPending}`}>Pendente</span>
       case 'failed':
-        return <span className={styles.badgeError}>Falhou</span>
+        return <span className={`${styles.statusBadge} ${styles.statusFailed}`}>Falhou</span>
       default:
-        return <span className={styles.badgePending}>Pendente</span>
+        return <span className={`${styles.statusBadge} ${styles.statusPending}`}>Pendente</span>
     }
   }
 
   return (
-    <div className={styles.container}>
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.logo}>
-            <span className={styles.logoIcon}>🌿</span>
-            <span className={styles.logoText}>Biohelp Admin</span>
+    <div className={styles.layout}>
+      {/* Sidebar */}
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <div className={styles.sidebarLogo}>
+            <div className={styles.logoIcon}>B</div>
+            <div className={styles.logoText}>
+              <span className={styles.logoTitle}>Admin Biohelp</span>
+              <span className={styles.logoSubtitle}>Painel de Gestão</span>
+            </div>
           </div>
-          <nav className={styles.nav}>
-            <a href="/" className={styles.navLink}>Sair</a>
-          </nav>
         </div>
-      </header>
 
+        <nav className={styles.nav}>
+          <ul className={styles.navList}>
+            <li className={`${styles.navItem} ${styles.navItemActive}`}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>👥</span>
+                <span>Parceiras</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>🔗</span>
+                <span>Rede</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>📦</span>
+                <span>Produtos</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>⚙️</span>
+                <span>Configurações</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/">
+                <span className={styles.navIcon}>🚪</span>
+                <span>Sair</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Main content */}
       <main className={styles.main}>
-        <div className={styles.pageHeader}>
-          <h1>Membros</h1>
-          <p className={styles.subtitle}>
-            {pagination.total} membro{pagination.total !== 1 ? 's' : ''} cadastrado{pagination.total !== 1 ? 's' : ''}
-          </p>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerInfo}>
+            <h1>Parceiras</h1>
+            <p>{members.length} membros cadastrados</p>
+          </div>
         </div>
 
-        {/* Busca */}
+        {/* Search */}
         <div className={styles.searchBox}>
           <input
             type="text"
             placeholder="Buscar por e-mail, nome ou ref_code..."
+            className={styles.searchInput}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className={styles.searchInput}
           />
-          {search && (
-            <button 
-              onClick={() => setSearch('')}
-              className={styles.clearBtn}
-              aria-label="Limpar busca"
-            >
-              ×
-            </button>
-          )}
         </div>
 
-        {/* Erro */}
-        {error && (
-          <div className={styles.errorBox}>
-            {error}
-            <button onClick={() => fetchMembers(pagination.page, search)}>
-              Tentar novamente
-            </button>
-          </div>
-        )}
-
-        {/* Loading */}
-        {loading && (
-          <div className={styles.loadingBox}>
-            <div className={styles.spinner} />
-            <span>Carregando...</span>
-          </div>
-        )}
-
-        {/* Tabela */}
-        {!loading && !error && (
-          <>
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Ref Code</th>
-                    <th>Sponsor</th>
-                    <th>Shopify</th>
-                    <th>Cadastro</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {members.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className={styles.emptyRow}>
-                        {search ? 'Nenhum membro encontrado' : 'Nenhum membro cadastrado'}
-                      </td>
-                    </tr>
-                  ) : (
-                    members.map((member) => (
-                      <tr key={member.id}>
-                        <td className={styles.nameCell}>
-                          <strong>{member.name}</strong>
-                        </td>
-                        <td>{member.email}</td>
-                        <td>
-                          <code className={styles.refCode}>{member.ref_code}</code>
-                        </td>
-                        <td>
-                          {member.sponsor ? (
-                            <span className={styles.sponsorInfo}>
-                              {member.sponsor.name}
-                              <code>{member.sponsor.ref_code}</code>
-                            </span>
-                          ) : (
-                            <span className={styles.noSponsor}>—</span>
-                          )}
-                        </td>
-                        <td>
-                          {getSyncStatusBadge(member.shopify_sync)}
-                          {member.shopify_sync?.last_sync_error && (
-                            <span 
-                              className={styles.errorHint}
-                              title={member.shopify_sync.last_sync_error}
-                            >
-                              ⓘ
-                            </span>
-                          )}
-                        </td>
-                        <td className={styles.dateCell}>
-                          {new Date(member.created_at).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td>
-                          <button
-                            onClick={() => handleResync(member.id)}
-                            disabled={resyncingId === member.id}
-                            className={styles.resyncBtn}
-                            title="Resync Shopify"
-                          >
-                            {resyncingId === member.id ? (
-                              <span className={styles.miniSpinner} />
-                            ) : (
-                              '🔄'
-                            )}
-                            Resync
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+        {/* Table */}
+        <div className={styles.tableCard}>
+          {isLoading ? (
+            <div className={styles.loading}>Carregando...</div>
+          ) : members.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>👥</div>
+              <h3>Nenhum membro encontrado</h3>
+              <p>Os membros cadastrados aparecerão aqui.</p>
             </div>
-
-            {/* Paginação */}
-            {pagination.totalPages > 1 && (
-              <div className={styles.pagination}>
-                <button
-                  onClick={() => fetchMembers(pagination.page - 1, search)}
-                  disabled={pagination.page <= 1}
-                  className={styles.pageBtn}
-                >
-                  ← Anterior
-                </button>
-                <span className={styles.pageInfo}>
-                  Página {pagination.page} de {pagination.totalPages}
-                </span>
-                <button
-                  onClick={() => fetchMembers(pagination.page + 1, search)}
-                  disabled={pagination.page >= pagination.totalPages}
-                  className={styles.pageBtn}
-                >
-                  Próxima →
-                </button>
-              </div>
-            )}
-          </>
-        )}
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Ref Code</th>
+                  <th>Sponsor</th>
+                  <th>Shopify</th>
+                  <th>Cadastro</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {members.map((member) => (
+                  <tr key={member.id}>
+                    <td>
+                      <span className={styles.memberName}>{member.name}</span>
+                    </td>
+                    <td>{member.email}</td>
+                    <td>
+                      <code className={styles.refCode}>{member.ref_code}</code>
+                    </td>
+                    <td>
+                      {member.sponsor ? (
+                        <div className={styles.sponsorInfo}>
+                          <span className={styles.sponsorName}>{member.sponsor.name}</span>
+                          <span className={styles.sponsorCode}>{member.sponsor.ref_code}</span>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--gray-400)' }}>—</span>
+                      )}
+                    </td>
+                    <td>
+                      {getStatusBadge(member.shopify_sync_status)}
+                      {member.shopify_error && (
+                        <span title={member.shopify_error} style={{ cursor: 'help', marginLeft: '4px' }}>
+                          ⓘ
+                        </span>
+                      )}
+                    </td>
+                    <td>{formatDate(member.created_at)}</td>
+                    <td>
+                      <button
+                        className={styles.resyncBtn}
+                        onClick={() => handleResync(member.id)}
+                        disabled={syncingId === member.id}
+                      >
+                        {syncingId === member.id ? '⏳' : '🔄'} Resync
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </main>
     </div>
   )
 }
-

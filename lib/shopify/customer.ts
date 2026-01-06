@@ -12,20 +12,6 @@
 import { shopifyGraphQL } from './client'
 
 // Tipos de resposta da Shopify
-interface CustomerSetResponse {
-  customerSet: {
-    customer: {
-      id: string
-      email: string
-      tags: string[]
-    } | null
-    userErrors: Array<{
-      field: string[] | null
-      message: string
-      code: string | null
-    }>
-  }
-}
 
 // Parâmetros para sync
 export interface CustomerSyncParams {
@@ -57,12 +43,28 @@ function generateMemberTags(params: CustomerSyncParams): string[] {
 }
 
 /**
- * Mutation GraphQL validada pelo Shopify Dev MCP
- * Usa customerSet para upsert por email
+ * Busca customer por email
  */
-const CUSTOMER_SET_MUTATION = `
-  mutation customerSet($input: CustomerSetInput!, $identifier: CustomerSetIdentifiers) {
-    customerSet(input: $input, identifier: $identifier) {
+const FIND_CUSTOMER_QUERY = `
+  query findCustomerByEmail($query: String!) {
+    customers(first: 1, query: $query) {
+      edges {
+        node {
+          id
+          email
+          tags
+        }
+      }
+    }
+  }
+`
+
+/**
+ * Mutation para criar customer
+ */
+const CUSTOMER_CREATE_MUTATION = `
+  mutation customerCreate($input: CustomerInput!) {
+    customerCreate(input: $input) {
       customer {
         id
         email
@@ -71,16 +73,79 @@ const CUSTOMER_SET_MUTATION = `
       userErrors {
         field
         message
-        code
       }
     }
   }
 `
 
 /**
+ * Mutation para atualizar customer
+ */
+const CUSTOMER_UPDATE_MUTATION = `
+  mutation customerUpdate($input: CustomerInput!, $id: ID!) {
+    customerUpdate(input: $input, id: $id) {
+      customer {
+        id
+        email
+        tags
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`
+
+interface FindCustomerResponse {
+  customers: {
+    edges: Array<{
+      node: {
+        id: string
+        email: string
+        tags: string[]
+      }
+    }>
+  }
+}
+
+interface CustomerCreateResponse {
+  customerCreate: {
+    customer: {
+      id: string
+      email: string
+      tags: string[]
+    } | null
+    userErrors: Array<{
+      field: string[] | null
+      message: string
+      code: string | null
+    }>
+  }
+}
+
+interface CustomerUpdateResponse {
+  customerUpdate: {
+    customer: {
+      id: string
+      email: string
+      tags: string[]
+    } | null
+    userErrors: Array<{
+      field: string[] | null
+      message: string
+      code: string | null
+    }>
+  }
+}
+
+/**
  * Cria ou atualiza customer na Shopify com tags LRP
  * SPEC 4.4: Ao cadastrar (ou re-sincronizar), garantir customer existe + tags aplicadas
  * SPEC 8.2: Customer create/update por e-mail
+ * 
+ * Nota: Usa customerCreate/customerUpdate porque customerSet não está disponível
+ * para esta loja/token. Implementação alternativa com busca por email primeiro.
  */
 export async function syncCustomerToShopify(
   params: CustomerSyncParams
@@ -92,71 +157,142 @@ export async function syncCustomerToShopify(
   const firstName = nameParts[0] || params.firstName
   const lastName = nameParts.slice(1).join(' ') || params.lastName || ''
 
-  const variables = {
-    input: {
-      email: params.email,
-      firstName,
-      lastName: lastName || undefined,
-      tags,
-    },
-    identifier: {
-      email: params.email, // Upsert por email
-    },
-  }
-
-  const result = await shopifyGraphQL<CustomerSetResponse>(
-    CUSTOMER_SET_MUTATION,
-    variables
+  // 1. Buscar customer existente por email
+  const findResult = await shopifyGraphQL<FindCustomerResponse>(
+    FIND_CUSTOMER_QUERY,
+    { query: `email:${params.email}` }
   )
 
-  // Tratar erros de conexão
-  if (result.errors.length > 0) {
-    console.error('[shopify] GraphQL errors:', result.errors)
+  if (findResult.errors.length > 0) {
+    console.error('[shopify] Error finding customer:', findResult.errors)
     return {
       success: false,
       shopifyCustomerId: null,
-      error: result.errors.join('; '),
+      error: findResult.errors.join('; '),
     }
   }
 
-  // Tratar erros de validação da mutation
-  const payload = result.data?.customerSet
-  if (!payload) {
+  const existingCustomer = findResult.data?.customers.edges[0]?.node
+
+  const customerInput = {
+    email: params.email,
+    firstName,
+    lastName: lastName || undefined,
+    tags,
+  }
+
+  // 2. Se existe, atualizar; senão, criar
+  if (existingCustomer) {
+    // Atualizar customer existente
+    const updateResult = await shopifyGraphQL<CustomerUpdateResponse>(
+      CUSTOMER_UPDATE_MUTATION,
+      {
+        input: customerInput,
+        id: existingCustomer.id,
+      }
+    )
+
+    if (updateResult.errors.length > 0) {
+      console.error('[shopify] GraphQL errors on update:', updateResult.errors)
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: updateResult.errors.join('; '),
+      }
+    }
+
+    const payload = updateResult.data?.customerUpdate
+    if (!payload) {
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: 'Empty response from Shopify on update',
+      }
+    }
+
+    if (payload.userErrors && payload.userErrors.length > 0) {
+      const errorMessages = payload.userErrors.map((e) => e.message).join('; ')
+      console.error('[shopify] User errors on update:', payload.userErrors)
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: errorMessages,
+      }
+    }
+
+    if (!payload.customer) {
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: 'Customer not returned from Shopify on update',
+      }
+    }
+
+    console.info('[shopify] Customer updated:', {
+      id: payload.customer.id,
+      email: payload.customer.email,
+      tags: payload.customer.tags,
+    })
+
     return {
-      success: false,
-      shopifyCustomerId: null,
-      error: 'Empty response from Shopify',
+      success: true,
+      shopifyCustomerId: payload.customer.id,
+      error: null,
     }
-  }
+  } else {
+    // Criar novo customer
+    const createResult = await shopifyGraphQL<CustomerCreateResponse>(
+      CUSTOMER_CREATE_MUTATION,
+      { input: customerInput }
+    )
 
-  if (payload.userErrors && payload.userErrors.length > 0) {
-    const errorMessages = payload.userErrors.map((e) => e.message).join('; ')
-    console.error('[shopify] User errors:', payload.userErrors)
+    if (createResult.errors.length > 0) {
+      console.error('[shopify] GraphQL errors on create:', createResult.errors)
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: createResult.errors.join('; '),
+      }
+    }
+
+    const payload = createResult.data?.customerCreate
+    if (!payload) {
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: 'Empty response from Shopify on create',
+      }
+    }
+
+    if (payload.userErrors && payload.userErrors.length > 0) {
+      const errorMessages = payload.userErrors.map((e) => e.message).join('; ')
+      console.error('[shopify] User errors on create:', payload.userErrors)
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: errorMessages,
+      }
+    }
+
+    if (!payload.customer) {
+      return {
+        success: false,
+        shopifyCustomerId: null,
+        error: 'Customer not returned from Shopify on create',
+      }
+    }
+
+    console.info('[shopify] Customer created:', {
+      id: payload.customer.id,
+      email: payload.customer.email,
+      tags: payload.customer.tags,
+    })
+
     return {
-      success: false,
-      shopifyCustomerId: null,
-      error: errorMessages,
+      success: true,
+      shopifyCustomerId: payload.customer.id,
+      error: null,
     }
-  }
-
-  if (!payload.customer) {
-    return {
-      success: false,
-      shopifyCustomerId: null,
-      error: 'Customer not returned from Shopify',
-    }
-  }
-
-  console.info('[shopify] Customer synced:', {
-    id: payload.customer.id,
-    email: payload.customer.email,
-    tags: payload.customer.tags,
-  })
-
-  return {
-    success: true,
-    shopifyCustomerId: payload.customer.id,
-    error: null,
   }
 }
 

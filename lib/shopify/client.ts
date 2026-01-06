@@ -7,6 +7,7 @@
  * - read_customers scope
  */
 
+// Versão da API - usar versão estável que suporta customerSet (disponível desde 2022-10)
 const SHOPIFY_API_VERSION = '2024-10'
 
 interface ShopifyGraphQLResponse<T> {

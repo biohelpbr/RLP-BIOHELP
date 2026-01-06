@@ -1,7 +1,7 @@
 /**
  * Landing Page
  * SPEC: Seção 6.1 - GET / (landing simples ou redirect)
- * TBD-007: Comportamento exato pendente - usando landing simples por enquanto
+ * Design: Estilo roxo/violeta baseado nas referências
  */
 
 import Link from 'next/link'
@@ -10,39 +10,80 @@ import styles from './page.module.css'
 export default function HomePage() {
   return (
     <div className={styles.container}>
+      {/* Decoração de fundo */}
       <div className={styles.bgDecoration} aria-hidden="true">
-        <div className={styles.bgCircle1} />
-        <div className={styles.bgCircle2} />
+        <div className={styles.bgBlob1} />
+        <div className={styles.bgBlob2} />
+        <div className={styles.bgBlob3} />
       </div>
 
       <main className={styles.main}>
+        {/* Logo */}
         <div className={styles.logo}>
-          <span className={styles.logoIcon}>🌿</span>
-          <span className={styles.logoText}>Biohelp</span>
+          <div className={styles.logoIcon}>B</div>
         </div>
 
+        {/* Título */}
         <h1 className={styles.title}>
-          Programa de Fidelidade
+          Entre no Nutrition Club
         </h1>
-
+        
         <p className={styles.subtitle}>
-          Faça parte da nossa comunidade e aproveite benefícios exclusivos
+          Você no controle do seu ritmo.
         </p>
 
-        <div className={styles.actions}>
+        {/* Card de login */}
+        <div className={styles.card}>
+          {/* Tabs */}
+          <div className={styles.tabs}>
+            <Link href="/login" className={`${styles.tab} ${styles.tabActive}`}>
+              Sou Parceira
+            </Link>
+            <Link href="/admin" className={styles.tab}>
+              Sou Admin Biohelp
+            </Link>
+          </div>
+
+          {/* Form simplificado */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Seu e-mail</label>
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputIcon}>✉️</span>
+              <input 
+                type="email" 
+                placeholder="seu@email.com"
+                className={styles.input}
+                disabled
+              />
+            </div>
+          </div>
+
           <Link href="/login" className={styles.btnPrimary}>
-            Entrar
+            Entrar na minha conta
+            <span className={styles.btnArrow}>→</span>
           </Link>
-          <Link href="/join" className={styles.btnSecondary}>
-            Criar conta
-          </Link>
+
+          {/* Info box */}
+          <div className={styles.infoBox}>
+            <span className={styles.infoIcon}>✨</span>
+            <div>
+              <strong>Programa de Fidelidade</strong>
+              <p>Faça parte da nossa comunidade e aproveite benefícios exclusivos.</p>
+            </div>
+          </div>
         </div>
 
-        <p className={styles.note}>
-          Para criar uma conta, você precisa de um link de convite de um membro existente.
+        {/* Link de cadastro */}
+        <p className={styles.registerLink}>
+          Ainda não tem conta?{' '}
+          <Link href="/join">Cadastre-se aqui</Link>
         </p>
+
+        {/* Footer */}
+        <footer className={styles.footer}>
+          © 2025 Biohelp Nutrition. Todos os direitos reservados.
+        </footer>
       </main>
     </div>
   )
 }
-

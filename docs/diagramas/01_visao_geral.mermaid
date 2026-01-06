@@ -1,0 +1,45 @@
+flowchart TD
+    subgraph BROWSER["🌐 CLIENTE - Browser"]
+        direction LR
+        P1["/login"]
+        P2["/join"]
+        P3["/dashboard"]
+        P4["/admin"]
+    end
+
+    subgraph API["⚛️ NEXT.JS - API Routes"]
+        direction LR
+        E1["POST<br/>/api/members/join"]
+        E2["GET<br/>/api/members/me"]
+        E3["POST<br/>/api/admin/.../resync"]
+    end
+
+    subgraph SUPA["🗄️ SUPABASE"]
+        direction LR
+        AUTH[("Auth")]
+        DB[("Postgres")]
+    end
+
+    subgraph SHOP["🛒 SHOPIFY"]
+        direction LR
+        CUST["Customer"]
+        TAGS["Tags LRP"]
+        LOJA["Loja Online"]
+    end
+
+    P1 --> AUTH
+    P2 --> E1
+    P3 --> E2
+    P4 --> E3
+
+    E1 --> AUTH
+    E1 --> DB
+    E2 --> DB
+    E3 --> DB
+
+    E1 --> CUST
+    E3 --> CUST
+
+    CUST --> TAGS
+    TAGS --> LOJA
+

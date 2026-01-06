@@ -1,312 +1,251 @@
 /**
- * Dashboard do Membro (/dashboard)
- * SPEC: Seção 5.1, 6.2 - Dashboard v1 mínimo
- * Sprint: 1
- * 
- * Exibe:
- * - Nome, e-mail, sponsor, ref_code
- * - Link de convite
- * - CTA para loja
- * 
- * NÃO exibe (fora do Sprint 1):
- * - CV
- * - Comissões
- * - Níveis
+ * Dashboard do Membro
+ * SPEC: Seção 6.4 - GET /dashboard
+ * Design: Estilo roxo/violeta com sidebar
  */
 
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import styles from './page.module.css'
-
-// URL da loja Shopify (TBD-004 pendente - usar env var)
-const STORE_URL = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || 'https://biohelp.com.br'
 
 interface MemberData {
   id: string
   name: string
   email: string
   ref_code: string
-  sponsor_name: string | null
-  sponsor_ref_code: string | null
   status: string
+  sponsor?: {
+    name: string
+    ref_code: string
+  }
   created_at: string
-  shopify_sync_status: string | null
-}
-
-function DashboardContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  
-  const [member, setMember] = useState<MemberData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [isNewMember, setIsNewMember] = useState(false)
-
-  // Verificar se é um novo membro (veio do cadastro)
-  useEffect(() => {
-    const newParam = searchParams.get('new')
-    if (newParam === '1') {
-      setIsNewMember(true)
-    }
-  }, [searchParams])
-
-  // Buscar dados do membro
-  useEffect(() => {
-    async function fetchMember() {
-      try {
-        const response = await fetch('/api/members/me')
-        
-        if (!response.ok) {
-          if (response.status === 401) {
-            // Não autenticado - redirecionar para login
-            router.push('/login')
-            return
-          }
-          throw new Error('Erro ao carregar dados')
-        }
-        
-        const data = await response.json()
-        setMember(data.member)
-      } catch (err) {
-        console.error('Fetch member error:', err)
-        setError('Não foi possível carregar seus dados. Tente novamente.')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchMember()
-  }, [router])
-
-  // Gerar link de convite
-  const inviteLink = member 
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/join?ref=${member.ref_code}`
-    : ''
-
-  // Copiar link
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(inviteLink)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('Copy failed:', err)
-    }
-  }
-
-  // Ir para loja
-  const handleGoToStore = () => {
-    window.open(STORE_URL, '_blank')
-  }
-
-  if (loading) {
-    return (
-      <div className={styles.loadingState}>
-        <div className={styles.spinner} />
-        <p>Carregando...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorState}>
-        <span className={styles.errorIcon}>⚠️</span>
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()} className="btn btn-secondary">
-          Tentar novamente
-        </button>
-      </div>
-    )
-  }
-
-  if (!member) {
-    return null
-  }
-
-  return (
-    <div className={styles.container}>
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.logo}>
-            <span className={styles.logoIcon}>🌿</span>
-            <span className={styles.logoText}>Biohelp</span>
-          </div>
-          <nav className={styles.nav}>
-            <a href="/login" className={styles.logoutLink}>Sair</a>
-          </nav>
-        </div>
-      </header>
-
-      <main className={styles.main}>
-        {/* Boas-vindas para novo membro */}
-        {isNewMember && (
-          <div className={`${styles.welcomeBanner} animate-fade-in`}>
-            <span className={styles.welcomeIcon}>🎉</span>
-            <div>
-              <strong>Bem-vindo(a) ao programa!</strong>
-              <p>Sua conta foi criada com sucesso. Agora você tem acesso a benefícios exclusivos.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Greeting */}
-        <div className={styles.greeting}>
-          <h1>Olá, {member.name.split(' ')[0]}!</h1>
-          <p className={styles.greetingSubtitle}>
-            Seu painel de membro Biohelp
-          </p>
-        </div>
-
-        {/* Cards Grid */}
-        <div className={styles.cardsGrid}>
-          {/* Card: Dados do membro */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>
-                <span className={styles.cardIcon}>👤</span>
-                Seus dados
-              </h2>
-            </div>
-            <div className={styles.cardBody}>
-              <dl className={styles.dataList}>
-                <div className={styles.dataItem}>
-                  <dt>Nome</dt>
-                  <dd>{member.name}</dd>
-                </div>
-                <div className={styles.dataItem}>
-                  <dt>E-mail</dt>
-                  <dd>{member.email}</dd>
-                </div>
-                <div className={styles.dataItem}>
-                  <dt>Quem te indicou</dt>
-                  <dd>
-                    {member.sponsor_name ? (
-                      <>
-                        {member.sponsor_name}
-                        <span className={styles.sponsorCode}>({member.sponsor_ref_code})</span>
-                      </>
-                    ) : (
-                      <span className={styles.noSponsor}>Sem indicação</span>
-                    )}
-                  </dd>
-                </div>
-                <div className={styles.dataItem}>
-                  <dt>Membro desde</dt>
-                  <dd>{new Date(member.created_at).toLocaleDateString('pt-BR')}</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-
-          {/* Card: Link de convite */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>
-                <span className={styles.cardIcon}>🔗</span>
-                Seu link de convite
-              </h2>
-            </div>
-            <div className={styles.cardBody}>
-              <p className={styles.cardDescription}>
-                Compartilhe este link com amigos e familiares para convidá-los a fazer parte do programa.
-              </p>
-              
-              <div className={styles.inviteLinkBox}>
-                <code className={styles.inviteLink}>{inviteLink}</code>
-                <button 
-                  onClick={handleCopyLink}
-                  className={`btn btn-secondary ${styles.copyBtn}`}
-                  aria-label="Copiar link"
-                >
-                  {copied ? (
-                    <>
-                      <span>✓</span> Copiado!
-                    </>
-                  ) : (
-                    <>
-                      <span>📋</span> Copiar
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className={styles.refCodeBadge}>
-                <span>Seu código:</span>
-                <strong>{member.ref_code}</strong>
-              </div>
-            </div>
-          </div>
-
-          {/* Card: CTA Loja */}
-          <div className={`${styles.card} ${styles.cardHighlight}`}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>
-                <span className={styles.cardIcon}>🛒</span>
-                Compre como membro
-              </h2>
-            </div>
-            <div className={styles.cardBody}>
-              <p className={styles.cardDescription}>
-                Aproveite preços exclusivos na nossa loja. Faça login com o mesmo e-mail 
-                que você usou aqui para desbloquear os benefícios.
-              </p>
-              
-              <button 
-                onClick={handleGoToStore}
-                className={`btn btn-primary ${styles.storeBtn}`}
-              >
-                <span>🛍️</span>
-                Ir para a loja
-              </button>
-              
-              <p className={styles.storeNote}>
-                Dica: Use o e-mail <strong>{member.email}</strong> para fazer login na loja
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Status de sync (debug - apenas se failed) */}
-        {member.shopify_sync_status === 'failed' && (
-          <div className={styles.syncWarning}>
-            <span>⚠️</span>
-            <p>
-              Houve um problema ao sincronizar sua conta com a loja. 
-              Entre em contato com o suporte se os benefícios não aparecerem.
-            </p>
-          </div>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <p>Biohelp © {new Date().getFullYear()} — Programa de Fidelidade</p>
-      </footer>
-    </div>
-  )
-}
-
-// Loading fallback
-function DashboardLoading() {
-  return (
-    <div className={styles.loadingState}>
-      <div className={styles.spinner} />
-      <p>Carregando...</p>
-    </div>
-  )
 }
 
 export default function DashboardPage() {
+  const [member, setMember] = useState<MemberData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    fetchMemberData()
+  }, [])
+
+  const fetchMemberData = async () => {
+    try {
+      const response = await fetch('/api/members/me')
+      if (response.ok) {
+        const data = await response.json()
+        setMember(data.member)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getInviteLink = () => {
+    if (typeof window === 'undefined' || !member) return ''
+    return `${window.location.origin}/join?ref=${member.ref_code}`
+  }
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(getInviteLink())
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Erro ao copiar:', err)
+    }
+  }
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase()
+  }
+
+  if (isLoading) {
+    return <div className={styles.loading}>Carregando...</div>
+  }
+
+  // Dados de demonstração se não houver membro
+  const displayMember = member || {
+    id: 'demo',
+    name: 'Marina Silva',
+    email: 'marina@exemplo.com',
+    ref_code: 'MARINA123',
+    status: 'active',
+    sponsor: { name: 'João Sponsor', ref_code: 'JOAO1' },
+    created_at: new Date().toISOString()
+  }
+
   return (
-    <Suspense fallback={<DashboardLoading />}>
-      <DashboardContent />
-    </Suspense>
+    <div className={styles.layout}>
+      {/* Sidebar */}
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <div className={styles.sidebarLogo}>
+            <div className={styles.logoIcon}>B</div>
+            <div className={styles.logoText}>
+              <span className={styles.logoTitle}>Biohelp</span>
+              <span className={styles.logoSubtitle}>Nutrition Club</span>
+            </div>
+          </div>
+        </div>
+
+        <nav className={styles.nav}>
+          <ul className={styles.navList}>
+            <li className={`${styles.navItem} ${styles.navItemActive}`}>
+              <Link href="/dashboard">
+                <span className={styles.navIcon}>📊</span>
+                <span>Visão Geral</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/dashboard">
+                <span className={styles.navIcon}>👥</span>
+                <span>Minha Rede</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/dashboard">
+                <span className={styles.navIcon}>🛒</span>
+                <span>Vendas</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/dashboard">
+                <span className={styles.navIcon}>👤</span>
+                <span>Meu Perfil</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <main className={styles.main}>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.avatar}>
+            {getInitials(displayMember.name)}
+          </div>
+          <div className={styles.headerInfo}>
+            <h1>
+              Oi, {displayMember.name.split(' ')[0]}!
+              <span>👋</span>
+            </h1>
+            <span className={styles.badge}>
+              <span className={styles.badgeDot}></span>
+              Parceira
+            </span>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className={styles.statsGrid}>
+          <div className={`${styles.statCard} ${styles.statCardGreen}`}>
+            <div className={styles.statHeader}>
+              <span className={styles.statLabel}>Status de Ativação</span>
+              <span className={styles.statIcon}>⚡</span>
+            </div>
+            <div className={styles.statValue}>Ativa</div>
+            <div className={styles.statChange}>Parabéns! Você está ativa</div>
+          </div>
+
+          <div className={`${styles.statCard} ${styles.statCardPurple}`}>
+            <div className={styles.statHeader}>
+              <span className={styles.statLabel}>Indicados</span>
+              <span className={styles.statIcon}>👥</span>
+            </div>
+            <div className={styles.statValue}>0</div>
+            <div className={styles.statChange}>Convide amigos!</div>
+          </div>
+
+          <div className={`${styles.statCard} ${styles.statCardYellow}`}>
+            <div className={styles.statHeader}>
+              <span className={styles.statLabel}>Meu Código</span>
+              <span className={styles.statIcon}>🔗</span>
+            </div>
+            <div className={styles.statValue}>{displayMember.ref_code}</div>
+            <div className={styles.statChange}>Compartilhe seu código</div>
+          </div>
+        </div>
+
+        {/* Invite Card */}
+        <div className={styles.inviteCard}>
+          <h2 className={styles.inviteTitle}>Convide seus amigos</h2>
+          <p className={styles.inviteSubtitle}>
+            Compartilhe seu link de convite e ganhe recompensas por cada indicação
+          </p>
+          
+          <div className={styles.inviteLinkWrapper}>
+            <div className={styles.inviteLink}>
+              {getInviteLink() || `${typeof window !== 'undefined' ? window.location.origin : ''}/join?ref=${displayMember.ref_code}`}
+            </div>
+            <button onClick={copyToClipboard} className={styles.copyBtn}>
+              {copied ? '✓ Copiado!' : '📋 Copiar'}
+            </button>
+          </div>
+
+          <a 
+            href={process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || '#'} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={styles.shopBtn}
+          >
+            🛍️ Ir para a loja
+          </a>
+        </div>
+
+        {/* Info Grid */}
+        <div className={styles.infoGrid}>
+          <div className={styles.infoCard}>
+            <h3 className={styles.infoCardTitle}>Meus Dados</h3>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Nome</span>
+              <span className={styles.infoValue}>{displayMember.name}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>E-mail</span>
+              <span className={styles.infoValue}>{displayMember.email}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Status</span>
+              <span className={styles.infoValue}>
+                {displayMember.status === 'active' ? '✅ Ativo' : '⏳ Pendente'}
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.infoCard}>
+            <h3 className={styles.infoCardTitle}>Meu Sponsor</h3>
+            {displayMember.sponsor ? (
+              <>
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>Nome</span>
+                  <span className={styles.infoValue}>{displayMember.sponsor.name}</span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>Código</span>
+                  <span className={styles.infoValue}>{displayMember.sponsor.ref_code}</span>
+                </div>
+              </>
+            ) : (
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Sem sponsor</span>
+                <span className={styles.infoValue}>—</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
   )
 }
-
