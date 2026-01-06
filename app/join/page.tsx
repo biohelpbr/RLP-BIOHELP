@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './page.module.css'
@@ -61,7 +61,7 @@ const Icons = {
   ),
 }
 
-export default function JoinPage() {
+function JoinForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const refCode = searchParams.get('ref')
@@ -263,5 +263,30 @@ export default function JoinPage() {
 
       </div>
     </div>
+  )
+}
+
+// Loading fallback para Suspense
+function JoinLoading() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <div className={styles.card}>
+          <div className={styles.header}>
+            <div className={styles.logo}>B</div>
+            <h1 className={styles.title}>Criar conta</h1>
+            <p className={styles.subtitle}>Carregando...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function JoinPage() {
+  return (
+    <Suspense fallback={<JoinLoading />}>
+      <JoinForm />
+    </Suspense>
   )
 }

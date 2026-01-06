@@ -13,6 +13,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase/server'
 import type { Member, ShopifyCustomer } from '@/types/database'
 
+// Força rota dinâmica (usa cookies)
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     // Verificar autenticação via Supabase Auth

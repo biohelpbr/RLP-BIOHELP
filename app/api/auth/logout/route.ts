@@ -8,6 +8,9 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+// Força rota dinâmica (usa cookies)
+export const dynamic = 'force-dynamic'
+
 export async function POST() {
   try {
     const supabase = await createServerSupabaseClient()
