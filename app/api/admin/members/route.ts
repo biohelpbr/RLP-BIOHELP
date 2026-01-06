@@ -10,24 +10,51 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase/server'
 import type { Member, ShopifyCustomer } from '@/types/database'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServiceClient()
+    // Verificar autenticação via Supabase Auth
+    const authClient = await createServerSupabaseClient()
+    const { data: { user }, error: authError } = await authClient.auth.getUser()
 
-    // TODO: Verificar se é admin (Supabase Auth + role check)
-    // Por enquanto aceita admin_token via header para testes
-    const adminToken = request.headers.get('x-admin-token')
-    const isAdminCookie = request.cookies.get('is_admin')?.value === 'true'
-    
-    if (!adminToken && !isAdminCookie) {
+    if (authError || !user) {
       return NextResponse.json(
-        { error: 'UNAUTHORIZED', message: 'Acesso não autorizado' },
+        { error: 'UNAUTHORIZED', message: 'Não autenticado' },
         { status: 401 }
       )
     }
+
+    // Verificar se é admin
+    const serviceClient = createServiceClient()
+    const { data: member } = await serviceClient
+      .from('members')
+      .select('id')
+      .eq('auth_user_id', user.id)
+      .single()
+
+    if (!member) {
+      return NextResponse.json(
+        { error: 'UNAUTHORIZED', message: 'Membro não encontrado' },
+        { status: 401 }
+      )
+    }
+
+    const { data: role } = await serviceClient
+      .from('roles')
+      .select('role')
+      .eq('member_id', member.id)
+      .single()
+
+    if (role?.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'FORBIDDEN', message: 'Acesso restrito a administradores' },
+        { status: 403 }
+      )
+    }
+
+    const supabase = serviceClient
 
     // Parse query params
     const searchParams = request.nextUrl.searchParams

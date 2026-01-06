@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export async function POST() {
@@ -12,13 +13,26 @@ export async function POST() {
     const supabase = await createServerSupabaseClient()
     await supabase.auth.signOut()
 
-    return NextResponse.json(
+    // Limpar cookies de autenticação
+    const cookieStore = await cookies()
+    const allCookies = cookieStore.getAll()
+    
+    const response = NextResponse.json(
       {
         ok: true,
         redirect: '/login',
       },
       { status: 200 }
     )
+
+    // Remover todos os cookies relacionados ao Supabase
+    allCookies.forEach((cookie) => {
+      if (cookie.name.includes('supabase') || cookie.name.includes('sb-')) {
+        response.cookies.delete(cookie.name)
+      }
+    })
+
+    return response
   } catch (error) {
     console.error('[logout] Error:', error)
     return NextResponse.json(

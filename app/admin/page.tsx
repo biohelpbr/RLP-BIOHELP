@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
 interface Member {
@@ -26,6 +27,7 @@ interface Member {
 }
 
 export default function AdminPage() {
+  const router = useRouter()
   const [members, setMembers] = useState<Member[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -34,6 +36,16 @@ export default function AdminPage() {
   useEffect(() => {
     fetchMembers()
   }, [search])
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/login')
+      router.refresh()
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
 
   const fetchMembers = async () => {
     try {
@@ -126,10 +138,10 @@ export default function AdminPage() {
               </Link>
             </li>
             <li className={styles.navItem}>
-              <Link href="/">
+              <button onClick={handleLogout} className={styles.logoutBtn}>
                 <span className={styles.navIcon}>🚪</span>
                 <span>Sair</span>
-              </Link>
+              </button>
             </li>
           </ul>
         </nav>
