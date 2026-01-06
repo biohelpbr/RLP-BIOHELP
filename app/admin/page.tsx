@@ -22,8 +22,11 @@ interface Member {
     name: string
     ref_code: string
   }
-  shopify_sync_status?: string
-  shopify_error?: string
+  shopify_sync?: {
+    last_sync_status: string | null
+    last_sync_at: string | null
+    last_sync_error: string | null
+  } | null
 }
 
 export default function AdminPage() {
@@ -84,16 +87,17 @@ export default function AdminPage() {
     return new Date(dateString).toLocaleDateString('pt-BR')
   }
 
-  const getStatusBadge = (status?: string) => {
+  const getStatusBadge = (status?: string | null) => {
     switch (status) {
+      case 'ok':
       case 'synced':
-        return <span className={`${styles.statusBadge} ${styles.statusSynced}`}>Sincronizado</span>
+        return <span className={`${styles.statusBadge} ${styles.statusSynced}`}>✅ Sincronizado</span>
       case 'pending':
-        return <span className={`${styles.statusBadge} ${styles.statusPending}`}>Pendente</span>
+        return <span className={`${styles.statusBadge} ${styles.statusPending}`}>⏳ Pendente</span>
       case 'failed':
-        return <span className={`${styles.statusBadge} ${styles.statusFailed}`}>Falhou</span>
+        return <span className={`${styles.statusBadge} ${styles.statusFailed}`}>❌ Falhou</span>
       default:
-        return <span className={`${styles.statusBadge} ${styles.statusPending}`}>Pendente</span>
+        return <span className={`${styles.statusBadge} ${styles.statusPending}`}>⏳ Pendente</span>
     }
   }
 
@@ -212,9 +216,9 @@ export default function AdminPage() {
                       )}
                     </td>
                     <td>
-                      {getStatusBadge(member.shopify_sync_status)}
-                      {member.shopify_error && (
-                        <span title={member.shopify_error} style={{ cursor: 'help', marginLeft: '4px' }}>
+                      {getStatusBadge(member.shopify_sync?.last_sync_status)}
+                      {member.shopify_sync?.last_sync_error && (
+                        <span title={member.shopify_sync.last_sync_error} style={{ cursor: 'help', marginLeft: '4px' }}>
                           ⓘ
                         </span>
                       )}
