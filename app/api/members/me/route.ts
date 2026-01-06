@@ -1,36 +1,30 @@
 /**
  * GET /api/members/me
- * SPEC: Suporte ao dashboard v1
+ * SPEC: Seção 5.1 - Dashboard mostra dados do membro
  * Sprint: 1
  * 
- * Retorna dados do membro autenticado.
- * 
- * TODO: Integrar com Supabase Auth quando implementado
- * Por enquanto aceita member_id via cookie ou query param para testes
+ * Retorna dados do membro autenticado via Supabase Auth.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient, getAuthUser } from '@/lib/supabase/server'
 import type { Member, ShopifyCustomer } from '@/types/database'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServiceClient()
+    // Verificar autenticação via Supabase Auth
+    const user = await getAuthUser()
 
-    // TODO: Substituir por auth real (Supabase Auth session)
-    // Por enquanto, aceitar member_id de cookie ou query para testes
-    const memberId = 
-      request.cookies.get('member_id')?.value ||
-      request.nextUrl.searchParams.get('member_id')
-
-    if (!memberId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'UNAUTHORIZED', message: 'Não autenticado' },
         { status: 401 }
       )
     }
 
-    // Buscar membro com sponsor
+    const supabase = createServiceClient()
+
+    // Buscar membro pelo auth_user_id
     const { data: memberData, error: memberError } = await supabase
       .from('members')
       .select(`
@@ -42,11 +36,11 @@ export async function GET(request: NextRequest) {
         status,
         created_at
       `)
-      .eq('id', memberId)
+      .eq('auth_user_id', user.id)
       .single()
 
     if (memberError || !memberData) {
-      console.error('[me] Member not found:', memberError)
+      console.error('[me] Member not found for auth user:', user.id, memberError)
       return NextResponse.json(
         { error: 'NOT_FOUND', message: 'Membro não encontrado' },
         { status: 404 }
@@ -78,7 +72,7 @@ export async function GET(request: NextRequest) {
     const { data: syncData } = await supabase
       .from('shopify_customers')
       .select('last_sync_status')
-      .eq('member_id', memberId)
+      .eq('member_id', member.id)
       .single()
     
     const shopifySync = syncData as Pick<ShopifyCustomer, 'last_sync_status'> | null
@@ -89,8 +83,10 @@ export async function GET(request: NextRequest) {
         name: member.name,
         email: member.email,
         ref_code: member.ref_code,
-        sponsor_name: sponsorName,
-        sponsor_ref_code: sponsorRefCode,
+        sponsor: sponsorName ? {
+          name: sponsorName,
+          ref_code: sponsorRefCode,
+        } : null,
         status: member.status,
         created_at: member.created_at,
         shopify_sync_status: shopifySync?.last_sync_status || null,
@@ -104,4 +100,3 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-

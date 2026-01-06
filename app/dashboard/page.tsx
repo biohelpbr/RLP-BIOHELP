@@ -1,13 +1,16 @@
 /**
  * Dashboard do Membro
- * SPEC: Seção 6.4 - GET /dashboard
- * Design: Estilo roxo/violeta com sidebar
+ * SPEC: Seção 5.1, 6.2 - GET /dashboard
+ * Sprint: 1
+ * 
+ * Página protegida - requer autenticação via Supabase Auth
  */
 
 'use client'
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
 interface MemberData {
@@ -24,6 +27,7 @@ interface MemberData {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [member, setMember] = useState<MemberData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [copied, setCopied] = useState(false)
@@ -38,11 +42,24 @@ export default function DashboardPage() {
       if (response.ok) {
         const data = await response.json()
         setMember(data.member)
+      } else if (response.status === 401) {
+        // Não autenticado - redireciona para login
+        router.push('/login')
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/login')
+      router.refresh()
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
     }
   }
 
@@ -127,6 +144,13 @@ export default function DashboardPage() {
             </li>
           </ul>
         </nav>
+
+        <div className={styles.sidebarFooter}>
+          <button onClick={handleLogout} className={styles.logoutBtn}>
+            <span className={styles.navIcon}>🚪</span>
+            <span>Sair</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}

@@ -118,6 +118,35 @@
   text-align: center;
 }
 
+/* Sidebar footer */
+.sidebarFooter {
+  margin-top: auto;
+  padding: var(--space-md);
+  border-top: 1px solid var(--gray-100);
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.logoutBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
 /* Main content */
 .main {
   flex: 1;

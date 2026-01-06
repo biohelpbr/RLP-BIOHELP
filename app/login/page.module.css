@@ -234,6 +234,30 @@
 }
 
 /* Info box */
+/* Error box */
+.errorBox {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  margin-bottom: var(--space-lg);
+  align-items: center;
+}
+
+.errorBox span {
+  font-size: 1.25rem;
+}
+
+.errorBox p {
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin: 0;
+  line-height: 1.4;
+}
+
 .infoBox {
   display: flex;
   gap: var(--space-md);

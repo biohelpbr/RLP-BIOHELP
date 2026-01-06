@@ -1,7 +1,9 @@
 /**
  * Página de Login
- * SPEC: Seção 6.2 - GET /login
- * Design: Estilo roxo/violeta baseado nas referências
+ * SPEC: Seção 5.2, 6.2 - GET /login
+ * Sprint: 1
+ * 
+ * Autentica via Supabase Auth
  */
 
 'use client'
@@ -14,21 +16,39 @@ import styles from './page.module.css'
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<'parceira' | 'admin'>('parceira')
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
     
-    // Simulação de login - redireciona para dashboard
-    setTimeout(() => {
-      if (activeTab === 'admin') {
-        router.push('/admin')
-      } else {
-        router.push('/dashboard')
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.ok) {
+        setError(data.message || 'Erro ao fazer login')
+        setIsLoading(false)
+        return
       }
-    }, 1000)
+
+      // Redireciona para dashboard ou admin
+      router.push(data.redirect || '/dashboard')
+      router.refresh()
+      
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('Erro de conexão. Tente novamente.')
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -57,23 +77,15 @@ export default function LoginPage() {
 
         {/* Card de login */}
         <div className={styles.card}>
-          {/* Tabs */}
-          <div className={styles.tabs}>
-            <button 
-              className={`${styles.tab} ${activeTab === 'parceira' ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab('parceira')}
-            >
-              Sou Parceira
-            </button>
-            <button 
-              className={`${styles.tab} ${activeTab === 'admin' ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab('admin')}
-            >
-              Sou Admin Biohelp
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit}>
+            {/* Mensagem de erro */}
+            {error && (
+              <div className={styles.errorBox}>
+                <span>⚠️</span>
+                <p>{error}</p>
+              </div>
+            )}
+
             {/* Campo de email */}
             <div className={styles.formGroup}>
               <label className={styles.label}>Seu e-mail</label>
@@ -86,6 +98,25 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            {/* Campo de senha */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Sua senha</label>
+              <div className={styles.inputWrapper}>
+                <span className={styles.inputIcon}>🔒</span>
+                <input 
+                  type="password" 
+                  placeholder="••••••••"
+                  className={styles.input}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -95,19 +126,10 @@ export default function LoginPage() {
               className={styles.btnPrimary}
               disabled={isLoading}
             >
-              {isLoading ? 'Entrando...' : 'Enviar link de acesso'}
+              {isLoading ? 'Entrando...' : 'Entrar'}
               <span className={styles.btnArrow}>→</span>
             </button>
           </form>
-
-          {/* Info box */}
-          <div className={styles.infoBox}>
-            <span className={styles.infoIcon}>✨</span>
-            <div>
-              <strong>Versão Demo</strong>
-              <p>O link de acesso é simulado. Clique em "Enviar link de acesso" para visualizar o painel.</p>
-            </div>
-          </div>
         </div>
 
         {/* Link de cadastro */}

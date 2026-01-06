@@ -8,12 +8,13 @@
  * - 4.2: Cadastro sem link (TBD-001 pendente - bloqueia por padrão)
  * - 4.3: Unicidade de membro (email único)
  * - 4.4: Shopify sync (customer + tags)
+ * - 5.2: Cria usuário no Supabase Auth
  * - 12: Se Shopify falhar, não bloquear criação do membro
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient, createAdminClient } from '@/lib/supabase/server'
 import { generateRefCode } from '@/lib/utils/ref-code'
 import { syncMemberToShopify } from '@/lib/shopify/sync'
 import type { UtmParams, Member } from '@/types/database'
@@ -41,6 +42,7 @@ const ErrorCodes = {
   INVALID_REF: 'INVALID_REF',
   NO_REF_BLOCKED: 'NO_REF_BLOCKED',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
+  AUTH_ERROR: 'AUTH_ERROR',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const
 
@@ -63,6 +65,7 @@ export async function POST(request: NextRequest) {
 
     const { name, email, password, ref, utm } = validation.data
     const supabase = createServiceClient()
+    const adminClient = createAdminClient()
 
     // 2. Verificar se e-mail já existe (SPEC 4.3)
     const { data: existingMember } = await supabase
@@ -125,7 +128,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 4. Gerar ref_code único (SPEC 3.2)
+    // 4. Criar usuário no Supabase Auth (SPEC 5.2)
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email: email.toLowerCase().trim(),
+      password: password,
+      email_confirm: true, // Auto-confirma o email
+      user_metadata: {
+        name: name.trim(),
+      },
+    })
+
+    if (authError || !authData.user) {
+      console.error('[join] Failed to create auth user:', authError)
+      
+      // Verificar se é erro de email duplicado no Auth
+      if (authError?.message?.includes('already been registered')) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: ErrorCodes.EMAIL_EXISTS,
+            message: 'Este e-mail já está cadastrado. Faça login.',
+          },
+          { status: 409 }
+        )
+      }
+      
+      return NextResponse.json(
+        {
+          ok: false,
+          error: ErrorCodes.AUTH_ERROR,
+          message: 'Erro ao criar conta. Tente novamente.',
+        },
+        { status: 500 }
+      )
+    }
+
+    const authUserId = authData.user.id
+
+    // 5. Gerar ref_code único (SPEC 3.2)
     let newRefCode = generateRefCode()
     let refCodeAttempts = 0
     const maxAttempts = 5
@@ -146,6 +186,8 @@ export async function POST(request: NextRequest) {
 
     if (refCodeAttempts >= maxAttempts) {
       console.error('[join] Failed to generate unique ref_code after max attempts')
+      // Limpar usuário Auth criado
+      await adminClient.auth.admin.deleteUser(authUserId)
       return NextResponse.json(
         {
           ok: false,
@@ -156,7 +198,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 5. Criar membro (SPEC 9.1)
+    // 6. Criar membro (SPEC 9.1) - agora com auth_user_id
     const { data: newMemberData, error: memberError } = await supabase
       .from('members')
       .insert({
@@ -165,12 +207,15 @@ export async function POST(request: NextRequest) {
         ref_code: newRefCode,
         sponsor_id: sponsorId,
         status: 'pending', // SPEC: pending no Sprint 1
+        auth_user_id: authUserId, // Vincula ao Supabase Auth
       })
       .select()
       .single()
 
     if (memberError || !newMemberData) {
       console.error('[join] Failed to create member:', memberError)
+      // Limpar usuário Auth criado
+      await adminClient.auth.admin.deleteUser(authUserId)
       return NextResponse.json(
         {
           ok: false,
@@ -184,7 +229,7 @@ export async function POST(request: NextRequest) {
     // Type assertion para garantir tipagem correta
     const newMember = newMemberData as Member
 
-    // 6. Registrar referral_event com UTMs (SPEC 9.2)
+    // 7. Registrar referral_event com UTMs (SPEC 9.2)
     const utmJson: UtmParams | null = utm && Object.keys(utm).length > 0 ? utm : null
 
     const { error: eventError } = await supabase
@@ -200,7 +245,7 @@ export async function POST(request: NextRequest) {
       console.warn('[join] Failed to create referral_event:', eventError)
     }
 
-    // 7. Criar role padrão (SPEC 9.4)
+    // 8. Criar role padrão (SPEC 9.4)
     const { error: roleError } = await supabase
       .from('roles')
       .insert({
@@ -212,7 +257,7 @@ export async function POST(request: NextRequest) {
       console.warn('[join] Failed to create role:', roleError)
     }
 
-    // 8. Criar registro de shopify_customers com status pending (SPEC 9.3)
+    // 9. Criar registro de shopify_customers com status pending (SPEC 9.3)
     const { error: shopifyRecordError } = await supabase
       .from('shopify_customers')
       .insert({
@@ -224,7 +269,7 @@ export async function POST(request: NextRequest) {
       console.warn('[join] Failed to create shopify_customers record:', shopifyRecordError)
     }
 
-    // 9. Sync com Shopify (SPEC 4.4, 8.2)
+    // 10. Sync com Shopify (SPEC 4.4, 8.2)
     // SPEC 12: Se Shopify falhar, NÃO bloquear criação do membro
     // O sync é feito após criar o registro para permitir reprocesso via admin
     const shopifySyncResult = await syncMemberToShopify({
@@ -239,9 +284,6 @@ export async function POST(request: NextRequest) {
       // Log mas NÃO retorna erro - SPEC 12
       console.warn('[join] Shopify sync failed (will retry via admin):', shopifySyncResult.error)
     }
-
-    // 10. TODO: Criar usuário no Supabase Auth (task separada)
-    // Por enquanto apenas registramos o membro no banco
 
     // 11. Retorno de sucesso (SPEC 7.1)
     // Inclui status do sync para debug (não bloqueia)
@@ -263,16 +305,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
 
-    // TODO: Substituir por Supabase Auth session
-    // Cookie temporário para dashboard funcionar antes do auth
-    response.cookies.set('member_id', newMember.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 dias
-      path: '/',
-    })
-
     return response
 
   } catch (error) {
@@ -287,4 +319,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-
