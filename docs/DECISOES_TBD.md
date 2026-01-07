@@ -128,7 +128,30 @@
 ## Decididos (histórico)
 > Mova itens daqui quando houver decisão oficial.
 
-- (vazio)
+### TBD-008 — Regra de cálculo de CV por produto ✅
+**Decisão:** Opção A - CV = 100% do preço do item
+**Data:** 07/01/2026
+**Implementação:** `lib/cv/calculator.ts` - Constante `CV_PERCENTAGE = 1.0`
+**Observação:** Pode ser ajustado futuramente via configuração
+
+---
+
+### TBD-009 — Comportamento de refund/cancel ✅
+**Decisão:** Reverter CV completamente
+**Data:** 07/01/2026
+**Implementação:** Webhooks de refund e cancel criam entradas negativas no cv_ledger
+**Observação:** CV é revertido integralmente, recalculando o CV mensal
+
+---
+
+### TBD-010 — Job de fechamento mensal ✅
+**Decisão:**
+- Executar: 1º dia do mês às 03:00 UTC (00:00 BRT)
+- Timezone: America/Sao_Paulo
+- Pedidos do último dia: Considerados até 23:59:59 do mês anterior
+
+**Data:** 07/01/2026
+**Implementação:** `app/api/cron/close-monthly-cv/route.ts` + `vercel.json`
 
 ---
 

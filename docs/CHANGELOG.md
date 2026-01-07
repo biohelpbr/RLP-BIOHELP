@@ -19,6 +19,29 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 2.0 — 2026-01-07
+**Tipo:** Nova feature (Sprint 2)  
+**Mudanças:**
+- Implementação completa do Sprint 2 (CV + Status)
+- Novas tabelas: orders, order_items, cv_ledger, cv_monthly_summary
+- Webhooks Shopify para orders/paid, orders/refunded, orders/cancelled
+- Cálculo automático de CV (100% do valor do pedido)
+- Status automático baseado em CV (active se >= 200/mês)
+- Dashboard atualizado com progresso de CV
+- Job de fechamento mensal
+- Ajuste manual de CV pelo admin
+- Ledger auditável e imutável
+
+**Impacto:**
+- Prazo: Conforme planejado
+- Custo: Incluso no escopo
+- Risco: Baixo
+
+**Aprovado por (cliente):** ____________________  
+**Evidência:** ____________________
+
+---
+
 ## Template para novas entradas
 ### Versão X.Y — AAAA-MM-DD
 **Tipo:** ajuste de regra / nova feature / correção de escopo / mudança técnica  

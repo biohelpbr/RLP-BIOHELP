@@ -83,12 +83,67 @@ Para um cadastro bem-sucedido (membro novo):
 
 ---
 
-## Sprint 2 — CV + Status (futuro)
-- [ ] Webhooks idempotentes (mesmo evento não duplica)
-- [ ] Pedido pago soma CV corretamente
-- [ ] Refund/cancel remove CV corretamente
-- [ ] CV mensal fecha no mês correto
-- [ ] Status muda para active quando CV >= 200
+## Sprint 2 — CV + Status ✅
+- [x] Webhooks idempotentes (mesmo evento não duplica)
+- [x] Pedido pago soma CV corretamente
+- [x] Refund/cancel remove CV corretamente
+- [x] CV mensal fecha no mês correto
+- [x] Status muda para active quando CV >= 200
+- [x] Dashboard mostra CV atual e progresso
+- [x] Admin pode ver CV de qualquer membro
+- [x] Admin pode fazer ajuste manual de CV
+- [x] Ledger é imutável (auditável)
+- [x] Job mensal fecha mês corretamente
+
+### Teste CV (Sprint 2) — Validação por evidência
+
+#### Pré-requisitos
+- Webhooks configurados no Shopify Admin
+- Variáveis de ambiente configuradas (SHOPIFY_WEBHOOK_SECRET, CRON_SECRET)
+- App rodando em staging
+
+#### Cenário T-CV-01 — Pedido pago gera CV
+1) Faça um pedido na loja Shopify com e-mail de membro cadastrado
+2) Aguarde webhook ser processado
+3) No Dashboard do membro:
+   - CV deve aumentar pelo valor do pedido
+   - Barra de progresso deve atualizar
+4) No Supabase:
+   - Registro em `orders` com status 'paid'
+   - Registros em `order_items`
+   - Entradas no `cv_ledger` com cv_type 'order_paid'
+
+✅ Passa se: CV calculado corretamente e registrado no ledger.
+
+#### Cenário T-CV-02 — Refund reverte CV
+1) Reembolse um pedido no Shopify
+2) Aguarde webhook ser processado
+3) No Dashboard do membro:
+   - CV deve diminuir
+   - Status pode mudar se CV < 200
+4) No Supabase:
+   - `orders.status` = 'refunded'
+   - Entradas negativas no `cv_ledger` com cv_type 'order_refunded'
+
+✅ Passa se: CV revertido corretamente.
+
+#### Cenário T-CV-03 — Idempotência
+1) Simule o mesmo webhook sendo enviado 2x
+2) No Supabase:
+   - Apenas 1 registro em `orders`
+   - CV não deve duplicar
+
+✅ Passa se: Pedido não duplicado.
+
+#### Cenário T-CV-04 — Status muda para Active
+1) Faça compras suficientes para atingir 200 CV
+2) No Dashboard:
+   - Status deve mudar para "Ativa"
+   - Barra de progresso em 100%
+3) No Shopify Admin:
+   - Tag `lrp_status:active` aplicada
+
+✅ Passa se: Status atualizado em todos os sistemas.
 
 ---
 

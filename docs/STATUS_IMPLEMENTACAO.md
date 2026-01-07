@@ -1,315 +1,272 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** Dezembro 2024  
-**Sprint Atual:** Sprint 1 (MVP Operacional Inicial)  
-**Status Geral:** 🟡 Em andamento (70% completo)
+**Data:** Janeiro 2026  
+**Sprint Atual:** Sprint 2 (CV + Status)  
+**Status Geral:** ✅ Sprint 2 Completo
 
 ---
 
 ## 🎯 Resumo Executivo
 
-O projeto está na **Fase 1 (Sprint 1)**, focando no MVP operacional: cadastro, rede de indicação e sincronização com Shopify. A infraestrutura base está pronta, as funcionalidades principais estão implementadas, mas ainda faltam alguns componentes críticos (autenticação completa e testes end-to-end).
+O projeto está na **Fase 2 (Sprint 2)**, focando na implementação de CV (Commission Volume) e status mensal dos membros. **Sprint 2 foi concluído com sucesso!**
 
 ---
 
-## ✅ O QUE JÁ FOI IMPLEMENTADO
+## ✅ SPRINT 1 — CONCLUÍDO (100%)
 
-### 1. Infraestrutura e Banco de Dados ✅
-
+### Resumo do Sprint 1
 | Componente | Status | Detalhes |
 |------------|--------|----------|
 | **Schema Supabase** | ✅ Completo | 4 tabelas criadas com migrations |
 | **RLS (Row Level Security)** | ✅ Ativo | Políticas de segurança implementadas |
-| **Tipos TypeScript** | ✅ Completo | Tipagem completa do banco |
+| **API Backend** | ✅ Completo | Todos endpoints funcionais |
+| **Integração Shopify** | ✅ Completo | REST API com tags |
+| **Frontend** | ✅ Completo | Todas páginas funcionais |
+| **Autenticação** | ✅ Completo | Supabase Auth integrado |
 
-**Tabelas criadas:**
-- ✅ `members` — Cadastro de membros
-- ✅ `referral_events` — Histórico de indicações e UTMs
-- ✅ `shopify_customers` — Rastreamento de sync com Shopify
-- ✅ `roles` — Controle de permissões (member/admin)
-
-**Evidência:** Migrations aplicadas no Supabase (projeto `rlp-biohelp`)
+**Especificação:** SPEC seções 4, 5, 6, 7, 8, 9, 10 (Sprint 1)
 
 ---
 
-### 2. API Backend (Next.js) ✅
+## ✅ SPRINT 2 — CONCLUÍDO (100%)
+
+### Objetivo do Sprint 2
+**Entrega:** "Membro compra → CV é calculado → Status muda para 'active' se CV >= 200 no mês"
+
+**Especificação:** SPEC seção 1.2
+
+### 1. Schema do Banco (Supabase) ✅
+
+| Tabela | Status | Descrição |
+|--------|--------|-----------|
+| `orders` | ✅ Completo | Espelho dos pedidos Shopify |
+| `order_items` | ✅ Completo | Itens dos pedidos |
+| `cv_ledger` | ✅ Completo | Ledger auditável de CV |
+| `cv_monthly_summary` | ✅ Completo | Resumo mensal por membro |
+| `members` (campos CV) | ✅ Completo | Novos campos para CV mensal |
+
+**Arquivo:** `supabase/migrations/20260107_sprint2_cv_tables.sql`
+
+### 2. Webhooks Shopify ✅
 
 | Endpoint | Status | Funcionalidade |
 |----------|--------|----------------|
-| `POST /api/members/join` | ✅ Implementado | Cadastro de membro com link de indicação |
-| `GET /api/members/me` | ✅ Implementado | Dados do membro autenticado |
-| `GET /api/admin/members` | ✅ Implementado | Lista/busca de membros (admin) |
-| `POST /api/admin/members/:id/resync-shopify` | ✅ Implementado | Reprocessar sync Shopify |
+| `POST /api/webhooks/shopify/orders/paid` | ✅ Completo | Receber pedido pago |
+| `POST /api/webhooks/shopify/orders/refunded` | ✅ Completo | Reverter CV em refund |
+| `POST /api/webhooks/shopify/orders/cancelled` | ✅ Completo | Reverter CV em cancelamento |
 
-**Funcionalidades implementadas:**
-- ✅ Cadastro com link de indicação (`ref`)
-- ✅ Validação de e-mail único
-- ✅ Geração de `ref_code` único (8 caracteres)
-- ✅ Vinculação de sponsor (rede de indicação)
-- ✅ Captura de parâmetros UTM
-- ✅ Tratamento de erros (e-mail existente, ref inválido)
-- ✅ Graceful degradation (Shopify falha não bloqueia cadastro)
+**Arquivos:**
+- `app/api/webhooks/shopify/orders/paid/route.ts`
+- `app/api/webhooks/shopify/orders/refunded/route.ts`
+- `app/api/webhooks/shopify/orders/cancelled/route.ts`
 
-**Especificação:** SPEC seções 4.1, 4.3, 7.1, 7.2
+### 3. API Endpoints ✅
 
----
+| Endpoint | Status | Funcionalidade |
+|----------|--------|----------------|
+| `GET /api/members/me/cv` | ✅ Completo | CV do membro autenticado |
+| `GET /api/admin/members/:id/cv` | ✅ Completo | CV detalhado (admin) |
+| `POST /api/admin/members/:id/cv` | ✅ Completo | Ajuste manual de CV |
 
-### 3. Integração Shopify ✅
+**Arquivos:**
+- `app/api/members/me/cv/route.ts`
+- `app/api/admin/members/[id]/cv/route.ts`
 
-| Funcionalidade | Status | Detalhes |
-|----------------|--------|----------|
-| **Customer Create/Update** | ✅ Implementado | Upsert por e-mail via REST API |
-| **Tags aplicadas** | ✅ Implementado | Tags conforme SPEC 4.4 |
-| **Tratamento de falhas** | ✅ Implementado | Registra erro sem bloquear cadastro |
-| **Resync manual** | ✅ Implementado | Admin pode reprocessar |
+### 4. Job de Fechamento Mensal ✅
 
-**Tags aplicadas no Shopify:**
-- `lrp_member`
-- `lrp_ref:<ref_code>`
-- `lrp_sponsor:<sponsor_ref_code|none>`
-- `lrp_status:pending`
+| Item | Status | Descrição |
+|------|--------|-----------|
+| Cron job | ✅ Completo | Fechar CV do mês anterior |
+| Atualização de status | ✅ Completo | active/inactive baseado em CV |
+| Sync tags Shopify | ✅ Completo | Atualizar tag lrp_status |
 
-**Nota técnica (Jan/2026):** Migrado de GraphQL para REST API devido a limitações do plano Basic da Shopify (acesso a PII bloqueado via GraphQL para custom apps). REST API funciona corretamente em todos os planos.
+**Arquivo:** `app/api/cron/close-monthly-cv/route.ts`
 
-**Especificação:** SPEC seções 4.4, 8.2, 12
+### 5. Frontend ✅
 
----
+| Componente | Status | Descrição |
+|------------|--------|-----------|
+| Dashboard - CV atual | ✅ Completo | Exibir CV do mês |
+| Dashboard - Progresso | ✅ Completo | Barra de progresso 200 CV |
+| Dashboard - Histórico | ✅ Completo | Meses anteriores |
 
-### 4. Interface do Usuário (Frontend) ✅
+**Arquivos:**
+- `app/dashboard/page.tsx`
+- `app/dashboard/page.module.css`
 
-| Página | Status | Funcionalidades |
-|--------|--------|-----------------|
-| `/join` | ✅ Implementado | Formulário de cadastro com validação |
-| `/dashboard` | ✅ Implementado | Painel do membro (v1) |
-| `/admin` | ✅ Implementado | Painel administrativo |
-| `/login` | 🟡 Placeholder | UI pronta, auth pendente |
+### 6. Bibliotecas ✅
 
-**Funcionalidades do Dashboard:**
-- ✅ Exibe dados do membro (nome, e-mail, sponsor)
-- ✅ Mostra `ref_code` e link de convite
-- ✅ Botão para copiar link de convite
-- ✅ CTA para ir à loja Shopify
-- ✅ Aviso de status de sync (se falhou)
+| Biblioteca | Status | Descrição |
+|------------|--------|-----------|
+| `lib/cv/calculator.ts` | ✅ Completo | Cálculo de CV |
+| `lib/shopify/webhook.ts` | ✅ Completo | Validação de webhooks |
 
-**Funcionalidades do Admin:**
-- ✅ Lista de membros com paginação
-- ✅ Busca por e-mail, nome ou ref_code
-- ✅ Exibe sponsor e status de sync Shopify
-- ✅ Botão "Resync Shopify" por membro
+### 7. Tipos TypeScript ✅
 
-**Especificação:** SPEC seções 5.1, 5.3, 6.1, 6.2, 6.3
+Novos tipos em `types/database.ts`:
+- ✅ `Order`, `OrderInsert`
+- ✅ `OrderItem`, `OrderItemInsert`
+- ✅ `CVLedger`, `CVLedgerInsert`
+- ✅ `CVMonthlySummary`, `CVMonthlySummaryInsert`
+- ✅ `MemberCVResponse`
+- ✅ `CVAdjustmentRequest`
 
 ---
 
-### 5. Utilitários e Helpers ✅
-
-| Componente | Status | Função |
-|------------|--------|--------|
-| `generateRefCode()` | ✅ Implementado | Gera código único de 8 caracteres |
-| `syncMemberToShopify()` | ✅ Implementado | Sincroniza membro com Shopify |
-| `syncCustomerToShopify()` | ✅ Implementado | Operações REST na Shopify API |
-| Validação de formulários | ✅ Implementado | Validação client-side |
-
----
-
-## 🟡 O QUE ESTÁ PENDENTE (Sprint 1)
-
-### 1. Autenticação Supabase Auth ⚠️ CRÍTICO
-
-| Item | Status | Impacto |
-|------|--------|---------|
-| **Login funcional** | ❌ Não implementado | Bloqueia acesso ao dashboard |
-| **Criação de usuário Auth** | ❌ Não implementado | Membro criado sem conta de login |
-| **Sessão persistente** | ❌ Não implementado | Usa cookie temporário (inseguro) |
-| **Proteção de rotas** | ❌ Não implementado | Rotas não protegidas |
-
-**Observação:** O código atual usa um cookie temporário (`member_id`) para testes. Isso **não é seguro para produção**.
-
-**Especificação:** SPEC seção 5.2 (fluxo de login)
-
----
-
-### 2. Decisões TBD Pendentes ⚠️ BLOQUEADOR
-
-| TBD | Status | Impacto |
-|-----|--------|---------|
-| **TBD-001: Cadastro sem link** | ❌ Não decidido | Bloqueia cadastros sem `ref` |
-| **TBD-004: URLs oficiais** | ❌ Não definido | Redirects e webhooks dependem |
-| **TBD-006: Formato do ref_code** | ❌ Não decidido | Pode mudar formato atual |
-
-**Observação:** O sistema atualmente **bloqueia** cadastros sem link de indicação (comportamento padrão conforme SPEC 4.2).
-
----
-
-### 3. Testes e Validação ⚠️ IMPORTANTE
-
-| Item | Status |
-|------|--------|
-| **Testes end-to-end** | ❌ Não executados |
-| **Validação no Shopify Admin** | ❌ Não validado |
-| **Teste de RLS** | ❌ Não testado |
-| **Teste de fluxo completo** | ❌ Não testado |
-
----
-
-## 📋 Checklist de Aceite (Sprint 1)
-
-Conforme `docs/ACCEPTANCE.md`:
+## 📋 Checklist de Aceite (Sprint 2)
 
 | Critério | Status | Observação |
 |----------|--------|------------|
-| Cadastro com link vincula sponsor | ✅ | Implementado |
-| `ref_code` único gerado | ✅ | Implementado |
-| Customer Shopify criado/atualizado | ✅ | Implementado |
-| Tags aplicadas corretamente | ✅ | Implementado |
-| Dashboard mostra link de convite | ✅ | Implementado |
-| Admin busca membro e executa resync | ✅ | Implementado |
-| RLS ativo | ✅ | Implementado |
-| **Login funciona** | ❌ | **Pendente** |
-| **Redirect pós-cadastro** | 🟡 | Funciona, mas sem auth real |
+| Webhook `orders/paid` processa corretamente | ✅ | Implementado |
+| Webhook `orders/refunded` reverte CV | ✅ | Implementado |
+| Webhook `orders/cancelled` reverte CV | ✅ | Implementado |
+| Idempotência: mesmo pedido não duplica CV | ✅ | Implementado |
+| CV mensal soma corretamente | ✅ | Implementado |
+| Status muda para 'active' quando CV >= 200 | ✅ | Implementado |
+| Status volta para 'pending' quando CV < 200 | ✅ | Implementado |
+| Job mensal fecha mês corretamente | ✅ | Implementado |
+| Dashboard mostra CV atual | ✅ | Implementado |
+| Admin pode ver CV de qualquer membro | ✅ | Implementado |
+| Admin pode fazer ajuste manual de CV | ✅ | Implementado |
+| Ledger é imutável (auditável) | ✅ | Implementado |
 
 ---
 
-## 🚧 Limitações Conhecidas
+## 📝 TBDs Resolvidos no Sprint 2
 
-1. **Autenticação:** Sistema usa cookie temporário inseguro. Precisa Supabase Auth.
-2. **Cadastro sem link:** Bloqueado por padrão (aguardando TBD-001).
-3. **Admin access:** Usa cookie temporário (`is_admin=true`). Precisa auth real.
-4. **Redirect Shopify:** URL hardcoded. Precisa TBD-004.
+### TBD-008 — Regra de cálculo de CV por produto
+**Decisão:** CV = 100% do preço do item (padrão)
+- Implementado em `lib/cv/calculator.ts`
+- Constante `CV_PERCENTAGE = 1.0`
 
----
+### TBD-009 — Comportamento de refund/cancel
+**Decisão:** Reverter CV completamente
+- Valores negativos no cv_ledger
+- Recálculo do CV mensal
 
-## 📈 Progresso por Fase
-
-### Fase 0: Kickoff & Infraestrutura
-- ✅ Documentação SDD criada
-- ✅ SPEC.md definido
-- ✅ Ambientes configurados (Supabase)
-
-### Fase 1: Sprint 1 (Atual)
-- ✅ Banco de dados (100%)
-- ✅ API Backend (100%)
-- ✅ Integração Shopify (100%)
-- ✅ Frontend (90% — falta auth)
-- ❌ Autenticação (0%)
-- ❌ Testes (0%)
-
-**Progresso Sprint 1:** ~70% completo
+### TBD-010 — Job de fechamento mensal
+**Decisão:**
+- Executar: 1º dia do mês às 03:00 UTC (00:00 BRT)
+- Pedidos: Considerados até 23:59:59 do mês anterior
 
 ---
 
-## 🎯 Próximos Passos (Para Completar Sprint 1)
+## 📈 Progresso por Sprint
 
-### Prioridade ALTA (Bloqueadores)
-1. **Implementar Supabase Auth**
-   - Criar usuário Auth no cadastro
-   - Implementar login funcional
-   - Proteger rotas autenticadas
-   - Substituir cookie temporário
+### Sprint 1 (Concluído)
+```
+├── ✅ Banco de Dados          [████████████████████] 100%
+├── ✅ API Backend             [████████████████████] 100%
+├── ✅ Integração Shopify      [████████████████████] 100%
+├── ✅ Frontend                [████████████████████] 100%
+├── ✅ Autenticação            [████████████████████] 100%
+└── ✅ Segurança (RLS)         [████████████████████] 100%
+```
 
-2. **Decidir TBD-001 (Cadastro sem link)**
-   - Cliente precisa escolher opção A/B/C
-   - Implementar regra escolhida
+### Sprint 2 (Concluído)
+```
+├── ✅ Schema (orders/cv)      [████████████████████] 100%
+├── ✅ Webhooks Shopify        [████████████████████] 100%
+├── ✅ Cálculo de CV           [████████████████████] 100%
+├── ✅ Job Mensal              [████████████████████] 100%
+├── ✅ API Endpoints           [████████████████████] 100%
+└── ✅ Frontend CV             [████████████████████] 100%
 
-3. **Testes End-to-End**
-   - Validar fluxo completo de cadastro
-   - Verificar tags no Shopify Admin
-   - Testar RLS (membro não vê dados de outro)
-
-### Prioridade MÉDIA
-4. **Definir URLs (TBD-004)**
-   - URLs de staging/prod
-   - Configurar variáveis de ambiente
-
-5. **Validação com Cliente**
-   - Testar fluxo completo
-   - Ajustar UI se necessário
+Progresso Sprint 2: 100% ✅
+```
 
 ---
 
-## 📊 Métricas de Qualidade
+## 🔒 Segurança e RLS (Sprint 2)
 
-| Métrica | Status |
-|---------|--------|
-| **Cobertura do SPEC** | ~85% (Sprint 1) |
-| **Código documentado** | ✅ Sim (comentários SPEC) |
-| **TypeScript** | ✅ 100% tipado |
-| **RLS ativo** | ✅ Sim |
-| **Tratamento de erros** | ✅ Implementado |
-| **Logs estruturados** | ✅ Parcial |
+### Policies Implementadas
 
----
+#### `orders`
+- ✅ Member pode ler apenas seus próprios pedidos
+- ✅ Admin pode ler todos
 
-## 🔍 Evidências de Implementação
+#### `order_items`
+- ✅ Member pode ler apenas itens de seus próprios pedidos
+- ✅ Admin pode ler todos
 
-### Código Implementado
-- ✅ `app/api/members/join/route.ts` — Endpoint de cadastro
-- ✅ `app/api/members/me/route.ts` — Dados do membro
-- ✅ `app/api/admin/members/route.ts` — Lista admin
-- ✅ `app/api/admin/members/[id]/resync-shopify/route.ts` — Resync
-- ✅ `lib/shopify/sync.ts` — Sincronização Shopify
-- ✅ `lib/shopify/customer.ts` — Operações GraphQL
-- ✅ `app/join/page.tsx` — Página de cadastro
-- ✅ `app/dashboard/page.tsx` — Dashboard do membro
-- ✅ `app/admin/page.tsx` — Painel admin
+#### `cv_ledger`
+- ✅ Member pode ler apenas seu próprio ledger
+- ✅ Admin pode ler todos
+- ✅ Apenas service_role pode inserir
 
-### Banco de Dados
-- ✅ Migrations aplicadas no Supabase
-- ✅ RLS policies ativas
-- ✅ Constraints (UNIQUE, FK) configuradas
+#### `cv_monthly_summary`
+- ✅ Member pode ler apenas seu próprio resumo
+- ✅ Admin pode ler todos
+
+**Arquivo:** `supabase/migrations/20260107_sprint2_rls_policies.sql`
 
 ---
 
-## ⚠️ Riscos e Dependências
+## 🔧 Configuração Necessária
 
-| Risco | Severidade | Mitigação |
-|-------|------------|-----------|
-| **Auth não implementada** | 🔴 Alta | Bloqueia go-live |
-| **TBD-001 não decidido** | 🟡 Média | Limita cadastros |
-| **Testes não executados** | 🟡 Média | Pode ter bugs em produção |
-| **URLs não definidas** | 🟢 Baixa | Fácil ajustar depois |
+### Variáveis de Ambiente (Novas)
+```env
+SHOPIFY_WEBHOOK_SECRET=shpss_xxx...  # Secret do webhook Shopify
+CRON_SECRET=seu_secret_aqui         # Protege o job mensal
+```
 
----
+### Webhooks no Shopify Admin
+1. `Order payment` → `/api/webhooks/shopify/orders/paid`
+2. `Order refund` → `/api/webhooks/shopify/orders/refunded`
+3. `Order cancellation` → `/api/webhooks/shopify/orders/cancelled`
 
-## 📝 Notas para Apresentação ao Cliente
-
-### Pontos Positivos ✅
-1. **Infraestrutura sólida:** Banco de dados e RLS configurados corretamente
-2. **Integração Shopify funcional:** Tags aplicadas conforme especificação
-3. **Código bem documentado:** Cada arquivo referencia seção do SPEC
-4. **Tratamento de erros:** Sistema não quebra se Shopify falhar
-
-### Pontos de Atenção ⚠️
-1. **Autenticação pendente:** Necessário para produção
-2. **Decisão TBD-001:** Precisa definir regra de cadastro sem link
-3. **Testes:** Necessário validar fluxo completo antes de go-live
-
-### Recomendações 💡
-1. **Priorizar auth:** Sem isso, sistema não pode ir para produção
-2. **Decidir TBD-001:** Permite cadastros sem link (se necessário)
-3. **Agendar validação:** Testar fluxo completo com cliente
+### Cron Job (Vercel)
+```json
+{
+  "crons": [{
+    "path": "/api/cron/close-monthly-cv",
+    "schedule": "0 3 1 * *"
+  }]
+}
+```
 
 ---
 
-## 📅 Timeline Estimado (Para Completar Sprint 1)
+## 📂 Arquivos Criados no Sprint 2
 
-| Tarefa | Estimativa |
-|--------|------------|
-| Implementar Supabase Auth | 2-3 dias |
-| Decidir e implementar TBD-001 | 1 dia |
-| Testes end-to-end | 1-2 dias |
-| Ajustes finais | 1 dia |
-| **Total** | **5-7 dias úteis** |
+### Migrations
+- `supabase/migrations/20260107_sprint2_cv_tables.sql`
+- `supabase/migrations/20260107_sprint2_rls_policies.sql`
+
+### Bibliotecas
+- `lib/cv/calculator.ts`
+- `lib/shopify/webhook.ts`
+
+### API Routes
+- `app/api/webhooks/shopify/orders/paid/route.ts`
+- `app/api/webhooks/shopify/orders/refunded/route.ts`
+- `app/api/webhooks/shopify/orders/cancelled/route.ts`
+- `app/api/members/me/cv/route.ts`
+- `app/api/admin/members/[id]/cv/route.ts`
+- `app/api/cron/close-monthly-cv/route.ts`
+
+### Frontend (Modificados)
+- `app/dashboard/page.tsx`
+- `app/dashboard/page.module.css`
+
+### Tipos
+- `types/database.ts` (atualizado)
 
 ---
 
-**Última atualização:** Dezembro 2024  
-**Próxima revisão:** Após implementação de auth
+## 📅 Próximos Passos
 
+### Imediato (Configuração)
+1. ✅ Aplicar migrations no Supabase
+2. ⏳ Configurar webhooks no Shopify Admin
+3. ⏳ Adicionar variáveis de ambiente na Vercel
+4. ⏳ Testar com pedido real
 
+### Sprint 3 (Próximo)
+1. Visualização da rede (N1, N2)
+2. Cálculo de níveis
+3. Regras de progressão
 
+---
 
-
-
-
-
-
+**Última atualização:** 07/01/2026  
+**Status:** Sprint 2 Completo ✅

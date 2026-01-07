@@ -426,6 +426,186 @@
   color: #b45309;
 }
 
+/* CV Card - Sprint 2 */
+.cvCard {
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  color: white;
+  margin-bottom: var(--space-xl);
+  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+}
+
+.cvHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.cvTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.cvSubtitle {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.cvTarget {
+  text-align: right;
+}
+
+.cvTargetLabel {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.cvTargetValue {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.cvProgress {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.cvProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-md);
+}
+
+.cvCurrent {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.cvPercentage {
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.cvProgressBar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+
+.cvProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #a3e635 0%, #84cc16 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.cvRemaining {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.cvRemaining strong {
+  font-weight: 600;
+}
+
+.cvComplete {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #a3e635;
+}
+
+/* Stat card blue variant */
+.statCardBlue {
+  border-color: #3b82f6;
+}
+
+/* History Card - Sprint 2 */
+.historyCard {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--space-xl);
+}
+
+.historyTitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: var(--space-lg);
+}
+
+.historyTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.historyHeader {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.historyRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  font-size: 0.875rem;
+  color: var(--gray-700);
+  border-radius: var(--radius-md);
+  transition: background 0.2s ease;
+}
+
+.historyRow:hover {
+  background: var(--gray-50);
+}
+
+.historyCV {
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.historyStatus {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.statusInactive {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
 /* Loading */
 .loading {
   display: flex;

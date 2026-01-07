@@ -1,0 +1,54 @@
+===============================================
+   LOGINS DE TESTE - RLP BIOHELP
+   (NÃO COMMITAR - ARQUIVO TEMPORÁRIO)
+===============================================
+
+PORTAL ADMIN
+------------
+URL: /admin
+Email: admin@biohelp.test
+Senha: 123456
+
+
+PORTAL PARCEIRAS (Dashboard)
+----------------------------
+URL: /dashboard
+
+Parceira 1:
+Email: sponsor@biohelp.test
+Senha: sponsor123
+
+
+===============================================
+NOTA: membro@teste.com
+===============================================
+O usuário membro@teste.com existe na tabela members
+mas NÃO tem conta no Supabase Auth.
+Para usar, seria necessário criar o usuário no Auth.
+
+
+===============================================
+URLS DE ACESSO (Local)
+===============================================
+Home:      http://localhost:3000/
+Login:     http://localhost:3000/login
+Cadastro:  http://localhost:3000/join?ref=SPONSOR01
+Dashboard: http://localhost:3000/dashboard
+Admin:     http://localhost:3000/admin
+
+
+===============================================
+URLS DE ACESSO (Vercel - Produção)
+===============================================
+Home:      https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/
+Login:     https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/login
+Dashboard: https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/dashboard
+Admin:     https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/admin
+
+
+===============================================
+NOTAS
+===============================================
+- Admin redireciona automaticamente para /admin
+- Parceiras redirecionam para /dashboard
+- Para criar nova parceira, use /join?ref=SPONSOR01

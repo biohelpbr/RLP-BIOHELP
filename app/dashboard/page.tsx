@@ -1,7 +1,7 @@
 /**
  * Dashboard do Membro
  * SPEC: Seção 5.1, 6.2 - GET /dashboard
- * Sprint: 1
+ * Sprint: 1 + 2 (CV)
  * 
  * Página protegida - requer autenticação via Supabase Auth
  */
@@ -24,6 +24,23 @@ interface MemberData {
     ref_code: string
   }
   created_at: string
+}
+
+interface CVData {
+  currentMonth: {
+    month: string
+    cv: number
+    target: number
+    remaining: number
+    status: string
+    percentage: number
+  }
+  history: Array<{
+    month: string
+    cv: number
+    status: string
+    ordersCount: number
+  }>
 }
 
 // Ícones SVG
@@ -99,17 +116,32 @@ const Icons = {
       <polyline points="12 6 12 12 16 14"/>
     </svg>
   ),
+  trendingUp: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+      <polyline points="17 6 23 6 23 12"/>
+    </svg>
+  ),
+  target: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <circle cx="12" cy="12" r="6"/>
+      <circle cx="12" cy="12" r="2"/>
+    </svg>
+  ),
 }
 
 export default function DashboardPage() {
   const router = useRouter()
   const [member, setMember] = useState<MemberData | null>(null)
+  const [cvData, setCvData] = useState<CVData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     fetchMemberData()
+    fetchCVData()
   }, [])
 
   const fetchMemberData = async () => {
@@ -133,6 +165,18 @@ export default function DashboardPage() {
       console.error('Erro ao carregar dados:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchCVData = async () => {
+    try {
+      const response = await fetch('/api/members/me/cv')
+      if (response.ok) {
+        const data = await response.json()
+        setCvData(data)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar CV:', error)
     }
   }
 
@@ -170,6 +214,20 @@ export default function DashboardPage() {
       .toUpperCase()
   }
 
+  const formatMonth = (monthYear: string) => {
+    const [year, month] = monthYear.split('-')
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+    return `${months[parseInt(month) - 1]}/${year}`
+  }
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active': return 'Ativa'
+      case 'inactive': return 'Inativa'
+      default: return 'Pendente'
+    }
+  }
+
   if (isLoading) {
     return <div className={styles.loading}>Carregando...</div>
   }
@@ -183,6 +241,19 @@ export default function DashboardPage() {
     status: 'active',
     sponsor: { name: 'João Sponsor', ref_code: 'JOAO1' },
     created_at: new Date().toISOString()
+  }
+
+  // CV padrão se não houver dados
+  const displayCV = cvData || {
+    currentMonth: {
+      month: new Date().toISOString().slice(0, 7),
+      cv: 0,
+      target: 200,
+      remaining: 200,
+      status: 'pending',
+      percentage: 0
+    },
+    history: []
   }
 
   return (
@@ -252,25 +323,62 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* CV Progress Card - Sprint 2 */}
+        <div className={styles.cvCard}>
+          <div className={styles.cvHeader}>
+            <div>
+              <h2 className={styles.cvTitle}>CV do Mês</h2>
+              <p className={styles.cvSubtitle}>{formatMonth(displayCV.currentMonth.month)}</p>
+            </div>
+            <div className={styles.cvTarget}>
+              <span className={styles.cvTargetLabel}>Meta</span>
+              <span className={styles.cvTargetValue}>{displayCV.currentMonth.target} CV</span>
+            </div>
+          </div>
+          
+          <div className={styles.cvProgress}>
+            <div className={styles.cvProgressHeader}>
+              <span className={styles.cvCurrent}>{displayCV.currentMonth.cv.toFixed(0)} CV</span>
+              <span className={styles.cvPercentage}>{displayCV.currentMonth.percentage.toFixed(0)}%</span>
+            </div>
+            <div className={styles.cvProgressBar}>
+              <div 
+                className={styles.cvProgressFill} 
+                style={{ width: `${Math.min(displayCV.currentMonth.percentage, 100)}%` }}
+              />
+            </div>
+            {displayCV.currentMonth.remaining > 0 && (
+              <p className={styles.cvRemaining}>
+                Faltam <strong>{displayCV.currentMonth.remaining.toFixed(0)} CV</strong> para ativar
+              </p>
+            )}
+            {displayCV.currentMonth.percentage >= 100 && (
+              <p className={styles.cvComplete}>
+                {Icons.check} Meta atingida! Você está ativa este mês.
+              </p>
+            )}
+          </div>
+        </div>
+
         {/* Stats Grid */}
         <div className={styles.statsGrid}>
-          <div className={`${styles.statCard} ${styles.statCardGreen}`}>
+          <div className={`${styles.statCard} ${displayCV.currentMonth.status === 'active' ? styles.statCardGreen : styles.statCardYellow}`}>
             <div className={styles.statHeader}>
               <span className={styles.statLabel}>Status de Ativação</span>
               <span className={styles.statIcon}>{Icons.zap}</span>
             </div>
-            <div className={styles.statValue}>Ativa</div>
+            <div className={styles.statValue}>{getStatusLabel(displayCV.currentMonth.status)}</div>
           </div>
 
           <div className={`${styles.statCard} ${styles.statCardPurple}`}>
             <div className={styles.statHeader}>
-              <span className={styles.statLabel}>Indicados</span>
-              <span className={styles.statIcon}>{Icons.users}</span>
+              <span className={styles.statLabel}>CV Acumulado</span>
+              <span className={styles.statIcon}>{Icons.trendingUp}</span>
             </div>
-            <div className={styles.statValue}>0</div>
+            <div className={styles.statValue}>{displayCV.currentMonth.cv.toFixed(0)}</div>
           </div>
 
-          <div className={`${styles.statCard} ${styles.statCardYellow}`}>
+          <div className={`${styles.statCard} ${styles.statCardBlue}`}>
             <div className={styles.statHeader}>
               <span className={styles.statLabel}>Meu Código</span>
               <span className={styles.statIcon}>{Icons.link}</span>
@@ -318,8 +426,8 @@ export default function DashboardPage() {
             </div>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Status</span>
-              <span className={`${styles.infoValue} ${styles.statusBadge} ${displayMember.status === 'active' ? styles.statusActive : styles.statusPending}`}>
-                {displayMember.status === 'active' ? (
+              <span className={`${styles.infoValue} ${styles.statusBadge} ${displayCV.currentMonth.status === 'active' ? styles.statusActive : styles.statusPending}`}>
+                {displayCV.currentMonth.status === 'active' ? (
                   <>{Icons.check} Ativo</>
                 ) : (
                   <>{Icons.clock} Pendente</>
@@ -349,6 +457,31 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+
+        {/* CV History - Sprint 2 */}
+        {displayCV.history.length > 0 && (
+          <div className={styles.historyCard}>
+            <h3 className={styles.historyTitle}>Histórico de CV</h3>
+            <div className={styles.historyTable}>
+              <div className={styles.historyHeader}>
+                <span>Mês</span>
+                <span>CV</span>
+                <span>Pedidos</span>
+                <span>Status</span>
+              </div>
+              {displayCV.history.map((item, index) => (
+                <div key={index} className={styles.historyRow}>
+                  <span>{formatMonth(item.month)}</span>
+                  <span className={styles.historyCV}>{item.cv.toFixed(0)}</span>
+                  <span>{item.ordersCount}</span>
+                  <span className={`${styles.historyStatus} ${item.status === 'active' ? styles.statusActive : styles.statusInactive}`}>
+                    {getStatusLabel(item.status)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
