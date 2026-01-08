@@ -103,6 +103,12 @@ const Icons = {
       <line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
   ),
+  eye: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  ),
 }
 
 export default function AdminPage() {
@@ -296,7 +302,9 @@ export default function AdminPage() {
                 {members.map((member) => (
                   <tr key={member.id}>
                     <td>
-                      <span className={styles.memberName}>{member.name}</span>
+                      <Link href={`/admin/members/${member.id}`} className={styles.memberName}>
+                        {member.name}
+                      </Link>
                     </td>
                     <td>{member.email}</td>
                     <td>
@@ -322,16 +330,22 @@ export default function AdminPage() {
                     </td>
                     <td>{formatDate(member.created_at)}</td>
                     <td>
-                      <button
-                        className={styles.resyncBtn}
-                        onClick={() => handleResync(member.id)}
-                        disabled={syncingId === member.id}
-                      >
-                        <span className={syncingId === member.id ? styles.spinning : ''}>
-                          {Icons.refresh}
-                        </span>
-                        <span>Resync</span>
-                      </button>
+                      <div className={styles.actionBtns}>
+                        <Link href={`/admin/members/${member.id}`} className={styles.viewBtn}>
+                          {Icons.eye}
+                          <span>CV</span>
+                        </Link>
+                        <button
+                          className={styles.resyncBtn}
+                          onClick={() => handleResync(member.id)}
+                          disabled={syncingId === member.id}
+                        >
+                          <span className={syncingId === member.id ? styles.spinning : ''}>
+                            {Icons.refresh}
+                          </span>
+                          <span>Resync</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

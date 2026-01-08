@@ -257,7 +257,14 @@
 
 .memberName {
   font-weight: 600;
-  color: var(--gray-900);
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.memberName:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
 }
 
 .refCode {
@@ -329,6 +336,38 @@
 
 .errorInfo:hover {
   color: var(--gray-600);
+}
+
+/* Action buttons */
+.actionBtns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.viewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  background: var(--gray-100);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.viewBtn svg {
+  flex-shrink: 0;
+}
+
+.viewBtn:hover {
+  background: var(--gray-200);
+  color: var(--gray-900);
 }
 
 /* Resync button */
