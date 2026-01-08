@@ -114,11 +114,17 @@ O **Sprint 2 (CV + Status)** está completo:
 
 ### Painel Admin (Atualizado)
 
+**Nova página de detalhes:** `/admin/members/[id]`
+
 | Componente | Status | Descrição |
 |------------|--------|-----------|
-| CV do membro | ✅ Novo | Ver CV detalhado |
-| Ajuste manual | ✅ Novo | Adicionar/remover CV |
-| Ledger | ✅ Novo | Histórico de transações |
+| CV do membro | ✅ Implementado | Cards com CV atual, meta e progresso |
+| Ajuste manual | ✅ Implementado | Modal para adicionar/remover CV |
+| Ledger | ✅ Implementado | Tabela com transações de CV |
+| Pedidos do mês | ✅ Implementado | Lista de pedidos processados |
+| Histórico de CV | ✅ Implementado | CV mensal acumulado |
+
+**Acesso:** Clique no nome do membro ou no botão "CV" na lista de parceiras
 
 ---
 

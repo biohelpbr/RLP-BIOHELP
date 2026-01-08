@@ -268,6 +268,31 @@ CRON_SECRET=seu_secret_aqui         # Protege o job mensal
 
 ---
 
+## ✅ PÁGINA DE DETALHES DO MEMBRO (Admin)
+
+**Implementado em:** 08/01/2026
+
+### Nova Rota: `/admin/members/[id]`
+
+| Funcionalidade | Status |
+|----------------|--------|
+| CV do Mês (card) | ✅ |
+| Meta e Progresso | ✅ |
+| Botão Ajuste Manual | ✅ |
+| Modal de Ajuste (add/remove) | ✅ |
+| Ledger de transações | ✅ |
+| Lista de pedidos do mês | ✅ |
+| Histórico de CV mensal | ✅ |
+| Link na tabela do Admin | ✅ |
+| Botão "CV" na coluna Ações | ✅ |
+
+### Teste de Ajuste Manual
+- ✅ Adicionado 25 CV via modal
+- ✅ Transação `manual_adjustment` criada no ledger
+- ✅ CV atualizado de 550 → 575
+
+---
+
 ## ✅ VALIDAÇÃO EM PRODUÇÃO (08/01/2026)
 
 ### Teste Realizado
