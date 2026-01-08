@@ -10,9 +10,9 @@
 
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import styles from './page.module.css'
 
 interface MemberDetails {
@@ -139,8 +139,9 @@ const Icons = {
   ),
 }
 
-export default function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function MemberDetailPage() {
+  const params = useParams()
+  const id = params.id as string
   const router = useRouter()
   const [data, setData] = useState<MemberCVData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
