@@ -1,7 +1,8 @@
 # 📋 Plano Técnico — Sprint 2 (CV + Status)
-**Status:** ✅ Implementação Completa  
+**Status:** ✅ CONCLUÍDO E VALIDADO EM PRODUÇÃO  
 **Especificação:** `docs/SPEC.md` Seção 1.2  
-**Data de Conclusão:** Janeiro 2026
+**Data de Conclusão:** 08/01/2026  
+**Validação:** Webhooks testados em produção na Vercel
 
 ---
 
@@ -347,25 +348,25 @@ CRON_SECRET=...             # Secret para proteger cron job
 
 ---
 
-## 📅 Próximos Passos
+## ✅ Configuração Realizada (08/01/2026)
 
-### Configuração no Shopify Admin
-1. Criar webhooks para:
-   - `orders/paid`
-   - `orders/updated` (para refunds)
-   - `orders/cancelled`
-2. Configurar URL base para webhooks
-3. Copiar webhook secret para env
+### Shopify Admin ✅
+1. ✅ Webhook `orders/paid` configurado
+2. ✅ Webhook `orders/refunded` configurado
+3. ✅ Webhook `orders/cancelled` configurado
+4. ✅ Webhook secret copiado para Vercel
 
-### Configuração na Vercel
-1. Adicionar variáveis de ambiente
-2. Configurar cron job no `vercel.json`
+### Vercel ✅
+1. ✅ Variáveis de ambiente configuradas
+2. ✅ `vercel.json` com cron job
+3. ✅ Deploy realizado e testado
 
-### Testes
-1. Criar pedido de teste no Shopify
-2. Verificar CV calculado
-3. Testar refund
-4. Testar fechamento mensal
+### Validação em Produção ✅
+1. ✅ Webhook simulado processado com sucesso
+2. ✅ CV calculado corretamente (R$ 150 por pedido)
+3. ✅ CV mensal acumulado (R$ 550 total)
+4. ✅ Idempotência funcionando (não duplica pedidos)
+5. ✅ Status atualizado para "active"
 
 ---
 
@@ -378,10 +379,160 @@ CRON_SECRET=...             # Secret para proteger cron job
 | Tabelas criadas | 4 |
 | Endpoints criados | 6 |
 | Linhas de código | ~1500 |
-| Tempo estimado | 5-7 dias |
+| Tempo de implementação | 2 dias |
 
 ---
 
-**Sprint 2 concluído!**
+## 🎉 Sprint 2 — CONCLUÍDO!
 
-**Próximo:** Sprint 3 (Rede Visual + Níveis)
+**Data de conclusão:** 08/01/2026  
+**Validação:** Teste de webhook em produção bem-sucedido
+
+---
+
+# 🚀 PRÓXIMO: Sprint 3 (Rede Visual + Níveis)
+
+## 🎯 Objetivo do Sprint 3
+
+**Especificação:** `docs/SPEC.md` Seção 1.3
+
+Implementar visualização da rede de indicados e cálculo de níveis dos membros.
+
+**Entrega:** "Membro vê sua rede de indicados (N1, N2) e seu nível é calculado automaticamente"
+
+---
+
+## 📋 Escopo do Sprint 3
+
+### 1. Visualização da Rede
+- Ver indicados diretos (N1)
+- Ver indicados de segundo nível (N2)
+- Contagem de membros por nível
+- Status de cada membro (ativo/inativo)
+
+### 2. Cálculo de Níveis
+Conforme SPEC, os níveis são:
+- **Parceira** - Nível inicial
+- **Líder** - Requisitos a definir (TBD)
+- **Diretora** - Requisitos a definir (TBD)
+- **Head** - Requisitos a definir (TBD)
+
+### 3. Dashboard Atualizado
+- Card de nível atual
+- Progresso para próximo nível
+- Visualização da árvore de rede
+
+---
+
+## ⚠️ TBDs Necessários para Sprint 3
+
+Antes de iniciar o Sprint 3, precisamos de decisões do cliente:
+
+### TBD-011 — Regras de progressão de nível
+**Pergunta:** Quais são os critérios para cada nível?
+- Parceira → Líder: ?
+- Líder → Diretora: ?
+- Diretora → Head: ?
+
+**Opções comuns:**
+- Por CV pessoal acumulado
+- Por número de indicados ativos
+- Por CV total da rede
+- Combinação de critérios
+
+### TBD-012 — Profundidade da rede visível
+**Pergunta:** Quantos níveis o membro pode ver?
+- **A)** Apenas N1 (indicados diretos)
+- **B)** N1 + N2 (2 níveis)
+- **C)** N1 + N2 + N3 (3 níveis)
+- **D)** Toda a rede abaixo
+
+### TBD-013 — Informações visíveis dos indicados
+**Pergunta:** O que o membro pode ver sobre seus indicados?
+- Nome completo ou apenas primeiro nome?
+- Email visível?
+- CV do indicado visível?
+- Status (ativo/inativo)?
+- Nível do indicado?
+
+---
+
+## 📐 Arquitetura Proposta (Sprint 3)
+
+### Banco de Dados
+
+#### Opção A: Usar tabela existente `members`
+```sql
+-- Campos já existentes
+sponsor_id uuid REFERENCES members(id)
+
+-- Novos campos
+ALTER TABLE members ADD COLUMN level text DEFAULT 'parceira';
+ALTER TABLE members ADD COLUMN level_updated_at timestamptz;
+```
+
+#### Opção B: Criar tabela de níveis
+```sql
+CREATE TABLE member_levels (
+  id uuid PRIMARY KEY,
+  member_id uuid REFERENCES members(id),
+  level text NOT NULL,
+  achieved_at timestamptz,
+  criteria_snapshot jsonb
+);
+```
+
+### API Endpoints Previstos
+
+| Endpoint | Método | Descrição |
+|----------|--------|-----------|
+| `/api/members/me/network` | GET | Rede do membro (N1, N2) |
+| `/api/members/me/level` | GET | Nível atual e progresso |
+| `/api/admin/members/:id/network` | GET | Rede de qualquer membro (admin) |
+
+### Frontend
+
+| Componente | Descrição |
+|------------|-----------|
+| NetworkTree | Visualização em árvore da rede |
+| LevelCard | Card com nível atual e progresso |
+| NetworkStats | Estatísticas da rede (contagem, CV total) |
+
+---
+
+## 📅 Estimativa Sprint 3
+
+| Item | Estimativa |
+|------|------------|
+| Schema + Migrations | 0.5 dia |
+| API Endpoints | 1 dia |
+| Cálculo de Níveis | 1 dia |
+| Frontend (Dashboard) | 1 dia |
+| Testes | 0.5 dia |
+| **Total** | **4 dias** |
+
+---
+
+## ✅ Checklist de Aceite (Sprint 3)
+
+| Critério | Status |
+|----------|--------|
+| Membro vê seus indicados diretos (N1) | ⏳ |
+| Membro vê indicados de N2 (se aprovado) | ⏳ |
+| Contagem de indicados por nível | ⏳ |
+| Status de cada indicado visível | ⏳ |
+| Nível do membro calculado automaticamente | ⏳ |
+| Progresso para próximo nível visível | ⏳ |
+| Admin pode ver rede de qualquer membro | ⏳ |
+
+---
+
+## 🚦 Bloqueadores
+
+Para iniciar o Sprint 3, precisamos:
+
+1. **TBD-011** resolvido (regras de níveis)
+2. **TBD-012** resolvido (profundidade visível)
+3. **TBD-013** resolvido (informações visíveis)
+
+**Ação:** Aguardar aprovação do cliente para os TBDs acima.

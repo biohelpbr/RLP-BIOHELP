@@ -125,6 +125,70 @@
 
 ---
 
+## TBDs do Sprint 3 (Rede Visual + Níveis)
+
+### TBD-011 — Regras de progressão de nível
+**Por que importa:** define como membros sobem de Parceira → Líder → Diretora → Head.  
+**Origem:** SPEC 1.3 menciona níveis mas não define critérios.
+
+**Opções comuns:**
+- **A)** Por CV pessoal acumulado (ex: Líder = 1000 CV total)
+- **B)** Por número de indicados ativos (ex: Líder = 5 indicados ativos)
+- **C)** Por CV total da rede (ex: Líder = rede com 5000 CV/mês)
+- **D)** Combinação de critérios (ex: 500 CV pessoal + 3 indicados ativos)
+
+**Critérios a definir:**
+| Nível | Requisito |
+|-------|-----------|
+| Parceira | (inicial) |
+| Líder | ________ |
+| Diretora | ________ |
+| Head | ________ |
+
+**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
+**Responsável:** ________  
+**Data:** ________  
+**Evidência:** ________
+
+---
+
+### TBD-012 — Profundidade da rede visível
+**Por que importa:** define o que o membro pode ver de sua rede.  
+**Origem:** SPEC 1.3 diz "visualização da rede (simples)" — não define profundidade.
+
+**Opções:**
+- **A)** Apenas N1 (indicados diretos)
+- **B)** N1 + N2 (2 níveis)
+- **C)** N1 + N2 + N3 (3 níveis)
+- **D)** Toda a rede abaixo (ilimitado)
+
+**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
+**Responsável:** ________  
+**Data:** ________  
+**Evidência:** ________
+
+---
+
+### TBD-013 — Informações visíveis dos indicados
+**Por que importa:** define privacidade e o que o membro vê sobre sua rede.
+
+**Campos a definir (marcar quais são visíveis):**
+- ⬜ Nome completo
+- ⬜ Apenas primeiro nome
+- ⬜ Email
+- ⬜ Telefone
+- ⬜ CV do indicado
+- ⬜ Status (ativo/inativo)
+- ⬜ Nível do indicado
+- ⬜ Data de cadastro
+- ⬜ Quantidade de indicados (do indicado)
+
+**Responsável:** ________  
+**Data:** ________  
+**Evidência:** ________
+
+---
+
 ## Decididos (histórico)
 > Mova itens daqui quando houver decisão oficial.
 
