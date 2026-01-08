@@ -1,7 +1,7 @@
 # Resumo Executivo — Biohelp LRP
-**Status do Projeto: Sprint 2 (Em Implementação)**
+**Status do Projeto: Sprint 2 ✅ CONCLUÍDO E TESTADO**
 
-**Última atualização:** 07/01/2026
+**Última atualização:** 08/01/2026
 
 ---
 
@@ -162,11 +162,11 @@ Progresso Total Sprint 2: 100% ✅
 
 | Página | URL |
 |--------|-----|
-| Home | https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/ |
-| Login | https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/login |
-| Cadastro | https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/join?ref=SPONSOR01 |
-| Dashboard | https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/dashboard |
-| Admin | https://rlp-biohelp-git-main-flowcodes-projects.vercel.app/admin |
+| Home | https://rlp-biohelp.vercel.app/ |
+| Login | https://rlp-biohelp.vercel.app/login |
+| Cadastro | https://rlp-biohelp.vercel.app/join?ref=SPONSOR01 |
+| Dashboard | https://rlp-biohelp.vercel.app/dashboard |
+| Admin | https://rlp-biohelp.vercel.app/admin |
 
 ### Logins de Teste
 
@@ -175,22 +175,98 @@ Progresso Total Sprint 2: 100% ✅
 | Admin | admin@biohelp.test | 123456 |
 | Parceira | sponsor@biohelp.test | sponsor123 |
 
-### Teste de CV (Novo)
+---
 
-1. **Simular compra:**
-   - Fazer pedido na loja Shopify com e-mail de membro
-   - Webhook é enviado automaticamente
-   - CV aparece no dashboard
+## 🧪 GUIA DE TESTE COMPLETO
 
-2. **Verificar no Dashboard:**
-   - Login como membro
-   - Ver card de CV com progresso
-   - Ver histórico de meses
+### Teste 1: Verificar Dashboard com CV
 
-3. **Verificar como Admin:**
-   - Login como admin
-   - Acessar CV do membro
-   - Ver ledger detalhado
+1. Acesse: https://rlp-biohelp.vercel.app/login
+2. Login com: `sponsor@biohelp.test` / `sponsor123`
+3. **Resultado esperado:**
+   - Ver card de CV com valor atual (R$ 550+)
+   - Barra de progresso da meta (200 CV)
+   - Status "Ativo" (badge verde)
+   - Histórico de meses anteriores
+
+### Teste 2: Simular Compra Real
+
+1. **Na loja Shopify:**
+   - Faça um pedido usando o email de um membro cadastrado
+   - Complete o pagamento
+
+2. **Aguarde ~30 segundos** (webhook é processado)
+
+3. **No Dashboard do Membro:**
+   - Faça login com o email do membro
+   - Verifique se o CV aumentou
+   - Verifique se a barra de progresso atualizou
+
+4. **No Painel Admin:**
+   - Login: `admin@biohelp.test` / `123456`
+   - Busque o membro
+   - Verifique o CV detalhado e ledger
+
+### Teste 3: Verificar Webhooks Funcionando
+
+Os webhooks estão configurados em:
+- Shopify Admin → Settings → Notifications → Webhooks
+
+| Evento | URL | Status |
+|--------|-----|--------|
+| Pagamento de pedido | `https://rlp-biohelp.vercel.app/api/webhooks/shopify/orders/paid` | ✅ Ativo |
+| Cancelamento de pedido | `https://rlp-biohelp.vercel.app/api/webhooks/shopify/orders/cancelled` | ✅ Ativo |
+| Criação de reembolso | `https://rlp-biohelp.vercel.app/api/webhooks/shopify/orders/refunded` | ✅ Ativo |
+
+### Teste 4: Verificar Idempotência
+
+Se o mesmo pedido for enviado 2x pelo Shopify:
+- **Resultado esperado:** CV não duplica
+- **Mensagem:** "Order already processed"
+
+### Teste 5: Testar Reembolso
+
+1. Faça um pedido de teste
+2. Verifique que o CV foi adicionado
+3. Faça um reembolso parcial ou total no Shopify
+4. **Resultado esperado:** CV é revertido automaticamente
+
+---
+
+## 📊 Dados de Teste Atuais (Supabase)
+
+| Membro | CV Mensal | Status | Pedidos |
+|--------|-----------|--------|---------|
+| sponsor@biohelp.test | R$ 550+ | Ativo | 2+ |
+
+---
+
+## ✅ Validação Realizada em 08/01/2026
+
+| Teste | Resultado |
+|-------|-----------|
+| Webhook orders/paid | ✅ Processando corretamente |
+| Cálculo de CV | ✅ 100% do valor do pedido |
+| Acumulação mensal | ✅ Somando corretamente |
+| Idempotência | ✅ Não duplica pedidos |
+| Validação HMAC | ✅ Segurança ativa |
+| Validação de domínio | ✅ Verificando loja correta |
+
+### Evidência do Teste
+
+```json
+// Resposta do webhook em produção (08/01/2026)
+{
+  "success": true,
+  "orderId": "235d02f2-f9d7-465a-b3b6-8406356499de",
+  "memberId": "69740fd1-3abc-4856-b8be-ccc8df97a701",
+  "cv": {
+    "orderCV": 150,
+    "monthlyCV": 550,
+    "status": "active"
+  }
+}
+```
 
 ---
 
@@ -312,6 +388,15 @@ Para dúvidas ou problemas:
 
 ---
 
-**Sprint 2 concluído com sucesso!**
+## 🎉 Sprint 2 — CONCLUÍDO E VALIDADO!
 
-**Próximo passo:** Configurar webhooks no Shopify Admin e validar com pedido de teste.
+**Data de conclusão:** 08/01/2026
+
+**Validações realizadas:**
+- ✅ Webhooks configurados no Shopify Admin
+- ✅ Teste de webhook em produção (Vercel)
+- ✅ CV calculado e acumulado corretamente
+- ✅ Idempotência funcionando
+- ✅ Segurança HMAC ativa
+
+**Próximo passo:** Iniciar Sprint 3 (Visualização da Rede)

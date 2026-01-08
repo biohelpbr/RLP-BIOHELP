@@ -1,7 +1,7 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** Janeiro 2026  
+**Data:** 08/01/2026  
 **Sprint Atual:** Sprint 2 (CV + Status)  
-**Status Geral:** ✅ Sprint 2 Completo
+**Status Geral:** ✅ Sprint 2 COMPLETO E TESTADO EM PRODUÇÃO
 
 ---
 
@@ -255,11 +255,11 @@ CRON_SECRET=seu_secret_aqui         # Protege o job mensal
 
 ## 📅 Próximos Passos
 
-### Imediato (Configuração)
+### Configuração (CONCLUÍDO ✅)
 1. ✅ Aplicar migrations no Supabase
-2. ⏳ Configurar webhooks no Shopify Admin
-3. ⏳ Adicionar variáveis de ambiente na Vercel
-4. ⏳ Testar com pedido real
+2. ✅ Configurar webhooks no Shopify Admin
+3. ✅ Adicionar variáveis de ambiente na Vercel
+4. ✅ Testar com pedido simulado em produção
 
 ### Sprint 3 (Próximo)
 1. Visualização da rede (N1, N2)
@@ -268,5 +268,36 @@ CRON_SECRET=seu_secret_aqui         # Protege o job mensal
 
 ---
 
-**Última atualização:** 07/01/2026  
-**Status:** Sprint 2 Completo ✅
+## ✅ VALIDAÇÃO EM PRODUÇÃO (08/01/2026)
+
+### Teste Realizado
+Webhook simulado enviado para `https://rlp-biohelp.vercel.app/api/webhooks/shopify/orders/paid`
+
+### Resultado
+```json
+{
+  "success": true,
+  "orderId": "235d02f2-f9d7-465a-b3b6-8406356499de",
+  "memberId": "69740fd1-3abc-4856-b8be-ccc8df97a701",
+  "cv": {
+    "orderCV": 150,
+    "monthlyCV": 550,
+    "status": "active"
+  }
+}
+```
+
+### Validações Confirmadas
+| Item | Status |
+|------|--------|
+| Validação HMAC | ✅ Funcionando |
+| Validação de domínio | ✅ Funcionando |
+| Cálculo de CV | ✅ 100% do valor |
+| Acumulação mensal | ✅ Somando corretamente |
+| Idempotência | ✅ Não duplica pedidos |
+| Status automático | ✅ Atualiza para "active" |
+
+---
+
+**Última atualização:** 08/01/2026  
+**Status:** Sprint 2 COMPLETO E VALIDADO ✅
