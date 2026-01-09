@@ -279,7 +279,7 @@ export default function DashboardPage() {
               </Link>
             </li>
             <li className={styles.navItem}>
-              <Link href="/dashboard">
+              <Link href="/dashboard/network">
                 <span className={styles.navIcon}>{Icons.users}</span>
                 <span>Minha Rede</span>
               </Link>

@@ -17,6 +17,10 @@ export type SyncStatus = 'pending' | 'ok' | 'failed'
 export type OrderStatus = 'pending' | 'paid' | 'refunded' | 'cancelled'
 export type CVType = 'order_paid' | 'order_refunded' | 'order_cancelled' | 'manual_adjustment'
 
+// Sprint 3 - Níveis de liderança
+export type MemberLevel = 'membro' | 'parceira' | 'lider_formacao' | 'lider' | 'diretora' | 'head'
+export type PhoneVisibility = 'public' | 'network' | 'private'
+
 // =====================================================
 // SPRINT 1 — TABELAS BASE
 // =====================================================
@@ -34,6 +38,13 @@ export interface Member {
   current_cv_month: number | null
   current_cv_month_year: string | null
   last_cv_calculation_at: string | null
+  // Sprint 3 - campos de nível e rede
+  level: MemberLevel
+  level_updated_at: string | null
+  phone: string | null
+  phone_visibility: PhoneVisibility
+  lider_formacao_started_at: string | null
+  inactive_months_count: number
   created_at: string
 }
 
@@ -195,6 +206,13 @@ export type MemberInsert = {
   current_cv_month?: number | null
   current_cv_month_year?: string | null
   last_cv_calculation_at?: string | null
+  // Sprint 3 - campos de nível e rede
+  level?: MemberLevel
+  level_updated_at?: string | null
+  phone?: string | null
+  phone_visibility?: PhoneVisibility
+  lider_formacao_started_at?: string | null
+  inactive_months_count?: number
   created_at?: string
 }
 
@@ -392,3 +410,124 @@ export interface CVAdjustmentRequest {
   description: string
   month?: string // 'YYYY-MM', default = mês atual
 }
+
+// =====================================================
+// SPRINT 3 — TIPOS DE REDE E NÍVEIS
+// =====================================================
+
+// Tabela member_level_history
+export interface MemberLevelHistory {
+  id: string
+  member_id: string
+  previous_level: MemberLevel | null
+  new_level: MemberLevel
+  reason: string
+  criteria_snapshot: LevelCriteriaSnapshot | null
+  created_at: string
+}
+
+// Snapshot dos critérios no momento da mudança de nível
+export interface LevelCriteriaSnapshot {
+  cv_pessoal: number
+  cv_rede: number
+  parceiras_ativas_n1: number
+  lideres_ativas_n1: number
+  diretoras_ativas_n1: number
+  status: MemberStatus
+}
+
+// Membro na visualização de rede (com campos filtrados por privacidade)
+export interface NetworkMember {
+  id: string
+  name: string
+  email: string
+  phone: string | null // null se não tiver permissão
+  ref_code: string
+  status: MemberStatus
+  level: MemberLevel
+  cv_month: number | null
+  depth: number // Nível na árvore (1 = N1, 2 = N2, etc.)
+  children_count: number
+  created_at: string
+}
+
+// Resposta do endpoint /api/members/me/network
+export interface MemberNetworkResponse {
+  member: {
+    id: string
+    name: string
+    level: MemberLevel
+    cv_pessoal: number
+    cv_rede: number
+  }
+  network: NetworkMember[]
+  stats: {
+    total_members: number
+    active_members: number
+    by_level: Record<number, { total: number; active: number }>
+  }
+}
+
+// Resposta do endpoint /api/members/me/level
+export interface MemberLevelResponse {
+  current: {
+    level: MemberLevel
+    since: string | null
+  }
+  progress: {
+    next_level: MemberLevel | null
+    requirements: LevelRequirement[]
+  }
+  history: MemberLevelHistory[]
+}
+
+// Requisito para próximo nível
+export interface LevelRequirement {
+  name: string
+  current: number
+  required: number
+  met: boolean
+}
+
+// Níveis com seus requisitos (para referência)
+export const LEVEL_REQUIREMENTS = {
+  membro: {
+    name: 'Membro',
+    requirements: [] // Nenhum requisito, é o nível inicial
+  },
+  parceira: {
+    name: 'Parceira',
+    requirements: [
+      { name: 'Status Ativo', type: 'status', value: 'active' },
+      { name: 'CV da Rede', type: 'cv_rede', value: 500 }
+    ]
+  },
+  lider_formacao: {
+    name: 'Líder em Formação',
+    requirements: [
+      { name: 'Nível Parceira', type: 'level', value: 'parceira' },
+      { name: 'Primeira Parceira em N1', type: 'parceiras_n1', value: 1 }
+    ]
+  },
+  lider: {
+    name: 'Líder',
+    requirements: [
+      { name: 'Status Ativo', type: 'status', value: 'active' },
+      { name: 'Parceiras Ativas em N1', type: 'parceiras_n1', value: 4 }
+    ]
+  },
+  diretora: {
+    name: 'Diretora',
+    requirements: [
+      { name: 'Líderes Ativas em N1', type: 'lideres_n1', value: 3 },
+      { name: 'CV da Rede', type: 'cv_rede', value: 80000 }
+    ]
+  },
+  head: {
+    name: 'Head',
+    requirements: [
+      { name: 'Diretoras Ativas em N1', type: 'diretoras_n1', value: 3 },
+      { name: 'CV da Rede', type: 'cv_rede', value: 200000 }
+    ]
+  }
+} as const

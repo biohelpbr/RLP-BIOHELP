@@ -1,0 +1,274 @@
+/* LevelCard.module.css - Sprint 3 */
+
+.card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--level-color, #6b7280);
+}
+
+/* Versão compacta */
+.compact {
+  padding: 0.75rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+}
+
+.compact::before {
+  display: none;
+}
+
+.compact .levelIcon {
+  font-size: 1rem;
+}
+
+.compact .levelName {
+  color: var(--level-color, #6b7280);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Loading e Error */
+.loading,
+.error {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 2rem;
+}
+
+.error {
+  color: #ef4444;
+}
+
+/* Cabeçalho */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.currentLevel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.levelIconLarge {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.levelInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.levelLabel {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.levelTitle {
+  color: var(--level-color, #6b7280);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.since {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+}
+
+/* Progresso */
+.progress {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progressLabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+.progressPercent {
+  color: var(--level-color, #6b7280);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.progressBar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--level-color, #6b7280);
+  border-radius: 9999px;
+  transition: width 0.5s ease-out;
+}
+
+/* Requisitos */
+.requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.requirement {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.requirement.met {
+  opacity: 1;
+}
+
+.reqHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.reqName {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+}
+
+.met .reqName {
+  color: #10b981;
+}
+
+.reqValue {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  font-family: 'SF Mono', monospace;
+}
+
+.reqBar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.reqFill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+  transition: width 0.3s ease-out;
+}
+
+.met .reqFill {
+  background: #10b981;
+}
+
+/* Nível máximo */
+.maxLevel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-radius: 12px;
+}
+
+.maxLevelIcon {
+  font-size: 2rem;
+}
+
+.maxLevelText {
+  color: #ec4899;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Histórico */
+.history {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.historyTitle {
+  display: block;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+
+.historyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.historyItem:last-child {
+  border-bottom: none;
+}
+
+.historyDate {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+}
+
+.historyReason {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .levelIconLarge {
+    font-size: 2rem;
+  }
+
+  .levelTitle {
+    font-size: 1.25rem;
+  }
+}
+
