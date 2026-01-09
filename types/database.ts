@@ -167,6 +167,17 @@ export interface ShopifyLineItem {
   sku: string | null
   quantity: number
   price: string
+  // Campos para CV via metafield (TBD-008)
+  properties?: Array<{
+    name: string
+    value: string
+  }>
+  metafields?: Array<{
+    namespace: string
+    key: string
+    value: string
+    value_type?: string
+  }>
 }
 
 // =====================================================

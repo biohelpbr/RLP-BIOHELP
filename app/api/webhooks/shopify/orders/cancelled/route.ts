@@ -9,7 +9,7 @@
  * - Atualizar status do pedido para 'cancelled'
  * - Registrar reversão no cv_ledger
  * - Recalcular CV mensal
- * - Verificar se status deve voltar para 'pending'
+ * - Verificar se status deve voltar para 'inactive'
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
 
     // Verificar se status deve mudar
     const shouldBeActive = isActiveCV(newMonthlyCV)
-    const newStatus = shouldBeActive ? 'active' : 'pending'
+    const newStatus = shouldBeActive ? 'active' : 'inactive'
 
     const { error: memberUpdateError } = await supabase
       .from('members')

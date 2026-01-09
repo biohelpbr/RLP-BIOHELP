@@ -152,11 +152,30 @@ export async function POST(request: NextRequest) {
     memberId: member.id
   })
 
-  // 8. Calcular CV total do pedido
-  const totalCV = calculateOrderCV(extractedData.lineItems)
   const monthYear = getCurrentMonthYear()
 
-  // 9. Criar registro do pedido
+  // 8. Processar itens do pedido e calcular CV (via metafield ou fallback)
+  // REGRA TBD-008: CV é definido por produto via metacampo/metafield
+  const processedItems = processShopifyLineItems(
+    extractedData.lineItems.map(item => ({
+      id: item.id,
+      product_id: item.productId,
+      variant_id: item.variantId,
+      title: item.title,
+      sku: item.sku,
+      quantity: item.quantity,
+      price: item.price,
+      // Passar properties/metafields se disponíveis no payload
+      properties: (item as any).properties,
+      metafields: (item as any).metafields
+    })),
+    'temp-order-id' // ID temporário, será atualizado após criar o pedido
+  )
+
+  // 9. Calcular CV total do pedido (soma dos CVs dos itens)
+  const totalCV = calculateOrderCV(processedItems)
+
+  // 10. Criar registro do pedido
   const { data: newOrder, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -185,30 +204,25 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // 10. Criar itens do pedido
-  const orderItems = processShopifyLineItems(
-    extractedData.lineItems.map(item => ({
-      id: item.id,
-      product_id: item.productId,
-      variant_id: item.variantId,
-      title: item.title,
-      sku: item.sku,
-      quantity: item.quantity,
-      price: item.price
-    })),
-    newOrder.id
-  )
+  // 11. Atualizar order_id nos itens processados
+  const orderItems = processedItems.map(item => ({
+    ...item,
+    order_id: newOrder.id
+  }))
+
+  // Remover cv_source antes de inserir (campo não existe na tabela)
+  const orderItemsForInsert = orderItems.map(({ cv_source, ...item }) => item)
 
   const { data: insertedItems, error: itemsError } = await supabase
     .from('order_items')
-    .insert(orderItems)
+    .insert(orderItemsForInsert)
     .select('id, cv_value, title')
 
   if (itemsError) {
     console.error('[webhook] Erro ao criar order_items:', itemsError)
   }
 
-  // 11. Criar entradas no CV ledger
+  // 12. Criar entradas no CV ledger
   if (insertedItems && insertedItems.length > 0) {
     const ledgerEntries = createCVLedgerEntriesForOrder(
       member.id,
@@ -226,7 +240,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 12. Atualizar CV mensal do membro
+  // 13. Atualizar CV mensal do membro
   const currentMonthCV = (member.current_cv_month_year === monthYear)
     ? (member.current_cv_month || 0) + totalCV
     : totalCV // Novo mês, reiniciar contagem
