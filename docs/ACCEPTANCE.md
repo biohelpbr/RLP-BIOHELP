@@ -106,14 +106,16 @@ Para um cadastro bem-sucedido (membro novo):
 1) Faça um pedido na loja Shopify com e-mail de membro cadastrado
 2) Aguarde webhook ser processado
 3) No Dashboard do membro:
-   - CV deve aumentar pelo valor do pedido
+   - CV deve aumentar pela soma dos CVs dos itens (metacampo por produto)
    - Barra de progresso deve atualizar
 4) No Supabase:
    - Registro em `orders` com status 'paid'
-   - Registros em `order_items`
+   - Registros em `order_items` com cv_value de cada item
    - Entradas no `cv_ledger` com cv_type 'order_paid'
 
-✅ Passa se: CV calculado corretamente e registrado no ledger.
+✅ Passa se: CV calculado corretamente via metacampo (ou fallback para preço) e registrado no ledger.
+
+**Nota sobre CV:** O CV de cada produto vem do metacampo `custom.cv` ou `lrp.cv`. Ex: Lemon Dreams (R$159) pode ter CV 77. Se não houver metacampo, usa o preço do item como fallback.
 
 #### Cenário T-CV-02 — Refund reverte CV
 1) Reembolse um pedido no Shopify
@@ -150,8 +152,41 @@ Para um cadastro bem-sucedido (membro novo):
 ## Sprint 3 — Rede Visual + Níveis (futuro)
 - [ ] Rede N1/N2 consistente
 - [ ] Membro vê rede (simples)
-- [ ] Níveis calculados conforme regra assinada
+- [ ] Níveis calculados conforme regra do documento canônico
 - [ ] Checklist do próximo nível exibido
+
+### Regras de Níveis (canônico: Biohelp___Loyalty_Reward_Program.md)
+
+| Nível | Requisitos |
+|-------|------------|
+| Membro | Cliente cadastrada |
+| Parceira | Membro Ativo + CV_rede >= 500 |
+| Líder em Formação | Parceira + primeira Parceira em N1 (janela 90 dias) |
+| Líder | Parceira Ativa + 4 Parceiras Ativas em N1 |
+| Diretora | 3 Líderes Ativas em N1 + 80.000 CV na rede |
+| Head | 3 Diretoras Ativas em N1 + 200.000 CV na rede |
+
+### Cenário T-NV-01 — Promoção para Parceira
+1) Membro atinge 200 CV (ativo) + rede com 500 CV total
+2) Sistema deve promover para Parceira
+3) Dashboard mostra novo nível
+
+✅ Passa se: Nível atualizado automaticamente
+
+### Cenário T-NV-02 — Líder em Formação (90 dias)
+1) Parceira traz primeira Parceira em N1
+2) Sistema inicia janela de 90 dias
+3) Parceira recebe comissão como Líder
+4) Após 90 dias sem atingir Líder, volta para comissão de Parceira
+
+✅ Passa se: Janela de 90 dias funciona corretamente
+
+### Cenário T-NV-03 — Perda de nível
+1) Líder perde 1 das 4 Parceiras ativas em N1
+2) Sistema deve rebaixar para Parceira
+3) Dashboard mostra novo nível
+
+✅ Passa se: Rebaixamento automático
 
 ---
 
@@ -160,10 +195,83 @@ Para um cadastro bem-sucedido (membro novo):
 - [ ] Cada valor tem origem (pedido/regra)
 - [ ] Reprocessamento seguro (sem duplicar)
 
+### Regras de Comissionamento (canônico: Biohelp___Loyalty_Reward_Program.md)
+
+**Creatina Mensal Grátis:**
+- [ ] Membro Ativo (200 CV) recebe creatina mensal
+
+**Fast-Track (primeiros 60 dias):**
+- [ ] N0 recebe 30% CV de N1 (primeiros 30 dias)
+- [ ] N0 recebe 20% CV de N1 (próximos 30 dias)
+- [ ] Líder N0 recebe 20%/10% CV de N2
+
+**Comissão Perpétua:**
+- [ ] Parceira: 5% CV de N1
+- [ ] Líder: 7% CV da rede + 5% CV de N1
+- [ ] Diretora: 10% CV da rede + 7% CV de Parceiras N1 + 5% CV de clientes N1
+- [ ] Head: 15% CV da rede + 10% CV de Líderes N1 + 7% CV de Parceiras N1 + 5% CV de clientes N1
+
+**Bônus 3:**
+- [ ] 3 Parceiras Ativas em N1 por 1 mês → R$250
+- [ ] Cada N1 com 3 Parceiras Ativas → R$1.500
+- [ ] Cada N2 com 3 Parceiras Ativas → R$8.000
+
+**Leadership Bônus:**
+- [ ] Diretora: 3% CV da rede
+- [ ] Head: 4% CV da rede
+
+**Royalty:**
+- [ ] Head forma Head → recebe 3% CV da nova rede
+
+### Cenário T-CM-01 — Fast-Track 30 dias
+1) N0 traz N1 no dia 1
+2) N1 compra R$100 (CV 50) no dia 15
+3) N0 deve receber 30% = R$15 de comissão
+
+✅ Passa se: Comissão calculada corretamente
+
+### Cenário T-CM-02 — Transição Fast-Track → Perpétua
+1) Após 60 dias do cadastro de N1
+2) N1 compra R$100 (CV 50)
+3) N0 (Parceira) deve receber 5% = R$2,50 de comissão
+
+✅ Passa se: Sistema detecta fim do Fast-Track e aplica Perpétua
+
 ---
 
 ## Sprint 5 — Saques + Fiscal (futuro)
 - [ ] Solicitação de saque + estados
-- [ ] Validação PF (RPA) até R$ 990
-- [ ] Validação PJ (NF-e) acima
+- [ ] Validação PF (RPA) até R$ 990/mês
+- [ ] Validação PJ (NF-e) acima de R$ 990/mês
 - [ ] Histórico de pagamentos
+
+### Regras de Saque (canônico)
+- [ ] Mínimo para saque: R$100 (TBD confirmar)
+- [ ] PF: até R$990/mês → Biohelp emite RPA, desconta impostos
+- [ ] PJ (MEI): pode usar conta PF
+- [ ] PJ (outras): obrigatório conta PJ + NF-e antes do pagamento
+- [ ] Conta sempre em nome da parceira (não terceiros)
+
+### Cenário T-SQ-01 — Saque PF válido
+1) Parceira PF com R$500 de saldo
+2) Solicita saque de R$300
+3) Sistema gera RPA automaticamente
+4) Transferência via PIX
+
+✅ Passa se: Saque processado com RPA
+
+### Cenário T-SQ-02 — Saque PJ com NF-e
+1) Parceira PJ com R$2.000 de saldo
+2) Solicita saque de R$1.500
+3) Sistema exige upload de NF-e
+4) Admin valida NF-e
+5) Transferência autorizada
+
+✅ Passa se: Saque bloqueado até NF-e válida
+
+### Cenário T-SQ-03 — Limite PF excedido
+1) Parceira PF já sacou R$800 no mês
+2) Tenta sacar mais R$300 (total R$1.100)
+3) Sistema deve bloquear ou exigir cadastro PJ
+
+✅ Passa se: Limite de R$990/mês respeitado

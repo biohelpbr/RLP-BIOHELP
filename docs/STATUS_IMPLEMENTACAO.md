@@ -122,7 +122,7 @@ Novos tipos em `types/database.ts`:
 | Idempotência: mesmo pedido não duplica CV | ✅ | Implementado |
 | CV mensal soma corretamente | ✅ | Implementado |
 | Status muda para 'active' quando CV >= 200 | ✅ | Implementado |
-| Status volta para 'pending' quando CV < 200 | ✅ | Implementado |
+| Status volta para 'inactive' quando CV < 200 | ✅ | Implementado |
 | Job mensal fecha mês corretamente | ✅ | Implementado |
 | Dashboard mostra CV atual | ✅ | Implementado |
 | Admin pode ver CV de qualquer membro | ✅ | Implementado |
@@ -133,10 +133,13 @@ Novos tipos em `types/database.ts`:
 
 ## 📝 TBDs Resolvidos no Sprint 2
 
-### TBD-008 — Regra de cálculo de CV por produto
-**Decisão:** CV = 100% do preço do item (padrão)
+### TBD-008 — Regra de cálculo de CV por produto (CORRIGIDO)
+**Decisão:** CV do pedido = soma do CV dos itens (metacampo por produto)
 - Implementado em `lib/cv/calculator.ts`
-- Constante `CV_PERCENTAGE = 1.0`
+- Fonte: `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
+- CV_SOURCE = product_metafield (ex.: `custom.cv` ou `lrp.cv`)
+- Fallback: se não houver metacampo, usar preço do item e logar warning
+- Ex: Lemon Dreams (R$159) → CV 77
 
 ### TBD-009 — Comportamento de refund/cancel
 **Decisão:** Reverter CV completamente
@@ -317,7 +320,7 @@ Webhook simulado enviado para `https://rlp-biohelp.vercel.app/api/webhooks/shopi
 |------|--------|
 | Validação HMAC | ✅ Funcionando |
 | Validação de domínio | ✅ Funcionando |
-| Cálculo de CV | ✅ 100% do valor |
+| Cálculo de CV | ✅ Via metacampo (fallback: preço) |
 | Acumulação mensal | ✅ Somando corretamente |
 | Idempotência | ✅ Não duplica pedidos |
 | Status automático | ✅ Atualiza para "active" |

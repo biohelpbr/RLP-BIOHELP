@@ -127,28 +127,27 @@
 
 ## TBDs do Sprint 3 (Rede Visual + Níveis)
 
-### TBD-011 — Regras de progressão de nível
+### TBD-011 — Regras de progressão de nível ✅ RESOLVIDO
 **Por que importa:** define como membros sobem de Parceira → Líder → Diretora → Head.  
-**Origem:** SPEC 1.3 menciona níveis mas não define critérios.
+**Fonte:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
 
-**Opções comuns:**
-- **A)** Por CV pessoal acumulado (ex: Líder = 1000 CV total)
-- **B)** Por número de indicados ativos (ex: Líder = 5 indicados ativos)
-- **C)** Por CV total da rede (ex: Líder = rede com 5000 CV/mês)
-- **D)** Combinação de critérios (ex: 500 CV pessoal + 3 indicados ativos)
-
-**Critérios a definir:**
+**Critérios definidos (canônico):**
 | Nível | Requisito |
 |-------|-----------|
-| Parceira | (inicial) |
-| Líder | ________ |
-| Diretora | ________ |
-| Head | ________ |
+| Membro | Cliente cadastrada |
+| Parceira | Membro Ativo + CV_rede >= 500 (inclui próprio membro) |
+| Líder em Formação | Parceira + primeira Parceira em N1 (janela 90 dias) |
+| Líder | Parceira Ativa (N0) + 4 Parceiras Ativas em N1 |
+| Diretora | 3 Líderes Ativas em N1 + 80.000 CV na rede |
+| Head | 3 Diretoras Ativas em N1 + 200.000 CV na rede |
 
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
+**Regras de perda de nível:**
+- Se requisitos deixam de ser atendidos, a Parceira desce de cargo
+- Líder perde status se não mantiver 4 Parceiras ativas em N1
+- Após 6 meses sem se ativar, perde totalmente o status e sai da rede
+
+**Data:** 09/01/2026
+**Evidência:** Documento canônico de regras de negócio
 
 ---
 
@@ -189,14 +188,113 @@
 
 ---
 
+## TBDs do Sprint 4/5 (Comissões + Saques)
+
+### TBD-014 — Nome exato do metafield CV no Shopify
+**Por que importa:** Define onde ler o CV de cada produto.
+**Origem:** Documento canônico menciona "metacampo CV" mas não especifica namespace/key.
+
+**Opções:**
+- **A)** `custom.cv`
+- **B)** `lrp.cv`
+- **C)** `biohelp.cv_value`
+- **D)** Outro: ________
+
+**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
+**Responsável:** ________  
+**Data:** ________
+
+---
+
+### TBD-015 — Limite de saque por CPF (PF)
+**Por que importa:** Documento canônico menciona R$990/mês em alguns lugares e R$1.000 em outros.
+**Origem:** Linhas 127/129 (R$990) vs linha 252 (R$1.000) do documento canônico.
+
+**Opções:**
+- **A)** R$990,00/mês
+- **B)** R$1.000,00/mês
+
+**Decisão escolhida:** ⬜ A  ⬜ B  
+**Responsável:** ________  
+**Data:** ________
+
+---
+
+### TBD-016 — Valor mínimo para saque
+**Por que importa:** Define quando a parceira pode solicitar saque.
+**Origem:** Não explicitado no documento canônico.
+
+**Opções:**
+- **A)** R$100,00
+- **B)** R$50,00
+- **C)** Sem mínimo
+- **D)** Outro: ________
+
+**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
+**Responsável:** ________  
+**Data:** ________
+
+---
+
+### TBD-017 — Arredondamento de CV e moeda
+**Por que importa:** Define precisão dos cálculos de CV e comissões.
+
+**Opções:**
+- **A)** 2 casas decimais (padrão BRL)
+- **B)** Inteiro (arredondar para cima)
+- **C)** Inteiro (arredondar para baixo)
+
+**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  
+**Responsável:** ________  
+**Data:** ________
+
+---
+
+### TBD-018 — Integração fintech para saques
+**Por que importa:** Define como os pagamentos serão processados.
+**Origem:** Documento canônico menciona "integração com ferramenta terceira".
+
+**Opções:**
+- **A)** Asaas (PIX + Boleto)
+- **B)** PagSeguro
+- **C)** Stripe
+- **D)** Manual (transferência bancária)
+- **E)** Outro: ________
+
+**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  ⬜ E  
+**Responsável:** ________  
+**Data:** ________
+
+---
+
+### TBD-019 — Creatina mensal grátis - implementação
+**Por que importa:** Documento canônico diz "Todo Membro Ativo (200 CV) recebe creatina mensal grátis".
+**Origem:** Linha 153 do documento canônico.
+
+**Opções:**
+- **A)** Cupom de desconto 100% gerado automaticamente
+- **B)** Produto adicionado ao pedido via Shopify Flow
+- **C)** Crédito no saldo da parceira
+- **D)** Processo manual (admin envia)
+
+**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
+**Responsável:** ________  
+**Data:** ________
+
+---
+
 ## Decididos (histórico)
 > Mova itens daqui quando houver decisão oficial.
 
-### TBD-008 — Regra de cálculo de CV por produto ✅
-**Decisão:** Opção A - CV = 100% do preço do item
-**Data:** 07/01/2026
-**Implementação:** `lib/cv/calculator.ts` - Constante `CV_PERCENTAGE = 1.0`
-**Observação:** Pode ser ajustado futuramente via configuração
+### TBD-008 — Regra de cálculo de CV por produto ✅ (CORRIGIDO)
+**Decisão:** CV do pedido = soma do CV dos itens (metacampo por produto).
+**Fonte:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md` — "Cada produto da Biohelp vai gerar um CV diferente, exemplo, o Lemon Dreams que venderemos a R$159,00, será gerado um CV de 77."
+**Data:** 07/01/2026 (atualizado 09/01/2026)
+**Implementação:** 
+- Ler metafield/metacampo do produto (ex.: `custom.cv` ou `lrp.cv`)
+- `lib/cv/calculator.ts` - Função `calculateCVForItem()` prioriza metafield
+**Fallback:** Se não houver metacampo, usar preço do item como fallback e logar warning "missing_cv_metafield"
+**Observação:** CV ≠ preço do produto. Ex: Lemon Dreams (R$159) → CV 77
 
 ---
 

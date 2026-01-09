@@ -263,7 +263,7 @@ Novos tipos adicionados em `types/database.ts`:
 | Idempotência: mesmo pedido não duplica CV | ✅ |
 | CV mensal soma corretamente | ✅ |
 | Status muda para 'active' quando CV >= 200 | ✅ |
-| Status volta para 'pending' quando CV < 200 | ✅ |
+| Status volta para 'inactive' quando CV < 200 | ✅ |
 | Job mensal fecha mês corretamente | ✅ |
 | Dashboard mostra CV atual | ✅ |
 | Admin pode ver CV de qualquer membro | ✅ |
@@ -292,10 +292,11 @@ Novos tipos adicionados em `types/database.ts`:
 
 ## 📝 TBDs Resolvidos
 
-### TBD-008 — Regra de cálculo de CV
-**Decisão:** CV = 100% do preço do item (padrão)
-- Implementado em `lib/cv/calculator.ts`
-- Constante `CV_PERCENTAGE = 1.0`
+### TBD-008 — Regra de cálculo de CV (CORRIGIDO)
+**Decisão (alinhada ao doc mestre):** CV do pedido = soma dos CVs dos itens (metacampo por produto).
+- Ex.: Lemon Dreams (R$159) pode ter CV 77.
+- Implementado em `lib/cv/calculator.ts` - prioriza metafield do produto
+- Fallback: se não houver metacampo, usar preço do item e logar warning
 
 ### TBD-009 — Comportamento de refund/cancel
 **Decisão:** Reverter CV completamente
@@ -411,11 +412,21 @@ Implementar visualização da rede de indicados e cálculo de níveis dos membro
 - Status de cada membro (ativo/inativo)
 
 ### 2. Cálculo de Níveis
-Conforme SPEC, os níveis são:
-- **Parceira** - Nível inicial
-- **Líder** - Requisitos a definir (TBD)
-- **Diretora** - Requisitos a definir (TBD)
-- **Head** - Requisitos a definir (TBD)
+Conforme documento canônico (`documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`):
+
+| Nível | Requisitos |
+|-------|------------|
+| **Membro** | Cliente cadastrada |
+| **Parceira** | Membro Ativo + CV_rede >= 500 (inclui próprio membro) |
+| **Líder em Formação** | Parceira que trouxe sua primeira Parceira em N1 (janela de 90 dias) |
+| **Líder** | Parceira Ativa (N0) + 4 Parceiras Ativas em N1 |
+| **Diretora** | N0 com mínimo 3 Líderes Ativas em N1 + 80.000 CV na rede |
+| **Head** | N0 com mínimo 3 Diretoras Ativas em N1 + 200.000 CV na rede |
+
+**Regras de perda de nível:**
+- Se requisitos deixam de ser atendidos, a Parceira desce de cargo
+- Líder perde status se não mantiver 4 Parceiras ativas em N1
+- Após 6 meses sem se ativar, perde totalmente o status e sai da rede
 
 ### 3. Dashboard Atualizado
 - Card de nível atual
@@ -428,17 +439,15 @@ Conforme SPEC, os níveis são:
 
 Antes de iniciar o Sprint 3, precisamos de decisões do cliente:
 
-### TBD-011 — Regras de progressão de nível
-**Pergunta:** Quais são os critérios para cada nível?
-- Parceira → Líder: ?
-- Líder → Diretora: ?
-- Diretora → Head: ?
+### TBD-011 — Regras de progressão de nível ✅ RESOLVIDO
+**Fonte:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
 
-**Opções comuns:**
-- Por CV pessoal acumulado
-- Por número de indicados ativos
-- Por CV total da rede
-- Combinação de critérios
+**Critérios definidos:**
+- Membro → Parceira: Membro Ativo + CV_rede >= 500
+- Parceira → Líder em Formação: Trouxe primeira Parceira em N1 (90 dias de janela)
+- Parceira → Líder: Parceira Ativa + 4 Parceiras Ativas em N1
+- Líder → Diretora: 3 Líderes Ativas em N1 + 80.000 CV na rede
+- Diretora → Head: 3 Diretoras Ativas em N1 + 200.000 CV na rede
 
 ### TBD-012 — Profundidade da rede visível
 **Pergunta:** Quantos níveis o membro pode ver?

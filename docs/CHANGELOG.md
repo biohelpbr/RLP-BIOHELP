@@ -25,7 +25,7 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 - Implementação completa do Sprint 2 (CV + Status)
 - Novas tabelas: orders, order_items, cv_ledger, cv_monthly_summary
 - Webhooks Shopify para orders/paid, orders/refunded, orders/cancelled
-- Cálculo automático de CV (100% do valor do pedido)
+- Cálculo automático de CV (via metacampo do produto; fallback para preço do item)
 - Status automático baseado em CV (active se >= 200/mês)
 - Dashboard atualizado com progresso de CV
 - Job de fechamento mensal

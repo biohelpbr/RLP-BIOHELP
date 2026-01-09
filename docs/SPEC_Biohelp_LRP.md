@@ -41,13 +41,51 @@ Inclui:
 
 ### 1.3 Sprint 3 (Rede visual + níveis)
 - Visualização da rede (simples)
-- Cálculo de níveis (Parceira/Líder/Diretora/Head) conforme regras aprovadas
+- Cálculo de níveis conforme regras do documento canônico:
+  - **Membro:** cliente cadastrada
+  - **Parceira:** Membro Ativo + CV_rede >= 500 (inclui próprio membro)
+  - **Líder em Formação:** Parceira que trouxe sua primeira Parceira em N1 (janela de 90 dias)
+  - **Líder:** Parceira Ativa (N0) + 4 Parceiras Ativas em N1
+  - **Diretora:** N0 com mínimo 3 Líderes Ativas em N1 + 80.000 CV na rede
+  - **Head:** N0 com mínimo 3 Diretoras Ativas em N1 + 200.000 CV na rede
 
 ### 1.4 Sprint 4 (Comissões + ledger)
 - Ledger auditável e motor de comissões faseado
+- **Creatina Mensal Grátis:** Todo Membro Ativo (200 CV) recebe creatina mensal
+- **Fast-Track (primeiros 60 dias):**
+  - N0 recebe 30% CV de N1 (primeiros 30 dias), 20% (próximos 30 dias)
+  - Líder N0 recebe 20%/10% CV de N2 (mesma regra de tempo)
+- **Comissão Perpétua (após Fast-Track):**
+  - Parceira: 5% CV de N1
+  - Líder: 7% CV da rede + 5% CV de N1
+  - Diretora: 10% CV da rede + 7% CV de Parceiras N1 + 5% CV de clientes N1
+  - Head: 15% CV da rede + 10% CV de Líderes N1 + 7% CV de Parceiras N1 + 5% CV de clientes N1
+- **Bônus 3:**
+  - 3 Parceiras Ativas em N1 por 1 mês → R$250
+  - Cada N1 com 3 Parceiras Ativas → R$1.500
+  - Cada N2 com 3 Parceiras Ativas → R$8.000
+- **Leadership Bônus:**
+  - Diretora: 3% CV da rede
+  - Head: 4% CV da rede
+- **Royalty (Head forma Head):**
+  - Head N0 forma Head N1 → rede N1 separa, N0 recebe 3% CV da nova rede
+  - Separação não faz N0 perder status de Head
 
 ### 1.5 Sprint 5 (Saques + fiscal)
-- Saques, documentos, regras PF/PJ, integrações (se definidas)
+- Saques, documentos, regras PF/PJ, integrações
+- **Regras de Saque (canônico):**
+  - Mínimo para saque: R$100 (TBD confirmar)
+  - PF: até R$990/mês → Biohelp emite RPA, desconta impostos
+  - PJ (MEI): pode usar conta PF
+  - PJ (outras): obrigatório conta PJ + NF-e antes do pagamento
+  - Conta sempre em nome da parceira (não terceiros)
+- **Fluxo de Saque:**
+  - Parceira solicita saque no painel
+  - Sistema valida saldo disponível
+  - Se PF: gera RPA automaticamente
+  - Se PJ: valida NF-e enviada
+  - Transferência via integração fintech (ex: Asaas/PIX)
+- **Auditoria:** Histórico completo de pagamentos
 
 ---
 
@@ -72,14 +110,45 @@ Inclui:
 - Código único do membro usado no link de indicação.
 - Deve ser **imutável** após criado.
 
-### 3.3 CV (Commission Volume) — fase futura
+### 3.3 CV (Commission Volume)
 - Pontuação associada aos produtos/pedidos.
+- **CV do item = valor do metafield/metacampo do produto** (ex.: `custom.cv` ou `lrp.cv`)
+- Fallback: se não houver metacampo, usar preço do item e logar warning
 - Medida mensal: soma do mês corrente.
 - Regra principal: **Ativa se CV >= 200 no mês**.
+- **Fonte canônica:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
+  - Ex: Lemon Dreams (R$159) → CV 77
 
-### 3.4 Status (Ativa/Inativa) — fase futura
+### 3.4 Status (Ativa/Inativa)
+- **Estados definidos:**
+  - `pending` = recém-cadastrada / antes de qualquer ciclo
+  - `active` = CV mensal >= 200
+  - `inactive` = CV mensal < 200 (pós-ciclo / regra padrão)
 - Atualizado mensalmente via job de fechamento.
+- No fechamento mensal: se CV < 200, status = `inactive` (não `pending`)
 - Refunds e cancelamentos podem impactar CV/status conforme regra assinada.
+- **Fonte canônica:** "Quando o mês termina, esse valor deve ser zerado e a tag deve mudar para Inativo"
+
+### 3.5 Regras de Níveis (canônico: Biohelp___Loyalty_Reward_Program.md)
+
+| Nível | Requisitos |
+|-------|------------|
+| **Membro** | Cliente cadastrada |
+| **Parceira** | Membro Ativo + CV_rede >= 500 (inclui próprio membro) |
+| **Líder em Formação** | Parceira que trouxe sua primeira Parceira em N1 (janela de 90 dias para atingir Líder) |
+| **Líder** | Parceira Ativa (N0) + 4 Parceiras Ativas em N1 |
+| **Diretora** | N0 com mínimo 3 Líderes Ativas em N1 + 80.000 CV na rede |
+| **Head** | N0 com mínimo 3 Diretoras Ativas em N1 + 200.000 CV na rede |
+
+**Regras de perda de nível:**
+- Se requisitos deixam de ser atendidos, a Parceira desce de cargo
+- Líder perde status se não mantiver 4 Parceiras ativas em N1
+- Após 6 meses sem se ativar, perde totalmente o status e sai da rede
+- Quando sai da rede, sua rede abaixo sobe e fica sob quem estava acima
+
+**Regra especial - Líder em Formação:**
+- Recebe bônus como Líder por 90 dias
+- Se não atingir requisitos de Líder após 90 dias, volta a comissão de Parceira
 
 ---
 
@@ -221,7 +290,7 @@ Definir UMA regra (precisa estar assinada no Anexo TBD):
 - `email` text unique
 - `ref_code` text unique (imutável)
 - `sponsor_id` uuid nullable (fk -> members.id)
-- `status` text default 'pending' *(fase futura: active/inactive)*
+- `status` text default 'pending' *(pending → active se CV>=200; inactive se CV<200 pós-ciclo)*
 - `created_at` timestamptz default now()
 
 ### 9.2 Tabela `referral_events`
