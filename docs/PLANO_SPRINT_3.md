@@ -1,4 +1,7 @@
-# 📋 Plano Técnico — Sprint 2 (CV + Status)
+# 📋 Plano Técnico — Sprint 2 (CV + Status) + Sprint 3 (Rede + Níveis)
+
+## Parte 1: Sprint 2 (CV + Status) — ✅ CONCLUÍDO
+
 **Status:** ✅ CONCLUÍDO E VALIDADO EM PRODUÇÃO  
 **Especificação:** `docs/SPEC.md` Seção 1.2  
 **Data de Conclusão:** 08/01/2026  
@@ -156,7 +159,8 @@ Políticas implementadas para todas as novas tabelas:
 - ✅ `createCVManualAdjustment()` - Ajuste manual
 - ✅ Funções auxiliares (getCurrentMonthYear, isActiveCV, etc.)
 
-**Regra de CV (TBD-008):** CV = 100% do preço do item (padrão)
+**Regra de CV (TBD-008):** CV é definido por produto (metacampo/metafield CV na Shopify) e pode ser diferente do preço.
+CV do pedido = Σ(CV_do_produto × quantidade). Ex.: Lemon Dreams (R$159) gera CV=77.
 
 ---
 
