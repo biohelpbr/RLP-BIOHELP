@@ -439,34 +439,55 @@ Conforme documento canônico (`documentos_projeto_iniciais_MD/Biohelp___Loyalty_
 
 ---
 
-## ⚠️ TBDs Necessários para Sprint 3
-
-Antes de iniciar o Sprint 3, precisamos de decisões do cliente:
+## ✅ TBDs do Sprint 3 — TODOS RESOLVIDOS
 
 ### TBD-011 — Regras de progressão de nível ✅ RESOLVIDO
 **Fonte:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
 
 **Critérios definidos:**
-- Membro → Parceira: Membro Ativo + CV_rede >= 500
-- Parceira → Líder em Formação: Trouxe primeira Parceira em N1 (90 dias de janela)
-- Parceira → Líder: Parceira Ativa + 4 Parceiras Ativas em N1
-- Líder → Diretora: 3 Líderes Ativas em N1 + 80.000 CV na rede
-- Diretora → Head: 3 Diretoras Ativas em N1 + 200.000 CV na rede
+| Nível | Requisitos |
+|-------|------------|
+| **Membro** | Cliente cadastrada |
+| **Parceira** | Membro Ativo + CV_rede >= 500 (inclui próprio membro) |
+| **Líder em Formação** | Parceira que trouxe primeira Parceira em N1 (janela 90 dias) |
+| **Líder** | Parceira Ativa (N0) + 4 Parceiras Ativas em N1 |
+| **Diretora** | 3 Líderes Ativas em N1 + 80.000 CV na rede |
+| **Head** | 3 Diretoras Ativas em N1 + 200.000 CV na rede |
 
-### TBD-012 — Profundidade da rede visível
-**Pergunta:** Quantos níveis o membro pode ver?
-- **A)** Apenas N1 (indicados diretos)
-- **B)** N1 + N2 (2 níveis)
-- **C)** N1 + N2 + N3 (3 níveis)
-- **D)** Toda a rede abaixo
+**Regras de perda:**
+- Se requisitos deixam de ser atendidos → desce de cargo
+- 6 meses sem ativar → perde status e sai da rede
+- Rede abaixo sobe para o sponsor
 
-### TBD-013 — Informações visíveis dos indicados
-**Pergunta:** O que o membro pode ver sobre seus indicados?
-- Nome completo ou apenas primeiro nome?
-- Email visível?
-- CV do indicado visível?
-- Status (ativo/inativo)?
-- Nível do indicado?
+---
+
+### TBD-012 — Profundidade da rede visível ✅ RESOLVIDO
+**Decisão:** **D) Toda a rede abaixo (ilimitado)**
+
+**Implementação:**
+- Lazy loading para evitar lag em redes grandes
+- Carregar níveis sob demanda (expand/collapse)
+- Paginação se necessário
+
+---
+
+### TBD-013 — Informações visíveis dos indicados ✅ RESOLVIDO
+
+**Campos visíveis para TODOS os níveis:**
+- ✅ Nome completo
+- ✅ Email
+- ✅ CV do indicado
+- ✅ Status (ativo/inativo)
+- ✅ Nível do indicado
+- ✅ Quantidade de indicados (do indicado)
+
+**Campos com visibilidade RESTRITA (telefone):**
+- 📱 Visível apenas para:
+  - Superior direto (sponsor)
+  - Indicados diretos (N1)
+  - OU se o membro habilitar nas configurações de privacidade
+
+**Decisão:** 09/01/2026
 
 ---
 
@@ -540,12 +561,28 @@ CREATE TABLE member_levels (
 
 ---
 
-## 🚦 Bloqueadores
+## ✅ Bloqueadores — TODOS RESOLVIDOS!
 
-Para iniciar o Sprint 3, precisamos:
+| Bloqueador | Status | Data |
+|------------|--------|------|
+| TBD-011 (regras de níveis) | ✅ Resolvido | 09/01/2026 |
+| TBD-012 (profundidade visível) | ✅ Resolvido | 09/01/2026 |
+| TBD-013 (informações visíveis) | ✅ Resolvido | 09/01/2026 |
+| Integração Shopify | ✅ Funcionando | 09/01/2026 |
+| Sprint 2 concluído | ✅ Validado | 08/01/2026 |
 
-1. **TBD-011** resolvido (regras de níveis)
-2. **TBD-012** resolvido (profundidade visível)
-3. **TBD-013** resolvido (informações visíveis)
+---
 
-**Ação:** Aguardar aprovação do cliente para os TBDs acima.
+## 🚀 PRONTO PARA INICIAR SPRINT 3!
+
+**Data de início prevista:** 10/01/2026
+**Estimativa:** 4 dias úteis
+
+### Próximos passos técnicos:
+
+1. **Criar migration** para campo `level` na tabela `members`
+2. **Criar tabela `member_level_history`** para auditoria de mudanças de nível
+3. **Implementar API `/api/members/me/network`** com lazy loading
+4. **Implementar cálculo de níveis** baseado nas regras do TBD-011
+5. **Criar componente NetworkTree** no dashboard
+6. **Adicionar configuração de privacidade** para telefone (TBD-013)

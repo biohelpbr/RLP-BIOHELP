@@ -151,7 +151,7 @@
 
 ---
 
-### TBD-012 — Profundidade da rede visível
+### TBD-012 — Profundidade da rede visível ✅ RESOLVIDO
 **Por que importa:** define o que o membro pode ver de sua rede.  
 **Origem:** SPEC 1.3 diz "visualização da rede (simples)" — não define profundidade.
 
@@ -159,32 +159,39 @@
 - **A)** Apenas N1 (indicados diretos)
 - **B)** N1 + N2 (2 níveis)
 - **C)** N1 + N2 + N3 (3 níveis)
-- **D)** Toda a rede abaixo (ilimitado)
+- **D)** Toda a rede abaixo (ilimitado) ✅
 
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
+**Decisão escolhida:** ✅ D — Toda a rede abaixo (ilimitado)
+**Observação:** Implementar com lazy loading e paginação para evitar lag em redes grandes.
+**Responsável:** Cliente  
+**Data:** 09/01/2026  
+**Evidência:** Aprovação via chat
 
 ---
 
-### TBD-013 — Informações visíveis dos indicados
+### TBD-013 — Informações visíveis dos indicados ✅ RESOLVIDO
 **Por que importa:** define privacidade e o que o membro vê sobre sua rede.
 
-**Campos a definir (marcar quais são visíveis):**
-- ⬜ Nome completo
-- ⬜ Apenas primeiro nome
-- ⬜ Email
-- ⬜ Telefone
-- ⬜ CV do indicado
-- ⬜ Status (ativo/inativo)
-- ⬜ Nível do indicado
-- ⬜ Data de cadastro
-- ⬜ Quantidade de indicados (do indicado)
+**Campos visíveis para TODOS os níveis da rede:**
+- ✅ Nome completo
+- ✅ Email
+- ✅ CV do indicado
+- ✅ Status (ativo/inativo)
+- ✅ Nível do indicado
+- ✅ Quantidade de indicados (do indicado)
 
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
+**Campos com visibilidade RESTRITA:**
+- 📱 Telefone: Visível apenas para:
+  - Superior direto (sponsor)
+  - Indicados diretos (N1)
+  - OU se o membro habilitar nas configurações de privacidade
+
+**Campos NÃO visíveis:**
+- ❌ Data de cadastro (opcional, pode adicionar depois)
+
+**Responsável:** Cliente  
+**Data:** 09/01/2026  
+**Evidência:** Aprovação via chat
 
 ---
 
