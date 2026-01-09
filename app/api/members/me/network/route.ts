@@ -11,24 +11,25 @@
  */
 
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createServiceClient, getAuthUser } from '@/lib/supabase/server'
 import type { NetworkMember, MemberNetworkResponse, MemberLevel } from '@/types/database'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const supabase = await createServerSupabaseClient()
-
-    // 1. Verificar autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // 1. Verificar autenticação via Supabase Auth
+    const user = await getAuthUser()
     
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Não autenticado' },
         { status: 401 }
       )
     }
+
+    // Usar service client para bypass RLS
+    const supabase = createServiceClient()
 
     // 2. Buscar membro logado
     const { data: member, error: memberError } = await supabase
@@ -38,6 +39,7 @@ export async function GET() {
       .single()
 
     if (memberError || !member) {
+      console.error('[network] Member not found for auth user:', user.id, memberError)
       return NextResponse.json(
         { error: 'Membro não encontrado' },
         { status: 404 }
