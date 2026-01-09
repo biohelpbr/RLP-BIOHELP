@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createServiceClient, getAuthUser } from '@/lib/supabase/server'
 import type { NetworkMember, MemberNetworkResponse, MemberLevel } from '@/types/database'
 
 export const dynamic = 'force-dynamic'
@@ -19,17 +19,19 @@ export async function GET(
 ) {
   try {
     const { id: memberId } = await params
-    const supabase = await createServerSupabaseClient()
-
-    // 1. Verificar autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (authError || !user) {
+    // 1. Verificar autenticação via Supabase Auth
+    const user = await getAuthUser()
+    
+    if (!user) {
       return NextResponse.json(
         { error: 'Não autenticado' },
         { status: 401 }
       )
     }
+
+    // Usar service client para bypass RLS
+    const supabase = createServiceClient()
 
     // 2. Verificar se é admin
     const { data: adminMember } = await supabase
@@ -39,6 +41,7 @@ export async function GET(
       .single()
 
     if (!adminMember) {
+      console.error('[admin/network] Admin member not found for auth user:', user.id)
       return NextResponse.json(
         { error: 'Membro não encontrado' },
         { status: 404 }
