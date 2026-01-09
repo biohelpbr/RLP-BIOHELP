@@ -1,7 +1,7 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** 08/01/2026  
-**Sprint Atual:** Sprint 2 (CV + Status)  
-**Status Geral:** ✅ Sprint 2 COMPLETO E TESTADO EM PRODUÇÃO
+**Data:** 10/01/2026  
+**Sprint Atual:** Sprint 3 (Rede Visual + Níveis)  
+**Status Geral:** 🚀 Sprint 3 EM ANDAMENTO
 
 ---
 
@@ -256,18 +256,154 @@ CRON_SECRET=seu_secret_aqui         # Protege o job mensal
 
 ---
 
-## 📅 Próximos Passos
+## 🚀 SPRINT 3 — EM ANDAMENTO
 
-### Configuração (CONCLUÍDO ✅)
-1. ✅ Aplicar migrations no Supabase
-2. ✅ Configurar webhooks no Shopify Admin
-3. ✅ Adicionar variáveis de ambiente na Vercel
-4. ✅ Testar com pedido simulado em produção
+### Objetivo do Sprint 3
+**Entrega:** "Membro visualiza sua rede completa + vê seu nível atual + progresso para próximo nível"
 
-### Sprint 3 (Próximo)
-1. Visualização da rede (N1, N2)
-2. Cálculo de níveis
-3. Regras de progressão
+**Especificação:** SPEC seção 1.3 + TBD-011, TBD-012, TBD-013
+
+### 1. Schema do Banco (Supabase) ✅
+
+| Tabela/Campo | Status | Descrição |
+|--------------|--------|-----------|
+| `members.level` | ✅ Completo | Nível atual (membro→head) |
+| `members.phone` | ✅ Completo | Telefone do membro |
+| `members.phone_visibility` | ✅ Completo | Privacidade (public/network/private) |
+| `members.lider_formacao_started_at` | ✅ Completo | Janela de 90 dias |
+| `member_level_history` | ✅ Completo | Histórico de mudanças |
+
+**Arquivo:** `supabase/migrations/20260110_sprint3_network_levels.sql`
+
+### 2. Funções RPC (Supabase) ✅
+
+| Função | Status | Descrição |
+|--------|--------|-----------|
+| `get_member_network` | ✅ Completo | Rede completa recursiva |
+| `calculate_network_cv` | ✅ Completo | CV total da rede |
+| `count_active_parceiras_n1` | ✅ Completo | Parceiras ativas em N1 |
+| `count_active_lideres_n1` | ✅ Completo | Líderes ativas em N1 |
+| `count_active_diretoras_n1` | ✅ Completo | Diretoras ativas em N1 |
+| `count_network_by_level` | ✅ Completo | Contagem por profundidade |
+
+### 3. API Endpoints ✅
+
+| Endpoint | Status | Funcionalidade |
+|----------|--------|----------------|
+| `GET /api/members/me/network` | ✅ Completo | Rede do membro |
+| `GET /api/members/me/level` | ✅ Completo | Nível + progresso |
+| `GET /api/admin/members/:id/network` | ✅ Completo | Rede (admin) |
+
+**Arquivos:**
+- `app/api/members/me/network/route.ts`
+- `app/api/members/me/level/route.ts`
+- `app/api/admin/members/[id]/network/route.ts`
+
+### 4. Frontend ✅
+
+| Componente | Status | Descrição |
+|------------|--------|-----------|
+| `NetworkTree` | ✅ Completo | Árvore visual da rede |
+| `LevelCard` | ✅ Completo | Nível + progresso |
+| `/dashboard/network` | ✅ Completo | Página Minha Rede |
+
+**Arquivos:**
+- `app/components/NetworkTree.tsx`
+- `app/components/LevelCard.tsx`
+- `app/dashboard/network/page.tsx`
+
+### 5. Lógica de Níveis ✅
+
+| Item | Status | Descrição |
+|------|--------|-----------|
+| Calculadora de níveis | ✅ Completo | `lib/levels/calculator.ts` |
+| Regras TBD-011 | ✅ Implementado | Parceira→Head |
+| Privacidade TBD-013 | ✅ Implementado | phone_visibility |
+
+### 6. TBDs Resolvidos no Sprint 3
+
+#### TBD-011 — Regras de progressão de nível ✅
+**Fonte:** `Biohelp___Loyalty_Reward_Program.md`
+
+| Nível | Requisitos |
+|-------|------------|
+| Membro | Cliente cadastrada |
+| Parceira | Membro Ativo + CV_rede >= 500 |
+| Líder em Formação | Parceira + 1ª Parceira em N1 (90 dias) |
+| Líder | Parceira Ativa + 4 Parceiras Ativas em N1 |
+| Diretora | 3 Líderes Ativas em N1 + 80.000 CV na rede |
+| Head | 3 Diretoras Ativas em N1 + 200.000 CV na rede |
+
+#### TBD-012 — Profundidade da rede visível ✅
+**Decisão:** Opção D — Toda a rede abaixo (ilimitado)
+- Limite técnico de 20 níveis para segurança
+- Performance otimizada com CTE recursiva
+
+#### TBD-013 — Informações visíveis dos indicados ✅
+**Campos visíveis:**
+- ✅ Nome completo
+- ✅ Email
+- ✅ CV do indicado
+- ✅ Status (ativo/inativo)
+- ✅ Nível do indicado
+- ✅ Quantidade de indicados
+
+**Telefone:**
+- `public`: visível para toda a rede
+- `network`: visível apenas para sponsor e N1
+- `private`: não visível
+
+---
+
+## 📈 Progresso por Sprint
+
+### Sprint 3 (Em Andamento)
+```
+├── ✅ Schema (levels/phone)      [████████████████████] 100%
+├── ✅ Funções RPC                [████████████████████] 100%
+├── ✅ API Endpoints              [████████████████████] 100%
+├── ✅ Lógica de Níveis           [████████████████████] 100%
+├── ✅ Frontend                   [████████████████████] 100%
+├── ⏳ Testes em Produção         [░░░░░░░░░░░░░░░░░░░░] 0%
+└── ⏳ Documentação Final         [░░░░░░░░░░░░░░░░░░░░] 0%
+
+Progresso Sprint 3: 85%
+```
+
+---
+
+## 📂 Arquivos Criados no Sprint 3
+
+### Migrations
+- `supabase/migrations/20260110_sprint3_network_levels.sql`
+
+### Bibliotecas
+- `lib/levels/calculator.ts`
+
+### API Routes
+- `app/api/members/me/network/route.ts`
+- `app/api/members/me/level/route.ts`
+- `app/api/admin/members/[id]/network/route.ts`
+
+### Frontend
+- `app/components/NetworkTree.tsx`
+- `app/components/NetworkTree.module.css`
+- `app/components/LevelCard.tsx`
+- `app/components/LevelCard.module.css`
+- `app/dashboard/network/page.tsx`
+- `app/dashboard/network/page.module.css`
+
+### Tipos
+- `types/database.ts` (atualizado com MemberLevel, NetworkMember, etc.)
+
+---
+
+## 📅 Próximos Passos Sprint 3
+
+### Pendente
+1. ⏳ Testar página Minha Rede em produção
+2. ⏳ Testar cálculo de níveis
+3. ⏳ Atualizar documentação final
 
 ---
 
@@ -327,5 +463,5 @@ Webhook simulado enviado para `https://rlp-biohelp.vercel.app/api/webhooks/shopi
 
 ---
 
-**Última atualização:** 08/01/2026  
-**Status:** Sprint 2 COMPLETO E VALIDADO ✅
+**Última atualização:** 10/01/2026  
+**Status:** Sprint 3 EM ANDAMENTO (85%) 🚀
