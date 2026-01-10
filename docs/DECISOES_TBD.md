@@ -243,17 +243,18 @@
 
 ---
 
-### TBD-017 — Arredondamento de CV e moeda
+### TBD-017 — Arredondamento de CV e moeda ✅ RESOLVIDO
 **Por que importa:** Define precisão dos cálculos de CV e comissões.
 
 **Opções:**
-- **A)** 2 casas decimais (padrão BRL)
+- **A)** 2 casas decimais (padrão BRL) ✅
 - **B)** Inteiro (arredondar para cima)
 - **C)** Inteiro (arredondar para baixo)
 
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  
-**Responsável:** ________  
-**Data:** ________
+**Decisão escolhida:** ✅ A — 2 casas decimais (padrão BRL)
+**Responsável:** Cliente  
+**Data:** 09/01/2026
+**Implementação:** Todos os valores monetários e de comissão usam DECIMAL(10,2)
 
 ---
 
@@ -274,7 +275,7 @@
 
 ---
 
-### TBD-019 — Creatina mensal grátis - implementação
+### TBD-019 — Creatina mensal grátis - implementação ⏳ ADIADO
 **Por que importa:** Documento canônico diz "Todo Membro Ativo (200 CV) recebe creatina mensal grátis".
 **Origem:** Linha 153 do documento canônico.
 
@@ -284,9 +285,43 @@
 - **C)** Crédito no saldo da parceira
 - **D)** Processo manual (admin envia)
 
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
-**Responsável:** ________  
-**Data:** ________
+**Decisão:** ⏳ Adiado para Sprint 5 ou posterior
+**Motivo:** Questão de fulfillment/logística, não de comissões
+**Responsável:** Cliente  
+**Data:** 09/01/2026
+
+---
+
+### TBD-020 — Período de cálculo de comissões ✅ RESOLVIDO
+**Por que importa:** Define quando as comissões são calculadas e disponibilizadas.
+
+**Opções:**
+- **A)** Em tempo real (cada pedido calcula comissão imediatamente) ✅
+- **B)** Diário (job roda 1x/dia)
+- **C)** Mensal (job roda no fechamento do mês)
+
+**Decisão escolhida:** ✅ A — Em tempo real
+**Motivo:** Mais simples e dá visibilidade imediata ao membro
+**Responsável:** Cliente  
+**Data:** 09/01/2026
+**Implementação:** Webhook de `orders/paid` calcula e registra comissões imediatamente
+
+---
+
+### TBD-021 — Status da comissão (disponibilidade para saque) ⏳ ADIADO
+**Por que importa:** Define se a comissão fica disponível imediatamente ou tem período de "trava".
+
+**Opções:**
+- **A)** Disponível imediatamente
+- **B)** Disponível após X dias (período de "trava" para evitar fraudes/estornos)
+- **C)** Disponível no fechamento do mês seguinte
+
+**Decisão:** ⏳ Adiado para Sprint 5 (Saques)
+**Motivo:** Depende da implementação de saques
+**Responsável:** Cliente  
+**Data:** 09/01/2026
+
+⚠️ **LEMBRETE SPRINT 5:** Definir período de trava antes de implementar saques!
 
 ---
 

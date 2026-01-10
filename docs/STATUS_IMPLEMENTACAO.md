@@ -1,13 +1,13 @@
 # 📊 Status de Implementação — Biohelp LRP
 **Data:** 10/01/2026  
-**Sprint Atual:** Sprint 3 (Rede Visual + Níveis)  
-**Status Geral:** ✅ Sprint 3 CONCLUÍDO
+**Sprint Atual:** Sprint 4 (Comissões + Ledger)  
+**Status Geral:** 🚧 Sprint 4 EM DESENVOLVIMENTO
 
 ---
 
 ## 🎯 Resumo Executivo
 
-O projeto está na **Fase 3 (Sprint 3)**, com rede visual e níveis implementados. **Sprint 3 foi concluído com sucesso!**
+O projeto está na **Fase 4 (Sprint 4)**, implementando motor de comissões. **Sprint 3 foi concluído com sucesso!**
 
 ### Funcionalidades Testadas em Produção:
 - ✅ API de rede (`/api/members/me/network`) funcionando
@@ -416,12 +416,128 @@ Progresso Sprint 3: 100% ✅
 
 ---
 
-## 📅 Próximos Passos Sprint 3
+## 🚧 SPRINT 4 — EM DESENVOLVIMENTO
 
-### Pendente
-1. ⏳ Testar página Minha Rede em produção
-2. ⏳ Testar cálculo de níveis
-3. ⏳ Atualizar documentação final
+### Objetivo do Sprint 4
+**Entrega:** "Motor de comissões com ledger auditável, calculando Fast-Track, Perpétua, Bônus 3, Leadership e Royalty"
+
+**Especificação:** SPEC seção 1.4 + TBD-017, TBD-020
+
+### 1. Schema do Banco (Supabase) ✅
+
+| Tabela | Status | Descrição |
+|--------|--------|-----------|
+| `commission_ledger` | ✅ Completo | Ledger imutável de comissões |
+| `commission_balances` | ✅ Completo | Saldo consolidado por membro |
+| `fast_track_windows` | ✅ Completo | Janelas de 60 dias |
+| `bonus_3_tracking` | ✅ Completo | Elegibilidade Bônus 3 |
+| `royalty_networks` | ✅ Completo | Redes separadas por Royalty |
+
+**Arquivo:** `supabase/migrations/20260110_sprint4_commissions.sql`
+
+### 2. Funções RPC (Supabase) ✅
+
+| Função | Status | Descrição |
+|--------|--------|-----------|
+| `calculate_order_commissions` | ✅ Completo | Calcula comissões de pedido |
+| `get_member_commission_summary` | ✅ Completo | Resumo de comissões |
+| `create_fast_track_window` (trigger) | ✅ Completo | Cria janela ao cadastrar |
+| `update_commission_balance` (trigger) | ✅ Completo | Atualiza saldo no ledger |
+
+### 3. API Endpoints ✅
+
+| Endpoint | Status | Funcionalidade |
+|----------|--------|----------------|
+| `GET /api/members/me/commissions` | ✅ Completo | Resumo de comissões |
+| `GET /api/members/me/commissions/details` | ✅ Completo | Detalhes do ledger |
+| `GET /api/admin/commissions` | ✅ Completo | Todas comissões (admin) |
+
+**Arquivos:**
+- `app/api/members/me/commissions/route.ts`
+- `app/api/members/me/commissions/details/route.ts`
+- `app/api/admin/commissions/route.ts`
+
+### 4. Bibliotecas de Cálculo ✅
+
+| Módulo | Status | Descrição |
+|--------|--------|-----------|
+| `calculator.ts` | ✅ Completo | Motor principal de comissões |
+| `bonus3.ts` | ✅ Completo | Cálculo Bônus 3 |
+| `royalty.ts` | ✅ Completo | Cálculo Royalty |
+
+**Arquivos:**
+- `lib/commissions/calculator.ts`
+- `lib/commissions/bonus3.ts`
+- `lib/commissions/royalty.ts`
+
+### 5. Frontend ✅
+
+| Componente | Status | Descrição |
+|------------|--------|-----------|
+| `/dashboard/commissions` | ✅ Completo | Página de comissões do membro |
+| `/admin/commissions` | ✅ Completo | Gestão de comissões (admin) |
+| Menu lateral (dashboard) | ✅ Completo | Link para comissões |
+| Menu lateral (admin) | ✅ Completo | Link para comissões |
+
+### 6. TBDs Resolvidos no Sprint 4
+
+#### TBD-017 — Arredondamento de CV e moeda ✅
+**Decisão:** 2 casas decimais (padrão BRL)
+**Implementação:** `DECIMAL(10,2)` em todas as tabelas
+
+#### TBD-020 — Período de cálculo de comissões ✅
+**Decisão:** Em tempo real (cada pedido calcula imediatamente)
+**Implementação:** Webhook `orders/paid` calcula e registra comissões
+
+### 7. TBDs Adiados
+
+| TBD | Descrição | Sprint |
+|-----|-----------|--------|
+| TBD-019 | Creatina mensal grátis | Sprint 5+ |
+| TBD-021 | Período de trava para saque | Sprint 5 |
+
+### 8. Regras de Comissionamento Implementadas
+
+#### Fast-Track (60 dias)
+- ✅ N0 recebe 30% CV de N1 (primeiros 30 dias)
+- ✅ N0 recebe 20% CV de N1 (dias 31-60)
+- ✅ Líder N0 recebe 20%/10% CV de N2
+
+#### Comissão Perpétua (após Fast-Track)
+- ✅ Parceira: 5% CV de N1
+- ✅ Líder: 7% CV da rede + 5% CV de N1
+- ✅ Diretora: 10% CV da rede + 7% CV de Parceiras N1 + 5% CV de clientes N1
+- ✅ Head: 15% CV da rede + 10% CV de Líderes N1 + 7% CV de Parceiras N1 + 5% CV de clientes N1
+
+#### Bônus 3
+- ✅ 3 Parceiras Ativas em N1 por 1 mês → R$250
+- ✅ Cada N1 com 3 Parceiras Ativas → R$1.500
+- ✅ Cada N2 com 3 Parceiras Ativas → R$8.000
+
+#### Leadership Bônus
+- ✅ Diretora: 3% CV da rede
+- ✅ Head: 4% CV da rede
+
+#### Royalty
+- ✅ Head forma Head → recebe 3% CV da nova rede
+- ✅ Separação não faz N0 perder status de Head
+
+---
+
+## 📈 Progresso Sprint 4
+
+```
+├── ✅ Schema (commission_ledger, etc.)  [████████████████████] 100%
+├── ✅ Funções RPC                       [████████████████████] 100%
+├── ✅ API Endpoints                     [████████████████████] 100%
+├── ✅ Bibliotecas de Cálculo            [████████████████████] 100%
+├── ✅ Frontend                          [████████████████████] 100%
+├── ⏳ Integrar no webhook orders/paid   [░░░░░░░░░░░░░░░░░░░░] 0%
+├── ⏳ Testes em Produção                [░░░░░░░░░░░░░░░░░░░░] 0%
+└── ⏳ Documentação Final                [░░░░░░░░░░░░░░░░░░░░] 0%
+
+Progresso Sprint 4: 70% 🚧
+```
 
 ---
 
@@ -481,5 +597,32 @@ Webhook simulado enviado para `https://rlp-biohelp.vercel.app/api/webhooks/shopi
 
 ---
 
+## 📂 Arquivos Criados no Sprint 4
+
+### Migrations
+- `supabase/migrations/20260110_sprint4_commissions.sql`
+
+### Bibliotecas
+- `lib/commissions/calculator.ts`
+- `lib/commissions/bonus3.ts`
+- `lib/commissions/royalty.ts`
+
+### API Routes
+- `app/api/members/me/commissions/route.ts`
+- `app/api/members/me/commissions/details/route.ts`
+- `app/api/admin/commissions/route.ts`
+
+### Frontend
+- `app/dashboard/commissions/page.tsx`
+- `app/admin/commissions/page.tsx`
+
+### Tipos
+- `types/database.ts` (atualizado com CommissionType, CommissionLedger, etc.)
+
+### Documentação
+- `docs/PLANO_SPRINT_4.md`
+
+---
+
 **Última atualização:** 10/01/2026  
-**Status:** Sprint 3 EM ANDAMENTO (85%) 🚀
+**Status:** Sprint 4 EM DESENVOLVIMENTO (70%) 🚧

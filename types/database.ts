@@ -531,3 +531,256 @@ export const LEVEL_REQUIREMENTS = {
     ]
   }
 } as const
+
+// =====================================================
+// SPRINT 4 — TIPOS DE COMISSÕES
+// =====================================================
+
+// Tipos de comissão
+export type CommissionType = 
+  | 'fast_track_30'     // Fast-Track 30% (primeiros 30 dias)
+  | 'fast_track_20'     // Fast-Track 20% (dias 31-60)
+  | 'perpetual'         // Comissão Perpétua
+  | 'bonus_3_level_1'   // Bônus 3 - R$250
+  | 'bonus_3_level_2'   // Bônus 3 - R$1.500
+  | 'bonus_3_level_3'   // Bônus 3 - R$8.000
+  | 'leadership'        // Leadership Bônus
+  | 'royalty'           // Royalty (Head forma Head)
+  | 'adjustment'        // Ajuste manual (admin)
+  | 'reversal'          // Reversão (refund)
+
+// Tabela commission_ledger
+export interface CommissionLedger {
+  id: string
+  member_id: string
+  commission_type: CommissionType
+  amount: number
+  cv_base: number | null
+  percentage: number | null
+  source_member_id: string | null
+  source_order_id: string | null
+  network_level: number | null
+  reference_month: string // 'YYYY-MM-DD' (primeiro dia do mês)
+  description: string | null
+  metadata: Record<string, unknown>
+  created_at: string
+}
+
+// Tabela commission_balances
+export interface CommissionBalance {
+  member_id: string
+  total_earned: number
+  total_withdrawn: number
+  available_balance: number
+  pending_balance: number
+  fast_track_month: number
+  perpetual_month: number
+  bonus_3_month: number
+  leadership_month: number
+  royalty_month: number
+  current_month: string | null
+  updated_at: string
+}
+
+// Tabela fast_track_windows
+export interface FastTrackWindow {
+  id: string
+  sponsor_id: string
+  member_id: string
+  started_at: string
+  phase_1_ends_at: string
+  phase_2_ends_at: string
+  is_active: boolean
+  created_at: string
+}
+
+// Tabela bonus_3_tracking
+export interface Bonus3Tracking {
+  id: string
+  member_id: string
+  reference_month: string
+  active_partners_n1: number
+  n1_with_3_partners: number
+  n2_with_3_partners: number
+  eligible_level_1: boolean
+  eligible_level_2: boolean
+  eligible_level_3: boolean
+  paid_level_1: boolean
+  paid_level_2: boolean
+  paid_level_3: boolean
+  created_at: string
+  updated_at: string
+}
+
+// Tabela royalty_networks
+export interface RoyaltyNetwork {
+  id: string
+  original_head_id: string
+  new_head_id: string
+  separated_at: string
+  royalty_percentage: number
+  is_active: boolean
+  created_at: string
+}
+
+// Tipos de inserção
+export type CommissionLedgerInsert = {
+  id?: string
+  member_id: string
+  commission_type: CommissionType
+  amount: number
+  cv_base?: number | null
+  percentage?: number | null
+  source_member_id?: string | null
+  source_order_id?: string | null
+  network_level?: number | null
+  reference_month: string
+  description?: string | null
+  metadata?: Record<string, unknown>
+  created_at?: string
+}
+
+export type CommissionBalanceInsert = {
+  member_id: string
+  total_earned?: number
+  total_withdrawn?: number
+  available_balance?: number
+  pending_balance?: number
+  fast_track_month?: number
+  perpetual_month?: number
+  bonus_3_month?: number
+  leadership_month?: number
+  royalty_month?: number
+  current_month?: string | null
+  updated_at?: string
+}
+
+export type FastTrackWindowInsert = {
+  id?: string
+  sponsor_id: string
+  member_id: string
+  started_at?: string
+  phase_1_ends_at: string
+  phase_2_ends_at: string
+  is_active?: boolean
+  created_at?: string
+}
+
+export type Bonus3TrackingInsert = {
+  id?: string
+  member_id: string
+  reference_month: string
+  active_partners_n1?: number
+  n1_with_3_partners?: number
+  n2_with_3_partners?: number
+  eligible_level_1?: boolean
+  eligible_level_2?: boolean
+  eligible_level_3?: boolean
+  paid_level_1?: boolean
+  paid_level_2?: boolean
+  paid_level_3?: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+// Resposta do endpoint /api/members/me/commissions
+export interface MemberCommissionsResponse {
+  balance: {
+    total_earned: number
+    total_withdrawn: number
+    available: number
+    pending: number
+  }
+  current_month: {
+    fast_track: number
+    perpetual: number
+    bonus_3: number
+    leadership: number
+    royalty: number
+    total: number
+  }
+  history: Array<{
+    month: string
+    total: number
+    breakdown: {
+      fast_track: number | null
+      perpetual: number | null
+      bonus_3: number | null
+      leadership: number | null
+      royalty: number | null
+    }
+  }>
+}
+
+// Detalhes de uma comissão individual
+export interface CommissionDetail {
+  id: string
+  type: CommissionType
+  type_label: string
+  amount: number
+  cv_base: number | null
+  percentage: number | null
+  source_member_name: string | null
+  source_order_number: string | null
+  network_level: number | null
+  description: string | null
+  created_at: string
+}
+
+// Resposta do endpoint /api/members/me/commissions/details
+export interface CommissionDetailsResponse {
+  month: string
+  commissions: CommissionDetail[]
+  totals: {
+    fast_track: number
+    perpetual: number
+    bonus_3: number
+    leadership: number
+    royalty: number
+    total: number
+  }
+}
+
+// Labels para tipos de comissão (para UI)
+export const COMMISSION_TYPE_LABELS: Record<CommissionType, string> = {
+  fast_track_30: 'Fast-Track 30%',
+  fast_track_20: 'Fast-Track 20%',
+  perpetual: 'Comissão Perpétua',
+  bonus_3_level_1: 'Bônus 3 - Nível 1',
+  bonus_3_level_2: 'Bônus 3 - Nível 2',
+  bonus_3_level_3: 'Bônus 3 - Nível 3',
+  leadership: 'Leadership Bônus',
+  royalty: 'Royalty',
+  adjustment: 'Ajuste Manual',
+  reversal: 'Reversão'
+}
+
+// Valores dos Bônus 3
+export const BONUS_3_VALUES = {
+  level_1: 250,    // R$250 - 3 Parceiras em N1
+  level_2: 1500,   // R$1.500 - Cada N1 com 3 Parceiras
+  level_3: 8000    // R$8.000 - Cada N2 com 3 Parceiras
+} as const
+
+// Percentuais de comissão por nível
+export const COMMISSION_PERCENTAGES = {
+  fast_track: {
+    phase_1: 30,  // 30% primeiros 30 dias
+    phase_2: 20   // 20% dias 31-60
+  },
+  fast_track_n2: {
+    phase_1: 20,  // 20% primeiros 30 dias (Líder)
+    phase_2: 10   // 10% dias 31-60 (Líder)
+  },
+  perpetual: {
+    parceira: 5,
+    lider: 7,
+    diretora: 10,
+    head: 15
+  },
+  leadership: {
+    diretora: 3,
+    head: 4
+  },
+  royalty: 3  // 3% quando Head forma Head
+} as const

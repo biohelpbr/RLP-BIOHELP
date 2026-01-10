@@ -129,6 +129,12 @@ const Icons = {
       <circle cx="12" cy="12" r="2"/>
     </svg>
   ),
+  dollarSign: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  ),
 }
 
 export default function DashboardPage() {
@@ -282,6 +288,12 @@ export default function DashboardPage() {
               <Link href="/dashboard/network">
                 <span className={styles.navIcon}>{Icons.users}</span>
                 <span>Minha Rede</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/dashboard/commissions">
+                <span className={styles.navIcon}>{Icons.dollarSign}</span>
+                <span>Comissões</span>
               </Link>
             </li>
             <li className={styles.navItem}>
