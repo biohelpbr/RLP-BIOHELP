@@ -818,4 +818,148 @@ CRON_SECRET=seu_secret_aqui
 - ✅ Funções RPC `get_buyer_type()` e `get_perpetual_percentage()` implementadas
 - ✅ Documentação alinhada com regras de negócio canônicas
 
+---
+
+# 🧪 RELATÓRIO DE TESTES EXAUSTIVOS — SPRINT 4
+
+**Data de execução:** 10/01/2026
+
+## Testes de Banco de Dados (Supabase)
+
+### 1. Estrutura do Commission Ledger ✅
+| Coluna | Tipo | Nullable | Status |
+|--------|------|----------|--------|
+| id | uuid | NO | ✅ |
+| member_id | uuid | NO | ✅ |
+| commission_type | text | NO | ✅ |
+| amount | numeric | NO | ✅ |
+| cv_base | numeric | YES | ✅ |
+| percentage | numeric | YES | ✅ |
+| source_member_id | uuid | YES | ✅ |
+| source_order_id | uuid | YES | ✅ |
+| network_level | integer | YES | ✅ |
+| reference_month | date | NO | ✅ |
+| description | text | YES | ✅ |
+| metadata | jsonb | YES | ✅ |
+| created_at | timestamp | YES | ✅ |
+
+### 2. Comissões Registradas ✅
+| Beneficiário | Tipo | Valor | CV Base | % | Fonte |
+|--------------|------|-------|---------|---|-------|
+| Sponsor Teste | fast_track_30 | R$ 45,00 | 150 | 30% | Membro Teste |
+
+**Cálculo verificado:** CV 150 × 30% = R$ 45,00 ✅
+
+### 3. Saldos Consolidados ✅
+| Membro | Total Ganho | Disponível | Fast-Track Mês |
+|--------|-------------|------------|----------------|
+| Sponsor Teste | R$ 45,00 | R$ 45,00 | R$ 45,00 |
+| Admin Biohelp | R$ 0,00 | R$ 0,00 | R$ 0,00 |
+| Membro Teste | R$ 0,00 | R$ 0,00 | R$ 0,00 |
+
+### 4. Janelas Fast-Track ✅
+| Sponsor | Membro | Fase 1 (30d) | Fase 2 (60d) |
+|---------|--------|--------------|--------------|
+| Sponsor Teste | Membro Teste | 2026-02-09 | 2026-03-11 |
+
+### 5. Funções RPC de Comissão Perpétua ✅
+
+**Cenários testados via `get_perpetual_percentage()`:**
+
+| Sponsor | Comprador | Resultado | Esperado | Status |
+|---------|-----------|-----------|----------|--------|
+| parceira | membro | 5.00% | 5% (cliente) | ✅ |
+| parceira | parceira | 0.00% | 0% (NÃO recebe) | ✅ |
+| parceira | lider | 0.00% | 0% (NÃO recebe) | ✅ |
+| lider | membro | 5.00% | 5% (cliente) | ✅ |
+| lider | parceira | 7.00% | 7% (rede) | ✅ |
+| lider | lider | 7.00% | 7% (rede) | ✅ |
+| diretora | membro | 5.00% | 5% (cliente) | ✅ |
+| diretora | parceira | 7.00% | 7% (parceira) | ✅ |
+| diretora | lider | 10.00% | 10% (líder) | ✅ |
+| head | membro | 5.00% | 5% (cliente) | ✅ |
+| head | parceira | 7.00% | 7% (parceira) | ✅ |
+| head | lider | 10.00% | 10% (líder N1) | ✅ |
+| head | diretora | 10.00% | 10% (líder N1) | ✅ |
+| head | head | 10.00% | 10% (líder N1) | ✅ |
+
+**Nota:** Para N1 diretos, Head recebe 10% de líderes (inclui diretora/head). O 15% aplica-se à rede N2+.
+
+### 6. RLS Policies ✅
+| Tabela | Policy | Permissão | Status |
+|--------|--------|-----------|--------|
+| commission_ledger | Members can view own commissions | SELECT | ✅ |
+| commission_balances | Members can view own balance | SELECT | ✅ |
+
+### 7. Integridade Referencial ✅
+- Registros órfãos no ledger: **0** ✅
+
+### 8. Índices de Performance ✅
+| Índice | Tipo | Status |
+|--------|------|--------|
+| commission_ledger_pkey | PRIMARY | ✅ |
+| idx_commission_ledger_member | btree(member_id) | ✅ |
+| idx_commission_ledger_month | btree(reference_month) | ✅ |
+| idx_commission_ledger_type | btree(commission_type) | ✅ |
+| idx_commission_ledger_source_order | btree(source_order_id) | ✅ |
+| idx_commission_ledger_created | btree(created_at DESC) | ✅ |
+
+### 9. Funções RPC Disponíveis ✅
+| Função | Argumentos | Retorno | Status |
+|--------|------------|---------|--------|
+| calculate_order_commissions | p_order_id, p_buyer_id, p_cv_total | record | ✅ |
+| get_buyer_type | p_level | text | ✅ |
+| get_perpetual_percentage | p_sponsor_level, p_buyer_level | numeric | ✅ |
+
+---
+
+## Testes de Interface (Browser)
+
+### 1. Dashboard de Comissões (Membro) ✅
+**Login:** sponsor@biohelp.test / sponsor123
+
+| Elemento | Valor Exibido | Esperado | Status |
+|----------|---------------|----------|--------|
+| Saldo Disponível | R$ 45,00 | R$ 45,00 | ✅ |
+| Total Ganho | R$ 45,00 | R$ 45,00 | ✅ |
+| Fast-Track | R$ 45,00 | R$ 45,00 | ✅ |
+| Perpétua | R$ 0,00 | R$ 0,00 | ✅ |
+| Bônus 3 | R$ 0,00 | R$ 0,00 | ✅ |
+| Leadership | R$ 0,00 | R$ 0,00 | ✅ |
+| Royalty | R$ 0,00 | R$ 0,00 | ✅ |
+
+**Screenshot:** `teste_dashboard_comissoes_membro.png`
+
+### 2. Painel Admin de Comissões ✅
+**Login:** admin@biohelp.test / 123456
+
+| Funcionalidade | Status |
+|----------------|--------|
+| Acesso à página | ✅ |
+| Lista de comissões | ✅ |
+| Filtros funcionando | ✅ |
+| Tabela de dados | ✅ |
+| Menu lateral integrado | ✅ |
+
+**Screenshot:** `teste_admin_comissoes.png`
+
+---
+
+## Resumo dos Testes
+
+| Categoria | Total | Passou | Falhou |
+|-----------|-------|--------|--------|
+| Schema/Estrutura | 9 | 9 | 0 |
+| RPC Functions | 14 | 14 | 0 |
+| RLS Policies | 2 | 2 | 0 |
+| Integridade | 1 | 1 | 0 |
+| Índices | 6 | 6 | 0 |
+| Dashboard Membro | 7 | 7 | 0 |
+| Painel Admin | 5 | 5 | 0 |
+| **TOTAL** | **44** | **44** | **0** |
+
+**Taxa de sucesso: 100%** ✅
+
+---
+
 **Próximo passo:** Iniciar Sprint 5 (Saques + Fiscal)
