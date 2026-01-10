@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import styles from '../page.module.css'
 
 interface Commission {
   id: string
@@ -38,18 +39,63 @@ interface CommissionsResponse {
   }
 }
 
+// Ícones SVG inline para design clean
+const Icons = {
+  users: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  ),
+  network: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+      <path d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+    </svg>
+  ),
+  box: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+  ),
+  settings: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  ),
+  logout: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+  ),
+  dollarSign: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  ),
+}
+
 // Cores para tipos de comissão
 const TYPE_COLORS: Record<string, string> = {
-  fast_track_30: 'bg-amber-100 text-amber-800',
-  fast_track_20: 'bg-amber-100 text-amber-800',
-  perpetual: 'bg-emerald-100 text-emerald-800',
-  bonus_3_level_1: 'bg-purple-100 text-purple-800',
-  bonus_3_level_2: 'bg-purple-100 text-purple-800',
-  bonus_3_level_3: 'bg-purple-100 text-purple-800',
-  leadership: 'bg-blue-100 text-blue-800',
-  royalty: 'bg-rose-100 text-rose-800',
-  adjustment: 'bg-gray-100 text-gray-800',
-  reversal: 'bg-red-100 text-red-800'
+  fast_track_30: styles.typeFastTrack,
+  fast_track_20: styles.typeFastTrack,
+  perpetual: styles.typePerpetual,
+  bonus_3_level_1: styles.typeBonus3,
+  bonus_3_level_2: styles.typeBonus3,
+  bonus_3_level_3: styles.typeBonus3,
+  leadership: styles.typeLeadership,
+  royalty: styles.typeRoyalty,
+  adjustment: styles.typeAdjustment,
+  reversal: styles.typeReversal
 }
 
 export default function AdminCommissionsPage() {
@@ -64,6 +110,16 @@ export default function AdminCommissionsPage() {
   const [selectedType, setSelectedType] = useState<string>('')
   const [page, setPage] = useState(0)
   const limit = 50
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/login')
+      router.refresh()
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
 
   // Buscar comissões
   useEffect(() => {
@@ -128,60 +184,84 @@ export default function AdminCommissionsPage() {
     return options
   }
 
-  if (loading && !data) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 max-w-md">
-          <h2 className="text-red-400 font-semibold mb-2">Erro</h2>
-          <p className="text-red-300">{error}</p>
-          <Link href="/admin" className="mt-4 inline-block text-emerald-400 hover:underline">
-            ← Voltar ao Admin
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-slate-900">
-      {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link 
-                href="/admin"
-                className="text-slate-400 hover:text-white transition-colors"
-              >
-                ← Voltar
-              </Link>
-              <h1 className="text-2xl font-bold text-white">Gestão de Comissões</h1>
+    <div className={styles.layout}>
+      {/* Sidebar */}
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <div className={styles.sidebarLogo}>
+            <div className={styles.logoIcon}>B</div>
+            <div className={styles.logoText}>
+              <span className={styles.logoTitle}>Admin Biohelp</span>
+              <span className={styles.logoSubtitle}>Painel de Gestão</span>
             </div>
           </div>
         </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <nav className={styles.nav}>
+          <ul className={styles.navList}>
+            <li className={styles.navItem}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>{Icons.users}</span>
+                <span>Parceiras</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>{Icons.network}</span>
+                <span>Rede</span>
+              </Link>
+            </li>
+            <li className={`${styles.navItem} ${styles.navItemActive}`}>
+              <Link href="/admin/commissions">
+                <span className={styles.navIcon}>{Icons.dollarSign}</span>
+                <span>Comissões</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>{Icons.box}</span>
+                <span>Produtos</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link href="/admin">
+                <span className={styles.navIcon}>{Icons.settings}</span>
+                <span>Configurações</span>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <button onClick={handleLogout} className={styles.logoutBtn}>
+                <span className={styles.navIcon}>{Icons.logout}</span>
+                <span>Sair</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <main className={styles.main}>
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.headerInfo}>
+            <h1>Gestão de Comissões</h1>
+            <p>{data?.pagination.total || 0} registros no período</p>
+          </div>
+        </div>
+
         {/* Filtros */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6">
-          <div className="flex flex-wrap items-center gap-4">
-            <div>
-              <label className="block text-sm text-slate-400 mb-1">Mês</label>
+        <div className={styles.filtersCard}>
+          <div className={styles.filtersRow}>
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Mês</label>
               <select
                 value={selectedMonth}
                 onChange={(e) => {
                   setSelectedMonth(e.target.value)
                   setPage(0)
                 }}
-                className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-emerald-500"
+                className={styles.filterSelect}
               >
                 {getMonthOptions().map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -191,15 +271,15 @@ export default function AdminCommissionsPage() {
               </select>
             </div>
             
-            <div>
-              <label className="block text-sm text-slate-400 mb-1">Tipo</label>
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Tipo</label>
               <select
                 value={selectedType}
                 onChange={(e) => {
                   setSelectedType(e.target.value)
                   setPage(0)
                 }}
-                className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-emerald-500"
+                className={styles.filterSelect}
               >
                 <option value="">Todos</option>
                 <option value="fast_track_30">Fast-Track 30%</option>
@@ -216,8 +296,8 @@ export default function AdminCommissionsPage() {
             </div>
 
             {loading && (
-              <div className="flex items-center gap-2 text-slate-400">
-                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-emerald-500"></div>
+              <div className={styles.loadingIndicator}>
+                <div className={styles.spinner}></div>
                 <span>Carregando...</span>
               </div>
             )}
@@ -226,31 +306,31 @@ export default function AdminCommissionsPage() {
 
         {/* Resumo */}
         {data && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 rounded-xl p-4">
-              <span className="text-emerald-300 text-sm font-medium block mb-1">Total do Período</span>
-              <p className="text-2xl font-bold text-white">
+          <div className={styles.summaryGrid}>
+            <div className={styles.summaryCardPrimary}>
+              <span className={styles.summaryLabel}>Total do Período</span>
+              <p className={styles.summaryValue}>
                 {formatCurrency(data.summary.total_amount)}
               </p>
             </div>
             
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-              <span className="text-slate-400 text-sm font-medium block mb-1">Registros</span>
-              <p className="text-2xl font-bold text-white">
+            <div className={styles.summaryCard}>
+              <span className={styles.summaryLabel}>Registros</span>
+              <p className={styles.summaryValue}>
                 {data.pagination.total}
               </p>
             </div>
 
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
-              <span className="text-amber-300 text-sm font-medium block mb-1">Fast-Track</span>
-              <p className="text-xl font-bold text-white">
+            <div className={styles.summaryCardFastTrack}>
+              <span className={styles.summaryLabel}>Fast-Track</span>
+              <p className={styles.summaryValue}>
                 {formatCurrency((data.summary.by_type['fast_track_30'] || 0) + (data.summary.by_type['fast_track_20'] || 0))}
               </p>
             </div>
 
-            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
-              <span className="text-emerald-300 text-sm font-medium block mb-1">Perpétua</span>
-              <p className="text-xl font-bold text-white">
+            <div className={styles.summaryCardPerpetual}>
+              <span className={styles.summaryLabel}>Perpétua</span>
+              <p className={styles.summaryValue}>
                 {formatCurrency(data.summary.by_type['perpetual'] || 0)}
               </p>
             </div>
@@ -258,91 +338,93 @@ export default function AdminCommissionsPage() {
         )}
 
         {/* Tabela de Comissões */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <div className={styles.tableCard}>
+          {loading && !data ? (
+            <div className={styles.loading}>Carregando...</div>
+          ) : error ? (
+            <div className={styles.emptyState}>
+              <h3>Erro ao carregar</h3>
+              <p>{error}</p>
+            </div>
+          ) : data?.commissions.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>{Icons.dollarSign}</div>
+              <h3>Nenhuma comissão encontrada</h3>
+              <p>Não há comissões registradas neste período.</p>
+            </div>
+          ) : (
+            <table className={styles.table}>
               <thead>
-                <tr className="text-left text-slate-400 text-sm bg-slate-700/50">
-                  <th className="px-4 py-3 font-medium">Membro</th>
-                  <th className="px-4 py-3 font-medium">Tipo</th>
-                  <th className="px-4 py-3 font-medium">Origem</th>
-                  <th className="px-4 py-3 font-medium">CV Base</th>
-                  <th className="px-4 py-3 font-medium">%</th>
-                  <th className="px-4 py-3 font-medium text-right">Valor</th>
-                  <th className="px-4 py-3 font-medium text-right">Data</th>
+                <tr>
+                  <th>Membro</th>
+                  <th>Tipo</th>
+                  <th>Origem</th>
+                  <th>CV Base</th>
+                  <th>%</th>
+                  <th>Valor</th>
+                  <th>Data</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
-                {data?.commissions.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
-                      <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <p>Nenhuma comissão encontrada neste período</p>
+              <tbody>
+                {data?.commissions.map((commission) => (
+                  <tr key={commission.id}>
+                    <td>
+                      <div className={styles.memberCell}>
+                        <span className={styles.memberName}>{commission.member.name}</span>
+                        <span className={styles.memberEmail}>{commission.member.email}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`${styles.typeBadge} ${TYPE_COLORS[commission.type] || ''}`}>
+                        {commission.type_label}
+                      </span>
+                    </td>
+                    <td>
+                      {commission.source_member_name || '-'}
+                      {commission.source_order_number && (
+                        <span className={styles.orderNumber}>
+                          #{commission.source_order_number}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      {commission.cv_base ? formatCurrency(commission.cv_base) : '-'}
+                    </td>
+                    <td>
+                      {commission.percentage ? `${commission.percentage}%` : '-'}
+                    </td>
+                    <td>
+                      <span className={commission.amount >= 0 ? styles.amountPositive : styles.amountNegative}>
+                        {formatCurrency(commission.amount)}
+                      </span>
+                    </td>
+                    <td className={styles.dateCell}>
+                      {formatDate(commission.created_at)}
                     </td>
                   </tr>
-                ) : (
-                  data?.commissions.map((commission) => (
-                    <tr key={commission.id} className="text-white hover:bg-slate-700/30">
-                      <td className="px-4 py-3">
-                        <div>
-                          <p className="font-medium">{commission.member.name}</p>
-                          <p className="text-sm text-slate-400">{commission.member.email}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${TYPE_COLORS[commission.type] || 'bg-slate-100 text-slate-800'}`}>
-                          {commission.type_label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-slate-300">
-                        {commission.source_member_name || '-'}
-                        {commission.source_order_number && (
-                          <span className="text-slate-500 text-xs ml-1">
-                            (#{commission.source_order_number})
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-slate-300">
-                        {commission.cv_base ? formatCurrency(commission.cv_base) : '-'}
-                      </td>
-                      <td className="px-4 py-3 text-slate-300">
-                        {commission.percentage ? `${commission.percentage}%` : '-'}
-                      </td>
-                      <td className="px-4 py-3 text-right font-medium">
-                        <span className={commission.amount >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                          {formatCurrency(commission.amount)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right text-slate-400 text-sm">
-                        {formatDate(commission.created_at)}
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
-          </div>
+          )}
 
           {/* Paginação */}
           {data && data.pagination.total > limit && (
-            <div className="px-4 py-3 border-t border-slate-700 flex items-center justify-between">
-              <span className="text-sm text-slate-400">
+            <div className={styles.pagination}>
+              <span className={styles.pageInfo}>
                 Mostrando {page * limit + 1} - {Math.min((page + 1) * limit, data.pagination.total)} de {data.pagination.total}
               </span>
-              <div className="flex gap-2">
+              <div className={styles.pageButtons}>
                 <button
                   onClick={() => setPage(Math.max(0, page - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1 bg-slate-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-600"
+                  className={styles.pageBtn}
                 >
                   Anterior
                 </button>
                 <button
                   onClick={() => setPage(page + 1)}
                   disabled={!data.pagination.hasMore}
-                  className="px-3 py-1 bg-slate-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-600"
+                  className={styles.pageBtn}
                 >
                   Próximo
                 </button>
@@ -354,4 +436,3 @@ export default function AdminCommissionsPage() {
     </div>
   )
 }
-

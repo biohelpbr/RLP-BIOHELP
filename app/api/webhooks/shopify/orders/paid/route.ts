@@ -11,6 +11,7 @@
  * - Calcular CV por item
  * - Registrar no cv_ledger
  * - Atualizar members.current_cv_month
+ * - [Sprint 4] Calcular e registrar comissões no commission_ledger
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -32,6 +33,13 @@ import {
   isActiveCV
 } from '@/lib/cv/calculator'
 import { syncCustomerToShopify } from '@/lib/shopify/customer'
+import {
+  calculateAllCommissions,
+  toCommissionLedgerInserts,
+  getCurrentMonthStart,
+  type MemberForCommission,
+  type FastTrackWindow
+} from '@/lib/commissions/calculator'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -319,6 +327,143 @@ export async function POST(request: NextRequest) {
       })
   }
 
+  // =====================================================
+  // 15. [Sprint 4] CALCULAR E REGISTRAR COMISSÕES
+  // =====================================================
+  let commissionsCreated = 0
+  try {
+    // Buscar dados completos do comprador
+    const { data: buyerData } = await supabase
+      .from('members')
+      .select('id, sponsor_id, level, status, name')
+      .eq('id', member.id)
+      .single()
+
+    if (buyerData && buyerData.sponsor_id && totalCV > 0) {
+      // Buscar sponsor (N0)
+      const { data: sponsorData } = await supabase
+        .from('members')
+        .select('id, sponsor_id, level, status, name')
+        .eq('id', buyerData.sponsor_id)
+        .single()
+
+      // Buscar grand sponsor (N1 do sponsor)
+      let grandSponsorData: MemberForCommission | null = null
+      if (sponsorData?.sponsor_id) {
+        const { data: gs } = await supabase
+          .from('members')
+          .select('id, sponsor_id, level, status, name')
+          .eq('id', sponsorData.sponsor_id)
+          .single()
+        if (gs) {
+          grandSponsorData = {
+            id: gs.id,
+            sponsor_id: gs.sponsor_id,
+            level: gs.level,
+            status: gs.status,
+            name: gs.name
+          }
+        }
+      }
+
+      // Buscar janela Fast-Track N1
+      let fastTrackWindow: FastTrackWindow | null = null
+      if (sponsorData) {
+        const { data: ftw } = await supabase
+          .from('fast_track_windows')
+          .select('*')
+          .eq('sponsor_id', sponsorData.id)
+          .eq('member_id', buyerData.id)
+          .eq('is_active', true)
+          .single()
+        
+        if (ftw) {
+          fastTrackWindow = {
+            sponsor_id: ftw.sponsor_id,
+            member_id: ftw.member_id,
+            started_at: new Date(ftw.started_at),
+            phase_1_ends_at: new Date(ftw.phase_1_ends_at),
+            phase_2_ends_at: new Date(ftw.phase_2_ends_at),
+            is_active: ftw.is_active
+          }
+        }
+      }
+
+      // Buscar janela Fast-Track N2 (para grand sponsor)
+      let fastTrackWindowN2: FastTrackWindow | null = null
+      if (grandSponsorData) {
+        const { data: ftw2 } = await supabase
+          .from('fast_track_windows')
+          .select('*')
+          .eq('sponsor_id', grandSponsorData.id)
+          .eq('member_id', buyerData.id)
+          .eq('is_active', true)
+          .single()
+        
+        if (ftw2) {
+          fastTrackWindowN2 = {
+            sponsor_id: ftw2.sponsor_id,
+            member_id: ftw2.member_id,
+            started_at: new Date(ftw2.started_at),
+            phase_1_ends_at: new Date(ftw2.phase_1_ends_at),
+            phase_2_ends_at: new Date(ftw2.phase_2_ends_at),
+            is_active: ftw2.is_active
+          }
+        }
+      }
+
+      // Preparar dados para cálculo
+      const buyer: MemberForCommission = {
+        id: buyerData.id,
+        sponsor_id: buyerData.sponsor_id,
+        level: buyerData.level,
+        status: buyerData.status,
+        name: buyerData.name
+      }
+
+      const sponsor: MemberForCommission | null = sponsorData ? {
+        id: sponsorData.id,
+        sponsor_id: sponsorData.sponsor_id,
+        level: sponsorData.level,
+        status: sponsorData.status,
+        name: sponsorData.name
+      } : null
+
+      // Calcular todas as comissões
+      const commissions = calculateAllCommissions(
+        totalCV,
+        newOrder.id,
+        buyer,
+        sponsor,
+        grandSponsorData,
+        fastTrackWindow,
+        fastTrackWindowN2
+      )
+
+      // Converter para formato de inserção e salvar
+      if (commissions.length > 0) {
+        const ledgerInserts = toCommissionLedgerInserts(commissions, getCurrentMonthStart())
+        
+        const { error: commissionError } = await supabase
+          .from('commission_ledger')
+          .insert(ledgerInserts)
+
+        if (commissionError) {
+          console.error('[webhook] Erro ao criar comissões:', commissionError)
+        } else {
+          commissionsCreated = commissions.length
+          logWebhookEvent('orders/paid', shopifyOrderId, 'commissions_created', {
+            count: commissionsCreated,
+            total: commissions.reduce((sum, c) => sum + c.amount, 0)
+          })
+        }
+      }
+    }
+  } catch (commissionErr) {
+    // Log do erro mas não falha o webhook
+    console.error('[webhook] Erro no cálculo de comissões:', commissionErr)
+  }
+
   const duration = Date.now() - startTime
   
   logWebhookEvent('orders/paid', shopifyOrderId, 'success', {
@@ -327,6 +472,7 @@ export async function POST(request: NextRequest) {
     totalCV,
     newMonthlyCV: currentMonthCV,
     statusChanged: newStatus !== member.status,
+    commissionsCreated,
     duration: `${duration}ms`
   })
 
@@ -338,6 +484,9 @@ export async function POST(request: NextRequest) {
       orderCV: totalCV,
       monthlyCV: currentMonthCV,
       status: newStatus
+    },
+    commissions: {
+      created: commissionsCreated
     }
   })
 }

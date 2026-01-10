@@ -557,3 +557,256 @@
     min-width: 800px;
   }
 }
+
+/* ==========================================
+   Estilos da página de Comissões Admin
+   ========================================== */
+
+/* Filtros */
+.filtersCard {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.filtersRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-lg);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.filterLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-500);
+}
+
+.filterSelect {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--gray-50);
+  color: var(--gray-700);
+  min-width: 180px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.loadingIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--gray-500);
+  font-size: 0.875rem;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--gray-200);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Resumo Grid */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.summaryCard {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.summaryCardPrimary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.summaryCardPrimary .summaryLabel {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.summaryCardPrimary .summaryValue {
+  color: white;
+}
+
+.summaryCardFastTrack {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.summaryCardFastTrack .summaryLabel {
+  color: #92400e;
+}
+
+.summaryCardFastTrack .summaryValue {
+  color: #78350f;
+}
+
+.summaryCardPerpetual {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.summaryCardPerpetual .summaryLabel {
+  color: #065f46;
+}
+
+.summaryCardPerpetual .summaryValue {
+  color: #064e3b;
+}
+
+.summaryLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-500);
+  margin-bottom: var(--space-xs);
+}
+
+.summaryValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+/* Células específicas da tabela */
+.memberCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.memberEmail {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.orderNumber {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+  margin-left: 4px;
+}
+
+.dateCell {
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+}
+
+/* Badges de tipo */
+.typeBadge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.typeFastTrack {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.typePerpetual {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.typeBonus3 {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.typeLeadership {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.typeRoyalty {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.typeAdjustment {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.typeReversal {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Valores positivos/negativos */
+.amountPositive {
+  color: #059669;
+  font-weight: 600;
+}
+
+.amountNegative {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* Botões de paginação */
+.pageButtons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Responsivo para grid de resumo */
+@media (max-width: 1024px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filtersRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filterSelect {
+    width: 100%;
+  }
+}
