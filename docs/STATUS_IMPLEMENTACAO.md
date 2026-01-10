@@ -11,11 +11,12 @@ O projeto concluiu a **Fase 4 (Sprint 4)**, com motor de comissões totalmente f
 
 ### Funcionalidades Testadas em Produção (Sprint 4):
 - ✅ Comissões calculadas em tempo real via webhook
-- ✅ Dashboard de comissões para membros
-- ✅ Painel admin de gestão de comissões
+- ✅ Dashboard de comissões para membros (dark theme, CSS Modules)
+- ✅ Painel admin de gestão de comissões (com sidebar integrada)
 - ✅ Fast-Track (30%/20% nos primeiros 60 dias)
 - ✅ Ledger auditável de comissões
 - ✅ Saldos consolidados por membro
+- ✅ Layout consistente com restante do app (testado em 10/01/2026)
 
 ### Funcionalidades Testadas em Produção (Sprint 3):
 - ✅ API de rede (`/api/members/me/network`) funcionando
