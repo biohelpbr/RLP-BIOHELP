@@ -272,11 +272,15 @@ export default function CommissionsPage() {
                 onChange={(e) => setSelectedMonth(e.target.value)}
                 className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
-                {summary?.history?.map((h) => (
-                  <option key={h.month} value={h.month}>
-                    {new Date(h.month + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                  </option>
-                ))}
+                {summary?.history?.map((h) => {
+                  // Normalizar formato do mês (pode vir como "2026-01" ou "2026-01-01")
+                  const monthKey = h.month.substring(0, 7)
+                  return (
+                    <option key={h.month} value={monthKey}>
+                      {new Date(monthKey + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                    </option>
+                  )
+                })}
                 {(!summary?.history || summary.history.length === 0) && (
                   <option value={selectedMonth}>
                     {new Date(selectedMonth + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
@@ -356,23 +360,27 @@ export default function CommissionsPage() {
           {/* Histórico Resumido */}
           {!showDetails && summary?.history && summary.history.length > 0 && (
             <div className="space-y-3">
-              {summary.history.map((month) => (
-                <div 
-                  key={month.month}
-                  className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer"
-                  onClick={() => {
-                    setSelectedMonth(month.month)
-                    setShowDetails(true)
-                  }}
-                >
-                  <span className="text-white font-medium">
-                    {new Date(month.month + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                  </span>
-                  <span className="text-emerald-400 font-bold">
-                    {formatCurrency(month.total)}
-                  </span>
-                </div>
-              ))}
+              {summary.history.map((month) => {
+                // Normalizar formato do mês (pode vir como "2026-01" ou "2026-01-01")
+                const monthKey = month.month.substring(0, 7)
+                return (
+                  <div 
+                    key={month.month}
+                    className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer"
+                    onClick={() => {
+                      setSelectedMonth(monthKey)
+                      setShowDetails(true)
+                    }}
+                  >
+                    <span className="text-white font-medium">
+                      {new Date(monthKey + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                    </span>
+                    <span className="text-emerald-400 font-bold">
+                      {formatCurrency(month.total)}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           )}
 
