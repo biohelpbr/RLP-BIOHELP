@@ -45,16 +45,29 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient()
 
-    // 2. Verificar se é admin
-    const { data: adminMember } = await supabase
+    // 2. Verificar se é admin (via tabela roles)
+    const { data: member } = await supabase
       .from('members')
-      .select('id, is_admin')
+      .select('id')
       .eq('auth_user_id', user.id)
       .single()
 
-    if (!adminMember?.is_admin) {
+    if (!member) {
       return NextResponse.json(
-        { error: 'Acesso negado' },
+        { error: 'Membro não encontrado' },
+        { status: 401 }
+      )
+    }
+
+    const { data: role } = await supabase
+      .from('roles')
+      .select('role')
+      .eq('member_id', member.id)
+      .single()
+
+    if (role?.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Acesso restrito a administradores' },
         { status: 403 }
       )
     }
