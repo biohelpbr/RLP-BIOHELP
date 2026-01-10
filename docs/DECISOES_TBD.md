@@ -328,6 +328,36 @@
 ## Decididos (histórico)
 > Mova itens daqui quando houver decisão oficial.
 
+### TBD-022 — Regras de Comissão Perpétua diferenciadas por tipo de N1 ✅ IMPLEMENTADO
+**Por que importa:** Define percentuais corretos de comissão perpétua conforme documento canônico.
+**Fonte:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md` (linhas 163-173)
+
+**Regras implementadas (canônico):**
+
+| Nível do Sponsor (N0) | Tipo de N1 | Percentual |
+|----------------------|------------|------------|
+| Parceira | Cliente | 5% |
+| Parceira | Parceira+ | **0%** (não recebe) |
+| Líder / Líder em Formação | Cliente | 5% |
+| Líder / Líder em Formação | Parceira+ | 7% |
+| Diretora | Cliente | 5% |
+| Diretora | Parceira | 7% |
+| Diretora | Líder+ | 10% |
+| Head | Cliente | 5% |
+| Head | Parceira | 7% |
+| Head | Líder | 10% |
+| Head | Rede (fallback) | 15% |
+
+**Data:** 10/01/2026
+**Implementação:**
+- `lib/commissions/calculator.ts` — Função `getPerpetualPercentage(sponsorLevel, buyerLevel)`
+- `supabase/migrations/20260110_fix_perpetual_commission.sql` — RPCs `get_buyer_type()`, `get_perpetual_percentage()`
+- Função `calculate_order_commissions()` atualizada para usar regras diferenciadas
+
+**Observação importante:** A implementação anterior simplificava incorretamente o cálculo usando apenas o nível do sponsor. A regra correta exige considerar TAMBÉM o nível do comprador (N1).
+
+---
+
 ### TBD-008 — Regra de cálculo de CV por produto ✅ (CORRIGIDO)
 **Decisão:** CV do pedido = soma do CV dos itens (metacampo por produto).
 **Fonte:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md` — "Cada produto da Biohelp vai gerar um CV diferente, exemplo, o Lemon Dreams que venderemos a R$159,00, será gerado um CV de 77."

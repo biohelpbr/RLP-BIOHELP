@@ -512,11 +512,27 @@ Progresso Sprint 3: 100% ✅
 - ✅ N0 recebe 20% CV de N1 (dias 31-60)
 - ✅ Líder N0 recebe 20%/10% CV de N2
 
-#### Comissão Perpétua (após Fast-Track)
-- ✅ Parceira: 5% CV de N1
-- ✅ Líder: 7% CV da rede + 5% CV de N1
-- ✅ Diretora: 10% CV da rede + 7% CV de Parceiras N1 + 5% CV de clientes N1
-- ✅ Head: 15% CV da rede + 10% CV de Líderes N1 + 7% CV de Parceiras N1 + 5% CV de clientes N1
+#### Comissão Perpétua (após Fast-Track) — CORRIGIDO 10/01/2026
+
+⚠️ **IMPORTANTE:** O percentual depende do nível do SPONSOR **E** do nível do COMPRADOR (N1)!
+
+| Nível Sponsor | Tipo de N1 | Percentual |
+|---------------|------------|------------|
+| Parceira | Cliente | 5% |
+| Parceira | Parceira+ | **0%** (NÃO recebe) |
+| Líder | Cliente | 5% |
+| Líder | Parceira+ | 7% |
+| Diretora | Cliente | 5% |
+| Diretora | Parceira | 7% |
+| Diretora | Líder+ | 10% |
+| Head | Cliente | 5% |
+| Head | Parceira | 7% |
+| Head | Líder | 10% |
+| Head | Rede (fallback) | 15% |
+
+**Funções RPC implementadas:**
+- `get_buyer_type(p_level)` — Determina tipo do comprador (cliente/parceira/líder)
+- `get_perpetual_percentage(p_sponsor_level, p_buyer_level)` — Calcula percentual correto
 
 #### Bônus 3
 - ✅ 3 Parceiras Ativas em N1 por 1 mês → R$250
@@ -559,6 +575,18 @@ Progresso Sprint 4: 100% ✅
 | Cálculo Fast-Track 30% | ✅ Passou | CV 150 × 30% = R$ 45,00 |
 | Trigger de saldo | ✅ Passou | Atualiza commission_balances |
 | Formatação de datas | ✅ Passou | Corrigido timezone |
+
+### Correção Aplicada (10/01/2026) — Comissão Perpétua Diferenciada
+
+| Teste | Resultado | Observação |
+|-------|-----------|------------|
+| `get_buyer_type('membro')` | ✅ Passou | Retorna 'cliente' |
+| `get_buyer_type('parceira')` | ✅ Passou | Retorna 'parceira' |
+| `get_buyer_type('lider')` | ✅ Passou | Retorna 'lider' |
+| `get_perpetual_percentage('parceira', 'membro')` | ✅ Passou | Retorna 5.00 |
+| `get_perpetual_percentage('parceira', 'parceira')` | ✅ Passou | Retorna 0.00 (NÃO recebe) |
+| `get_perpetual_percentage('diretora', 'lider')` | ✅ Passou | Retorna 10.00 |
+| `get_perpetual_percentage('head', 'parceira')` | ✅ Passou | Retorna 7.00 |
 
 ---
 
@@ -622,9 +650,10 @@ Webhook simulado enviado para `https://rlp-biohelp.vercel.app/api/webhooks/shopi
 
 ### Migrations
 - `supabase/migrations/20260110_sprint4_commissions.sql`
+- `supabase/migrations/20260110_fix_perpetual_commission.sql` — Correção Comissão Perpétua diferenciada
 
 ### Bibliotecas
-- `lib/commissions/calculator.ts`
+- `lib/commissions/calculator.ts` — Motor principal (corrigido 10/01/2026)
 - `lib/commissions/bonus3.ts`
 - `lib/commissions/royalty.ts`
 
@@ -656,11 +685,31 @@ Webhook simulado enviado para `https://rlp-biohelp.vercel.app/api/webhooks/shopi
 | API admin de comissões | ✅ | GET /api/admin/commissions |
 | Cálculo Fast-Track 30% | ✅ | Primeiros 30 dias |
 | Cálculo Fast-Track 20% | ✅ | Dias 31-60 |
-| Cálculo Perpétua | ✅ | Após Fast-Track |
+| Cálculo Perpétua diferenciada | ✅ | Por tipo de N1 (cliente/parceira/líder) |
 | Cálculo Leadership | ✅ | 3%/4% para Diretora/Head |
 | Dashboard membro funcionando | ✅ | Mostra saldo e histórico |
 | Painel admin funcionando | ✅ | Filtros e listagem |
 | Ledger auditável | ✅ | Imutável com referências |
+
+---
+
+## 📝 TBDs Resolvidos no Sprint 4
+
+### TBD-017 — Arredondamento de CV e moeda ✅
+**Decisão:** 2 casas decimais (padrão BRL)
+**Implementação:** `DECIMAL(10,2)` em todas as tabelas
+
+### TBD-020 — Período de cálculo de comissões ✅
+**Decisão:** Em tempo real (cada pedido calcula imediatamente)
+**Implementação:** Webhook `orders/paid` calcula e registra comissões
+
+### TBD-022 — Comissão Perpétua diferenciada por tipo de N1 ✅
+**Decisão:** Percentual depende do nível do sponsor E do nível do comprador
+**Fonte:** `Biohelp___Loyalty_Reward_Program.md` (linhas 163-173)
+**Implementação:**
+- `get_buyer_type()` — Determina tipo do comprador
+- `get_perpetual_percentage()` — Calcula percentual correto
+- `lib/commissions/calculator.ts` — Função `getPerpetualPercentage()`
 
 ---
 

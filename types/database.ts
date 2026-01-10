@@ -763,6 +763,7 @@ export const BONUS_3_VALUES = {
 } as const
 
 // Percentuais de comissão por nível
+// DOCUMENTO CANÔNICO: Biohelp___Loyalty_Reward_Program.md (linhas 163-173)
 export const COMMISSION_PERCENTAGES = {
   fast_track: {
     phase_1: 30,  // 30% primeiros 30 dias
@@ -772,11 +773,18 @@ export const COMMISSION_PERCENTAGES = {
     phase_1: 20,  // 20% primeiros 30 dias (Líder)
     phase_2: 10   // 10% dias 31-60 (Líder)
   },
+  // Comissão Perpétua - DIFERENCIADA POR TIPO DE N1
+  // O percentual depende do nível do SPONSOR e do nível do COMPRADOR
   perpetual: {
-    parceira: 5,
-    lider: 7,
-    diretora: 10,
-    head: 15
+    // Percentuais BASE sobre N1 específicos
+    base_cliente: 5,    // 5% sobre CV de clientes N1 (todos os níveis)
+    base_parceira: 7,   // 7% sobre CV de parceiras N1 (Diretora/Head)
+    base_lider: 10,     // 10% sobre CV de líderes N1 (Head)
+    
+    // Percentuais da REDE (N2+)
+    rede_lider: 7,      // Líder: 7% CV da rede inteira
+    rede_diretora: 10,  // Diretora: 10% CV da rede inteira
+    rede_head: 15       // Head: 15% CV da rede inteira
   },
   leadership: {
     diretora: 3,
@@ -784,3 +792,26 @@ export const COMMISSION_PERCENTAGES = {
   },
   royalty: 3  // 3% quando Head forma Head
 } as const
+
+/**
+ * Regras de Comissão Perpétua (Documento Canônico):
+ * 
+ * PARCEIRA (N0):
+ *   - 5% CV de clientes N1
+ *   - NÃO recebe de outras parceiras
+ * 
+ * LÍDER / LÍDER EM FORMAÇÃO (N0):
+ *   - 5% CV de clientes N1
+ *   - 7% CV de parceiras+ N1 (parte da rede)
+ * 
+ * DIRETORA (N0):
+ *   - 5% CV de clientes N1
+ *   - 7% CV de parceiras N1
+ *   - 10% CV de líderes+ N1
+ * 
+ * HEAD (N0):
+ *   - 5% CV de clientes N1
+ *   - 7% CV de parceiras N1
+ *   - 10% CV de líderes N1
+ *   - 15% CV da rede inteira (fallback)
+ */

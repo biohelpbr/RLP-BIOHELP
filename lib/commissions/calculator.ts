@@ -3,6 +3,15 @@
  * Sprint 4 - Biohelp LRP
  * 
  * Calcula comissões em tempo real (TBD-020) com precisão de 2 casas decimais (TBD-017)
+ * 
+ * REGRAS DE COMISSÃO PERPÉTUA (Documento Canônico: Biohelp___Loyalty_Reward_Program.md):
+ * 
+ * - Parceira (N0): 5% CV de clientes N1
+ * - Líder/Líder em Formação (N0): 7% CV da rede inteira + 5% CV de clientes N1
+ * - Diretora (N0): 10% CV da rede inteira + 7% CV de parceiras N1 + 5% CV de clientes N1
+ * - Head (N0): 15% CV da rede inteira + 10% CV de líderes N1 + 7% CV de parceiras N1 + 5% CV de clientes N1
+ * 
+ * IMPORTANTE: O percentual depende do NÍVEL DO N1 (quem comprou), não apenas do nível do sponsor.
  */
 
 import type {
@@ -23,12 +32,19 @@ export const PERCENTAGES = {
     phase_1: 20,  // 20% primeiros 30 dias (Líder)
     phase_2: 10   // 10% dias 31-60 (Líder)
   },
+  // Comissão Perpétua - REGRAS DIFERENCIADAS POR TIPO DE N1
+  // Documento canônico: linhas 163-173
   perpetual: {
-    parceira: 5,
-    lider: 7,
-    lider_formacao: 7, // Líder em Formação recebe como Líder
-    diretora: 10,
-    head: 15
+    // Percentuais BASE sobre N1 (aplicados a todos os níveis elegíveis)
+    base_cliente: 5,    // 5% sobre CV de clientes N1
+    base_parceira: 7,   // 7% sobre CV de parceiras N1 (Diretora/Head)
+    base_lider: 10,     // 10% sobre CV de líderes N1 (Head)
+    
+    // Percentuais da REDE INTEIRA (além do N1)
+    // Estes são aplicados sobre compras de N2, N3, etc.
+    rede_lider: 7,      // Líder: 7% CV da rede inteira
+    rede_diretora: 10,  // Diretora: 10% CV da rede inteira
+    rede_head: 15       // Head: 15% CV da rede inteira
   },
   leadership: {
     diretora: 3,
@@ -36,6 +52,92 @@ export const PERCENTAGES = {
   },
   royalty: 3  // 3% quando Head forma Head
 } as const
+
+/**
+ * Determina se um membro é considerado "cliente" (membro que não é parceira+)
+ * Cliente = membro ou inativo
+ */
+export function isClienteLevel(level: MemberLevel): boolean {
+  return level === 'membro'
+}
+
+/**
+ * Determina se um membro é considerado "parceira" (parceira, lider_formacao)
+ */
+export function isParceiraLevel(level: MemberLevel): boolean {
+  return level === 'parceira' || level === 'lider_formacao'
+}
+
+/**
+ * Determina se um membro é considerado "líder" (lider, diretora, head)
+ */
+export function isLiderLevel(level: MemberLevel): boolean {
+  return level === 'lider' || level === 'diretora' || level === 'head'
+}
+
+/**
+ * Obtém o percentual de comissão perpétua baseado no nível do sponsor E no nível do comprador (N1)
+ * 
+ * Regras do documento canônico:
+ * - Parceira: 5% de clientes N1
+ * - Líder: 7% da rede + 5% de clientes N1
+ * - Diretora: 10% da rede + 7% de parceiras N1 + 5% de clientes N1
+ * - Head: 15% da rede + 10% de líderes N1 + 7% de parceiras N1 + 5% de clientes N1
+ */
+export function getPerpetualPercentage(sponsorLevel: MemberLevel, buyerLevel: MemberLevel): number {
+  // Sponsor precisa ser pelo menos parceira
+  const eligibleSponsorLevels: MemberLevel[] = ['parceira', 'lider_formacao', 'lider', 'diretora', 'head']
+  if (!eligibleSponsorLevels.includes(sponsorLevel)) {
+    return 0
+  }
+
+  // PARCEIRA: só recebe 5% de clientes N1
+  if (sponsorLevel === 'parceira') {
+    if (isClienteLevel(buyerLevel)) {
+      return PERCENTAGES.perpetual.base_cliente // 5%
+    }
+    return 0 // Parceira não recebe de outras parceiras
+  }
+
+  // LÍDER / LÍDER EM FORMAÇÃO: 7% da rede + 5% de clientes N1
+  if (sponsorLevel === 'lider' || sponsorLevel === 'lider_formacao') {
+    // Líder recebe de todos na rede (7%), mas clientes N1 dão 5% adicional
+    // Na prática, para N1: cliente = 5%, parceira+ = 7%
+    if (isClienteLevel(buyerLevel)) {
+      return PERCENTAGES.perpetual.base_cliente // 5% de clientes N1
+    }
+    return PERCENTAGES.perpetual.rede_lider // 7% de parceiras+ N1 (faz parte da rede)
+  }
+
+  // DIRETORA: 10% da rede + 7% de parceiras N1 + 5% de clientes N1
+  if (sponsorLevel === 'diretora') {
+    if (isClienteLevel(buyerLevel)) {
+      return PERCENTAGES.perpetual.base_cliente // 5% de clientes N1
+    }
+    if (isParceiraLevel(buyerLevel)) {
+      return PERCENTAGES.perpetual.base_parceira // 7% de parceiras N1
+    }
+    // Líderes N1 fazem parte da rede (10%)
+    return PERCENTAGES.perpetual.rede_diretora // 10% de líderes+ N1
+  }
+
+  // HEAD: 15% da rede + 10% de líderes N1 + 7% de parceiras N1 + 5% de clientes N1
+  if (sponsorLevel === 'head') {
+    if (isClienteLevel(buyerLevel)) {
+      return PERCENTAGES.perpetual.base_cliente // 5% de clientes N1
+    }
+    if (isParceiraLevel(buyerLevel)) {
+      return PERCENTAGES.perpetual.base_parceira // 7% de parceiras N1
+    }
+    if (isLiderLevel(buyerLevel)) {
+      return PERCENTAGES.perpetual.base_lider // 10% de líderes N1
+    }
+    // Fallback para rede
+    return PERCENTAGES.perpetual.rede_head // 15%
+  }
+
+  return 0
+}
 
 export const BONUS_3 = {
   level_1: 250,    // R$250 - 3 Parceiras em N1
@@ -251,11 +353,14 @@ export function calculateFastTrackN2(
 /**
  * Calcula Comissão Perpétua para um pedido
  * 
- * Regras:
- * - Parceira: 5% CV de N1
- * - Líder: 7% CV da rede + 5% CV de N1
- * - Diretora: 10% CV da rede + 7% CV de Parceiras N1 + 5% CV de clientes N1
- * - Head: 15% CV da rede + 10% CV de Líderes N1 + 7% CV de Parceiras N1 + 5% CV de clientes N1
+ * REGRAS DO DOCUMENTO CANÔNICO (Biohelp___Loyalty_Reward_Program.md linhas 163-173):
+ * 
+ * - Parceira (N0): 5% CV de clientes N1 (APENAS clientes, não parceiras)
+ * - Líder/Líder em Formação (N0): 7% CV da rede inteira + 5% CV de clientes N1
+ * - Diretora (N0): 10% CV da rede inteira + 7% CV de parceiras N1 + 5% CV de clientes N1
+ * - Head (N0): 15% CV da rede inteira + 10% CV de líderes N1 + 7% CV de parceiras N1 + 5% CV de clientes N1
+ * 
+ * IMPORTANTE: O percentual depende do NÍVEL DO COMPRADOR (N1), não apenas do nível do sponsor.
  * 
  * Nota: Só é aplicada APÓS o Fast-Track expirar
  */
@@ -278,17 +383,17 @@ export function calculatePerpetual(
     return commissions
   }
   
-  // Sponsor precisa ser pelo menos Parceira
-  const eligibleLevels: MemberLevel[] = ['parceira', 'lider_formacao', 'lider', 'diretora', 'head']
-  if (!eligibleLevels.includes(sponsor.level)) {
+  // Obter percentual baseado no nível do sponsor E no nível do comprador
+  const percentage = getPerpetualPercentage(sponsor.level, buyer.level)
+  
+  // Se percentual é 0, não há comissão (ex: Parceira não recebe de outras Parceiras)
+  if (percentage === 0) {
     return commissions
   }
   
-  // Obter percentual baseado no nível
-  const percentage = PERCENTAGES.perpetual[sponsor.level as keyof typeof PERCENTAGES.perpetual]
-  if (!percentage) {
-    return commissions
-  }
+  // Gerar descrição detalhada
+  const buyerTypeLabel = getBuyerTypeLabel(buyer.level)
+  const description = `Comissão Perpétua ${percentage}% - ${buyer.name} (${buyerTypeLabel})`
   
   commissions.push({
     member_id: sponsor.id,
@@ -299,10 +404,20 @@ export function calculatePerpetual(
     source_member_id: buyer.id,
     source_order_id: orderId,
     network_level: 1,
-    description: `Comissão Perpétua ${percentage}% - ${buyer.name}`
+    description
   })
   
   return commissions
+}
+
+/**
+ * Retorna label amigável para o tipo de comprador
+ */
+function getBuyerTypeLabel(level: MemberLevel): string {
+  if (isClienteLevel(level)) return 'Cliente'
+  if (isParceiraLevel(level)) return 'Parceira'
+  if (isLiderLevel(level)) return 'Líder'
+  return 'Membro'
 }
 
 /**

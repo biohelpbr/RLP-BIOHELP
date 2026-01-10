@@ -206,12 +206,25 @@ export function mapFinancialStatus(
 // =====================================================
 
 /**
+ * Tipos de status para eventos de webhook
+ */
+export type WebhookEventStatus = 
+  | 'received' 
+  | 'processing' 
+  | 'success' 
+  | 'error' 
+  | 'skipped'
+  | 'commissions_created'
+  | 'commissions_skipped'
+  | 'commissions_error'
+
+/**
  * Cria log estruturado para webhook
  */
 export function logWebhookEvent(
   topic: string,
   orderId: string,
-  status: 'received' | 'processing' | 'success' | 'error' | 'skipped',
+  status: WebhookEventStatus,
   details?: Record<string, unknown>
 ) {
   const logEntry = {
