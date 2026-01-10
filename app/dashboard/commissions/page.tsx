@@ -102,6 +102,15 @@ export default function CommissionsPage() {
     })
   }
 
+  // Formatar mês (evita problemas de timezone)
+  const formatMonth = (monthStr: string) => {
+    // monthStr pode ser "2026-01" ou "2026-01-01"
+    const normalized = monthStr.substring(0, 7) // "2026-01"
+    const [year, month] = normalized.split('-').map(Number)
+    const date = new Date(year, month - 1, 15) // Dia 15 evita problemas de timezone
+    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
@@ -277,13 +286,13 @@ export default function CommissionsPage() {
                   const monthKey = h.month.substring(0, 7)
                   return (
                     <option key={h.month} value={monthKey}>
-                      {new Date(monthKey + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                      {formatMonth(h.month)}
                     </option>
                   )
                 })}
                 {(!summary?.history || summary.history.length === 0) && (
                   <option value={selectedMonth}>
-                    {new Date(selectedMonth + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                    {formatMonth(selectedMonth)}
                   </option>
                 )}
               </select>
@@ -373,7 +382,7 @@ export default function CommissionsPage() {
                     }}
                   >
                     <span className="text-white font-medium">
-                      {new Date(monthKey + '-01').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                      {formatMonth(month.month)}
                     </span>
                     <span className="text-emerald-400 font-bold">
                       {formatCurrency(month.total)}
