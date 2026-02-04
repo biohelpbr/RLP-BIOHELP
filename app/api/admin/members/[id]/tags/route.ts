@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient, isCurrentUserAdmin } from '@/lib/supabase/server'
-import { shopifyAdminClient } from '@/lib/shopify/client'
+import { shopifyGraphQL } from '@/lib/shopify/client'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -71,11 +71,11 @@ export async function GET(
       }
     `
 
-    const response = await shopifyAdminClient(query, {
-      id: shopifyData.shopify_customer_id
+    const response = await shopifyGraphQL<{ customer: { id: string; tags: string[] } | null }>(query, {
+      id: `gid://shopify/Customer/${shopifyData.shopify_customer_id}`
     })
 
-    const tags: string[] = response.customer?.tags || []
+    const tags: string[] = response.data?.customer?.tags || []
     
     // Separar tags do sistema e customizadas
     const systemTags = tags.filter(t => 
@@ -163,11 +163,12 @@ export async function POST(
       }
     `
 
-    const currentData = await shopifyAdminClient(getQuery, {
-      id: shopifyData.shopify_customer_id
+    const customerId = `gid://shopify/Customer/${shopifyData.shopify_customer_id}`
+    const currentData = await shopifyGraphQL<{ customer: { id: string; tags: string[] } | null }>(getQuery, {
+      id: customerId
     })
 
-    const currentTags: string[] = currentData.customer?.tags || []
+    const currentTags: string[] = currentData.data?.customer?.tags || []
 
     // Verificar se tag já existe
     if (currentTags.includes(sanitizedTag)) {
@@ -196,15 +197,20 @@ export async function POST(
       }
     `
 
-    const updateResult = await shopifyAdminClient(updateQuery, {
+    const updateResult = await shopifyGraphQL<{ 
+      customerUpdate: { 
+        customer: { id: string; tags: string[] } | null
+        userErrors: { field: string; message: string }[]
+      } 
+    }>(updateQuery, {
       input: {
-        id: shopifyData.shopify_customer_id,
+        id: customerId,
         tags: newTags
       }
     })
 
-    if (updateResult.customerUpdate?.userErrors?.length > 0) {
-      console.error('Shopify errors:', updateResult.customerUpdate.userErrors)
+    if (updateResult.data?.customerUpdate?.userErrors?.length) {
+      console.error('Shopify errors:', updateResult.data.customerUpdate.userErrors)
       return NextResponse.json(
         { error: 'Erro ao adicionar tag no Shopify' },
         { status: 500 }
@@ -214,7 +220,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       message: `Tag '${sanitizedTag}' adicionada`,
-      tags: updateResult.customerUpdate?.customer?.tags || newTags
+      tags: updateResult.data?.customerUpdate?.customer?.tags || newTags
     })
 
   } catch (error) {
@@ -287,11 +293,12 @@ export async function DELETE(
       }
     `
 
-    const currentData = await shopifyAdminClient(getQuery, {
-      id: shopifyData.shopify_customer_id
+    const customerId = `gid://shopify/Customer/${shopifyData.shopify_customer_id}`
+    const currentData = await shopifyGraphQL<{ customer: { id: string; tags: string[] } | null }>(getQuery, {
+      id: customerId
     })
 
-    const currentTags: string[] = currentData.customer?.tags || []
+    const currentTags: string[] = currentData.data?.customer?.tags || []
 
     // Remover tag
     const newTags = currentTags.filter(t => t !== tag)
@@ -319,15 +326,20 @@ export async function DELETE(
       }
     `
 
-    const updateResult = await shopifyAdminClient(updateQuery, {
+    const updateResult = await shopifyGraphQL<{ 
+      customerUpdate: { 
+        customer: { id: string; tags: string[] } | null
+        userErrors: { field: string; message: string }[]
+      } 
+    }>(updateQuery, {
       input: {
-        id: shopifyData.shopify_customer_id,
+        id: customerId,
         tags: newTags
       }
     })
 
-    if (updateResult.customerUpdate?.userErrors?.length > 0) {
-      console.error('Shopify errors:', updateResult.customerUpdate.userErrors)
+    if (updateResult.data?.customerUpdate?.userErrors?.length) {
+      console.error('Shopify errors:', updateResult.data.customerUpdate.userErrors)
       return NextResponse.json(
         { error: 'Erro ao remover tag no Shopify' },
         { status: 500 }
@@ -337,7 +349,7 @@ export async function DELETE(
     return NextResponse.json({
       success: true,
       message: `Tag '${tag}' removida`,
-      tags: updateResult.customerUpdate?.customer?.tags || newTags
+      tags: updateResult.data?.customerUpdate?.customer?.tags || newTags
     })
 
   } catch (error) {

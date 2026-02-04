@@ -14,7 +14,7 @@
  */
 
 import { createServiceClient } from '@/lib/supabase/server'
-import { syncCustomerToShopify } from '@/lib/shopify/sync'
+import { syncMemberToShopify } from '@/lib/shopify/sync'
 
 const INACTIVE_MONTHS_THRESHOLD = 6
 
@@ -178,7 +178,31 @@ export async function compressMemberNetwork(memberId: string): Promise<Compressi
 
   // 6. Sincronizar com Shopify (remover tags LRP)
   try {
-    await syncCustomerToShopify(memberId)
+    // Buscar ref_code do sponsor
+    let sponsorRefCode: string | null = null
+    if (member.sponsor_id) {
+      const { data: sponsorData } = await supabase
+        .from('members')
+        .select('ref_code')
+        .eq('id', member.sponsor_id)
+        .single()
+      sponsorRefCode = sponsorData?.ref_code || null
+    }
+
+    // Buscar ref_code do membro
+    const { data: memberData } = await supabase
+      .from('members')
+      .select('ref_code')
+      .eq('id', memberId)
+      .single()
+
+    await syncMemberToShopify({
+      memberId,
+      email: member.email,
+      name: member.name,
+      refCode: memberData?.ref_code || '',
+      sponsorRefCode
+    })
   } catch (syncError) {
     console.error('[compression] Erro ao sincronizar Shopify:', syncError)
     // Não falhar a operação por causa do sync

@@ -201,7 +201,7 @@ export async function POST(request: NextRequest) {
     // Verificação simplificada: nome do titular deve conter parte do nome do membro
     const memberNameParts = member.name.toLowerCase().split(' ')
     const holderNameLower = body.holder_name.toLowerCase()
-    const nameMatch = memberNameParts.some(part => 
+    const nameMatch = memberNameParts.some((part: string) =>
       part.length > 2 && holderNameLower.includes(part)
     )
 

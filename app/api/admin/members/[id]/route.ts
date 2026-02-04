@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient, isCurrentUserAdmin, getAuthUser } from '@/lib/supabase/server'
-import { syncCustomerToShopify } from '@/lib/shopify/sync'
+import { syncMemberToShopify } from '@/lib/shopify/sync'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -371,7 +371,33 @@ export async function PATCH(
       // Sincronizar com Shopify se necessário
       if (body.action === 'edit' || body.action === 'block' || body.action === 'unblock') {
         try {
-          await syncCustomerToShopify(memberId)
+          // Buscar dados atualizados do membro para sync
+          const { data: updatedMember } = await supabase
+            .from('members')
+            .select('id, email, name, ref_code, sponsor_id')
+            .eq('id', memberId)
+            .single()
+          
+          if (updatedMember) {
+            // Buscar ref_code do sponsor
+            let sponsorRefCode: string | null = null
+            if (updatedMember.sponsor_id) {
+              const { data: sponsorData } = await supabase
+                .from('members')
+                .select('ref_code')
+                .eq('id', updatedMember.sponsor_id)
+                .single()
+              sponsorRefCode = sponsorData?.ref_code || null
+            }
+            
+            await syncMemberToShopify({
+              memberId: updatedMember.id,
+              email: updatedMember.email,
+              name: updatedMember.name,
+              refCode: updatedMember.ref_code,
+              sponsorRefCode
+            })
+          }
         } catch (syncError) {
           console.error('Erro ao sincronizar com Shopify:', syncError)
           // Não falhar a operação por causa do sync
