@@ -35,6 +35,13 @@ interface CVData {
     status: string
     percentage: number
   }
+  // FR-17: CV separado (próprio vs rede)
+  network?: {
+    ownCV: number
+    networkCV: number
+    totalCV: number
+    activeRecruits: number
+  }
   history: Array<{
     month: string
     cv: number
@@ -135,12 +142,32 @@ const Icons = {
       <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
     </svg>
   ),
+  gift: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 12 20 22 4 22 4 12"/>
+      <rect x="2" y="7" width="20" height="5"/>
+      <line x1="12" y1="22" x2="12" y2="7"/>
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+    </svg>
+  ),
+}
+
+// Interface para creatina grátis
+interface FreeCreatineData {
+  eligible: boolean
+  reason: string
+  month: string
+  alreadyClaimed: boolean
+  memberStatus: string
+  currentCV: number
 }
 
 export default function DashboardPage() {
   const router = useRouter()
   const [member, setMember] = useState<MemberData | null>(null)
   const [cvData, setCvData] = useState<CVData | null>(null)
+  const [freeCreatine, setFreeCreatine] = useState<FreeCreatineData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -148,6 +175,7 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchMemberData()
     fetchCVData()
+    fetchFreeCreatine()
   }, [])
 
   const fetchMemberData = async () => {
@@ -183,6 +211,18 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Erro ao carregar CV:', error)
+    }
+  }
+
+  const fetchFreeCreatine = async () => {
+    try {
+      const response = await fetch('/api/members/me/free-creatine')
+      if (response.ok) {
+        const data = await response.json()
+        setFreeCreatine(data)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar benefício:', error)
     }
   }
 
@@ -335,11 +375,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* CV Progress Card - Sprint 2 */}
+        {/* CV Progress Card - Sprint 2 + Sprint 7 (FR-17) */}
         <div className={styles.cvCard}>
           <div className={styles.cvHeader}>
             <div>
-              <h2 className={styles.cvTitle}>CV do Mês</h2>
+              <h2 className={styles.cvTitle}>Meu CV do Mês</h2>
               <p className={styles.cvSubtitle}>{formatMonth(displayCV.currentMonth.month)}</p>
             </div>
             <div className={styles.cvTarget}>
@@ -371,6 +411,67 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+
+        {/* CV da Rede - Sprint 7 (FR-17) */}
+        {displayCV.network && (
+          <div className={styles.networkCVCard}>
+            <h3 className={styles.networkCVTitle}>CV da Minha Rede</h3>
+            <div className={styles.networkCVGrid}>
+              <div className={styles.networkCVItem}>
+                <span className={styles.networkCVLabel}>Meu CV</span>
+                <span className={styles.networkCVValue}>{displayCV.network.ownCV.toFixed(0)}</span>
+              </div>
+              <div className={styles.networkCVItem}>
+                <span className={styles.networkCVLabel}>CV da Rede</span>
+                <span className={styles.networkCVValue}>{displayCV.network.networkCV.toFixed(0)}</span>
+              </div>
+              <div className={styles.networkCVItem}>
+                <span className={styles.networkCVLabel}>CV Total</span>
+                <span className={styles.networkCVValueHighlight}>{displayCV.network.totalCV.toFixed(0)}</span>
+              </div>
+              <div className={styles.networkCVItem}>
+                <span className={styles.networkCVLabel}>Indicados Ativos</span>
+                <span className={styles.networkCVValue}>{displayCV.network.activeRecruits}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Creatina Grátis - Sprint 7 (TBD-019) */}
+        {freeCreatine && (
+          <div className={`${styles.benefitCard} ${freeCreatine.eligible ? styles.benefitCardEligible : freeCreatine.alreadyClaimed ? styles.benefitCardClaimed : styles.benefitCardIneligible}`}>
+            <div className={styles.benefitIcon}>
+              {Icons.gift}
+            </div>
+            <div className={styles.benefitContent}>
+              <h3 className={styles.benefitTitle}>Creatina Grátis do Mês</h3>
+              {freeCreatine.eligible ? (
+                <>
+                  <p className={styles.benefitStatus}>Disponível!</p>
+                  <p className={styles.benefitDescription}>
+                    Você tem direito a 1 unidade de creatina grátis este mês. 
+                    Adicione ao seu próximo pedido e o desconto será aplicado automaticamente.
+                  </p>
+                </>
+              ) : freeCreatine.alreadyClaimed ? (
+                <>
+                  <p className={styles.benefitStatusUsed}>Já utilizado</p>
+                  <p className={styles.benefitDescription}>
+                    Você já utilizou sua creatina grátis em {freeCreatine.month}. 
+                    O benefício renova no próximo mês!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className={styles.benefitStatusInactive}>Indisponível</p>
+                  <p className={styles.benefitDescription}>
+                    {freeCreatine.reason}. Atinja 200 CV para desbloquear este benefício!
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className={styles.statsGrid}>

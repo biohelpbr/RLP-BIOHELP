@@ -29,6 +29,35 @@ interface Member {
   } | null
 }
 
+interface GlobalStats {
+  members: {
+    total: number
+    active: number
+    inactive: number
+    pending: number
+    newThisMonth: number
+    byLevel: Array<{ level: string; count: number }>
+  }
+  cv: {
+    currentMonth: number
+    currentMonthYear: string
+    allTime: number
+  }
+  commissions: {
+    currentMonth: number
+    allTime: number
+    byType: Array<{ commission_type: string; total: number; count: number }>
+  }
+  payouts: {
+    pending: { count: number; total: number }
+    completed: { count: number; total: number }
+  }
+  orders: {
+    total: number
+    totalValue: number
+  }
+}
+
 // Ícones SVG inline para design clean
 const Icons = {
   users: (
@@ -115,18 +144,38 @@ const Icons = {
       <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
     </svg>
   ),
+  trendingUp: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+      <polyline points="17 6 23 6 23 12"/>
+    </svg>
+  ),
 }
 
 export default function AdminPage() {
   const router = useRouter()
   const [members, setMembers] = useState<Member[]>([])
+  const [stats, setStats] = useState<GlobalStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [syncingId, setSyncingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchMembers()
+    fetchStats()
   }, [search])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/admin/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error)
+    }
+  }
 
   const handleLogout = async () => {
     try {
@@ -270,10 +319,85 @@ export default function AdminPage() {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerInfo}>
-            <h1>Parceiras</h1>
-            <p>{members.length} membros cadastrados</p>
+            <h1>Dashboard Admin</h1>
+            <p>Visão geral do programa de fidelidade</p>
           </div>
         </div>
+
+        {/* KPIs Grid - Sprint 7 */}
+        {stats && (
+          <div className={styles.kpisGrid}>
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiIcon} style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
+                {Icons.users}
+              </div>
+              <div className={styles.kpiContent}>
+                <span className={styles.kpiLabel}>Total Membros</span>
+                <span className={styles.kpiValue}>{stats.members.total}</span>
+                <span className={styles.kpiSubtext}>
+                  {stats.members.active} ativos • {stats.members.newThisMonth} novos este mês
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiIcon} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                {Icons.trendingUp}
+              </div>
+              <div className={styles.kpiContent}>
+                <span className={styles.kpiLabel}>CV do Mês</span>
+                <span className={styles.kpiValue}>{stats.cv.currentMonth.toLocaleString('pt-BR')}</span>
+                <span className={styles.kpiSubtext}>
+                  Total histórico: {stats.cv.allTime.toLocaleString('pt-BR')}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiIcon} style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
+                {Icons.dollarSign}
+              </div>
+              <div className={styles.kpiContent}>
+                <span className={styles.kpiLabel}>Comissões do Mês</span>
+                <span className={styles.kpiValue}>R$ {stats.commissions.currentMonth.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                <span className={styles.kpiSubtext}>
+                  Total pago: R$ {stats.commissions.allTime.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiIcon} style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
+                {Icons.clock}
+              </div>
+              <div className={styles.kpiContent}>
+                <span className={styles.kpiLabel}>Saques Pendentes</span>
+                <span className={styles.kpiValue}>{stats.payouts.pending.count}</span>
+                <span className={styles.kpiSubtext}>
+                  R$ {stats.payouts.pending.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} aguardando
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Membros por Nível */}
+        {stats && stats.members.byLevel.length > 0 && (
+          <div className={styles.levelCard}>
+            <h3 className={styles.levelTitle}>Membros por Nível</h3>
+            <div className={styles.levelGrid}>
+              {stats.members.byLevel.map((level) => (
+                <div key={level.level} className={styles.levelItem}>
+                  <span className={styles.levelName}>{level.level}</span>
+                  <span className={styles.levelCount}>{level.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section Title */}
+        <h2 className={styles.sectionTitle}>Parceiras Cadastradas</h2>
 
         {/* Search */}
         <div className={styles.searchBox}>

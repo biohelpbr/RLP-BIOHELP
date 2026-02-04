@@ -645,6 +645,167 @@
   }
 }
 
+/* Benefit Card - Sprint 7 (TBD-019) */
+.benefitCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-xl);
+  border: 2px solid var(--gray-100);
+}
+
+.benefitCardEligible {
+  border-color: #86efac;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.benefitCardClaimed {
+  border-color: #fcd34d;
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+}
+
+.benefitCardIneligible {
+  border-color: var(--gray-200);
+  background: var(--gray-50);
+}
+
+.benefitIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  flex-shrink: 0;
+}
+
+.benefitCardEligible .benefitIcon {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.benefitCardClaimed .benefitIcon {
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+}
+
+.benefitCardIneligible .benefitIcon {
+  background: var(--gray-400);
+}
+
+.benefitContent {
+  flex: 1;
+}
+
+.benefitTitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: var(--space-xs);
+}
+
+.benefitStatus {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #16a34a;
+  margin-bottom: var(--space-sm);
+}
+
+.benefitStatusUsed {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ca8a04;
+  margin-bottom: var(--space-sm);
+}
+
+.benefitStatusInactive {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  margin-bottom: var(--space-sm);
+}
+
+.benefitDescription {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  line-height: 1.5;
+}
+
+/* Network CV Card - Sprint 7 (FR-17) */
+.networkCVCard {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-xl);
+  border: 1px solid var(--gray-100);
+}
+
+.networkCVTitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.networkCVTitle::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  border-radius: 2px;
+}
+
+.networkCVGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+.networkCVItem {
+  text-align: center;
+  padding: var(--space-md);
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+}
+
+.networkCVLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.networkCVValue {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.networkCVValueHighlight {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -688,5 +849,9 @@
   
   .inviteLinkWrapper {
     flex-direction: column;
+  }
+  
+  .networkCVGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

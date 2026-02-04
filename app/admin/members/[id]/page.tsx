@@ -19,7 +19,10 @@ interface MemberDetails {
   id: string
   name: string
   email: string
+  phone?: string
   status: string
+  level?: string
+  ref_code?: string
   lastCalculation: string | null
 }
 
@@ -137,6 +140,36 @@ const Icons = {
       <line x1="3" y1="10" x2="21" y2="10"/>
     </svg>
   ),
+  edit: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  ),
+  lock: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  ),
+  unlock: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+    </svg>
+  ),
+  award: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="7"/>
+      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+    </svg>
+  ),
+  dollarSign: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  ),
 }
 
 export default function MemberDetailPage() {
@@ -147,13 +180,21 @@ export default function MemberDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  // Estado do modal de ajuste
+  // Estado do modal de ajuste CV
   const [showAdjustModal, setShowAdjustModal] = useState(false)
   const [adjustAmount, setAdjustAmount] = useState('')
   const [adjustDescription, setAdjustDescription] = useState('')
   const [adjustType, setAdjustType] = useState<'add' | 'subtract'>('add')
   const [isAdjusting, setIsAdjusting] = useState(false)
   const [adjustSuccess, setAdjustSuccess] = useState(false)
+  
+  // Estado do modal de ações (Sprint 7)
+  const [showActionModal, setShowActionModal] = useState<'level' | 'block' | 'commission' | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
+  const [selectedLevel, setSelectedLevel] = useState('')
+  const [commissionAmount, setCommissionAmount] = useState('')
+  const [commissionDescription, setCommissionDescription] = useState('')
+  const [actionReason, setActionReason] = useState('')
 
   useEffect(() => {
     fetchMemberData()
@@ -237,6 +278,72 @@ export default function MemberDetailPage() {
     }
   }
 
+  // Ações de gestão do membro (Sprint 7)
+  const handleMemberAction = async (action: string, actionData?: Record<string, unknown>) => {
+    setActionLoading(true)
+    try {
+      const response = await fetch(`/api/admin/members/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          data: actionData,
+          reason: actionReason
+        })
+      })
+
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || 'Erro ao executar ação')
+      }
+
+      // Sucesso - recarregar dados
+      setShowActionModal(null)
+      setActionReason('')
+      setSelectedLevel('')
+      setCommissionAmount('')
+      setCommissionDescription('')
+      fetchMemberData()
+      alert('Ação executada com sucesso!')
+    } catch (err) {
+      console.error('Erro:', err)
+      alert(err instanceof Error ? err.message : 'Erro ao executar ação')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleLevelChange = () => {
+    if (!selectedLevel) {
+      alert('Selecione um nível')
+      return
+    }
+    handleMemberAction('adjust_level', { level: selectedLevel })
+  }
+
+  const handleBlockToggle = () => {
+    const action = data?.member.status === 'inactive' ? 'unblock' : 'block'
+    handleMemberAction(action)
+  }
+
+  const handleCommissionAdjust = () => {
+    const amount = parseFloat(commissionAmount)
+    if (isNaN(amount) || amount === 0) {
+      alert('Informe um valor válido')
+      return
+    }
+    if (!commissionDescription.trim()) {
+      alert('Informe uma descrição')
+      return
+    }
+    handleMemberAction('adjust_commission', {
+      commission_adjustment: {
+        amount,
+        description: commissionDescription
+      }
+    })
+  }
+
   const formatMonth = (monthYear: string) => {
     const [year, month] = monthYear.split('-')
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
@@ -316,10 +423,41 @@ export default function MemberDetailPage() {
           <div className={styles.memberInfo}>
             <h1>{data.member.name}</h1>
             <p>{data.member.email}</p>
+            {data.member.level && (
+              <span className={styles.levelBadge}>{data.member.level}</span>
+            )}
           </div>
           <span className={`${styles.statusBadge} ${data.member.status === 'active' ? styles.statusActive : styles.statusPending}`}>
             {getStatusLabel(data.member.status)}
           </span>
+        </div>
+        
+        {/* Ações de Gestão - Sprint 7 */}
+        <div className={styles.actionButtons}>
+          <button 
+            className={styles.actionBtn}
+            onClick={() => setShowActionModal('level')}
+            title="Ajustar Nível"
+          >
+            {Icons.award}
+            <span>Nível</span>
+          </button>
+          <button 
+            className={`${styles.actionBtn} ${data.member.status === 'inactive' ? styles.actionBtnSuccess : styles.actionBtnDanger}`}
+            onClick={() => setShowActionModal('block')}
+            title={data.member.status === 'inactive' ? 'Desbloquear' : 'Bloquear'}
+          >
+            {data.member.status === 'inactive' ? Icons.unlock : Icons.lock}
+            <span>{data.member.status === 'inactive' ? 'Desbloquear' : 'Bloquear'}</span>
+          </button>
+          <button 
+            className={styles.actionBtn}
+            onClick={() => setShowActionModal('commission')}
+            title="Ajustar Comissão"
+          >
+            {Icons.dollarSign}
+            <span>Comissão</span>
+          </button>
         </div>
       </div>
 
@@ -509,7 +647,7 @@ export default function MemberDetailPage() {
         </div>
       </div>
 
-      {/* Modal de Ajuste */}
+      {/* Modal de Ajuste CV */}
       {showAdjustModal && (
         <div className={styles.modalOverlay} onClick={() => !isAdjusting && setShowAdjustModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -591,6 +729,198 @@ export default function MemberDetailPage() {
                 </form>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Ajuste de Nível - Sprint 7 */}
+      {showActionModal === 'level' && (
+        <div className={styles.modalOverlay} onClick={() => !actionLoading && setShowActionModal(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Ajustar Nível</h3>
+              <p>Membro: {data.member.name}</p>
+            </div>
+            
+            <div className={styles.adjustForm}>
+              <div className={styles.formGroup}>
+                <label>Nível Atual</label>
+                <p className={styles.currentValue}>{data.member.level || 'membro'}</p>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="level">Novo Nível</label>
+                <select
+                  id="level"
+                  value={selectedLevel}
+                  onChange={(e) => setSelectedLevel(e.target.value)}
+                  disabled={actionLoading}
+                >
+                  <option value="">Selecione...</option>
+                  <option value="membro">Membro</option>
+                  <option value="parceira">Parceira</option>
+                  <option value="lider_formacao">Líder em Formação</option>
+                  <option value="lider">Líder</option>
+                  <option value="diretora">Diretora</option>
+                  <option value="head">Head</option>
+                </select>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="reason">Motivo (opcional)</label>
+                <textarea
+                  id="reason"
+                  value={actionReason}
+                  onChange={(e) => setActionReason(e.target.value)}
+                  placeholder="Ex: Promoção manual por mérito"
+                  disabled={actionLoading}
+                  rows={2}
+                />
+              </div>
+              
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => setShowActionModal(null)}
+                  disabled={actionLoading}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className={styles.submitBtn}
+                  onClick={handleLevelChange}
+                  disabled={actionLoading || !selectedLevel}
+                >
+                  {actionLoading ? 'Salvando...' : 'Alterar Nível'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Bloquear/Desbloquear - Sprint 7 */}
+      {showActionModal === 'block' && (
+        <div className={styles.modalOverlay} onClick={() => !actionLoading && setShowActionModal(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>{data.member.status === 'inactive' ? 'Desbloquear Membro' : 'Bloquear Membro'}</h3>
+              <p>Membro: {data.member.name}</p>
+            </div>
+            
+            <div className={styles.adjustForm}>
+              <div className={styles.warningBox}>
+                {data.member.status === 'inactive' ? (
+                  <p>O membro será desbloqueado e poderá voltar a participar do programa.</p>
+                ) : (
+                  <p>O membro será bloqueado e não poderá mais participar do programa até ser desbloqueado.</p>
+                )}
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="blockReason">Motivo (opcional)</label>
+                <textarea
+                  id="blockReason"
+                  value={actionReason}
+                  onChange={(e) => setActionReason(e.target.value)}
+                  placeholder="Ex: Violação de termos"
+                  disabled={actionLoading}
+                  rows={2}
+                />
+              </div>
+              
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => setShowActionModal(null)}
+                  disabled={actionLoading}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className={data.member.status === 'inactive' ? styles.submitBtn : styles.submitBtnDanger}
+                  onClick={handleBlockToggle}
+                  disabled={actionLoading}
+                >
+                  {actionLoading ? 'Processando...' : data.member.status === 'inactive' ? 'Desbloquear' : 'Bloquear'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Ajuste de Comissão - Sprint 7 */}
+      {showActionModal === 'commission' && (
+        <div className={styles.modalOverlay} onClick={() => !actionLoading && setShowActionModal(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Ajustar Comissão</h3>
+              <p>Membro: {data.member.name}</p>
+            </div>
+            
+            <div className={styles.adjustForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="commissionAmount">Valor (R$)</label>
+                <input
+                  type="number"
+                  id="commissionAmount"
+                  step="0.01"
+                  value={commissionAmount}
+                  onChange={(e) => setCommissionAmount(e.target.value)}
+                  placeholder="Ex: 50.00 ou -50.00"
+                  disabled={actionLoading}
+                />
+                <small>Use valor negativo para débito</small>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="commissionDesc">Descrição (obrigatório)</label>
+                <textarea
+                  id="commissionDesc"
+                  value={commissionDescription}
+                  onChange={(e) => setCommissionDescription(e.target.value)}
+                  placeholder="Ex: Bônus especial de campanha"
+                  disabled={actionLoading}
+                  rows={2}
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="commissionReason">Motivo (opcional)</label>
+                <textarea
+                  id="commissionReason"
+                  value={actionReason}
+                  onChange={(e) => setActionReason(e.target.value)}
+                  placeholder="Ex: Aprovado pela diretoria"
+                  disabled={actionLoading}
+                  rows={2}
+                />
+              </div>
+              
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => setShowActionModal(null)}
+                  disabled={actionLoading}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className={styles.submitBtn}
+                  onClick={handleCommissionAdjust}
+                  disabled={actionLoading || !commissionAmount || !commissionDescription}
+                >
+                  {actionLoading ? 'Salvando...' : 'Ajustar Comissão'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -564,6 +564,7 @@ export interface CommissionLedger {
   description: string | null
   metadata: Record<string, unknown>
   created_at: string
+  available_at: string | null // Net-15: data em que a comissão fica disponível para saque
 }
 
 // Tabela commission_balances

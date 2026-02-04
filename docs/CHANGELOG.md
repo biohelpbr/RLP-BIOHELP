@@ -6,39 +6,31 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
-## Versão 1.0 — 2025-12-23
-**Tipo:** criação do baseline SDD  
+## Versão 3.0 — 2026-01-12
+**Tipo:** Atualização completa do SDD com mapeamento de FRs  
 **Mudanças:**
-- Criação do SPEC.md (SDD) e documentos de suporte (TBD/Acceptance/Changelog/Docs README)
-- Definição do Sprint 1 (MVP) e fases futuras
-- Definição inicial de schema Supabase e RLS mínimos
-- Definição inicial de integração Shopify (customer + tags)
+- **SPEC.md:** Atualização completa com todos os 38 FRs do documento de escopo formal
+- **ACCEPTANCE.md:** Reorganização com matriz de FRs e critérios de aceite por categoria
+- **STATUS_IMPLEMENTACAO.md:** Adição de cobertura de FRs por sprint e status detalhado
+- **DECISOES_TBD.md:** Mapeamento completo de TBDs do escopo formal para TBDs do SDD
+- **WORKFLOW.md:** Atualização com checklist de FRs
+- Adição de seção de Requisitos Não Funcionais (NFR) do escopo formal
+- Adição de critérios de aceite macro do projeto
+- Mapeamento de FRs bloqueados por TBDs pendentes
 
-**Aprovado por (cliente):** ____________________  
-**Evidência:** ____________________
-
----
-
-## Versão 2.0 — 2026-01-07
-**Tipo:** Nova feature (Sprint 2)  
-**Mudanças:**
-- Implementação completa do Sprint 2 (CV + Status)
-- Novas tabelas: orders, order_items, cv_ledger, cv_monthly_summary
-- Webhooks Shopify para orders/paid, orders/refunded, orders/cancelled
-- Cálculo automático de CV (via metacampo do produto; fallback para preço do item)
-- Status automático baseado em CV (active se >= 200/mês)
-- Dashboard atualizado com progresso de CV
-- Job de fechamento mensal
-- Ajuste manual de CV pelo admin
-- Ledger auditável e imutável
+**FRs mapeados:**
+- FR-01 a FR-38 (38 requisitos funcionais)
+- 24 implementados (71%)
+- 3 parcialmente implementados
+- 11 pendentes
 
 **Impacto:**
-- Prazo: Conforme planejado
+- Prazo: Sem impacto (documentação)
 - Custo: Incluso no escopo
-- Risco: Baixo
+- Risco: Baixo (melhoria de rastreabilidade)
 
 **Aprovado por (cliente):** ____________________  
-**Evidência:** ____________________
+**Evidência:** Documentos de escopo formal
 
 ---
 
@@ -62,6 +54,8 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 - `types/database.ts` — Tipos e constantes atualizados
 - `supabase/migrations/20260110_fix_perpetual_commission.sql` — Nova migration
 
+**FRs afetados:** FR-23 (Comissão Perpétua)
+
 **Impacto:**
 - Prazo: Sem impacto (correção pontual)
 - Custo: Incluso no escopo
@@ -72,11 +66,53 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 2.0 — 2026-01-07
+**Tipo:** Nova feature (Sprint 2)  
+**Mudanças:**
+- Implementação completa do Sprint 2 (CV + Status)
+- Novas tabelas: orders, order_items, cv_ledger, cv_monthly_summary
+- Webhooks Shopify para orders/paid, orders/refunded, orders/cancelled
+- Cálculo automático de CV (via metacampo do produto; fallback para preço do item)
+- Status automático baseado em CV (active se >= 200/mês)
+- Dashboard atualizado com progresso de CV
+- Job de fechamento mensal
+- Ajuste manual de CV pelo admin
+- Ledger auditável e imutável
+
+**FRs implementados:** FR-13, FR-14, FR-15, FR-16
+
+**Impacto:**
+- Prazo: Conforme planejado
+- Custo: Incluso no escopo
+- Risco: Baixo
+
+**Aprovado por (cliente):** ____________________  
+**Evidência:** ____________________
+
+---
+
+## Versão 1.0 — 2025-12-23
+**Tipo:** criação do baseline SDD  
+**Mudanças:**
+- Criação do SPEC.md (SDD) e documentos de suporte (TBD/Acceptance/Changelog/Docs README)
+- Definição do Sprint 1 (MVP) e fases futuras
+- Definição inicial de schema Supabase e RLS mínimos
+- Definição inicial de integração Shopify (customer + tags)
+
+**FRs implementados:** FR-01, FR-02, FR-03, FR-04, FR-05, FR-07, FR-08, FR-09
+
+**Aprovado por (cliente):** ____________________  
+**Evidência:** ____________________
+
+---
+
 ## Template para novas entradas
 ### Versão X.Y — AAAA-MM-DD
 **Tipo:** ajuste de regra / nova feature / correção de escopo / mudança técnica  
 **Mudanças:**
 - (listar em bullets)
+
+**FRs afetados:** FR-XX, FR-YY
 
 **Impacto:**
 - Prazo: (ex.: +1 semana / sem impacto)

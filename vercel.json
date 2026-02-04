@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/close-monthly-cv",
       "schedule": "0 3 1 * *"
+    },
+    {
+      "path": "/api/cron/network-compression",
+      "schedule": "0 4 1 * *"
     }
   ]
 }

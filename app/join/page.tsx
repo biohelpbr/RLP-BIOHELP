@@ -107,7 +107,8 @@ function JoinForm() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          ref_code: refCode,
+          password: formData.password,
+          ref: refCode,
         }),
       })
 

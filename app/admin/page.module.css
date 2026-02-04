@@ -322,6 +322,42 @@
   color: #dc2626;
 }
 
+/* Status badges para saques */
+.statusAwaiting {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.statusReview {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.statusApproved {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.statusProcessing {
+  background: #cffafe;
+  color: #0891b2;
+}
+
+.statusCompleted {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.statusRejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.statusCancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 .noSponsor {
   color: var(--gray-400);
 }
@@ -789,15 +825,136 @@
   gap: var(--space-sm);
 }
 
+/* KPIs Grid - Sprint 7 */
+.kpisGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.kpiCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-100);
+}
+
+.kpiIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  color: white;
+  flex-shrink: 0;
+}
+
+.kpiContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kpiLabel {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kpiValue {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.kpiSubtext {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+/* Level Card */
+.levelCard {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-100);
+  margin-bottom: var(--space-xl);
+}
+
+.levelTitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: var(--space-md);
+}
+
+.levelGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.levelItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+}
+
+.levelName {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  text-transform: capitalize;
+}
+
+.levelCount {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* Section Title */
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: var(--space-md);
+}
+
 /* Responsivo para grid de resumo */
 @media (max-width: 1024px) {
   .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .kpisGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .kpisGrid {
     grid-template-columns: 1fr;
   }
   

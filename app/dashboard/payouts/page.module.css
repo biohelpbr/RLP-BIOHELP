@@ -1,0 +1,736 @@
+/* Página Saques - Sprint 5 */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  padding: 2rem;
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+  color: #ef4444;
+}
+
+.errorIcon {
+  font-size: 3rem;
+}
+
+.retryButton {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.retryButton:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.title {
+  color: #fff;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Success Message */
+.successMessage {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  color: #fff;
+}
+
+.successIcon {
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.successMessage strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #10b981;
+}
+
+.successMessage p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  margin-left: auto;
+}
+
+.closeButton:hover {
+  color: #fff;
+}
+
+/* Balance Cards */
+.balanceGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.balanceCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.balanceCardPrimary {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.balanceHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.balanceIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.balanceIconGreen {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.balanceIconYellow {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.balanceLabel {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.balanceLabelPrimary {
+  font-size: 0.875rem;
+  color: rgba(16, 185, 129, 0.8);
+}
+
+.balanceValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.balanceValuePrimary {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1rem;
+}
+
+.withdrawButton {
+  background: #10b981;
+  border: none;
+  border-radius: 10px;
+  padding: 0.875rem 1.5rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+
+.withdrawButton:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+/* Limit Card */
+.limitCard {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.limitTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fbbf24;
+  margin: 0 0 1rem;
+}
+
+.limitBar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.limitProgress {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.limitInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.limitNote {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* Form Overlay */
+.formOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.formCard {
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.formHeader h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.closeFormButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.closeFormButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.formError {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.formGroup small {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.input, .select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  color: #fff;
+  font-size: 0.9375rem;
+  transition: all 0.2s;
+}
+
+.input:focus, .select:focus {
+  outline: none;
+  border-color: #10b981;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.select {
+  cursor: pointer;
+}
+
+.select option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.cancelButton {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitButton {
+  flex: 1;
+  background: #10b981;
+  border: none;
+  border-radius: 10px;
+  padding: 0.875rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #059669;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* List Card */
+.listCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.listTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 1.5rem;
+}
+
+/* Payouts List */
+.payoutsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payoutItem {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.payoutMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.payoutInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.payoutAmount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.payoutDate {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Status Badges */
+.statusBadge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.statusPending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.statusAwaiting {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.statusReview {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.statusApproved {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.statusProcessing {
+  background: rgba(6, 182, 212, 0.2);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.statusCompleted {
+  background: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.statusRejected {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.statusCancelled {
+  background: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.payoutDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.payoutTax {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  padding-top: 0.75rem;
+}
+
+.payoutTax span:last-child {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.payoutRejection {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #f87171;
+}
+
+.uploadLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.625rem 1rem;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  color: #a78bfa;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.uploadLink:hover {
+  background: rgba(139, 92, 246, 0.3);
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0;
+}
+
+.emptySubtext {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Info Card */
+.infoCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.infoTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 1rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.infoItem {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+.infoItem h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 0.5rem;
+}
+
+.infoItem p {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .balanceGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .balanceCardPrimary {
+    grid-column: span 2;
+  }
+  
+  .infoGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .balanceGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .balanceCardPrimary {
+    grid-column: span 1;
+  }
+  
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .payoutMain {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}

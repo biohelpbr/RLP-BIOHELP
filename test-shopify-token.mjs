@@ -1,6 +1,15 @@
 /**
  * Script de teste para validar o token Shopify Admin API
  * Uso: node test-shopify-token.mjs
+ * 
+ * ⚠️ NOTA IMPORTANTE (ver docs/DECISOES_TBD.md - NOTA-001):
+ * O Teste 3 (GraphQL customers) FALHARÁ em planos Basic/Starter da Shopify.
+ * Isso é ESPERADO e NÃO afeta a integração real.
+ * 
+ * A implementação de produção usa REST API (lib/shopify/customer.ts) que
+ * funciona normalmente mesmo em planos básicos.
+ * 
+ * Para testar a integração real, use: node test-resync.mjs
  */
 
 import dotenv from "dotenv";
@@ -107,8 +116,11 @@ try {
   console.log('  ❌ Erro de conexão:', error.message)
 }
 
-// Teste 3: Verificar scopes (customers)
-console.log('\n🧪 Teste 3: Verificar acesso a Customers')
+// Teste 3: Verificar scopes (customers) - VIA GRAPHQL
+// ⚠️ ESTE TESTE FALHARÁ EM PLANOS BASIC/STARTER - ISSO É ESPERADO!
+// A implementação real usa REST API que funciona normalmente.
+console.log('\n🧪 Teste 3: Verificar acesso a Customers (GraphQL)')
+console.log('  ⚠️  NOTA: Este teste pode falhar em planos Basic - é esperado!')
 
 try {
   const customersRes = await fetch(graphqlUrl, {
@@ -151,6 +163,38 @@ try {
   console.log('  ❌ Erro de conexão:', error.message)
 }
 
+// Teste 4: Verificar acesso via REST API (implementação real)
+console.log('\n🧪 Teste 4: Verificar acesso a Customers (REST API)')
+console.log('  ℹ️  Esta é a API usada em produção')
+
+try {
+  const restCustomersUrl = `https://${SHOP}/admin/api/2024-10/customers/search.json?query=email:test@example.com`
+  
+  const restCustomersRes = await fetch(restCustomersUrl, {
+    headers: {
+      'X-Shopify-Access-Token': TOKEN,
+      'Content-Type': 'application/json',
+    },
+  })
+  
+  console.log(`  Status: ${restCustomersRes.status}`)
+  
+  if (restCustomersRes.ok) {
+    const data = await restCustomersRes.json()
+    console.log('  ✅ REST API para Customers OK!')
+    console.log(`  Customers encontrados: ${data.customers?.length || 0}`)
+    console.log('  ℹ️  A integração real funciona corretamente.')
+  } else {
+    const text = await restCustomersRes.text()
+    console.log('  ❌ Erro:', text.substring(0, 200))
+  }
+} catch (error) {
+  console.log('  ❌ Erro de conexão:', error.message)
+}
+
 console.log('\n' + '='.repeat(60))
-console.log('Fim do teste')
+console.log('Resumo:')
+console.log('  - Testes 1 e 2 (Shop): Validam conexão básica')
+console.log('  - Teste 3 (GraphQL Customers): Pode falhar em plano Basic (esperado)')
+console.log('  - Teste 4 (REST Customers): Deve funcionar sempre (produção)')
 console.log('='.repeat(60))
