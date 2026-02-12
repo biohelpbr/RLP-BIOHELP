@@ -8,10 +8,13 @@
  * - Verificar idempotência (não processar mesmo pedido 2x)
  * - Buscar member no Supabase por e-mail
  * - Criar registro em orders e order_items
+ * - Buscar CV dos produtos via Shopify REST API (metafield custom.cv)
  * - Calcular CV por item
  * - Registrar no cv_ledger
  * - Atualizar members.current_cv_month
  * - [Sprint 4] Calcular e registrar comissões no commission_ledger
+ * 
+ * BUILD_VERSION: v4.1-cv-api-fix (2026-02-12)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -43,6 +46,8 @@ import {
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
+  
+  console.info('[webhook] ===== ORDERS/PAID v4.1-cv-api-fix (2026-02-12) =====')
   
   // 1. Extrair headers
   const webhookHeaders = extractWebhookHeaders(request.headers)
@@ -169,9 +174,15 @@ export async function POST(request: NextRequest) {
     .map(item => item.productId)
     .filter((id): id is string => !!id)
 
-  console.info(`[webhook] Buscando CV de ${productIds.length} produto(s) via API...`)
+  console.info(`[webhook] === ETAPA CV: Buscando metafield custom.cv de ${productIds.length} produto(s) via Shopify REST API ===`)
+  console.info(`[webhook] Product IDs:`, JSON.stringify(productIds))
+  
   const cvMap = await fetchProductCVsBatch(productIds)
-  console.info(`[webhook] CV map:`, Object.fromEntries(cvMap))
+  
+  console.info(`[webhook] CV map resultado (${cvMap.size} encontrados):`, JSON.stringify(Object.fromEntries(cvMap)))
+  if (cvMap.size === 0) {
+    console.warn(`[webhook] ⚠️ NENHUM CV encontrado! Todos os itens terão CV=0. Verifique: 1) metafield custom.cv no produto Shopify, 2) permissão read_products no token API`)
+  }
 
   const processedItems = processShopifyLineItems(
     extractedData.lineItems.map(item => ({

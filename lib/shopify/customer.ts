@@ -246,36 +246,49 @@ export async function fetchProductCV(productId: string): Promise<number | null> 
   // Extrair ID numérico (pode vir como "gid://shopify/Product/123" ou "123")
   const numericId = productId.replace(/\D/g, '')
   if (!numericId) {
-    console.warn(`[shopify] fetchProductCV: ID inválido "${productId}"`)
+    console.warn(`[shopify-cv] fetchProductCV: ID inválido "${productId}"`)
     return null
   }
 
+  console.info(`[shopify-cv] Buscando metafield para produto ${numericId}...`)
+  
+  // Buscar TODOS os metafields do namespace custom (sem filtro por key no URL
+  // para máxima compatibilidade com versões da API)
+  const endpoint = `/products/${numericId}/metafields.json?namespace=custom`
+  console.info(`[shopify-cv] Endpoint: ${endpoint}`)
+  
   const result = await shopifyRest<{
     metafields: Array<{
+      id: number
       namespace: string
       key: string
       value: string
       type: string
     }>
-  }>(`/products/${numericId}/metafields.json?namespace=custom&key=cv`)
+  }>(endpoint)
 
   if (result.errors.length > 0) {
-    console.warn(`[shopify] Erro ao buscar metafield CV do produto ${numericId}:`, result.errors)
+    console.error(`[shopify-cv] ERRO API para produto ${numericId}:`, JSON.stringify(result.errors))
     return null
   }
 
   const metafields = result.data?.metafields || []
+  console.info(`[shopify-cv] Produto ${numericId}: ${metafields.length} metafield(s) retornados:`, 
+    JSON.stringify(metafields.map(m => ({ ns: m.namespace, key: m.key, value: m.value, type: m.type })))
+  )
+  
   const cvMetafield = metafields.find(m => m.namespace === 'custom' && m.key === 'cv')
 
   if (cvMetafield) {
     const cv = parseFloat(cvMetafield.value)
     if (!isNaN(cv)) {
-      console.info(`[shopify] Produto ${numericId}: CV=${cv} (via API metafield)`)
+      console.info(`[shopify-cv] ✅ Produto ${numericId}: CV=${cv} (via API metafield)`)
       return cv
     }
+    console.warn(`[shopify-cv] Metafield encontrado mas valor não numérico: "${cvMetafield.value}"`)
   }
 
-  console.warn(`[shopify] missing_cv_metafield: Produto ${numericId} sem metafield custom.cv`)
+  console.warn(`[shopify-cv] ❌ Produto ${numericId}: metafield custom.cv NÃO encontrado entre ${metafields.length} metafields`)
   return null
 }
 
