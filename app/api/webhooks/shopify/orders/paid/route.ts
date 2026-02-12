@@ -32,7 +32,7 @@ import {
   getCurrentMonthYear,
   isActiveCV
 } from '@/lib/cv/calculator'
-import { syncCustomerToShopify } from '@/lib/shopify/customer'
+import { syncCustomerToShopify, fetchProductCVsBatch } from '@/lib/shopify/customer'
 import {
   calculateAllCommissions,
   toCommissionLedgerInserts,
@@ -162,8 +162,17 @@ export async function POST(request: NextRequest) {
 
   const monthYear = getCurrentMonthYear()
 
-  // 8. Processar itens do pedido e calcular CV (via metafield ou fallback)
-  // REGRA TBD-008: CV é definido por produto via metacampo/metafield
+  // 8. Buscar CV dos produtos via Shopify REST API (metafield custom.cv)
+  // REGRA TBD-014: CV definido exclusivamente por metafield; webhook NÃO inclui metafields
+  // Solução: chamada extra à API para buscar metafield de cada produto
+  const productIds = extractedData.lineItems
+    .map(item => item.productId)
+    .filter((id): id is string => !!id)
+
+  console.info(`[webhook] Buscando CV de ${productIds.length} produto(s) via API...`)
+  const cvMap = await fetchProductCVsBatch(productIds)
+  console.info(`[webhook] CV map:`, Object.fromEntries(cvMap))
+
   const processedItems = processShopifyLineItems(
     extractedData.lineItems.map(item => ({
       id: item.id,
@@ -173,9 +182,11 @@ export async function POST(request: NextRequest) {
       sku: item.sku,
       quantity: item.quantity,
       price: item.price,
-      // Passar properties/metafields se disponíveis no payload
+      // Injetar CV obtido da API como metafield virtual para o calculator
       properties: (item as any).properties,
-      metafields: (item as any).metafields
+      metafields: item.productId && cvMap.has(item.productId)
+        ? [{ namespace: 'custom', key: 'cv', value: String(cvMap.get(item.productId)) }]
+        : (item as any).metafields
     })),
     'temp-order-id' // ID temporário, será atualizado após criar o pedido
   )

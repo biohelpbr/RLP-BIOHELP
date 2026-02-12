@@ -48,7 +48,7 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 | **FR-11** | Visualização da rede (admin) | 3 | ✅ | Admin endpoint |
 | **FR-12** | Regra de saída após 6 meses | 6 | ✅ | Compressão de rede implementada |
 | **FR-13** | Webhooks de pedidos | 2 | ✅ | paid/refund/cancel |
-| **FR-14** | Cálculo de CV por pedido | 2 | ✅ | Via metafield |
+| **FR-14** | Cálculo de CV por pedido | 2 | ✅ | Via metafield (busca API REST — webhook não inclui metafields) |
 | **FR-15** | Status Ativo/Inativo mensal | 2 | ✅ | >= 200 CV |
 | **FR-16** | Reset mensal | 2 | ✅ | Cron job |
 | **FR-17** | Separação de CV (próprio vs rede) | 7 | ✅ | Dashboard com CV próprio + rede |
@@ -296,6 +296,7 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 - [x] **TBD-014 — CV sem fallback:**
   - Metafield `custom.cv` ausente → CV = 0 (sem fallback para preço)
   - Log `missing_cv_metafield` emitido
+  - **Fix v4.1:** Webhook não inclui metafields → adicionada busca via REST API (`fetchProductCVsBatch`)
 - [x] **TBD-019 — Cupom Individual Mensal Creatina:**
   - Helper `lib/shopify/coupon.ts` para criar Price Rule + Discount Code
   - API GET gera cupom automaticamente se elegível

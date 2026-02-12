@@ -236,6 +236,74 @@ async function updateCustomer(
 }
 
 /**
+ * Busca o metafield custom.cv de um produto na Shopify
+ * TBD-014: CV é definido via metafield custom.cv do produto
+ * 
+ * @param productId - ID numérico do produto no Shopify
+ * @returns Valor do CV ou null se não encontrado
+ */
+export async function fetchProductCV(productId: string): Promise<number | null> {
+  // Extrair ID numérico (pode vir como "gid://shopify/Product/123" ou "123")
+  const numericId = productId.replace(/\D/g, '')
+  if (!numericId) {
+    console.warn(`[shopify] fetchProductCV: ID inválido "${productId}"`)
+    return null
+  }
+
+  const result = await shopifyRest<{
+    metafields: Array<{
+      namespace: string
+      key: string
+      value: string
+      type: string
+    }>
+  }>(`/products/${numericId}/metafields.json?namespace=custom&key=cv`)
+
+  if (result.errors.length > 0) {
+    console.warn(`[shopify] Erro ao buscar metafield CV do produto ${numericId}:`, result.errors)
+    return null
+  }
+
+  const metafields = result.data?.metafields || []
+  const cvMetafield = metafields.find(m => m.namespace === 'custom' && m.key === 'cv')
+
+  if (cvMetafield) {
+    const cv = parseFloat(cvMetafield.value)
+    if (!isNaN(cv)) {
+      console.info(`[shopify] Produto ${numericId}: CV=${cv} (via API metafield)`)
+      return cv
+    }
+  }
+
+  console.warn(`[shopify] missing_cv_metafield: Produto ${numericId} sem metafield custom.cv`)
+  return null
+}
+
+/**
+ * Busca CVs de múltiplos produtos em batch
+ * Retorna mapa de productId → CV
+ */
+export async function fetchProductCVsBatch(
+  productIds: string[]
+): Promise<Map<string, number>> {
+  const cvMap = new Map<string, number>()
+  const uniqueIds = Array.from(new Set(productIds.filter(Boolean)))
+
+  for (const productId of uniqueIds) {
+    const cv = await fetchProductCV(productId)
+    if (cv !== null) {
+      cvMap.set(productId, cv)
+    }
+    // Rate limiting mínimo entre chamadas
+    if (uniqueIds.length > 1) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+  }
+
+  return cvMap
+}
+
+/**
  * Cria ou atualiza customer na Shopify com tags LRP
  * SPEC 4.4: Ao cadastrar (ou re-sincronizar), garantir customer existe + tags aplicadas
  * SPEC 8.2: Customer create/update por e-mail

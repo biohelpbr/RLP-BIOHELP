@@ -176,10 +176,16 @@ O resync compara os dados do Supabase com o estado no Shopify e só atualiza se 
 
 **Motivo:** Evita distorção de comissão. Se o produto não tem CV configurado, não deve gerar comissão.
 
-**Implementação necessária:**
-- Alterar `lib/cv/calculator.ts` — remover fallback para preço
-- Se `custom.cv` não existir: `cv_value = 0`
-- Manter log warning para produtos sem metafield configurado
+**Implementação — ✅ CONCLUÍDA (11/02/2026):**
+- `lib/cv/calculator.ts` — fallback para preço removido; se `custom.cv` não existir → `cv_value = 0`
+- Log warning `missing_cv_metafield` ativo para produtos sem metafield
+
+**Detalhe técnico crítico:**
+- O webhook `orders/paid` do Shopify **NÃO inclui metafields** dos produtos no payload.
+- Solução implementada: chamada extra à **Shopify REST API** (`GET /products/{id}/metafields.json?namespace=custom&key=cv`) para cada produto do pedido.
+- Funções: `fetchProductCV()` e `fetchProductCVsBatch()` em `lib/shopify/customer.ts`
+- Os CVs obtidos são injetados como metafields virtuais nos itens antes do cálculo.
+- Arquivos alterados: `lib/shopify/customer.ts`, `app/api/webhooks/shopify/orders/paid/route.ts`
 
 ---
 

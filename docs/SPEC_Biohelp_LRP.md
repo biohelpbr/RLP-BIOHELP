@@ -291,6 +291,12 @@ Esta seção mapeia todos os FRs do documento de escopo formal (`Biohelp_LRP_Esc
 - **Fonte canônica:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
   - Ex: Lemon Dreams (R$159) → CV 77
 
+**Implementação técnica — obtenção do CV:**
+- O webhook `orders/paid` do Shopify **não inclui metafields** dos produtos no payload.
+- Solução: ao receber o webhook, o sistema faz chamada extra à **Shopify REST API** (`GET /products/{id}/metafields.json?namespace=custom&key=cv`) para cada produto do pedido.
+- Os CVs são obtidos via `fetchProductCVsBatch()` e injetados nos itens antes do cálculo.
+- Implementado em: `lib/shopify/customer.ts` (funções `fetchProductCV` e `fetchProductCVsBatch`) e `app/api/webhooks/shopify/orders/paid/route.ts`.
+
 ### 4.4 Status (Ativa/Inativa)
 **FR-15**
 - **Estados definidos:**
@@ -666,7 +672,8 @@ Se a N0 estiver recebendo Fast-Track de uma N1, só passa a receber a Comissão 
 
 ### 11.3 POST `/api/webhooks/shopify/orders/paid`
 - Handler de webhooks com idempotência
-- Calcula CV e comissões
+- **Busca metafield `custom.cv` de cada produto via Shopify REST API** (webhook não inclui metafields)
+- Calcula CV e comissões com CVs obtidos da API
 
 ### 11.4 POST `/api/webhooks/shopify/orders/refunded`
 - Reverte CV e comissões

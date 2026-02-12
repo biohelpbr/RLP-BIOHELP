@@ -52,6 +52,32 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 4.1 — 2026-02-11
+**Tipo:** Correção técnica (obtenção de CV via Shopify API)  
+**Mudanças:**
+
+### Fix: Webhook orders/paid — busca de metafield CV via API
+
+**Problema identificado:**
+- O webhook `orders/paid` do Shopify **não inclui metafields dos produtos** no payload.
+- Como consequência, o cálculo de CV resultava sempre em 0 (TBD-014: sem fallback para preço).
+
+**Solução implementada:**
+- Adicionadas funções `fetchProductCV()` e `fetchProductCVsBatch()` em `lib/shopify/customer.ts`
+- Ao receber o webhook, o sistema agora faz chamada extra à **Shopify REST API** (`GET /products/{id}/metafields.json?namespace=custom&key=cv`) para cada produto do pedido
+- CVs obtidos são injetados como metafields virtuais nos itens antes do cálculo
+- Rate limiting entre chamadas (100ms) para respeitar limites da API Shopify
+
+**Arquivos alterados:**
+- `lib/shopify/customer.ts` — novas funções `fetchProductCV()` e `fetchProductCVsBatch()`
+- `app/api/webhooks/shopify/orders/paid/route.ts` — integração com busca de CV via API
+
+**FRs afetados:** FR-14 (CV agora funcional com compras reais)  
+**Impacto:** Sem impacto em outras funcionalidades; correção essencial para demo com Shopify real  
+**Risco:** Baixo (chamadas adicionais à API são leves e com rate limiting)
+
+---
+
 ## Versão 3.0 — 2026-01-12
 **Tipo:** Atualização completa do SDD com mapeamento de FRs  
 **Mudanças:**
