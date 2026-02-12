@@ -282,10 +282,10 @@ export async function POST(request: NextRequest) {
       sponsorRefCode = sponsor?.ref_code || null
     }
 
-    // Buscar nome do membro para sync
+    // Buscar nome e level do membro para sync (TBD-003)
     const { data: memberFull } = await supabase
       .from('members')
-      .select('name')
+      .select('name, level')
       .eq('id', member.id)
       .single()
 
@@ -294,7 +294,9 @@ export async function POST(request: NextRequest) {
       email: extractedData.customerEmail,
       firstName: memberFull?.name || '',
       refCode: member.ref_code,
-      sponsorRefCode
+      sponsorRefCode,
+      level: memberFull?.level || 'membro',
+      status: newStatus, // status atualizado (TBD-003)
     }).catch(err => {
       console.error('[webhook] Erro ao sync Shopify:', err)
     })
@@ -462,6 +464,60 @@ export async function POST(request: NextRequest) {
   } catch (commissionErr) {
     // Log do erro mas não falha o webhook
     console.error('[webhook] Erro no cálculo de comissões:', commissionErr)
+  }
+
+  // =====================================================
+  // 16. [TBD-019] DETECTAR USO DE CUPOM CREATINA
+  // =====================================================
+  try {
+    const creatineCoupon = extractedData.discountCodes?.find(
+      (dc: { code: string }) => dc.code.toUpperCase().startsWith('CREATINA-')
+    )
+
+    if (creatineCoupon && member) {
+      const couponCode = creatineCoupon.code.toUpperCase()
+      console.info(`[webhook] Cupom creatina detectado: ${couponCode} (membro: ${member.id})`)
+
+      // Buscar claim pelo coupon_code
+      const { data: claim } = await supabase
+        .from('free_creatine_claims')
+        .select('id')
+        .eq('coupon_code', couponCode)
+        .eq('member_id', member.id)
+        .single()
+
+      if (claim) {
+        // Atualizar com order_id
+        await supabase
+          .from('free_creatine_claims')
+          .update({
+            order_id: newOrder.id,
+            status: 'claimed',
+          })
+          .eq('id', claim.id)
+
+        console.info(`[webhook] Creatina claim atualizado: ${claim.id} → order ${newOrder.id}`)
+      } else {
+        // Cupom usado sem claim prévio — registrar mesmo assim
+        const currentMonth = getCurrentMonthYear()
+        await supabase
+          .from('free_creatine_claims')
+          .upsert({
+            member_id: member.id,
+            month_year: currentMonth,
+            order_id: newOrder.id,
+            coupon_code: couponCode,
+            status: 'claimed',
+          }, {
+            onConflict: 'member_id,month_year'
+          })
+
+        console.info(`[webhook] Creatina claim criado retroativamente para ${member.id}`)
+      }
+    }
+  } catch (creatineErr) {
+    // Log mas não falha o webhook
+    console.error('[webhook] Erro ao processar cupom creatina:', creatineErr)
   }
 
   const duration = Date.now() - startTime

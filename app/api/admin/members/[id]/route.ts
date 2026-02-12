@@ -16,7 +16,7 @@ interface RouteParams {
 }
 
 // Tipos de ação permitidas
-type MemberAction = 'edit' | 'adjust_level' | 'block' | 'unblock' | 'adjust_commission'
+type MemberAction = 'edit' | 'adjust_level' | 'block' | 'unblock' | 'adjust_commission' | 'customize_ref_code'
 
 interface PatchBody {
   action: MemberAction
@@ -27,6 +27,7 @@ interface PatchBody {
     phone_visibility?: 'public' | 'network' | 'private'
     level?: 'membro' | 'parceira' | 'lider_formacao' | 'lider' | 'diretora' | 'head'
     status?: 'pending' | 'active' | 'inactive'
+    ref_code?: string // TBD-006: Admin pode customizar ref_code
     commission_adjustment?: {
       amount: number
       description: string
@@ -273,6 +274,49 @@ export async function PATCH(
         auditLog.unblocked = true
         break
 
+      case 'customize_ref_code':
+        // TBD-006: Admin pode customizar ref_code
+        if (!body.data?.ref_code) {
+          return NextResponse.json(
+            { error: 'Novo ref_code é obrigatório' },
+            { status: 400 }
+          )
+        }
+
+        const newRefCode = body.data.ref_code.trim()
+
+        // Validar formato (4-20 chars alfanuméricos)
+        if (!/^[a-zA-Z0-9_-]{4,20}$/.test(newRefCode)) {
+          return NextResponse.json(
+            { error: 'ref_code deve ter 4-20 caracteres alfanuméricos (letras, números, _ ou -)' },
+            { status: 400 }
+          )
+        }
+
+        // Verificar unicidade
+        const { data: existingRefCode } = await supabase
+          .from('members')
+          .select('id')
+          .eq('ref_code', newRefCode)
+          .neq('id', memberId)
+          .single()
+
+        if (existingRefCode) {
+          return NextResponse.json(
+            { error: `ref_code "${newRefCode}" já está em uso por outro membro` },
+            { status: 409 }
+          )
+        }
+
+        const oldRefCode = member.ref_code
+        updateData.ref_code = newRefCode
+
+        auditLog.old_ref_code = oldRefCode
+        auditLog.new_ref_code = newRefCode
+
+        console.info(`[admin] ref_code customizado: ${oldRefCode} → ${newRefCode} (membro: ${memberId})`)
+        break
+
       case 'adjust_commission':
         // Ajustar comissão manualmente
         if (!body.data?.commission_adjustment) {
@@ -369,12 +413,12 @@ export async function PATCH(
       }
 
       // Sincronizar com Shopify se necessário
-      if (body.action === 'edit' || body.action === 'block' || body.action === 'unblock') {
+      if (body.action === 'edit' || body.action === 'block' || body.action === 'unblock' || body.action === 'customize_ref_code' || body.action === 'adjust_level') {
         try {
           // Buscar dados atualizados do membro para sync
           const { data: updatedMember } = await supabase
             .from('members')
-            .select('id, email, name, ref_code, sponsor_id')
+            .select('id, email, name, ref_code, sponsor_id, level, status')
             .eq('id', memberId)
             .single()
           
@@ -395,7 +439,9 @@ export async function PATCH(
               email: updatedMember.email,
               name: updatedMember.name,
               refCode: updatedMember.ref_code,
-              sponsorRefCode
+              sponsorRefCode,
+              level: updatedMember.level || undefined,   // TBD-003: tag de nível
+              status: updatedMember.status || undefined,  // tag de status
             })
           }
         } catch (syncError) {

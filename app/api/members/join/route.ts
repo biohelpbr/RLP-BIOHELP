@@ -5,9 +5,9 @@
  * 
  * Regras implementadas:
  * - 4.1: Cadastro com link (ref)
- * - 4.2: Cadastro sem link (TBD-001 pendente - bloqueia por padrão)
+ * - 4.2: Cadastro sem link (TBD-001 RESOLVIDO — House Account)
  * - 4.3: Unicidade de membro (email único)
- * - 4.4: Shopify sync (customer + tags)
+ * - 4.4: Shopify sync (customer + tags + nivel)
  * - 5.2: Cria usuário no Supabase Auth
  * - 12: Se Shopify falhar, não bloquear criação do membro
  */
@@ -15,7 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServiceClient, createAdminClient } from '@/lib/supabase/server'
-import { generateRefCode } from '@/lib/utils/ref-code'
+import { generateRefCode, HOUSE_ACCOUNT_ID } from '@/lib/utils/ref-code'
 import { syncMemberToShopify } from '@/lib/shopify/sync'
 import type { UtmParams, Member } from '@/types/database'
 
@@ -104,28 +104,17 @@ export async function POST(request: NextRequest) {
         sponsorId = sponsor.id
         refCodeUsed = sponsor.ref_code
       } else {
-        // SPEC 4.1: Se ref inválido → tratar como cadastro sem link
-        // SPEC 4.2: TBD-001 não decidido → bloquear por padrão
-        return NextResponse.json(
-          {
-            ok: false,
-            error: ErrorCodes.INVALID_REF,
-            message: 'Código de indicação inválido.',
-          },
-          { status: 400 }
-        )
+        // SPEC 4.1: Se ref inválido → tratar como cadastro sem link (House Account)
+        console.warn(`[join] ref_code inválido "${ref}" — usando House Account como sponsor`)
+        sponsorId = HOUSE_ACCOUNT_ID
+        refCodeUsed = null
       }
     } else {
-      // SPEC 4.2: Cadastro sem link
-      // TBD-001 não decidido → comportamento padrão: bloquear
-      return NextResponse.json(
-        {
-          ok: false,
-          error: ErrorCodes.NO_REF_BLOCKED,
-          message: 'Cadastro indisponível sem convite.',
-        },
-        { status: 400 }
-      )
+      // SPEC 4.2 + TBD-001 RESOLVIDO: Cadastro sem link → House Account
+      // Comissões de membros sem convite vão para a empresa (Biohelp)
+      console.info('[join] Cadastro sem link de convite — atribuindo sponsor = House Account')
+      sponsorId = HOUSE_ACCOUNT_ID
+      refCodeUsed = null
     }
 
     // 4. Criar usuário no Supabase Auth (SPEC 5.2)
@@ -165,28 +154,12 @@ export async function POST(request: NextRequest) {
 
     const authUserId = authData.user.id
 
-    // 5. Gerar ref_code único (SPEC 3.2)
-    let newRefCode = generateRefCode()
-    let refCodeAttempts = 0
-    const maxAttempts = 5
-
-    // Garantir unicidade do ref_code
-    while (refCodeAttempts < maxAttempts) {
-      const { data: existingRefCodeData } = await supabase
-        .from('members')
-        .select('id')
-        .eq('ref_code', newRefCode)
-        .single()
-
-      if (!existingRefCodeData) break
-      
-      newRefCode = generateRefCode()
-      refCodeAttempts++
-    }
-
-    if (refCodeAttempts >= maxAttempts) {
-      console.error('[join] Failed to generate unique ref_code after max attempts')
-      // Limpar usuário Auth criado
+    // 5. Gerar ref_code único (SPEC 3.2 + TBD-006: formato sequencial BH00001)
+    let newRefCode: string
+    try {
+      newRefCode = await generateRefCode()
+    } catch (refError) {
+      console.error('[join] Failed to generate ref_code:', refError)
       await adminClient.auth.admin.deleteUser(authUserId)
       return NextResponse.json(
         {
@@ -196,6 +169,31 @@ export async function POST(request: NextRequest) {
         },
         { status: 500 }
       )
+    }
+
+    // Verificação extra de unicidade (a RPC já garante, mas por segurança)
+    const { data: existingRefCodeData } = await supabase
+      .from('members')
+      .select('id')
+      .eq('ref_code', newRefCode)
+      .single()
+
+    if (existingRefCodeData) {
+      console.error('[join] ref_code gerado já existe (colisão):', newRefCode)
+      // Tentar novamente
+      try {
+        newRefCode = await generateRefCode()
+      } catch {
+        await adminClient.auth.admin.deleteUser(authUserId)
+        return NextResponse.json(
+          {
+            ok: false,
+            error: ErrorCodes.INTERNAL_ERROR,
+            message: 'Erro interno. Tente novamente.',
+          },
+          { status: 500 }
+        )
+      }
     }
 
     // 6. Criar membro (SPEC 9.1) - agora com auth_user_id
@@ -278,6 +276,8 @@ export async function POST(request: NextRequest) {
       name: newMember.name,
       refCode: newMember.ref_code,
       sponsorRefCode: refCodeUsed, // ref_code do sponsor
+      level: 'membro', // nível padrão no cadastro
+      status: 'active', // status padrão no cadastro (TBD-003)
     })
 
     if (!shopifySyncResult.success) {

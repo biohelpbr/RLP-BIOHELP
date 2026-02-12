@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Decisões — Biohelp LRP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-secondary: #f7f6f3;
+            --bg-hover: #efefef;
+            --text: #37352f;
+            --text-secondary: #6b6b6b;
+            --text-light: #9b9a97;
+            --border: #e3e2de;
+            --accent: #2eaadc;
+            --green: #0f7b6c;
+            --green-bg: #dbeddb;
+            --yellow: #dfab01;
+            --yellow-bg: #fdecc8;
+            --red: #e03e3e;
+            --red-bg: #ffe2dd;
+            --blue: #0b6e99;
+            --blue-bg: #d3e5ef;
+            --purple: #6940a5;
+            --purple-bg: #e8deee;
+            --orange: #d9730d;
+            --orange-bg: #fadec9;
+            --gray-bg: #ebeced;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .page { max-width: 900px; margin: 0 auto; padding: 80px 96px; }
+        @media (max-width: 768px) { .page { padding: 40px 24px; } }
+        .page-header { margin-bottom: 48px; }
+        .page-icon { font-size: 78px; margin-bottom: 16px; }
+        h1.page-title { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+        .page-description { color: var(--text-secondary); font-size: 16px; }
+        .status-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 3px 8px; border-radius: 3px; font-size: 14px; font-weight: 500; margin-left: 8px;
+        }
+        .status-inline.pending { background: var(--yellow-bg); color: var(--yellow); }
+        .status-inline.done { background: var(--green-bg); color: var(--green); }
+        h1 { font-size: 30px; font-weight: 600; margin: 48px 0 16px; letter-spacing: -0.01em; }
+        h2 { font-size: 24px; font-weight: 600; margin: 40px 0 12px; letter-spacing: -0.01em; }
+        h3 { font-size: 20px; font-weight: 600; margin: 32px 0 8px; }
+        h4 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; }
+        p { margin: 8px 0; color: var(--text); }
+        a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 2px; }
+        a:hover { text-decoration-color: var(--text); }
+        hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+        .callout { display: flex; gap: 12px; padding: 16px; border-radius: 4px; margin: 16px 0; }
+        .callout-icon { font-size: 20px; flex-shrink: 0; }
+        .callout-content { flex: 1; }
+        .callout.gray { background: var(--gray-bg); }
+        .callout.yellow { background: var(--yellow-bg); }
+        .callout.green { background: var(--green-bg); }
+        .callout.blue { background: var(--blue-bg); }
+        .callout.red { background: var(--red-bg); }
+        .callout.purple { background: var(--purple-bg); }
+        .callout.orange { background: var(--orange-bg); }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+        th { text-align: left; padding: 8px 12px; background: var(--bg-secondary); font-weight: 500; color: var(--text-secondary); border: 1px solid var(--border); }
+        td { padding: 8px 12px; border: 1px solid var(--border); vertical-align: top; }
+        tr:hover td { background: var(--bg-secondary); }
+        .tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-weight: 500; }
+        .tag.green { background: var(--green-bg); color: var(--green); }
+        .tag.yellow { background: var(--yellow-bg); color: var(--yellow); }
+        .tag.red { background: var(--red-bg); color: var(--red); }
+        .tag.blue { background: var(--blue-bg); color: var(--blue); }
+        .tag.gray { background: var(--gray-bg); color: var(--text-secondary); }
+        .tag.orange { background: var(--orange-bg); color: var(--orange); }
+        code { font-family: 'IBM Plex Mono', monospace; background: var(--bg-secondary); padding: 2px 5px; border-radius: 3px; font-size: 14px; color: var(--red); }
+        pre { font-family: 'IBM Plex Mono', monospace; background: var(--bg-secondary); padding: 16px; border-radius: 4px; overflow-x: auto; font-size: 12px; line-height: 1.5; margin: 16px 0; white-space: pre-wrap; }
+        pre code { background: none; padding: 0; color: var(--text); }
+        details { margin: 8px 0; border: 1px solid var(--border); border-radius: 4px; }
+        summary { cursor: pointer; padding: 12px 16px; font-weight: 500; list-style: none; display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); }
+        summary::before { content: '▶'; font-size: 10px; color: var(--text-light); transition: transform 0.2s; }
+        details[open] summary::before { transform: rotate(90deg); }
+        summary::-webkit-details-marker { display: none; }
+        details > .content { padding: 16px; }
+        .toc { margin: 24px 0; }
+        .toc-item { display: block; padding: 6px 0; color: var(--text-secondary); text-decoration: none; font-size: 14px; border-radius: 3px; transition: background 0.1s; }
+        .toc-item:hover { color: var(--text); background: var(--bg-hover); padding-left: 8px; }
+        ul.bullet { list-style: none; margin: 8px 0; }
+        ul.bullet li { position: relative; padding-left: 24px; margin: 4px 0; }
+        ul.bullet li::before { content: '•'; position: absolute; left: 8px; color: var(--text-light); }
+        ol.numbered { list-style: none; counter-reset: item; margin: 8px 0; }
+        ol.numbered li { position: relative; padding-left: 32px; margin: 6px 0; counter-increment: item; }
+        ol.numbered li::before { content: counter(item) "."; position: absolute; left: 8px; color: var(--text-light); font-weight: 500; }
+        .columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 16px 0; }
+        .column { padding: 16px; background: var(--bg-secondary); border-radius: 4px; }
+        .column h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .diagram { background: var(--bg-secondary); border-radius: 4px; padding: 20px; margin: 16px 0; overflow-x: auto; }
+        .diagram pre { background: none; padding: 0; margin: 0; font-size: 11px; line-height: 1.3; }
+        .page-footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-light); font-size: 13px; text-align: center; }
+        .option-card { border: 1px solid var(--border); border-radius: 4px; padding: 16px; margin: 12px 0; }
+        .option-card h5 { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .option-card p { font-size: 14px; margin: 0; }
+        .decision-card { border-left: 4px solid var(--green); padding: 16px; margin: 16px 0; background: var(--green-bg); border-radius: 0 4px 4px 0; }
+        .decision-card.pending { border-left-color: var(--yellow); background: var(--yellow-bg); }
+        .example-box { background: var(--blue-bg); border-radius: 4px; padding: 16px; margin: 16px 0; }
+        .example-box h5 { font-size: 14px; font-weight: 600; color: var(--blue); margin-bottom: 8px; }
+        .tbd-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .tbd-number { background: var(--purple-bg); color: var(--purple); padding: 4px 10px; border-radius: 4px; font-weight: 600; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="page-icon">📋</div>
+            <h1 class="page-title">Guia de Decisões</h1>
+            <p class="page-description">Biohelp LRP — Explicação detalhada das decisões pendentes e já tomadas</p>
+            <p class="page-description" style="margin-top: 8px;"><strong>Última atualização:</strong> 04/02/2026</p>
+        </header>
+
+        <!-- Resumo -->
+        <section>
+            <h1>📊 Resumo Rápido</h1>
+            <table>
+                <thead>
+                    <tr><th>Status</th><th>Quantidade</th><th>Impacto</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag yellow">⏳ Pendentes</span></td>
+                        <td>8</td>
+                        <td>Bloqueiam funcionalidades</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag green">✅ Resolvidas</span></td>
+                        <td>14</td>
+                        <td>Já implementadas</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td><strong>22</strong></td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Índice -->
+        <section>
+            <h2>Índice</h2>
+            <nav class="toc">
+                <a class="toc-item" href="#pendentes">⏳ Decisões Pendentes</a>
+                <a class="toc-item" href="#tbd001">└─ TBD-001: Cadastro sem link</a>
+                <a class="toc-item" href="#tbd002">└─ TBD-002: Preço de membro Shopify</a>
+                <a class="toc-item" href="#tbd003">└─ TBD-003: Tags e metacampos</a>
+                <a class="toc-item" href="#tbd004">└─ TBD-004: URLs oficiais</a>
+                <a class="toc-item" href="#tbd005">└─ TBD-005: Resync Shopify</a>
+                <a class="toc-item" href="#tbd006">└─ TBD-006: Formato do ref_code</a>
+                <a class="toc-item" href="#tbd007">└─ TBD-007: Landing page</a>
+                <a class="toc-item" href="#tbd014">└─ TBD-014: Metafield CV</a>
+                <a class="toc-item" href="#resolvidas">✅ Decisões Já Tomadas</a>
+                <a class="toc-item" href="#como-decidir">📌 Como Tomar uma Decisão</a>
+            </nav>
+        </section>
+
+        <hr>
+
+        <!-- Decisões Pendentes -->
+        <section id="pendentes">
+            <h1>⏳ Decisões Pendentes</h1>
+            <div class="callout yellow">
+                <span class="callout-icon">⚠️</span>
+                <div class="callout-content">
+                    <strong>Estas decisões bloqueiam funcionalidades</strong>
+                    <p>Precisam ser tomadas pelo cliente antes da implementação.</p>
+                </div>
+            </div>
+
+            <!-- TBD-001 -->
+            <article id="tbd001">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-001</span>
+                    <h2 style="margin: 0;">Cadastro sem link de convite</h2>
+                </div>
+
+                <h4>O que é?</h4>
+                <p>Quando alguém tenta se cadastrar acessando diretamente <code>/join</code> (sem o parâmetro <code>?ref=CODIGO</code>), o sistema precisa saber o que fazer.</p>
+
+                <h4>Por que importa?</h4>
+                <ul class="bullet">
+                    <li>Define como a rede de indicações começa</li>
+                    <li>Evita membros "órfãos" (sem sponsor)</li>
+                    <li>Afeta o cálculo de comissões</li>
+                </ul>
+
+                <h4>Comportamento ATUAL</h4>
+                <pre><code>Usuário acessa: https://rlp-biohelp.vercel.app/join
+Resultado: ❌ "Cadastro indisponível sem convite"</code></pre>
+
+                <h4>Opções disponíveis</h4>
+
+                <div class="option-card">
+                    <h5><span class="tag blue">Opção A</span> House Account (Conta Raiz)</h5>
+                    <pre><code>Usuário acessa /join sem ref
+    │
+    ▼
+Sistema cadastra com sponsor = "House Account"
+    │
+    ▼
+Todas as compras desse membro geram comissão para a empresa</code></pre>
+                    <div class="example-box">
+                        <h5>💡 Exemplo prático</h5>
+                        <ul class="bullet">
+                            <li>Maria acessa o site direto (sem link)</li>
+                            <li>Maria é cadastrada com sponsor = "Biohelp House"</li>
+                            <li>Quando Maria compra, a comissão vai para a empresa</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="option-card">
+                    <h5><span class="tag blue">Opção B</span> Round-robin para Líderes</h5>
+                    <pre><code>Usuário acessa /join sem ref
+    │
+    ▼
+Sistema distribui para próxima líder disponível
+    │
+    ▼
+Líderes elegíveis recebem novos membros em rotação</code></pre>
+                    <div class="example-box">
+                        <h5>💡 Exemplo prático</h5>
+                        <ul class="bullet">
+                            <li>Temos 3 Líderes: Ana, Bia, Carla</li>
+                            <li>1º cadastro sem link → vai para Ana</li>
+                            <li>2º cadastro sem link → vai para Bia</li>
+                            <li>3º cadastro sem link → vai para Carla</li>
+                            <li>4º cadastro sem link → volta para Ana</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="option-card">
+                    <h5><span class="tag gray">Opção C</span> Sem sponsor (não recomendado)</h5>
+                    <p>Usuário é cadastrado sem ninguém acima. Rede começa nele próprio.</p>
+                    <div class="callout red" style="margin-top: 8px;">
+                        <span class="callout-icon">⚠️</span>
+                        <div class="callout-content"><strong>Problema:</strong> Gera exceções no sistema de comissões.</div>
+                    </div>
+                </div>
+
+                <div class="callout green">
+                    <span class="callout-icon">💡</span>
+                    <div class="callout-content">
+                        <strong>Recomendação:</strong> Opção A (House Account) é a mais comum no mercado.
+                    </div>
+                </div>
+            </article>
+
+            <hr>
+
+            <!-- TBD-002 -->
+            <article id="tbd002">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-002</span>
+                    <h2 style="margin: 0;">Como liberar preço de membro na Shopify</h2>
+                </div>
+
+                <h4>O que é?</h4>
+                <p>Define o mecanismo técnico para que membros LRP vejam preços especiais na loja Shopify.</p>
+
+                <h4>Por que importa?</h4>
+                <ul class="bullet">
+                    <li>É um benefício central do programa</li>
+                    <li>Afeta a experiência de compra</li>
+                    <li>Requer configuração na loja Shopify</li>
+                </ul>
+
+                <h4>Situação ATUAL</h4>
+                <pre><code>Membro cadastrado → Tag "lrp_member" aplicada no Customer Shopify</code></pre>
+
+                <h4>Opções disponíveis</h4>
+
+                <div class="option-card">
+                    <h5><span class="tag blue">Opção A</span> Tags + Shopify Flow/Script</h5>
+                    <pre><code>Customer tem tag "lrp_member"
+    │
+    ▼
+Shopify Flow detecta a tag
+    │
+    ▼
+Aplica desconto automático ou exibe preço diferente</code></pre>
+                    <p><strong>Configuração necessária:</strong> Criar Flow no Shopify Admin</p>
+                </div>
+
+                <div class="option-card">
+                    <h5><span class="tag blue">Opção B</span> Metafield + Tema customizado</h5>
+                    <pre><code>Customer tem metafield lrp.is_member = true
+    │
+    ▼
+Tema da loja lê o metafield
+    │
+    ▼
+Exibe preço de membro se metafield = true</code></pre>
+                    <p><strong>Configuração necessária:</strong> Modificar tema da loja</p>
+                </div>
+
+                <div class="option-card">
+                    <h5><span class="tag purple">Opção C</span> Price Lists (Shopify Plus)</h5>
+                    <pre><code>Criar lista de preços "Membros LRP"
+    │
+    ▼
+Associar customers com tag lrp_member
+    │
+    ▼
+Preços diferentes automaticamente</code></pre>
+                    <p><strong>Requisito:</strong> Plano Shopify Plus (mais caro)</p>
+                </div>
+
+                <div class="example-box">
+                    <h5>💡 Exemplo prático</h5>
+                    <pre><code>Produto: Creatina Premium
+├── Preço normal: R$ 199,00
+└── Preço membro LRP: R$ 159,00 (20% off)
+
+Maria (membro LRP) acessa a loja:
+├── Sistema detecta tag "lrp_member"
+└── Maria vê preço: R$ 159,00 ✅
+
+João (visitante comum) acessa a loja:
+├── Sem tag de membro
+└── João vê preço: R$ 199,00</code></pre>
+                </div>
+            </article>
+
+            <hr>
+
+            <!-- TBD-003 -->
+            <article id="tbd003">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-003</span>
+                    <h2 style="margin: 0;">Lista final de tags e metacampos</h2>
+                </div>
+
+                <h4>O que é?</h4>
+                <p>Padroniza quais tags e metacampos serão usados nos Customers do Shopify.</p>
+
+                <h4>Por que importa?</h4>
+                <ul class="bullet">
+                    <li>Facilita automações (Shopify Flow, relatórios)</li>
+                    <li>Evita inconsistências</li>
+                    <li>Documenta o padrão para manutenção futura</li>
+                </ul>
+
+                <h4>Tags ATUAIS (já implementadas)</h4>
+                <table>
+                    <thead><tr><th>Tag</th><th>Descrição</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>lrp_member</code></td><td>Identifica como membro do programa</td></tr>
+                        <tr><td><code>lrp_ref:J6QTY7hy</code></td><td>Código de referência do membro</td></tr>
+                        <tr><td><code>lrp_sponsor:ABC123</code></td><td>Código de quem indicou (ou "none")</td></tr>
+                        <tr><td><code>lrp_status:active</code></td><td>Status atual (pending/active/inactive)</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="example-box">
+                    <h5>💡 Exemplo no Shopify Admin</h5>
+                    <pre><code>Customer: Maria Silva
+Email: maria@email.com
+Tags: lrp_member, lrp_ref:J6QTY7hy, lrp_sponsor:ABC123, lrp_status:active</code></pre>
+                </div>
+
+                <div class="callout yellow">
+                    <span class="callout-icon">⏳</span>
+                    <div class="callout-content">
+                        <strong>Decisão pendente:</strong> Confirmar se essa lista está completa e definir se usar metacampos adicionais.
+                    </div>
+                </div>
+            </article>
+
+            <hr>
+
+            <!-- TBD-004 -->
+            <article id="tbd004">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-004</span>
+                    <h2 style="margin: 0;">URLs oficiais (staging e produção)</h2>
+                </div>
+
+                <h4>O que é?</h4>
+                <p>Define os domínios oficiais do sistema para diferentes ambientes.</p>
+
+                <h4>Por que importa?</h4>
+                <ul class="bullet">
+                    <li>Webhooks da Shopify precisam apontar para URL correta</li>
+                    <li>Links de convite precisam funcionar</li>
+                    <li>Redirects dependem disso</li>
+                </ul>
+
+                <h4>Situação ATUAL</h4>
+                <table>
+                    <thead><tr><th>Ambiente</th><th>URL</th></tr></thead>
+                    <tbody>
+                        <tr><td>App (staging)</td><td><code>https://rlp-biohelp.vercel.app</code></td></tr>
+                        <tr><td>Loja (dev)</td><td><code>https://biohelp-dev.myshopify.com</code> (senha: nowcli)</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Decisão pendente</h4>
+                <table>
+                    <thead><tr><th>Ambiente</th><th>URL</th></tr></thead>
+                    <tbody>
+                        <tr><td>App (produção)</td><td>❓ <em>A definir</em></td></tr>
+                        <tr><td>Loja (produção)</td><td>❓ <em>A definir</em></td></tr>
+                    </tbody>
+                </table>
+
+                <div class="example-box">
+                    <h5>💡 Impacto nos links de convite</h5>
+                    <pre><code>Link ATUAL:
+https://rlp-biohelp.vercel.app/join?ref=J6QTY7hy
+
+Link PRODUÇÃO (após decisão):
+https://[dominio-oficial]/join?ref=J6QTY7hy</code></pre>
+                </div>
+            </article>
+
+            <hr>
+
+            <!-- TBD-005 -->
+            <article id="tbd005">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-005</span>
+                    <h2 style="margin: 0;">O que "Resync Shopify" deve fazer</h2>
+                </div>
+
+                <h4>O que é?</h4>
+                <p>Define exatamente o que acontece quando o admin clica em "Resync Shopify" para um membro.</p>
+
+                <h4>Opções (marcar quais devem ser executadas)</h4>
+                <table>
+                    <thead><tr><th>Ação</th><th>Sempre</th><th>Só se divergente</th></tr></thead>
+                    <tbody>
+                        <tr><td>Reaplicar tags</td><td>⬜</td><td>⬜</td></tr>
+                        <tr><td>Reaplicar metacampos</td><td>⬜</td><td>⬜</td></tr>
+                        <tr><td>Recriar customer se não existir</td><td>⬜</td><td>⬜</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="example-box">
+                    <h5>💡 Exemplo prático</h5>
+                    <pre><code>Cenário: Maria foi cadastrada, mas Shopify falhou
+
+NO SUPABASE:
+├── members: Maria existe ✅
+└── shopify_customers: status = 'failed' ❌
+
+NO SHOPIFY:
+└── Customer Maria: NÃO EXISTE ❌
+
+Admin clica "Resync Shopify":
+├── Sistema cria customer no Shopify
+├── Aplica tags: lrp_member, lrp_ref:..., etc.
+└── Atualiza status para 'ok'
+
+DEPOIS DO RESYNC:
+├── Supabase: status = 'ok' ✅
+└── Shopify: Customer existe com tags ✅</code></pre>
+                </div>
+            </article>
+
+            <hr>
+
+            <!-- TBD-006 -->
+            <article id="tbd006">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-006</span>
+                    <h2 style="margin: 0;">Formato do código de referência (ref_code)</h2>
+                </div>
+
+                <h4>Situação ATUAL</h4>
+                <pre><code>Formato: UUID curto (8 caracteres)
+Exemplo: J6QTY7hy</code></pre>
+
+                <h4>Opções disponíveis</h4>
+                <table>
+                    <thead><tr><th>Opção</th><th>Exemplo</th><th>Prós</th><th>Contras</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag blue">A</span> UUID curto</td>
+                            <td><code>J6QTY7hy</code></td>
+                            <td>Único, aleatório</td>
+                            <td>Difícil de lembrar</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag blue">B</span> Nome + número</td>
+                            <td><code>maria-silva-1234</code></td>
+                            <td>Fácil de lembrar</td>
+                            <td>Pode revelar nome</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag blue">C</span> Sequencial</td>
+                            <td><code>BH00001</code></td>
+                            <td>Organizado</td>
+                            <td>Previsível</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag blue">D</span> Escolha do membro</td>
+                            <td><code>maria2024</code></td>
+                            <td>Personalizado</td>
+                            <td>Conflitos possíveis</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="example-box">
+                    <h5>💡 Exemplo de links</h5>
+                    <pre><code>Opção A: https://rlp-biohelp.vercel.app/join?ref=J6QTY7hy
+Opção B: https://rlp-biohelp.vercel.app/join?ref=maria-silva-1234
+Opção C: https://rlp-biohelp.vercel.app/join?ref=BH00001
+Opção D: https://rlp-biohelp.vercel.app/join?ref=maria2024</code></pre>
+                </div>
+            </article>
+
+            <hr>
+
+            <!-- TBD-007 -->
+            <article id="tbd007">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-007</span>
+                    <h2 style="margin: 0;">Comportamento da página inicial (/)</h2>
+                </div>
+
+                <h4>O que é?</h4>
+                <p>Define o que acontece quando alguém acessa a raiz do site.</p>
+
+                <h4>Opções</h4>
+
+                <div class="columns">
+                    <div class="column">
+                        <h4><span class="tag blue">Opção A</span></h4>
+                        <p><strong>Redirect para /join</strong></p>
+                        <p>Foco em novos cadastros</p>
+                    </div>
+                    <div class="column">
+                        <h4><span class="tag blue">Opção B</span></h4>
+                        <p><strong>Redirect para /login</strong></p>
+                        <p>Foco em membros existentes</p>
+                    </div>
+                    <div class="column">
+                        <h4><span class="tag blue">Opção C</span></h4>
+                        <p><strong>Landing page com opções</strong></p>
+                        <p>Botões para /join e /login</p>
+                    </div>
+                </div>
+            </article>
+
+            <hr>
+
+            <!-- TBD-014 -->
+            <article id="tbd014">
+                <div class="tbd-header">
+                    <span class="tbd-number">TBD-014</span>
+                    <h2 style="margin: 0;">Nome do metafield CV no Shopify</h2>
+                </div>
+
+                <h4>O que é?</h4>
+                <p>Define onde o sistema lê o valor de CV de cada produto.</p>
+
+                <div class="callout blue">
+                    <span class="callout-icon">ℹ️</span>
+                    <div class="callout-content">
+                        <strong>Importante:</strong> CV ≠ Preço do produto. Cada produto tem um CV específico configurado no Shopify.
+                    </div>
+                </div>
+
+                <h4>Situação ATUAL</h4>
+                <pre><code>Sistema tenta ler: custom.cv
+Se não encontrar: usa preço do item como fallback</code></pre>
+
+                <h4>Opções</h4>
+                <table>
+                    <thead><tr><th>Opção</th><th>Namespace.Key</th><th>Exemplo de valor</th></tr></thead>
+                    <tbody>
+                        <tr><td>A</td><td><code>custom.cv</code></td><td>77</td></tr>
+                        <tr><td>B</td><td><code>lrp.cv</code></td><td>77</td></tr>
+                        <tr><td>C</td><td><code>biohelp.cv_value</code></td><td>77</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="example-box">
+                    <h5>💡 Exemplo prático</h5>
+                    <pre><code>Produto: Lemon Dreams
+├── Preço: R$ 159,00
+├── Metafield custom.cv: 77
+└── CV creditado na compra: 77 pontos
+
+Produto: Creatina Premium
+├── Preço: R$ 199,00
+├── Metafield custom.cv: 100
+└── CV creditado na compra: 100 pontos</code></pre>
+                </div>
+            </article>
+        </section>
+
+        <hr>
+
+        <!-- Decisões Resolvidas -->
+        <section id="resolvidas">
+            <h1>✅ Decisões Já Tomadas</h1>
+            <div class="callout green">
+                <span class="callout-icon">✅</span>
+                <div class="callout-content">
+                    <strong>Estas decisões já foram aprovadas e implementadas no sistema.</strong>
+                </div>
+            </div>
+
+            <!-- TBD-008 -->
+            <details>
+                <summary><span class="tag green">TBD-008</span> Cálculo de CV por produto</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisão:</strong> CV é lido do metafield do produto, não do preço.
+                    </div>
+                    <div class="example-box">
+                        <h5>💡 Exemplo prático</h5>
+                        <pre><code>Pedido de Maria:
+├── 2x Lemon Dreams (R$159 cada, CV 77 cada)
+├── 1x Creatina Premium (R$199, CV 100)
+└── Total do pedido: R$517
+
+Cálculo de CV:
+├── Lemon Dreams: 77 × 2 = 154 CV
+├── Creatina: 100 × 1 = 100 CV
+└── CV TOTAL: 254 CV
+
+⚠️ Nota: CV (254) ≠ Valor (R$517)</code></pre>
+                    </div>
+                </div>
+            </details>
+
+            <!-- TBD-009 -->
+            <details>
+                <summary><span class="tag green">TBD-009</span> Comportamento de refund/cancelamento</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisão:</strong> Reverter CV completamente quando pedido é reembolsado ou cancelado.
+                    </div>
+                    <div class="example-box">
+                        <h5>💡 Exemplo prático</h5>
+                        <pre><code>ANTES DO REFUND:
+Maria tem 450 CV no mês
+
+REFUND de pedido (150 CV):
+├── Sistema cria entrada negativa no cv_ledger
+├── Tipo: 'order_refunded'
+└── Valor: -150 CV
+
+DEPOIS DO REFUND:
+Maria tem 300 CV no mês
+
+Se Maria tinha status "Ativa" (200+ CV):
+└── Continua ativa (300 >= 200) ✅</code></pre>
+                    </div>
+                </div>
+            </details>
+
+            <!-- TBD-011 -->
+            <details>
+                <summary><span class="tag green">TBD-011</span> Regras de progressão de nível</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisão:</strong> Níveis definidos conforme documento canônico.
+                    </div>
+                    <table>
+                        <thead><tr><th>Nível</th><th>Requisitos</th><th>Exemplo</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Membro</strong></td><td>Cadastrado no sistema</td><td>Maria acabou de se cadastrar</td></tr>
+                            <tr><td><strong>Parceira</strong></td><td>Membro Ativo + CV rede >= 500</td><td>Maria tem 200 CV + rede soma 500</td></tr>
+                            <tr><td><strong>Líder em Formação</strong></td><td>Parceira + 1ª Parceira em N1</td><td>Maria trouxe Ana, que virou Parceira</td></tr>
+                            <tr><td><strong>Líder</strong></td><td>Parceira Ativa + 4 Parceiras em N1</td><td>Maria tem 4 Parceiras diretas ativas</td></tr>
+                            <tr><td><strong>Diretora</strong></td><td>3 Líderes em N1 + 80.000 CV rede</td><td>Maria tem 3 Líderes + rede soma 80k CV</td></tr>
+                            <tr><td><strong>Head</strong></td><td>3 Diretoras em N1 + 200.000 CV rede</td><td>Maria tem 3 Diretoras + rede soma 200k CV</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <!-- TBD-022 -->
+            <details>
+                <summary><span class="tag green">TBD-022</span> Comissão Perpétua diferenciada</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisão:</strong> Percentual de comissão depende do nível do sponsor E do tipo de quem comprou.
+                    </div>
+                    <table>
+                        <thead><tr><th>Você é</th><th>Quem comprou</th><th>Você recebe</th></tr></thead>
+                        <tbody>
+                            <tr><td>Parceira</td><td>Cliente (membro comum)</td><td>5%</td></tr>
+                            <tr><td>Parceira</td><td>Outra Parceira</td><td><span class="tag red">0%</span> (não recebe!)</td></tr>
+                            <tr><td>Líder</td><td>Cliente</td><td>5%</td></tr>
+                            <tr><td>Líder</td><td>Parceira</td><td>7%</td></tr>
+                            <tr><td>Diretora</td><td>Cliente</td><td>5%</td></tr>
+                            <tr><td>Diretora</td><td>Parceira</td><td>7%</td></tr>
+                            <tr><td>Diretora</td><td>Líder</td><td>10%</td></tr>
+                            <tr><td>Head</td><td>Cliente</td><td>5%</td></tr>
+                            <tr><td>Head</td><td>Parceira</td><td>7%</td></tr>
+                            <tr><td>Head</td><td>Líder</td><td>10%</td></tr>
+                            <tr><td>Head</td><td>Outros</td><td>15%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <!-- TBD-021 -->
+            <details>
+                <summary><span class="tag green">TBD-021</span> Net-15 (Período de trava)</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisão:</strong> Comissões ficam disponíveis 15 dias após virada do mês.
+                    </div>
+                    <div class="example-box">
+                        <h5>💡 Linha do tempo</h5>
+                        <pre><code>JANEIRO:
+├── Dia 10: Maria ganha R$ 100 de comissão
+├── Dia 25: Maria ganha R$ 50 de comissão
+└── Total de janeiro: R$ 150
+
+FEVEREIRO:
+├── Dia 1-14: Comissões de janeiro ainda "em análise"
+├── Dia 15: Comissões de janeiro ficam DISPONÍVEIS
+└── Maria pode sacar os R$ 150
+
+LINHA DO TEMPO:
+10/Jan     25/Jan     01/Fev     15/Fev
+  │          │          │          │
+  ▼          ▼          ▼          ▼
++R$100    +R$50     Virada     LIBERADO!
+                   do mês     R$150 disponível</code></pre>
+                    </div>
+                </div>
+            </details>
+
+            <!-- TBD-015/016 -->
+            <details>
+                <summary><span class="tag green">TBD-015/016</span> Limites de saque</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisões:</strong>
+                        <ul class="bullet">
+                            <li>Mínimo por saque: <strong>R$ 100,00</strong></li>
+                            <li>Limite PF mensal: <strong>R$ 1.000,00</strong></li>
+                        </ul>
+                    </div>
+                    <div class="example-box">
+                        <h5>💡 Exemplo prático</h5>
+                        <pre><code>Maria (PF) tem saldo de R$ 2.500 disponível
+
+SAQUE 1 (válido):
+├── Solicita: R$ 500
+├── Sistema: ✅ Aprovado
+└── Limite restante no mês: R$ 500
+
+SAQUE 2 (válido):
+├── Solicita: R$ 400
+├── Sistema: ✅ Aprovado
+└── Limite restante no mês: R$ 100
+
+SAQUE 3 (bloqueado):
+├── Solicita: R$ 200
+├── Sistema: ❌ Excede limite mensal (restam R$ 100)
+└── Opção: Aguardar próximo mês ou virar PJ</code></pre>
+                    </div>
+                </div>
+            </details>
+
+            <!-- TBD-018 -->
+            <details>
+                <summary><span class="tag green">TBD-018</span> Integração Asaas</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisão:</strong> Usar Asaas para processar pagamentos de saque.
+                    </div>
+                    <pre><code>1. Parceira solicita saque no sistema
+    │
+    ▼
+2. Admin aprova a solicitação
+    │
+    ▼
+3. Sistema envia para Asaas:
+   ├── Dados da conta (PIX ou banco)
+   ├── Valor do saque
+   └── Identificação do membro
+    │
+    ▼
+4. Asaas processa o pagamento:
+   ├── PIX: imediato
+   └── TED: até D+1
+    │
+    ▼
+5. Asaas notifica via webhook:
+   ├── Pagamento confirmado
+   └── Sistema atualiza status para "pago"</code></pre>
+                    <div class="callout yellow" style="margin-top: 16px;">
+                        <span class="callout-icon">⚠️</span>
+                        <div class="callout-content">
+                            <strong>Status atual:</strong> Aguardando credenciais Asaas para implementar a integração.
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- TBD-019 -->
+            <details>
+                <summary><span class="tag green">TBD-019</span> Creatina mensal grátis</summary>
+                <div class="content">
+                    <div class="decision-card">
+                        <strong>Decisão:</strong> Desconto de 100% aplicado no pedido real (1 unidade/mês).
+                    </div>
+                    <pre><code>1. Membro atinge 200 CV no mês
+    │
+    ▼
+2. Dashboard mostra: "🎁 Creatina Grátis Disponível"
+    │
+    ▼
+3. Membro vai à loja e adiciona creatina ao carrinho
+    │
+    ▼
+4. No checkout, desconto de 100% é aplicado automaticamente
+    │
+    ▼
+5. Sistema registra uso em free_creatine_claims
+    │
+    ▼
+6. Dashboard mostra: "✅ Já utilizado este mês"</code></pre>
+                    <h4 style="margin-top: 16px;">Estados do card no dashboard</h4>
+                    <table>
+                        <thead><tr><th>CV do mês</th><th>Já usou?</th><th>Estado do card</th></tr></thead>
+                        <tbody>
+                            <tr><td>< 200</td><td>-</td><td>⚪ "Indisponível - atinja 200 CV"</td></tr>
+                            <tr><td>>= 200</td><td>Não</td><td>🟢 "Disponível - resgate sua creatina!"</td></tr>
+                            <tr><td>>= 200</td><td>Sim</td><td>🟡 "Já utilizado este mês"</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="callout yellow" style="margin-top: 16px;">
+                        <span class="callout-icon">⚠️</span>
+                        <div class="callout-content">
+                            <strong>Status atual:</strong> Backend pronto. Falta configurar Shopify Discount para aplicar o desconto automático.
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <hr>
+
+        <!-- Como decidir -->
+        <section id="como-decidir">
+            <h1>📌 Como Tomar uma Decisão Pendente</h1>
+            <ol class="numbered">
+                <li><strong>Revise as opções</strong> disponíveis neste documento</li>
+                <li><strong>Escolha a opção</strong> que faz mais sentido para o negócio</li>
+                <li><strong>Comunique a decisão</strong> por escrito (email, chat, documento)</li>
+                <li><strong>Aguarde implementação</strong> pela equipe técnica</li>
+                <li><strong>Valide em ambiente de teste</strong> antes de ir para produção</li>
+            </ol>
+
+            <hr>
+
+            <h2>📞 Contato</h2>
+            <div class="columns">
+                <div class="column">
+                    <h4>Dúvidas sobre decisões técnicas?</h4>
+                    <p>Consulte a equipe de desenvolvimento.</p>
+                </div>
+                <div class="column">
+                    <h4>Dúvidas sobre regras de negócio?</h4>
+                    <p>Consulte a documentação em <code>docs/SPEC_Biohelp_LRP.md</code></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="page-footer">
+            <p>Biohelp LRP — Guia de Decisões</p>
+            <p>Documento gerado em: 04/02/2026 | Baseado em: <code>docs/DECISOES_TBD.md</code></p>
+        </footer>
+    </div>
+</body>
+</html>

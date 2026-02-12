@@ -1,7 +1,7 @@
 # DECISÕES TBD — Biohelp LRP
 **Objetivo:** registrar decisões obrigatórias (pendentes) que afetam regra de negócio, escopo, banco e integração.  
 **Regra:** nada marcado como **TBD** deve ser implementado sem aprovação formal do cliente (assinatura/ok por escrito).  
-**Última atualização:** 23/01/2026
+**Última atualização:** 11/02/2026
 
 ---
 
@@ -18,15 +18,15 @@
 ### Por Status
 | Status | Quantidade |
 |--------|------------|
-| ⏳ Pendente | 8 |
-| ✅ Resolvido | 14 |
+| ⏳ Pendente | 1 |
+| ✅ Resolvido | 21 |
 | **Total** | **22** |
 
 ### Por Sprint
 | Sprint | Pendentes | Resolvidos |
 |--------|-----------|------------|
-| Sprint 1 | 7 | 0 |
-| Sprint 2 | 1 | 3 |
+| Sprint 1 | 1 | 6 |
+| Sprint 2 | 0 | 4 |
 | Sprint 3 | 0 | 4 |
 | Sprint 4 | 0 | 2 |
 | Sprint 5 | 0 | 4 |
@@ -35,63 +35,6 @@
 ---
 
 ## TBD — Pendentes (Sprint 1)
-
-### TBD-001 — Regra de cadastro **sem link** (sem `ref`)
-**Por que importa:** define como a rede começa e evita casos "órfãos".  
-**FR bloqueado:** FR-06  
-**Fonte:** `Biohelp_LRP_Escopo_Projeto_v1.md` (TBD-01)
-
-**Opções (escolher 1):**
-- **A)** Sponsor = *House Account* (usuário raiz do sistema)
-- **B)** Distribuição para lista de líderes elegíveis (round-robin/critério)
-- **C)** Sem sponsor (rede começa nele) *(não recomendado se gerar exceções)*
-
-**Comportamento atual:** Bloqueia cadastro com mensagem "cadastro indisponível sem convite"
-
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
-
----
-
-### TBD-002 — Como o **preço de membro** é liberado na Shopify
-**Por que importa:** define como o cliente "vê preço de membro".  
-**FR relacionado:** FR-08
-
-**Opções comuns:**
-- Tags no customer + Shopify Flow/Script/Logic na loja
-- Metaobject/metafield no customer e tema faz a regra
-- Segmentação de customer + price list (depende de plano/recursos)
-
-**Decisão escolhida (descrever mecanismo):** ________  
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
-
----
-
-### TBD-003 — Lista final de **tags** e **metacampos**
-**Por que importa:** padroniza auditoria e automações.  
-**Fonte:** `Biohelp_LRP_Escopo_Projeto_v1.md` (premissa 4.3)
-
-**Tags propostas (base):**
-- `lrp_member`
-- `lrp_ref:<ref_code>`
-- `lrp_sponsor:<sponsor_ref_code|none>`
-- `lrp_status:pending|active|inactive`
-
-**Metacampos propostos (opcional):**
-- `lrp.ref_code`
-- `lrp.sponsor_ref_code`
-- `lrp.status`
-
-**Decisão final (lista fechada):** ________  
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
-
----
 
 ### TBD-004 — Domínios e URLs oficiais (staging/prod)
 **Por que importa:** redirects e webhooks dependem disso.
@@ -106,77 +49,139 @@
 
 ---
 
-### TBD-005 — "Resync Shopify" (o que exatamente reaplicar?)
-**Por que importa:** evita divergência entre Supabase e Shopify.
-
-**Decisão (marcar):**
-- ⬜ Reaplicar tags sempre
-- ⬜ Reaplicar metacampos sempre
-- ⬜ Recriar customer se não existir
-- ⬜ Somente atualizar se divergente
-
-**Responsável:** ________  
-**Data:** ________
-
----
-
-### TBD-006 — Formato do `ref_code` (geração)
-**Por que importa:** define usabilidade do link de convite e unicidade.  
-**Origem:** SPEC 3.2 diz que é único e imutável, mas não define formato.
-
-**Opções:**
-- **A)** UUID curto (ex.: `abc123xy`) ← Implementação atual
-- **B)** Slug baseado no nome (ex.: `maria-silva-1234`)
-- **C)** Código alfanumérico sequencial (ex.: `BH00001`)
-- **D)** Permitir que o membro escolha (com validação de unicidade)
-
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
-
----
-
-### TBD-007 — Comportamento da landing page (`/`)
-**Por que importa:** define primeira impressão do usuário.  
-**Origem:** SPEC 6.1 diz "landing simples ou redirect" — não está claro qual.
-
-**Opções:**
-- **A)** Redirect direto para `/join`
-- **B)** Redirect direto para `/login`
-- **C)** Landing page simples com CTAs para `/join` e `/login`
-
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  
-**Responsável:** ________  
-**Data:** ________  
-**Evidência:** ________
-
----
-
-## TBD — Pendentes (Sprint 2)
-
-### TBD-014 — Nome exato do metafield CV no Shopify
-**Por que importa:** Define onde ler o CV de cada produto.  
-**Origem:** Documento canônico menciona "metacampo CV" mas não especifica namespace/key.  
-**Fonte:** `Biohelp_LRP_Escopo_Projeto_v1.md` (TBD-05)
-
-**Opções:**
-- **A)** `custom.cv`
-- **B)** `lrp.cv`
-- **C)** `biohelp.cv_value`
-- **D)** Outro: ________
-
-**Implementação atual:** Tenta `custom.cv`, fallback para preço do item
-
-**Decisão escolhida:** ⬜ A  ⬜ B  ⬜ C  ⬜ D  
-**Responsável:** ________  
-**Data:** ________
-
----
-
----
-
 ## Decididos (histórico)
+
+### TBD-002 — Como o **preço de membro** é liberado na Shopify ✅
+**Decisão:** ✅ **Configuração feita pelo próprio cliente dentro da loja Shopify**  
+O cliente informou que a configuração de preço de membro (regras de preço, segmentação, scripts) será gerenciada diretamente por eles no Shopify Admin. O sistema LRP apenas garante que o Customer tenha as tags corretas (`lrp_member`, `nivel:<nivel>`, etc.) para que a loja aplique as regras de preço.  
+**FR relacionado:** FR-08  
+**Responsável:** Cliente  
+**Data:** 11/02/2026  
+**Evidência:** Comunicação direta com o cliente
+
+---
+
+### TBD-005 — "Resync Shopify" (o que exatamente reaplicar?) ✅
+**Decisão:** ✅ **Somente atualizar se divergente**  
+O resync compara os dados do Supabase com o estado no Shopify e só atualiza se houver divergência (tags diferentes, customer inexistente, etc.).  
+**Responsável:** Cliente  
+**Data:** 11/02/2026  
+**Evidência:** Comunicação direta com o cliente
+
+---
+
+### TBD-001 — Regra de cadastro **sem link** (sem `ref`) ✅
+**Decisão:** ✅ **Opção A — House Account**  
+**Regra:** Cadastro sem link → sponsor = conta da empresa (House Account) → comissão vai para a Biohelp.  
+**FR desbloqueado:** FR-06  
+**Fonte:** `Biohelp_LRP_Escopo_Projeto_v1.md` (TBD-01)  
+**Responsável:** Cliente  
+**Data:** 11/02/2026  
+**Evidência:** Ata de reunião de alinhamento
+
+**Implementação necessária:**
+- Criar membro "House Account" no sistema (conta raiz da empresa)
+- Alterar fluxo de cadastro: se `ref` ausente ou inválido → `sponsor_id = house_account.id`
+- Comissões de membros sem link vão para a House Account (empresa)
+- Remover bloqueio atual "cadastro indisponível sem convite"
+
+---
+
+### TBD-003 — Lista final de **tags** e **metacampos** ✅
+**Decisão:** ✅ Manter tags atuais + adicionar nova tag obrigatória de nível  
+**Fonte:** `Biohelp_LRP_Escopo_Projeto_v1.md` (premissa 4.3)  
+**Responsável:** Cliente  
+**Data:** 11/02/2026  
+**Evidência:** Ata de reunião de alinhamento
+
+**Tags finais (lista fechada):**
+- `lrp_member` — identifica como membro do programa
+- `lrp_ref:<ref_code>` — código de referência do membro
+- `lrp_sponsor:<sponsor_ref_code|none>` — código de quem indicou
+- `lrp_status:pending|active|inactive` — status atual
+- `nivel:<nivel>` — **NOVA** — nível do membro (parceiro/diretor/head/etc.)
+
+**Exemplos de tag de nível:**
+- `nivel:membro`
+- `nivel:parceiro`
+- `nivel:lider`
+- `nivel:diretor`
+- `nivel:head`
+
+**Impacto:**
+- Regras de comissão podem referenciar tag de nível
+- Hierarquia visível na Shopify
+- Relatórios podem filtrar por nível via tags
+- Sync Shopify deve aplicar/atualizar tag de nível quando nível muda
+
+**Metacampos:** Mantidos como opcionais (podem ser adicionados conforme necessidade)
+
+---
+
+### TBD-006 — Formato do `ref_code` (geração) ✅
+**Decisão:** ✅ **Padrão sequencial + customização pelo admin**  
+**Origem:** SPEC 3.2 diz que é único e imutável, mas não definia formato.  
+**Responsável:** Cliente  
+**Data:** 11/02/2026  
+**Evidência:** Ata de reunião de alinhamento
+
+**Formato padrão:** Código alfanumérico sequencial  
+- Prefixo: `BH` + número sequencial de 5 dígitos
+- Exemplo: `BH00001`, `BH00002`, `BH00003`
+
+**Override pelo admin:**
+- Admin pode customizar manualmente o ref_code de qualquer membro
+- Exemplo customizado: `MARIA2026`, `JOANA2025`
+- Validação de unicidade obrigatória (rejeita duplicatas)
+- Após customização, o código permanece imutável
+
+**Implementação necessária:**
+- Alterar geração de `ref_code` para formato sequencial (`BH00001`)
+- Criar sequência no banco (`ref_code_seq`)
+- Adicionar endpoint admin para customizar `ref_code`
+- Validar unicidade antes de salvar
+- Membros existentes: manter códigos atuais (UUID) ou migrar (a definir)
+
+---
+
+### TBD-007 — Comportamento da landing page (`/`) ✅
+**Decisão:** ✅ **Opção B — Redirect direto para `/login`** (manter como está)  
+**Origem:** SPEC 6.1  
+**Responsável:** Cliente  
+**Data:** 11/02/2026  
+**Evidência:** Ata de reunião de alinhamento
+
+**Comportamento:**
+- `GET /` → redirect 302 para `/login`
+- Foco em membros existentes
+- Novos cadastros acessam via link de convite (`/join?ref=...`)
+
+**Implementação:** ✅ Já implementado (sem alterações necessárias)
+
+---
+
+### TBD-014 — Nome exato do metafield CV no Shopify ✅
+**Decisão:** ✅ Manter leitura via metafield `custom.cv` | ❌ Remover fallback para preço | ✅ Se não encontrar CV → usar ZERO  
+**Origem:** Documento canônico  
+**Fonte:** `Biohelp_LRP_Escopo_Projeto_v1.md` (TBD-05)  
+**Responsável:** Cliente  
+**Data:** 11/02/2026  
+**Evidência:** Ata de reunião de alinhamento
+
+**Regra final:**
+- Ler metafield `custom.cv` do produto
+- Se metafield não existir → **CV = 0** (zero)
+- ❌ **Removido:** fallback para preço do item
+- Logar warning `missing_cv_metafield` quando CV for zero por ausência de metafield
+
+**Motivo:** Evita distorção de comissão. Se o produto não tem CV configurado, não deve gerar comissão.
+
+**Implementação necessária:**
+- Alterar `lib/cv/calculator.ts` — remover fallback para preço
+- Se `custom.cv` não existir: `cv_value = 0`
+- Manter log warning para produtos sem metafield configurado
+
+---
 
 ### TBD-008 — Regra de cálculo de CV por produto ✅
 **Decisão:** CV do pedido = soma do CV dos itens (metacampo por produto).  
@@ -185,7 +190,7 @@
 **Implementação:** 
 - Ler metafield/metacampo do produto (ex.: `custom.cv` ou `lrp.cv`)
 - `lib/cv/calculator.ts` - Função `calculateCVForItem()` prioriza metafield
-**Fallback:** Se não houver metacampo, usar preço do item como fallback e logar warning "missing_cv_metafield"  
+**Fallback (ATUALIZADO 11/02/2026):** ~~Se não houver metacampo, usar preço do item como fallback~~ → **CV = 0** se metafield não existir. Logar warning `missing_cv_metafield`.  
 **Observação:** CV ≠ preço do produto. Ex: Lemon Dreams (R$159) → CV 77
 
 ---
@@ -399,28 +404,43 @@
 
 ---
 
-### TBD-019 — Creatina mensal grátis ✅
+### TBD-019 — Creatina mensal grátis ✅ (Atualizado 11/02/2026)
 **Por que importa:** Documento canônico diz "Todo Membro Ativo (200 CV) recebe creatina mensal grátis".  
 **Origem:** Linha 153 do documento canônico.
 
-**Decisão escolhida:** ✅ **A) Desconto 100% no pedido real**  
+**Decisão original (20/01/2026):** Desconto 100% no pedido real  
+**Decisão atualizada (11/02/2026):** ✅ **Cupom Individual Mensal**  
 **Responsável:** Cliente  
-**Data:** 20/01/2026  
-**Evidência:** Aprovação via chat
+**Data:** 11/02/2026  
+**Evidência:** Ata de reunião de alinhamento
 
 **Regra detalhada:**
 - Membro Ativo (CV >= 200 no mês) tem direito a **1 unidade de creatina grátis por mês**
-- O cliente deve adicionar o produto ao carrinho em um **pedido real**
-- O desconto de 100% é aplicado automaticamente (limite: 1 unidade/mês)
+- Sistema gera **código de cupom exclusivo** para cada membro ativo
+- Cupom válido apenas naquele mês
 - Se o membro não usar no mês, **não acumula** para o próximo
 
-**Implementação proposta:**
-- Criar tabela `free_creatine_claims` para controlar uso mensal
-- Webhook de pedido verifica se membro é ativo e se já usou no mês
-- Aplicar desconto via Shopify Discount Functions ou Script (a definir com loja)
-- Alternativa: Cupom único gerado mensalmente para cada membro ativo
+**Formato do cupom:**
+- Padrão: `CREATINA-<NOME>-<MÊSANO>`
+- Exemplo: `CREATINA-MARIA-FEV2026`
 
-**Observação:** Requer configuração no Shopify (Discount Functions ou Script) para aplicar desconto automático no checkout.
+**Motivo da mudança:**
+- ✔️ Mais simples de implementar
+- ✔️ Mais barato (não exige Shopify Functions)
+- ✔️ Não depende de validação manual
+- ✔️ Cupom criado via Shopify Admin API (Discount Code)
+
+**Implementação necessária:**
+- Manter tabela `free_creatine_claims` para controlar uso mensal
+- Gerar cupom via Shopify Admin API (Discount Code) — 100% OFF, 1 uso, validade mensal
+- Job mensal (ou sob demanda) gera cupons para membros ativos
+- API `GET /api/members/me/free-creatine` retorna código do cupom do mês
+- Card no dashboard exibe cupom gerado para o membro usar na loja
+- Webhook de pedido com cupom registra claim em `free_creatine_claims`
+
+**Descartadas:**
+- ❌ Shopify Functions (mais complexo, mais caro)
+- ❌ Validação manual (mais trabalhoso para admin)
 
 ---
 
@@ -471,12 +491,12 @@
 
 | TBD Escopo | TBD SDD | Tema | Status |
 |------------|---------|------|--------|
-| TBD-01 | TBD-001 | Cadastro sem link | ⏳ Pendente |
+| TBD-01 | TBD-001 | Cadastro sem link | ✅ House Account |
 | TBD-02 | TBD-015 | Limite saque CPF | ✅ R$1.000/mês |
 | TBD-03 | TBD-021 | Trava/saldo em análise | ✅ Net-15 |
 | TBD-04 | TBD-018 | Fintech | ✅ Asaas |
-| TBD-05 | TBD-014 | Metafield CV | ⏳ Pendente |
-| — | TBD-019 | Creatina grátis | ✅ Desconto 100% no pedido |
+| TBD-05 | TBD-014 | Metafield CV | ✅ custom.cv (CV=0 se ausente) |
+| — | TBD-019 | Creatina grátis | ✅ Cupom Individual Mensal |
 
 ---
 

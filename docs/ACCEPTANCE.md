@@ -23,18 +23,18 @@ Este documento reúne **checklists de validação** por sprint, **mapeamento de 
 | FR-03 | Controle de permissões (RBAC) | 1 | ✅ | CA-01 |
 | FR-04 | Cadastro de novo membro | 1 | ✅ | CA-02 |
 | FR-05 | Captura de link de indicação | 1 | ✅ | CA-02 |
-| FR-06 | Regra para cadastro sem link | 1 | ❌ | CA-02 (TBD-001) |
+| FR-06 | Regra para cadastro sem link | 1 | ✅ | CA-02 (TBD-001 ✅ House Account — implementado 11/02/2026) |
 | FR-07 | Geração de link único | 1 | ✅ | CA-02 |
 | FR-08 | Ativação de preço de membro | 1 | ✅ | CA-02 |
 | FR-09 | Persistência da rede | 1 | ✅ | CA-03 |
 | FR-10 | Visualização da rede (membro) | 3 | ✅ | CA-03 |
 | FR-11 | Visualização da rede (admin) | 3 | ✅ | CA-03 |
-| FR-12 | Regra de saída após 6 meses | 6 | ⏳ | CA-03 |
+| FR-12 | Regra de saída após 6 meses | 6 | ✅ | CA-03 |
 | FR-13 | Webhooks de pedidos | 2 | ✅ | CA-04 |
 | FR-14 | Cálculo de CV por pedido | 2 | ✅ | CA-04 |
 | FR-15 | Status Ativo/Inativo mensal | 2 | ✅ | CA-04 |
 | FR-16 | Reset mensal | 2 | ✅ | CA-04 |
-| FR-17 | Separação de CV (próprio vs rede) | 3 | ⚠️ | CA-04 |
+| FR-17 | Separação de CV (próprio vs rede) | 7 | ✅ | CA-04 |
 | FR-18 | Recalcular nível automaticamente | 3 | ✅ | CA-05 |
 | FR-19 | Status 'Líder em Formação' | 3 | ✅ | CA-05 |
 | FR-20 | Rebaixamento automático | 3 | ✅ | CA-05 |
@@ -45,17 +45,17 @@ Este documento reúne **checklists de validação** por sprint, **mapeamento de 
 | FR-25 | Leadership Bônus | 4 | ✅ | CA-06 |
 | FR-26 | Royalty | 4 | ✅ | CA-06 |
 | FR-27 | Detalhamento por tipo de comissão | 4 | ✅ | CA-06 |
-| FR-28 | Saldo em análise (trava) | 5 | ⚠️ | CA-07 (TBD-021 pendente) |
+| FR-28 | Saldo em análise (trava) | 5 | ✅ | CA-07 (TBD-021 ✅ Net-15) |
 | FR-29 | Solicitação de saque | 5 | ✅ | CA-07 |
 | FR-30 | Upload e validação de NF-e | 5 | ✅ | CA-07 |
 | FR-31 | Emissão de RPA (CPF) | 5 | ✅ | CA-07 |
 | FR-32 | Workflow de aprovação | 5 | ✅ | CA-07 |
-| FR-33 | Integração de pagamento | 5 | ⏳ | CA-07 (TBD-018 pendente) |
-| FR-34 | Gestão de admins | 6 | ⏳ | CA-08 |
-| FR-35 | Dashboard global | 6 | ⚠️ | CA-08 |
-| FR-36 | Filtros por modo de comissionamento | 6 | ⏳ | CA-08 |
-| FR-37 | Gestão de membro | 6 | ⚠️ | CA-08 |
-| FR-38 | Gestão de tags | 6 | ⏳ | CA-08 |
+| FR-33 | Integração de pagamento | 5 | ⚠️ | CA-07 (Asaas definido, aguarda credenciais) |
+| FR-34 | Gestão de admins | 6 | ⚠️ | CA-08 (CRUD básico, sem multi-admin) |
+| FR-35 | Dashboard global | 6 | ✅ | CA-08 |
+| FR-36 | Filtros por modo de comissionamento | 6 | ✅ | CA-08 |
+| FR-37 | Gestão de membro | 6 | ✅ | CA-08 |
+| FR-38 | Gestão de tags | 6 | ✅ | CA-08 |
 
 ---
 
@@ -77,11 +77,15 @@ Este documento reúne **checklists de validação** por sprint, **mapeamento de 
 - [ ] Link do membro funciona e atribui corretamente a hierarquia (parent/child)
 - [ ] Acesso a preço de membro funciona para o e-mail cadastrado
 - [ ] `ref_code` é único e imutável
+- [ ] `ref_code` no formato sequencial `BH00001` (TBD-006 ✅)
+- [ ] Admin pode customizar `ref_code` com validação de unicidade (TBD-006 ✅)
 - [ ] Captura de UTMs (quando existirem) e registro em `referral_events`
 - [ ] Customer Shopify criado/atualizado por e-mail
-- [ ] Tags aplicadas corretamente no customer
+- [ ] Tags aplicadas corretamente no customer (incluindo `nivel:<nivel>` — TBD-003 ✅)
 - [ ] Dashboard mostra: nome, e-mail, sponsor (ou "none"), `ref_code`, link de convite
 - [ ] CTA para "Ir para a Loja" (redirect definido)
+- [ ] Cadastro sem link → sponsor = House Account (TBD-001 ✅)
+- [ ] House Account existe como conta raiz no sistema (TBD-001 ✅)
 
 ### CA-03 — Rede (Árvore) e Visualização
 **FRs:** FR-09, FR-10, FR-11, FR-12
@@ -98,7 +102,7 @@ Este documento reúne **checklists de validação** por sprint, **mapeamento de 
 - [ ] Cada pedido é processado uma única vez (idempotência por shopify_order_id)
 - [ ] Mudanças de status (Ativo/Inativo) refletem no LRP e na Shopify
 - [ ] Reset mensal roda com log e pode ser reexecutado de forma segura (sem duplicar)
-- [ ] CV calculado corretamente via metacampo (ou fallback para preço)
+- [ ] CV calculado corretamente via metafield `custom.cv` (se ausente → CV = 0, sem fallback para preço)
 - [ ] CV próprio separado de CV da rede no painel (FR-17)
 
 ### CA-05 — Cálculo de Níveis
@@ -147,7 +151,7 @@ Este documento reúne **checklists de validação** por sprint, **mapeamento de 
 
 **Objetivo:** permitir cadastro → virar membro → convidar → comprar como membro.
 
-**FRs cobertos:** FR-01, FR-02, FR-03, FR-04, FR-05, FR-06 (parcial), FR-07, FR-08, FR-09
+**FRs cobertos:** FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09
 
 ### Checklist (Aceite)
 - [x] Cadastro com link (`/join?ref=...`) cria membro com `sponsor_id` correto
@@ -182,6 +186,7 @@ Para um cadastro bem-sucedido (membro novo):
    - `lrp_ref:<ref_code_do_membro>`
    - `lrp_sponsor:<ref_code_do_sponsor|none>`
    - `lrp_status:pending` *(no Sprint 1)*
+   - `nivel:<nivel>` (ex.: `nivel:membro`) — TBD-003 ✅
 3) (Se metacampos forem usados) os metacampos aparecem com valores coerentes
 
 ### Cenário T-SH-01 — Cadastro com link cria/atualiza customer e tags
@@ -256,7 +261,7 @@ Para um cadastro bem-sucedido (membro novo):
    - Registros em `order_items` com cv_value de cada item
    - Entradas no `cv_ledger` com cv_type 'order_paid'
 
-✅ Passa se: CV calculado corretamente via metacampo (ou fallback para preço) e registrado no ledger.
+✅ Passa se: CV calculado corretamente via metacampo `custom.cv` (se ausente → CV=0, sem fallback) e registrado no ledger.
 
 #### Cenário T-CV-02 — Refund reverte CV
 1) Reembolse um pedido no Shopify
@@ -300,7 +305,7 @@ Para um cadastro bem-sucedido (membro novo):
 - [x] Níveis calculados conforme regra do documento canônico
 - [x] Checklist do próximo nível exibido
 - [x] Privacidade de telefone (phone_visibility) implementada
-- [ ] CV próprio separado de CV da rede (FR-17) — ⚠️ Parcial
+- [x] CV próprio separado de CV da rede (FR-17) — ✅ Implementado Sprint 7
 
 ### Regras de Níveis (canônico: Biohelp___Loyalty_Reward_Program.md)
 
@@ -355,13 +360,18 @@ Para um cadastro bem-sucedido (membro novo):
 
 ### Regras de Comissionamento (canônico: Biohelp___Loyalty_Reward_Program.md)
 
-**Creatina Mensal Grátis (TBD-019 ✅ RESOLVIDO):**
+**Creatina Mensal Grátis (TBD-019 ✅ RESOLVIDO — Atualizado 11/02/2026):**
 - [x] Membro Ativo (200 CV) tem direito a 1 creatina grátis/mês
-- [x] Mecanismo: Desconto 100% no pedido real
+- [x] Mecanismo: ~~Desconto 100% no pedido real~~ → **Cupom Individual Mensal**
 - [x] Tabela `free_creatine_claims` controla uso mensal
 - [x] API `/api/members/me/free-creatine` (GET/POST)
 - [x] Card no dashboard mostra elegibilidade
-- [ ] Configurar Shopify Discount Function/Script (pendente)
+- [x] Gerar cupom via Shopify Admin API (Discount Code — 100% OFF, 1 uso, validade mensal) ✅ `lib/shopify/coupon.ts`
+- [x] Formato do cupom: `CREATINA-<NOME>-<MÊSANO>` (ex.: `CREATINA-MARIA-FEV2026`) ✅
+- [x] Job mensal para gerar cupons para membros ativos ✅ `/api/cron/generate-creatine-coupons` (dia 2/mês, 05:00 UTC)
+- [x] Dashboard mostra cupom gerado para o membro ✅ Card com código + botão copiar
+- [x] Webhook detecta uso de cupom `CREATINA-*` e atualiza `free_creatine_claims` ✅
+- [x] UNIQUE constraint em `free_creatine_claims(member_id, month_year)` ✅
 
 **Fast-Track (primeiros 60 dias):**
 - [x] N0 recebe 30% CV de N1 (primeiros 30 dias)
@@ -542,15 +552,15 @@ Para um cadastro bem-sucedido (membro novo):
 
 | Sprint | FRs | Implementados | Parciais | Pendentes | % Completo |
 |--------|-----|---------------|----------|-----------|------------|
-| Sprint 1 | 9 | 8 | 0 | 1 (TBD) | 89% |
+| Sprint 1 | 9 | 9 | 0 | 0 | 100% |
 | Sprint 2 | 4 | 4 | 0 | 0 | 100% |
-| Sprint 3 | 6 | 6 | 0 | 0 | 100% |
+| Sprint 3 | 5 | 5 | 0 | 0 | 100% |
 | Sprint 4 | 7 | 7 | 0 | 0 | 100% |
 | Sprint 5 | 6 | 5 | 1 | 0 | 92% |
-| Sprint 6 | 6 | 6 | 0 | 0 | 100% |
-| Sprint 7 | 1 | 1 | 0 | 0 | 100% |
-| **Total** | **38** | **37** | **1** | **1** | **97%** |
+| Sprint 6 | 6 | 5 | 1 | 0 | 92% |
+| Sprint 7 | 2 | 2 | 0 | 0 | 100% |
+| **Total** | **38** | **37** | **2** | **0** | **98%** |
 
 ---
 
-**Última atualização:** 15/01/2026
+**Última atualização:** 11/02/2026

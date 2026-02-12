@@ -191,6 +191,8 @@
             <a class="toc-item" href="#sprint5">💸 Sprint 5 — Saques + Fiscal</a>
             <a class="toc-item" href="#futuro">🔮 Sprints Futuros</a>
             <a class="toc-item" href="#testar">🧪 Como Testar</a>
+            <a class="toc-item" href="#testes-realizados">🧪 Testes Realizados (04/02/2026)</a>
+            <a class="toc-item" href="#tipos-compra">📊 Tipos de Compra</a>
             <a class="toc-item" href="#tbd">📋 Decisões Pendentes</a>
         </nav>
 
@@ -1106,6 +1108,28 @@ Para cada membro:
                 </tbody>
             </table>
 
+            <h3>Loja Shopify de Teste</h3>
+            <table>
+                <thead><tr><th>Item</th><th>Valor</th></tr></thead>
+                <tbody>
+                    <tr><td>URL da Loja</td><td><a href="https://biohelp-dev.myshopify.com/">https://biohelp-dev.myshopify.com/</a></td></tr>
+                    <tr><td>Senha de Acesso</td><td><code>nowcli</code></td></tr>
+                    <tr><td>Produto de Teste</td><td>Creatina Teste LRP ($150.00)</td></tr>
+                </tbody>
+            </table>
+
+            <h4>Pagamentos de Teste (Gateway Fictício)</h4>
+            <p>A loja está configurada com o <strong>Gateway Fictício (Bogus Gateway)</strong> para testes:</p>
+            <table>
+                <thead><tr><th>Campo</th><th>Valor para APROVAR</th><th>Valor para RECUSAR</th></tr></thead>
+                <tbody>
+                    <tr><td>Número do cartão</td><td><code>1</code></td><td><code>2</code></td></tr>
+                    <tr><td>Data de validade</td><td>Qualquer data futura (ex: 12/28)</td><td>Qualquer data futura</td></tr>
+                    <tr><td>CVV</td><td>Qualquer 3 dígitos (ex: 123)</td><td>Qualquer 3 dígitos</td></tr>
+                    <tr><td>Nome no cartão</td><td>Qualquer nome</td><td>Qualquer nome</td></tr>
+                </tbody>
+            </table>
+
             <h3>Logins de Teste</h3>
             <table>
                 <thead><tr><th>Portal</th><th>Email</th><th>Senha</th></tr></thead>
@@ -1114,6 +1138,27 @@ Para cada membro:
                     <tr><td>Parceira</td><td><code>sponsor@biohelp.test</code></td><td><code>sponsor123</code></td></tr>
                 </tbody>
             </table>
+
+            <details open>
+                <summary>Teste 0: Compra de Teste na Shopify (Fluxo Completo)</summary>
+                <div class="content">
+                    <p><strong>Pré-requisitos:</strong> Ter um membro cadastrado no LRP e conhecer o email usado no cadastro.</p>
+                    <ol class="numbered">
+                        <li>Acesse a loja: <a href="https://biohelp-dev.myshopify.com/">https://biohelp-dev.myshopify.com/</a> e digite a senha: <code>nowcli</code></li>
+                        <li>Adicione "Creatina Teste LRP" ao carrinho e clique em "Check out"</li>
+                        <li>Preencha o <strong>email</strong> (MESMO email do cadastro no LRP), endereço fictício e escolha frete "Economy - FREE"</li>
+                        <li>Pague com cartão de teste: Número <code>1</code>, Data <code>12/28</code>, CVV <code>123</code></li>
+                        <li>Clique em "Pay now" e aguarde 1-2 minutos</li>
+                        <li>Acesse <a href="https://rlp-biohelp.vercel.app/dashboard">https://rlp-biohelp.vercel.app/dashboard</a> e verifique se o CV foi atualizado</li>
+                    </ol>
+                    <div class="callout blue">
+                        <span class="callout-icon">💡</span>
+                        <div class="callout-content">
+                            <strong>Importante:</strong> O sistema identifica o membro pelo EMAIL do pedido. Use o mesmo email do cadastro no LRP.
+                        </div>
+                    </div>
+                </div>
+            </details>
 
             <details>
                 <summary>Teste 1: Dashboard da Parceira</summary>
@@ -1179,6 +1224,139 @@ Para cada membro:
                     </ul>
                 </div>
             </details>
+        </section>
+
+        <hr>
+
+        <!-- Testes Realizados -->
+        <section id="testes-realizados">
+            <h1>🧪 Testes Realizados (04/02/2026)</h1>
+
+            <div class="callout green">
+                <span class="callout-icon">✅</span>
+                <div class="callout-content">
+                    <strong>Teste de Integração Completa - APROVADO</strong>
+                    <p style="margin-top: 8px;"><strong>Data:</strong> 04/02/2026 | <strong>Ambiente:</strong> Produção (Vercel) + Loja de Desenvolvimento (Shopify)</p>
+                </div>
+            </div>
+
+            <h3>Cenário Testado: Autoconsumo (Parceira compra para si)</h3>
+            <table>
+                <thead><tr><th>Etapa</th><th>Ação</th><th>Resultado</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Cadastro no LRP</td><td>Membro "eduardo" criado com código <code>J6QTY7hy</code></td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>2</td><td>Acesso à loja Shopify</td><td>Login com senha <code>nowcli</code></td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>3</td><td>Compra #1002</td><td>Creatina Teste LRP ($150.00)</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>4</td><td>Webhook processado</td><td>CV creditado automaticamente</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>5</td><td>Compra #1003</td><td>2x Creatina Teste LRP ($300.00)</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>6</td><td>Dashboard atualizado</td><td>450 CV, Status: Ativa, 100% da meta</td><td><span class="tag green">✅</span></td></tr>
+                </tbody>
+            </table>
+
+            <h3>Evidências Coletadas</h3>
+            <div class="columns">
+                <div class="column">
+                    <h4>Dashboard do Membro</h4>
+                    <ul class="bullet">
+                        <li>CV do Mês: <strong>450 CV</strong></li>
+                        <li>Meta: <strong>200 CV</strong> (100% atingida)</li>
+                        <li>Status de Ativação: <strong>Ativa</strong></li>
+                        <li>Nível: <strong>Parceira</strong></li>
+                        <li>Código: <strong>J6QTY7hy</strong></li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h4>Shopify Admin - Pedidos</h4>
+                    <ul class="bullet">
+                        <li>Pedido #1002: $150.00 - Pago - Processado</li>
+                        <li>Pedido #1003: $300.00 - Pago - Processado</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Fluxos Validados</h3>
+            <table>
+                <thead><tr><th>Fluxo</th><th>Descrição</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr><td>Cadastro</td><td>Criação de membro via link de convite</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>Webhooks</td><td>Recebimento e processamento de <code>orders/paid</code></td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>CV</td><td>Cálculo e crédito automático de CV</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>Status</td><td>Mudança automática para "Ativa" ao atingir 200 CV</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>Dashboard</td><td>Exibição correta de CV, status, código</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>Sync Shopify</td><td>Customer criado com tags corretas</td><td><span class="tag green">✅</span></td></tr>
+                </tbody>
+            </table>
+
+            <div class="callout yellow">
+                <span class="callout-icon">⏳</span>
+                <div class="callout-content">
+                    <strong>Cenário Pendente: Indicação de Cliente</strong>
+                    <p style="margin-top: 8px;">Para validar o sistema de <strong>comissões</strong>, é necessário testar:</p>
+                    <ol class="numbered" style="margin-top: 8px;">
+                        <li>Criar um cliente pelo link <code>https://rlp-biohelp.vercel.app/join?ref=J6QTY7hy</code></li>
+                        <li>Cliente faz compra na loja</li>
+                        <li>Verificar se a parceira recebe <strong>comissão Fast-Track 30%</strong></li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- Entendendo os Tipos de Compra -->
+        <section id="tipos-compra">
+            <h1>📊 Entendendo os Dois Tipos de Compra</h1>
+
+            <div class="columns">
+                <div class="column">
+                    <h3>Tipo 1: Autoconsumo</h3>
+                    <p><strong>Parceira compra para si mesma</strong></p>
+                    <pre><code>Parceira (você)
+    │
+    ▼
+Compra na loja (usando SEU email)
+    │
+    ▼
+CV é creditado para VOCÊ
+    │
+    ▼
+Você atinge meta de 200 CV → Status ATIVA
+
+⚠️ Você NÃO recebe comissão (é sua própria compra)</code></pre>
+                </div>
+                <div class="column">
+                    <h3>Tipo 2: Indicação</h3>
+                    <p><strong>Cliente compra pelo seu link</strong></p>
+                    <pre><code>1️⃣ Você compartilha seu link de convite
+    │
+    ▼
+2️⃣ Cliente se cadastra (você vira sponsor)
+    │
+    ▼
+3️⃣ Cliente compra na loja (email DELE)
+    │
+    ▼
+4️⃣ CV é creditado para o CLIENTE
+    │
+    ▼
+5️⃣ VOCÊ recebe COMISSÃO:
+   • Fast-Track 30% (dias 1-30)
+   • Fast-Track 20% (dias 31-60)
+   • Perpétua 5-15% (após 60 dias)</code></pre>
+                </div>
+            </div>
+
+            <h3>Resumo das Diferenças</h3>
+            <table>
+                <thead><tr><th>Aspecto</th><th>Autoconsumo</th><th>Indicação</th></tr></thead>
+                <tbody>
+                    <tr><td>Quem compra</td><td>Você (parceira)</td><td>Seu cliente indicado</td></tr>
+                    <tr><td>Email no checkout</td><td>Seu email</td><td>Email do cliente</td></tr>
+                    <tr><td>CV vai para</td><td>Você</td><td>Cliente</td></tr>
+                    <tr><td>Você recebe comissão?</td><td><span class="tag red">❌ Não</span></td><td><span class="tag green">✅ Sim (30%/20%/5-15%)</span></td></tr>
+                    <tr><td>Ajuda sua meta?</td><td><span class="tag green">✅ Sim</span></td><td><span class="tag red">❌ Não</span> (ajuda a meta do cliente)</td></tr>
+                </tbody>
+            </table>
         </section>
 
         <hr>
@@ -1315,22 +1493,29 @@ Para cada membro:
         <section>
             <h1>🎉 Status Atual</h1>
 
-            <div class="callout yellow">
-                <span class="callout-icon">⚠️</span>
+            <div class="callout green">
+                <span class="callout-icon">✅</span>
                 <div class="callout-content">
-                    <strong>Sprint 7 — PARCIAL (85%) | 🎉 MVP COMPLETO</strong>
-                    <p style="margin-top: 8px;"><strong>Data de atualização:</strong> 20/01/2026</p>
-                    <p style="margin-top: 8px;"><strong>TBD-019 (Creatina):</strong> ✅ RESOLVIDO — Desconto 100% no pedido real</p>
-                    <p style="margin-top: 8px;"><strong>Próximo passo:</strong> Configurar Shopify Discount Function/Script para aplicar desconto automático</p>
-                    <p style="margin-top: 8px;"><strong>Cobertura de FRs:</strong> 97% (37/38 + TBD-019 implementados)</p>
+                    <strong>Sprint 6 — CONCLUÍDO! | Sprint 7 — EM ANDAMENTO (85%)</strong>
+                    <p style="margin-top: 8px;"><strong>Data de conclusão Sprint 6:</strong> 20/01/2026</p>
+                    <p style="margin-top: 8px;"><strong>Testes de integração:</strong> ✅ APROVADOS (04/02/2026)</p>
+                    <p style="margin-top: 8px;"><strong>Cobertura de FRs:</strong> 95% (35/38 implementados)</p>
                 </div>
             </div>
+
+            <h3>Próximos Passos</h3>
+            <ul class="bullet">
+                <li>⏳ Testar fluxo de indicação (comissões)</li>
+                <li>⏳ Configurar Shopify Discount para creatina grátis</li>
+                <li>⏳ Integração Asaas (aguardando credenciais)</li>
+                <li>⏳ Remover senha da loja para produção</li>
+            </ul>
         </section>
 
         <!-- Footer -->
         <footer class="page-footer">
             <p>Biohelp LRP — Resumo Executivo</p>
-            <p>Última atualização: 20/01/2026</p>
+            <p>Última atualização: 04/02/2026</p>
         </footer>
     </div>
 </body>

@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/network-compression",
       "schedule": "0 4 1 * *"
+    },
+    {
+      "path": "/api/cron/generate-creatine-coupons",
+      "schedule": "0 5 2 * *"
     }
   ]
 }

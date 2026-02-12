@@ -7,11 +7,12 @@
  * - REST API permite criar/atualizar customers mesmo em planos básicos
  * - Tags são aplicadas corretamente via REST
  * 
- * Tags aplicadas (SPEC 4.4):
+ * Tags aplicadas (SPEC 4.4 + TBD-003 RESOLVIDO):
  * - lrp_member
  * - lrp_ref:<ref_code>
  * - lrp_sponsor:<sponsor_ref_code|none>
- * - lrp_status:pending (Sprint 1)
+ * - lrp_status:pending|active|inactive
+ * - nivel:<nivel> (membro/parceiro/lider/diretor/head)
  */
 
 // Versão da API
@@ -24,6 +25,8 @@ export interface CustomerSyncParams {
   lastName?: string
   refCode: string
   sponsorRefCode: string | null
+  level?: string        // TBD-003: nível do membro (membro/parceiro/lider/diretor/head)
+  status?: string       // Status atual (pending/active/inactive)
 }
 
 // Resultado do sync
@@ -56,14 +59,19 @@ interface ShopifyCustomersSearchResponse {
 }
 
 /**
- * Gera as tags do membro conforme SPEC 4.4
+ * Gera as tags do membro conforme SPEC 4.4 + TBD-003
+ * Tags: lrp_member, lrp_ref, lrp_sponsor, lrp_status, nivel
  */
 function generateMemberTags(params: CustomerSyncParams): string {
+  const status = params.status || 'pending'
+  const level = params.level || 'membro'
+  
   const tags: string[] = [
     'lrp_member',
     `lrp_ref:${params.refCode}`,
     `lrp_sponsor:${params.sponsorRefCode ?? 'none'}`,
-    'lrp_status:pending', // SPEC: pending no Sprint 1
+    `lrp_status:${status}`,
+    `nivel:${level}`,  // TBD-003 RESOLVIDO: tag de nível obrigatória
   ]
   return tags.join(', ')
 }

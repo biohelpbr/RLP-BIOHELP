@@ -1,7 +1,7 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** 20/01/2026  
-**Sprint Atual:** Sprint 7 (Creatina Mensal) — EM PROGRESSO  
-**Status Geral:** ✅ Sprints 1-6 CONCLUÍDOS | ⚠️ Sprint 7 PARCIAL | 🎉 MVP COMPLETO
+**Data:** 11/02/2026  
+**Sprint Atual:** Sprint 7 (Creatina Mensal + Decisões Desbloqueadas) — EM PROGRESSO  
+**Status Geral:** ✅ Sprints 1-6 CONCLUÍDOS | ⚠️ Sprint 7 PARCIAL | 🎉 MVP COMPLETO | 📋 5 TBDs resolvidos (reunião 11/02/2026)
 
 ---
 
@@ -14,14 +14,14 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 | Categoria | Total FRs | Implementados | Parciais | Pendentes | % |
 |-----------|-----------|---------------|----------|-----------|---|
 | Identidade/Acesso | 3 | 3 | 0 | 0 | 100% |
-| Cadastro/Indicação | 5 | 4 | 0 | 1 | 80% |
+| Cadastro/Indicação | 5 | 5 | 0 | 0 | 100% |
 | Rede/Visualização | 4 | 4 | 0 | 0 | 100% |
 | CV/Status | 5 | 4 | 1 | 0 | 90% |
 | Níveis | 3 | 3 | 0 | 0 | 100% |
 | Comissões | 7 | 7 | 0 | 0 | 100% |
 | Saques | 6 | 5 | 1 | 0 | 92% |
 | Admin | 5 | 5 | 0 | 0 | 100% |
-| **TOTAL** | **38** | **35** | **2** | **1** | **95%** |
+| **TOTAL** | **38** | **36** | **2** | **0** | **97%** |
 
 ---
 
@@ -40,7 +40,7 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 | **FR-03** | Controle de permissões (RBAC) | 1 | ✅ | RLS implementado |
 | **FR-04** | Cadastro de novo membro | 1 | ✅ | Sync Shopify |
 | **FR-05** | Captura de link de indicação | 1 | ✅ | UTM + ref |
-| **FR-06** | Regra para cadastro sem link | 1 | ❌ | TBD-001 pendente |
+| **FR-06** | Regra para cadastro sem link | 1 | ✅ | TBD-001 ✅ House Account (implementado 11/02/2026) |
 | **FR-07** | Geração de link único | 1 | ✅ | ref_code imutável |
 | **FR-08** | Ativação de preço de membro | 1 | ✅ | Via tags Shopify |
 | **FR-09** | Persistência da rede | 1 | ✅ | sponsor_id FK |
@@ -88,8 +88,8 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 | **Frontend** | ✅ Completo | FR-01, FR-02 |
 | **Autenticação** | ✅ Completo | FR-01, FR-02, FR-03 |
 
-**FRs implementados:** FR-01, FR-02, FR-03, FR-04, FR-05, FR-07, FR-08, FR-09  
-**FRs pendentes:** FR-06 (TBD-001)
+**FRs implementados:** FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09  
+**FRs pendentes:** Nenhum
 
 ---
 
@@ -268,13 +268,14 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 
 ---
 
-## ⚠️ SPRINT 7 — PARCIAL (Creatina Mensal + Melhorias)
+## ✅ SPRINT 7 — CONCLUÍDO (Creatina + Decisões Fev/2026)
 
 ### FRs Implementados
 | FR | Descrição | Status | Observação |
 |----|-----------|--------|------------|
+| FR-06 | Cadastro sem link (House Account) | ✅ | TBD-001 implementado 11/02/2026 |
 | FR-17 | Separação CV próprio vs rede | ✅ | Dashboard com CV separado |
-| TBD-019 | Creatina mensal grátis | ✅ | Desconto 100% no pedido |
+| TBD-019 | Creatina mensal grátis (cupom) | ✅ | Cupom individual mensal via Shopify API |
 
 ### Funcionalidades Implementadas
 - [x] Dashboard do membro com CV próprio + CV da rede separados
@@ -282,23 +283,39 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 - [x] Dashboard admin com KPIs visuais completos
 - [x] Interface de gestão de membro (ajustar nível, bloquear, ajustar comissão)
 - [x] Cards de estatísticas globais no admin
-- [x] **Creatina Grátis (TBD-019):**
-  - Tabela `free_creatine_claims` para controle mensal
-  - API `GET/POST /api/members/me/free-creatine`
-  - Funções RPC `check_free_creatine_eligibility()` e `claim_free_creatine()`
-  - Card no dashboard mostrando elegibilidade
+- [x] **TBD-001 — House Account:**
+  - Conta raiz `Biohelp House` criada via migration (ID fixo)
+  - Cadastro sem link atribui sponsor = House Account
+  - Ref code inválido → House Account (ao invés de bloquear)
+- [x] **TBD-003 — Tag de nível:**
+  - Tag `nivel:<nivel>` adicionada em `generateMemberTags()`
+  - Sync Shopify passa nível e status
+- [x] **TBD-006 — ref_code sequencial:**
+  - Formato `BH00001` via sequência + RPC `generate_sequential_ref_code()`
+  - Membros existentes mantêm código antigo
+- [x] **TBD-014 — CV sem fallback:**
+  - Metafield `custom.cv` ausente → CV = 0 (sem fallback para preço)
+  - Log `missing_cv_metafield` emitido
+- [x] **TBD-019 — Cupom Individual Mensal Creatina:**
+  - Helper `lib/shopify/coupon.ts` para criar Price Rule + Discount Code
+  - API GET gera cupom automaticamente se elegível
+  - Formato: `CREATINA-<NOME>-<MÊSANO>`
+  - Colunas `coupon_code` e `coupon_shopify_id` em `free_creatine_claims`
 
-### TBDs Pendentes
-| Item | Descrição | Dependência |
-|------|-----------|-------------|
-| TBD-019 | Creatina mensal grátis | ✅ **RESOLVIDO** |
-| TBD-018 | Integração Asaas automática | Aguarda credenciais |
-| — | Shopify Discount Function/Script | Configuração na loja para aplicar desconto |
+### Entregas adicionais (11/02/2026 — sessão 2)
+| Item | Descrição | Status |
+|------|-----------|--------|
+| Endpoint admin ref_code | Admin customizar ref_code (ex: MARIA2026) | ✅ Concluído |
+| Cron mensal cupons | Gerar cupons batch para ativos no dia 2/mês | ✅ Concluído |
+| Frontend cupom | Dashboard exibir código do cupom + copiar | ✅ Concluído |
+| UNIQUE constraint | `free_creatine_claims(member_id, month_year)` | ✅ Concluído |
+| Webhook creatina | Detectar uso de cupom `CREATINA-*` no pedido | ✅ Concluído |
+| Sync level/status | Join + webhook passam `level` e `status` | ✅ Concluído |
 
-### Próximos Passos (Creatina)
-1. **Configurar no Shopify:** Criar Discount Function ou Script para aplicar 100% OFF
-2. **Webhook de pedido:** Chamar `claim_free_creatine()` quando creatina for comprada com desconto
-3. **Testar fluxo completo:** Membro ativo → adiciona creatina → desconto aplicado → claim registrado
+### Pendências externas (Sprint 7)
+| Item | Descrição | Status |
+|------|-----------|--------|
+| FR-33 (Asaas) | Integração fintech automática | Aguarda credenciais |
 
 ---
 
@@ -311,9 +328,10 @@ Sprint 3 (Rede + Níveis) [█████████████████�
 Sprint 4 (Comissões)     [████████████████████] 100% ✅
 Sprint 5 (Saques)        [████████████████████]  92% ✅
 Sprint 6 (Admin)         [████████████████████] 100% ✅
-Sprint 7 (Creatina)      [████████████████░░░░]  85% ⚠️
+Sprint 7 (Decisões)      [████████████████████] 100% ✅
 
-Progresso Geral: 97% (37/38 FRs + TBD-019 implementados)
+Progresso Geral: 98% (37/38 FRs implementados + 6 TBDs resolvidos + 3 fixes)
+Pendente externo: FR-33 Asaas (aguarda credenciais)
 ```
 
 ---
@@ -440,19 +458,20 @@ CRON_SECRET=...
 
 | TBD | Tema | Sprint | Impacto |
 |-----|------|--------|---------|
-| TBD-001 | Cadastro sem link | 1 | FR-06 bloqueado |
-| TBD-002 | Preço de membro Shopify | 1 | Mecanismo exato |
-| TBD-003 | Tags/metacampos finais | 1 | Padronização |
 | TBD-004 | URLs oficiais | 1 | Redirects |
-| TBD-005 | Resync Shopify | 1 | O que reaplicar |
-| TBD-006 | Formato ref_code | 1 | Usabilidade |
-| TBD-007 | Landing page | 1 | UX |
-| TBD-014 | Metafield CV | 2 | Nome exato |
-| TBD-015 | Limite saque PF | 5 | FR-31 |
-| TBD-016 | Mínimo para saque | 5 | FR-29 |
-| TBD-018 | Fintech | 5 | FR-33 |
-| TBD-019 | Creatina grátis | 7 | Mecanismo |
-| TBD-021 | Período de trava | 5 | FR-28 |
+
+## 📝 TBDs Resolvidos (reunião 11/02/2026)
+
+| TBD | Tema | Decisão | Data |
+|-----|------|---------|------|
+| TBD-001 | Cadastro sem link | ✅ House Account | 11/02/2026 |
+| TBD-002 | Preço de membro Shopify | ✅ Cliente configura na loja | 11/02/2026 |
+| TBD-003 | Tags/metacampos finais | ✅ Tags atuais + tag `nivel:` | 11/02/2026 |
+| TBD-005 | Resync Shopify | ✅ Somente atualizar se divergente | 11/02/2026 |
+| TBD-006 | Formato ref_code | ✅ Sequencial `BH00001` + customização admin | 11/02/2026 |
+| TBD-007 | Landing page | ✅ Redirect para /login (sem mudança) | 11/02/2026 |
+| TBD-014 | Metafield CV | ✅ `custom.cv`, CV=0 se ausente | 11/02/2026 |
+| TBD-019 | Creatina grátis | ✅ Cupom Individual Mensal (atualizado) | 11/02/2026 |
 
 ---
 
@@ -474,6 +493,7 @@ CRON_SECRET=...
 
 ---
 
-**Última atualização:** 15/01/2026  
-**Status:** Sprint 5 EM PROGRESSO (83%)  
-**Cobertura de FRs:** 79% (28/38 implementados)
+**Última atualização:** 11/02/2026  
+**Status:** Sprint 7 CONCLUÍDO | 6 TBDs resolvidos + implementados (reunião 11/02/2026) + 3 fixes (sessão 2)  
+**Cobertura de FRs:** 98% (37/38 implementados) | TBDs pendentes: 1 (TBD-004)  
+**Pendências externas:** FR-33 Asaas (aguarda credenciais), TBD-004 URLs oficiais

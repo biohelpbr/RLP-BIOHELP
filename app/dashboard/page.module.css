@@ -736,6 +736,47 @@
   line-height: 1.5;
 }
 
+/* Coupon Code - TBD-019 */
+.couponCodeWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-sm) 0;
+  padding: var(--space-sm) var(--space-md);
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px dashed #22c55e;
+  border-radius: var(--radius-lg);
+}
+
+.couponCode {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #15803d;
+  letter-spacing: 0.05em;
+  flex: 1;
+  user-select: all;
+}
+
+.couponCopyBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.couponCopyBtn:hover {
+  background: #16a34a;
+}
+
 /* Network CV Card - Sprint 7 (FR-17) */
 .networkCVCard {
   background: var(--white);

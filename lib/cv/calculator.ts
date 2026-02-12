@@ -2,9 +2,10 @@
  * Calculador de CV (Commission Volume)
  * SPEC: Seção 1.2, 3.3 - CV por item/pedido
  * 
- * Regra (TBD-008 CORRIGIDO): CV é definido por produto via metacampo/metafield.
- * CV do pedido = Σ(CV_do_produto × quantidade)
- * Fallback: se não houver metacampo, usar preço do item e logar warning.
+ * Regra (TBD-008 + TBD-014 RESOLVIDOS):
+ * - CV é definido por produto via metafield `custom.cv`
+ * - CV do pedido = Σ(CV_do_produto × quantidade)
+ * - Se metafield não existir → CV = 0 (sem fallback para preço)
  * 
  * Fonte canônica: documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md
  * Ex: Lemon Dreams (R$159) gera CV=77
@@ -24,17 +25,11 @@ export const CV_TARGET_MONTHLY = 200
 
 /**
  * Namespace e key do metafield de CV no Shopify
- * TBD-014: Definir nome exato (custom.cv, lrp.cv, etc.)
- * Por enquanto, aceita múltiplos formatos
+ * TBD-014 RESOLVIDO: Usar `custom.cv` — se ausente, CV = 0
  */
-export const CV_METAFIELD_NAMESPACES = ['custom', 'lrp', 'biohelp']
+export const CV_METAFIELD_NAMESPACE = 'custom'
+export const CV_METAFIELD_NAMESPACES = ['custom'] // Mantido para compatibilidade
 export const CV_METAFIELD_KEY = 'cv'
-
-/**
- * @deprecated Use getItemCV() que lê o metafield
- * Mantido apenas como fallback quando não há metafield
- */
-export const CV_PERCENTAGE_FALLBACK = 1.0 // 100% do preço como fallback
 
 // =====================================================
 // FUNÇÕES DE CÁLCULO
@@ -87,9 +82,10 @@ export function extractCVFromMetafield(
 /**
  * Calcula o CV de um item do pedido
  * 
- * REGRA (TBD-008 CORRIGIDO):
- * 1. Primeiro tenta ler o CV do metafield do produto
- * 2. Se não encontrar, usa o preço como fallback e loga warning
+ * REGRA (TBD-008 + TBD-014 RESOLVIDOS):
+ * 1. Tenta ler o CV do metafield `custom.cv` do produto
+ * 2. Se não encontrar → CV = 0 (sem fallback para preço)
+ * 3. Loga warning para produtos sem metafield configurado
  * 
  * @param item - Item do pedido (Shopify ou interno)
  * @param metafieldCV - CV do metafield (se já extraído)
@@ -99,22 +95,17 @@ export function calculateItemCV(
   item: { price: number | string; quantity: number },
   metafieldCV?: number | null
 ): number {
-  const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price
-  
   // Se temos CV do metafield, usar ele
   if (metafieldCV !== undefined && metafieldCV !== null) {
     const cv = metafieldCV * item.quantity
     return Math.round(cv * 100) / 100
   }
   
-  // Fallback: usar preço do item (logar warning)
+  // TBD-014 RESOLVIDO: Sem fallback para preço — CV = 0
   console.warn(
-    `[CV] Metafield CV não encontrado para item. Usando preço como fallback: R$${price}`
+    `[CV] missing_cv_metafield: Metafield custom.cv não encontrado para item. CV = 0 (sem fallback para preço)`
   )
-  const cv = price * item.quantity * CV_PERCENTAGE_FALLBACK
-  
-  // Arredondar para 2 casas decimais
-  return Math.round(cv * 100) / 100
+  return 0
 }
 
 /**
@@ -139,9 +130,9 @@ export function calculateOrderCV(
 /**
  * Processa itens do Shopify e retorna dados para inserção
  * 
- * REGRA (TBD-008 CORRIGIDO):
- * - CV é extraído do metafield do produto
- * - Se não houver metafield, usa preço como fallback
+ * REGRA (TBD-008 + TBD-014 RESOLVIDOS):
+ * - CV é extraído do metafield `custom.cv` do produto
+ * - Se não houver metafield → CV = 0 (sem fallback para preço)
  * 
  * @param lineItems - Itens do pedido Shopify
  * @param orderId - ID do pedido no banco
@@ -160,14 +151,14 @@ export function processShopifyLineItems(
   quantity: number
   price: number
   cv_value: number
-  cv_source: 'metafield' | 'fallback_price'
+  cv_source: 'metafield' | 'zero_no_metafield'
 }> {
   return lineItems.map(item => {
     // Tentar extrair CV do metafield
     const metafieldCV = extractCVFromMetafield(item)
-    const cvSource = metafieldCV !== null ? 'metafield' : 'fallback_price'
+    const cvSource = metafieldCV !== null ? 'metafield' : 'zero_no_metafield'
     
-    // Calcular CV (usa metafield ou fallback para preço)
+    // Calcular CV (usa metafield ou 0 se ausente — TBD-014)
     const cvValue = calculateItemCV(
       { price: item.price, quantity: item.quantity },
       metafieldCV
@@ -176,7 +167,7 @@ export function processShopifyLineItems(
     if (cvSource === 'metafield') {
       console.info(`[CV] Item "${item.title}": CV=${metafieldCV} × ${item.quantity} = ${cvValue} (via metafield)`)
     } else {
-      console.warn(`[CV] Item "${item.title}": Usando preço R$${item.price} como fallback (metafield não encontrado)`)
+      console.warn(`[CV] missing_cv_metafield: Item "${item.title}" sem metafield custom.cv — CV=0`)
     }
 
     return {

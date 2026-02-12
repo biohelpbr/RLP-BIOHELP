@@ -17,6 +17,8 @@ export interface SyncMemberToShopifyParams {
   name: string
   refCode: string
   sponsorRefCode: string | null
+  level?: string    // TBD-003: nível do membro
+  status?: string   // Status atual
 }
 
 export interface SyncResult {
@@ -41,6 +43,8 @@ export async function syncMemberToShopify(
     firstName: params.name,
     refCode: params.refCode,
     sponsorRefCode: params.sponsorRefCode,
+    level: params.level,     // TBD-003: tag de nível
+    status: params.status,   // Status para tag
   }
 
   const shopifyResult = await syncCustomerToShopify(syncParams)

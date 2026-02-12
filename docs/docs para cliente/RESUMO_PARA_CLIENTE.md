@@ -1,7 +1,7 @@
 # Resumo Executivo — Biohelp LRP
-**Status do Projeto: Sprint 7 ⚠️ PARCIAL | 🎉 MVP COMPLETO**
+**Status do Projeto: Sprint 7 ✅ CONCLUÍDO | 🎉 MVP COMPLETO + DECISÕES IMPLEMENTADAS**
 
-**Última atualização:** 20/01/2026
+**Última atualização:** 11/02/2026
 
 ---
 
@@ -14,7 +14,7 @@ Sprint 3 — Rede Visual         [███████████████�
 Sprint 4 — Comissões           [████████████████████] 100% ✅
 Sprint 5 — Saques              [████████████████████]  92% ✅
 Sprint 6 — Admin Avançado      [████████████████████] 100% ✅
-Sprint 7 — Creatina Mensal     [████████████████░░░░]  85% ⚠️
+Sprint 7 — Creatina + Decisões [████████████████████] 100% ✅
 ```
 
 ### Cobertura de Requisitos Funcionais (FRs)
@@ -22,14 +22,14 @@ Sprint 7 — Creatina Mensal     [███████████████�
 | Categoria | Total | ✅ | ⚠️ | ⏳ | % |
 |-----------|-------|----|----|----|----|
 | Identidade/Acesso | 3 | 3 | 0 | 0 | 100% |
-| Cadastro/Indicação | 5 | 4 | 0 | 1 | 80% |
+| Cadastro/Indicação | 5 | 5 | 0 | 0 | 100% |
 | Rede/Visualização | 4 | 4 | 0 | 0 | 100% |
-| CV/Status | 5 | 4 | 1 | 0 | 90% |
+| CV/Status | 5 | 5 | 0 | 0 | 100% |
 | Níveis | 3 | 3 | 0 | 0 | 100% |
 | Comissões | 7 | 7 | 0 | 0 | 100% |
 | Saques | 6 | 5 | 1 | 0 | 92% |
 | Admin | 5 | 5 | 0 | 0 | 100% |
-| **TOTAL** | **38** | **35** | **2** | **1** | **95%** |
+| **TOTAL** | **38** | **37** | **1** | **0** | **98%** |
 
 ---
 
@@ -41,7 +41,7 @@ Sprint 7 — Creatina Mensal     [███████████████�
 4. [Sprint 4 — Comissões + Ledger](#-sprint-4--comissões--ledger-)
 5. [Sprint 5 — Saques + Fiscal](#-sprint-5--saques--fiscal-)
 6. [Sprint 6 — Admin Avançado](#-sprint-6--admin-avançado-)
-7. [Sprint 7 — Creatina Mensal](#-sprint-7--creatina-mensal-)
+7. [Sprint 7 — Creatina + Decisões Fev/2026](#-sprint-7--creatina--decisões-fev2026-)
 8. [Sprints Futuros](#-sprints-futuros)
 9. [Como Testar](#-como-testar)
 10. [Decisões Pendentes (TBD)](#-decisões-pendentes-tbd)
@@ -58,14 +58,15 @@ Sprint 7 — Creatina Mensal     [███████████████�
 | # | Funcionalidade | FR | Status | Descrição |
 |---|----------------|-----|--------|-----------|
 | 1 | Cadastro com link | FR-04, FR-05 | ✅ | Cliente recebe link e se cadastra |
-| 2 | Autenticação membro | FR-01 | ✅ | Login/logout via Supabase Auth |
-| 3 | Autenticação admin | FR-02 | ✅ | Login com role admin |
-| 4 | Controle de permissões | FR-03 | ✅ | RLS ativo no banco |
-| 5 | Dashboard do membro | FR-01 | ✅ | Painel com dados e link de convite |
-| 6 | Painel administrativo | FR-02 | ✅ | Lista, busca e gerencia membros |
-| 7 | Integração Shopify | FR-04, FR-08 | ✅ | Cria/atualiza customer com tags |
-| 8 | Geração de link único | FR-07 | ✅ | ref_code único e imutável |
-| 9 | Persistência da rede | FR-09 | ✅ | sponsor_id vincula hierarquia |
+| 2 | Cadastro sem link | FR-06 | ✅ | Sem link → sponsor = House Account (TBD-001) |
+| 3 | Autenticação membro | FR-01 | ✅ | Login/logout via Supabase Auth |
+| 4 | Autenticação admin | FR-02 | ✅ | Login com role admin |
+| 5 | Controle de permissões | FR-03 | ✅ | RLS ativo no banco |
+| 6 | Dashboard do membro | FR-01 | ✅ | Painel com dados e link de convite |
+| 7 | Painel administrativo | FR-02 | ✅ | Lista, busca e gerencia membros |
+| 8 | Integração Shopify | FR-04, FR-08 | ✅ | Cria/atualiza customer com tags (incluindo `nivel:`) |
+| 9 | Geração de ref_code | FR-07 | ✅ | Sequencial BH00001 + customização admin (TBD-006) |
+| 10 | Persistência da rede | FR-09 | ✅ | sponsor_id vincula hierarquia |
 
 ## Fluxo de Funcionamento
 
@@ -119,9 +120,10 @@ Sprint 7 — Creatina Mensal     [███████████████�
    │  ├── Cria/atualiza Customer por email
    │  └── Aplica tags:
    │      ├── lrp_member (identifica como membro LRP)
-   │      ├── lrp_ref:XYZ789 (código do novo membro)
+   │      ├── lrp_ref:BH00001 (código sequencial do novo membro)
    │      ├── lrp_sponsor:ABC123 (código de quem indicou)
-   │      └── lrp_status:pending (status inicial)
+   │      ├── lrp_status:active (status atual)
+   │      └── nivel:membro (nível de liderança — TBD-003)
    │
    ▼
 7️⃣ SISTEMA REDIRECIONA PARA DASHBOARD
@@ -196,9 +198,10 @@ Sprint 7 — Creatina Mensal     [███████████████�
 Após cadastro bem-sucedido, o Customer deve ter:
 - ✅ Email do membro
 - ✅ Tag `lrp_member`
-- ✅ Tag `lrp_ref:<ref_code>`
-- ✅ Tag `lrp_sponsor:<sponsor_ref_code>`
-- ✅ Tag `lrp_status:pending`
+- ✅ Tag `lrp_ref:<ref_code>` (ex: `lrp_ref:BH00001`)
+- ✅ Tag `lrp_sponsor:<sponsor_ref_code>` (ou `lrp_sponsor:HOUSE` se sem link)
+- ✅ Tag `lrp_status:active`
+- ✅ Tag `nivel:membro` (nível de liderança — TBD-003)
 
 ## Banco de Dados Criado
 
@@ -1181,85 +1184,178 @@ DEPOIS DA COMPRESSÃO:
 
 ---
 
-# 🎁 SPRINT 7 — Creatina Mensal ⚠️
+# 🎁 SPRINT 7 — Creatina + Decisões Fev/2026 ✅
 
-**Data de início:** 20/01/2026  
-**Status:** PARCIAL (85%)  
-**TBD-019:** ✅ RESOLVIDO
+**Data de conclusão:** 11/02/2026  
+**Status:** CONCLUÍDO (100%)  
+**Decisões implementadas:** TBD-001, TBD-003, TBD-006, TBD-007, TBD-014, TBD-019
 
 ## O que foi entregue
 
-| # | Funcionalidade | Status | Descrição |
-|---|----------------|--------|-----------|
-| 1 | Decisão TBD-019 | ✅ | Desconto 100% no pedido real |
-| 2 | Tabela de controle | ✅ | `free_creatine_claims` |
-| 3 | API de elegibilidade | ✅ | `GET /api/members/me/free-creatine` |
-| 4 | API de registro | ✅ | `POST /api/members/me/free-creatine` |
-| 5 | Card no dashboard | ✅ | Mostra status do benefício |
-| 6 | Shopify Discount | ⏳ | Configuração na loja pendente |
+| # | Funcionalidade | FR/TBD | Status | Descrição |
+|---|----------------|--------|--------|-----------|
+| 1 | House Account | TBD-001 | ✅ | Cadastro sem link → sponsor = empresa |
+| 2 | Tag de nível | TBD-003 | ✅ | Tag `nivel:<nivel>` no Shopify Customer |
+| 3 | ref_code sequencial | TBD-006 | ✅ | Formato BH00001 + customização admin |
+| 4 | Landing page | TBD-007 | ✅ | Redirect para /login (já implementado) |
+| 5 | CV sem fallback | TBD-014 | ✅ | CV=0 se metafield ausente |
+| 6 | Cupom creatina | TBD-019 | ✅ | Cupom individual mensal via Shopify API |
+| 7 | API de elegibilidade | FR-17 | ✅ | `GET /api/members/me/free-creatine` |
+| 8 | Frontend cupom | - | ✅ | Dashboard exibe código do cupom |
+| 9 | Cron mensal cupons | - | ✅ | Gera cupons batch no dia 2/mês |
+| 10 | Webhook creatina | - | ✅ | Detecta uso de cupom CREATINA-* |
+| 11 | Admin ref_code | - | ✅ | Admin pode customizar ref_code |
+| 12 | UNIQUE constraint | - | ✅ | Garantia de 1 claim/membro/mês |
+| 13 | Sync level/status | - | ✅ | Join + webhook passam nível/status |
 
-## Regra da Creatina Grátis (TBD-019)
+## Detalhamento das Decisões Implementadas
 
-**Quem tem direito:**
-- Membro **Ativo** (CV >= 200 no mês)
-- Limite: **1 unidade por mês**
-- **Não acumula** para o próximo mês
+### TBD-001 — House Account (Cadastro sem link)
+
+**Regra:** Quando alguém se cadastra sem link de convite (ou com link inválido), o sistema atribui como sponsor a **conta da empresa (House Account)**. Comissões geradas por esses membros vão para a Biohelp.
 
 **Como funciona:**
-1. Membro acessa o dashboard e vê o card "Creatina Grátis do Mês"
-2. Se elegível, adiciona a creatina ao carrinho em um pedido real
-3. O desconto de 100% é aplicado automaticamente no checkout
-4. Sistema registra o uso (1x por mês)
-
-**Estados do card:**
-- 🟢 **Disponível** - Membro ativo, ainda não usou
-- 🟡 **Já utilizado** - Membro usou este mês
-- ⚪ **Indisponível** - Membro não atingiu 200 CV
-
-## Fluxo Técnico
-
 ```
-Membro Ativo (200 CV)
+Cadastro sem ?ref=...
        ↓
-Dashboard mostra "Creatina Disponível"
+Sistema não encontra sponsor válido
        ↓
-Membro adiciona creatina ao carrinho
+Atribui sponsor = House Account (Biohelp)
        ↓
-Shopify Discount aplica 100% OFF (1 unidade)
+Membro cadastrado normalmente
        ↓
-Webhook de pedido chama claim_free_creatine()
-       ↓
-Tabela free_creatine_claims registra uso
-       ↓
-Dashboard mostra "Já utilizado"
+Comissões futuras desse membro → conta da empresa
 ```
 
-## APIs Criadas
+### TBD-003 — Tag de Nível no Shopify
+
+**Nova tag obrigatória:** `nivel:<nivel>` aplicada em todos os Customers.
+
+**Tags completas de um Customer:**
+- `lrp_member` — identifica como membro
+- `lrp_ref:BH00001` — código do membro
+- `lrp_sponsor:BH00042` — código de quem indicou
+- `lrp_status:active` — status atual
+- `nivel:parceiro` — **NOVA** — nível de liderança
+
+### TBD-006 — ref_code Sequencial + Customização Admin
+
+**Formato padrão:** `BH00001`, `BH00002`, `BH00003`...
+- Gerado automaticamente por sequência no banco
+- Prefixo `BH` + 5 dígitos sequenciais
+
+**Customização pelo admin:**
+- Admin pode mudar o ref_code de qualquer membro
+- Exemplo: `MARIA2026`, `JOANA2025`
+- Validação de unicidade obrigatória
+- Membros existentes mantêm códigos atuais
+
+### TBD-014 — CV sem Fallback para Preço
+
+**Regra anterior:** Se metafield `custom.cv` não existisse, usava o preço do produto.
+**Regra nova:** Se metafield não existir → **CV = 0** (zero). Log de warning emitido.
+
+**Motivo:** Evitar distorção de comissão. Produto sem CV configurado não deve gerar comissão.
+
+### TBD-019 — Cupom Individual Mensal de Creatina
+
+**Regra:** Membro Ativo (CV >= 200) recebe cupom exclusivo para 1 creatina grátis/mês.
+
+**Formato do cupom:** `CREATINA-<NOME>-<MÊSANO>`
+- Exemplo: `CREATINA-MARIA-FEV2026`
+
+**Como funciona:**
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    FLUXO DA CREATINA GRÁTIS (Sprint 7)                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1️⃣ SISTEMA GERA CUPONS (dia 2 de cada mês, automático)
+   │
+   │  Cron job: /api/cron/generate-creatine-coupons
+   │  Para cada membro ativo:
+   │  ├── Cria Price Rule na Shopify (100% OFF, 1 uso)
+   │  └── Gera Discount Code: CREATINA-MARIA-FEV2026
+   │
+   ▼
+2️⃣ MEMBRO ACESSA DASHBOARD
+   │
+   │  Card "Creatina Grátis do Mês"
+   │  Mostra: "Seu cupom está pronto!"
+   │  Exibe código: CREATINA-MARIA-FEV2026
+   │  Botão de copiar 📋
+   │
+   ▼
+3️⃣ MEMBRO USA NA LOJA
+   │
+   │  Adiciona creatina ao carrinho
+   │  No checkout, cola o cupom
+   │  Desconto de 100% aplicado automaticamente
+   │
+   ▼
+4️⃣ WEBHOOK DETECTA USO
+   │
+   │  Webhook orders/paid detecta cupom CREATINA-*
+   │  Atualiza free_creatine_claims com order_id
+   │  Status = 'claimed'
+   │
+   ▼
+5️⃣ DASHBOARD ATUALIZA
+   │
+   │  Card mostra: "Já utilizado este mês ✅"
+   │  Próximo cupom: mês seguinte
+   │
+   └── FIM DO FLUXO
+```
+
+**Estados do card no dashboard:**
+- 🟢 **Cupom pronto** — Exibe código + botão copiar
+- 🟡 **Já utilizado** — Membro usou este mês
+- ⚪ **Indisponível** — Membro não atingiu 200 CV
+- ⏳ **Gerando...** — Cupom sendo gerado
+
+## APIs Criadas/Atualizadas (Sprint 7)
 
 | Endpoint | Método | Descrição |
 |----------|--------|-----------|
-| `/api/members/me/free-creatine` | GET | Verifica elegibilidade |
-| `/api/members/me/free-creatine` | POST | Registra uso |
+| `/api/members/me/free-creatine` | GET | Elegibilidade + gera cupom |
+| `/api/admin/members/[id]` | PATCH | Customizar ref_code (action: customize_ref_code) |
+| `/api/cron/generate-creatine-coupons` | GET | Cron mensal (dia 2, 05:00 UTC) |
 
-## Funções RPC Criadas
+## Funções RPC e DB
 
-| Função | Descrição |
-|--------|-----------|
+| Item | Descrição |
+|------|-----------|
 | `check_free_creatine_eligibility(uuid)` | Verifica se membro pode usar |
-| `claim_free_creatine(uuid, uuid)` | Registra uso da creatina |
+| `generate_sequential_ref_code()` | Gera próximo BH00001 via sequência |
+| `ref_code_seq` | Sequência PostgreSQL para ref_code |
+| `free_creatine_claims.coupon_code` | Código do cupom gerado |
+| `free_creatine_claims.coupon_shopify_id` | ID do Discount na Shopify |
+| UNIQUE(member_id, month_year) | Garante 1 claim por membro/mês |
 
-## Próximos Passos (Pendente)
+## Testes Esperados (Sprint 7)
 
-1. **Configurar no Shopify:**
-   - Criar Discount Function ou Script para aplicar 100% OFF
-   - Definir qual produto é a "creatina" (SKU/variant)
-   - Limitar a 1 unidade por pedido
+### Cenário 1: Cadastro sem link ✅
+| Passo | Ação | Resultado Esperado | Status |
+|-------|------|-------------------|--------|
+| 1 | Acessar `/join` (sem ?ref=) | Página de cadastro carrega | ✅ |
+| 2 | Preencher nome, email, senha | Formulário aceita dados | ✅ |
+| 3 | Verificar Supabase | sponsor_id = House Account | ✅ |
 
-2. **Webhook de pedido:**
-   - Detectar quando creatina foi comprada com desconto
-   - Chamar `claim_free_creatine()` automaticamente
+### Cenário 2: ref_code sequencial ✅
+| Passo | Ação | Resultado Esperado | Status |
+|-------|------|-------------------|--------|
+| 1 | Cadastrar novo membro | ref_code = BH00001 (ou próximo) | ✅ |
+| 2 | Admin customiza ref_code | ref_code = MARIA2026 | ✅ |
+| 3 | Tentar duplicar | Erro de unicidade | ✅ |
 
-3. **Testar fluxo completo**
+### Cenário 3: Cupom creatina ✅
+| Passo | Ação | Resultado Esperado | Status |
+|-------|------|-------------------|--------|
+| 1 | Membro ativo acessa dashboard | Card mostra cupom | ✅ |
+| 2 | Copiar código | Cupom copiado para clipboard | ✅ |
+| 3 | Usar na loja | 100% OFF aplicado | ✅ |
+| 4 | Webhook processa | free_creatine_claims atualizado | ✅ |
 
 ---
 
@@ -1290,6 +1386,25 @@ Dashboard mostra "Já utilizado"
 | Admin | https://rlp-biohelp.vercel.app/admin |
 | Admin Saques | https://rlp-biohelp.vercel.app/admin/payouts |
 
+## Loja Shopify de Teste
+
+| Item | Valor |
+|------|-------|
+| URL da Loja | https://biohelp-dev.myshopify.com/ |
+| Senha de Acesso | `nowcli` |
+| Produto de Teste | Creatina Teste LRP ($150.00) |
+
+### Pagamentos de Teste (Gateway Fictício)
+
+A loja está configurada com o **Gateway Fictício (Bogus Gateway)** para testes:
+
+| Campo | Valor para APROVAR | Valor para RECUSAR |
+|-------|-------------------|-------------------|
+| Número do cartão | `1` | `2` |
+| Data de validade | Qualquer data futura (ex: 12/28) | Qualquer data futura |
+| CVV | Qualquer 3 dígitos (ex: 123) | Qualquer 3 dígitos |
+| Nome no cartão | Qualquer nome | Qualquer nome |
+
 ## Logins de Teste
 
 | Portal | Email | Senha |
@@ -1298,6 +1413,48 @@ Dashboard mostra "Já utilizado"
 | Parceira | sponsor@biohelp.test | sponsor123 |
 
 ## Roteiro de Teste Rápido
+
+### Teste 0: Compra de Teste na Shopify (Fluxo Completo)
+
+**Pré-requisitos:**
+- Ter um membro cadastrado no LRP
+- Conhecer o email usado no cadastro
+
+**Passos:**
+
+1. **Acesse a loja de teste:**
+   - URL: https://biohelp-dev.myshopify.com/
+   - Digite a senha: `nowcli`
+
+2. **Adicione um produto ao carrinho:**
+   - Escolha "Creatina Teste LRP" ou outro produto
+   - Clique em "Add to cart"
+
+3. **Vá para o checkout:**
+   - Clique em "Check out"
+
+4. **Preencha os dados:**
+   - **Email:** Use o MESMO email do cadastro no LRP
+   - Endereço: pode ser fictício
+   - Frete: escolha "Economy - FREE"
+
+5. **Pague com cartão de teste:**
+   - Número do cartão: `1`
+   - Data: `12/28`
+   - CVV: `123`
+   - Nome: qualquer nome
+
+6. **Clique em "Pay now"**
+
+7. **Verifique o resultado:**
+   - Aguarde 1-2 minutos
+   - Acesse: https://rlp-biohelp.vercel.app/dashboard
+   - Faça login com o email usado na compra
+   - **Resultado esperado:** CV atualizado com o valor do produto
+
+**Importante:** O sistema identifica o membro pelo EMAIL do pedido. Certifique-se de usar o mesmo email do cadastro no LRP.
+
+---
 
 ### Teste 1: Dashboard da Parceira
 1. Acesse https://rlp-biohelp.vercel.app/login
@@ -1334,40 +1491,156 @@ Dashboard mostra "Já utilizado"
 
 ---
 
+# 🧪 TESTES REALIZADOS (04/02/2026)
+
+## Teste de Integração Completa - APROVADO ✅
+
+**Data:** 04/02/2026  
+**Ambiente:** Produção (Vercel) + Loja de Desenvolvimento (Shopify)
+
+### Cenário Testado: Autoconsumo (Parceira compra para si)
+
+| Etapa | Ação | Resultado | Status |
+|-------|------|-----------|--------|
+| 1 | Cadastro no LRP | Membro "eduardo" criado com código `J6QTY7hy` | ✅ |
+| 2 | Acesso à loja Shopify | Login com senha `nowcli` | ✅ |
+| 3 | Compra #1002 | Creatina Teste LRP ($150.00) | ✅ |
+| 4 | Webhook processado | CV creditado automaticamente | ✅ |
+| 5 | Compra #1003 | 2x Creatina Teste LRP ($300.00) | ✅ |
+| 6 | Dashboard atualizado | 450 CV, Status: Ativa, 100% da meta | ✅ |
+
+### Evidências Coletadas
+
+**Dashboard do Membro:**
+- CV do Mês: **450 CV**
+- Meta: **200 CV** (100% atingida)
+- Status de Ativação: **Ativa**
+- Nível: **Parceira**
+- Código: **J6QTY7hy**
+
+**Shopify Admin - Pedidos:**
+- Pedido #1002: $150.00 - Pago - Processado
+- Pedido #1003: $300.00 - Pago - Processado
+
+### Fluxos Validados
+
+| Fluxo | Descrição | Status |
+|-------|-----------|--------|
+| Cadastro | Criação de membro via link de convite | ✅ |
+| Webhooks | Recebimento e processamento de `orders/paid` | ✅ |
+| CV | Cálculo e crédito automático de CV | ✅ |
+| Status | Mudança automática para "Ativa" ao atingir 200 CV | ✅ |
+| Dashboard | Exibição correta de CV, status, código | ✅ |
+| Sync Shopify | Customer criado com tags corretas | ✅ |
+
+### Cenário Pendente: Indicação de Cliente
+
+Para validar o sistema de **comissões**, é necessário testar:
+
+1. Criar um cliente pelo link `https://rlp-biohelp.vercel.app/join?ref=J6QTY7hy`
+2. Cliente faz compra na loja
+3. Verificar se a parceira recebe **comissão Fast-Track 30%**
+
+---
+
+# 📊 ENTENDENDO OS DOIS TIPOS DE COMPRA
+
+## Tipo 1: Autoconsumo (Parceira compra para si)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    AUTOCONSUMO                                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   Parceira (você)                                                │
+│        │                                                         │
+│        ▼                                                         │
+│   Compra na loja (usando SEU email)                              │
+│        │                                                         │
+│        ▼                                                         │
+│   CV é creditado para VOCÊ                                       │
+│        │                                                         │
+│        ▼                                                         │
+│   Você atinge meta de 200 CV → Status ATIVA                      │
+│                                                                  │
+│   ⚠️ Você NÃO recebe comissão (é sua própria compra)            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Tipo 2: Indicação (Cliente compra pelo seu link)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    INDICAÇÃO DE CLIENTE                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   1️⃣ Você compartilha seu link de convite                       │
+│      https://rlp-biohelp.vercel.app/join?ref=J6QTY7hy           │
+│        │                                                         │
+│        ▼                                                         │
+│   2️⃣ Cliente se cadastra (você vira sponsor dele)               │
+│        │                                                         │
+│        ▼                                                         │
+│   3️⃣ Cliente compra na loja (usando email DELE)                 │
+│        │                                                         │
+│        ▼                                                         │
+│   4️⃣ CV é creditado para o CLIENTE                              │
+│        │                                                         │
+│        ▼                                                         │
+│   5️⃣ VOCÊ recebe COMISSÃO:                                      │
+│      • Fast-Track 30% (dias 1-30)                                │
+│      • Fast-Track 20% (dias 31-60)                               │
+│      • Perpétua 5-15% (após 60 dias)                             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Resumo das Diferenças
+
+| Aspecto | Autoconsumo | Indicação |
+|---------|-------------|-----------|
+| Quem compra | Você (parceira) | Seu cliente indicado |
+| Email no checkout | Seu email | Email do cliente |
+| CV vai para | Você | Cliente |
+| Você recebe comissão? | ❌ Não | ✅ Sim (30%/20%/5-15%) |
+| Ajuda sua meta? | ✅ Sim | ❌ Não (ajuda a meta do cliente) |
+
+---
+
 # 📋 DECISÕES PENDENTES (TBD)
 
-## Críticos para Sprint 6
+## Pendentes (1 restante)
 
-| TBD | Descrição | FR Bloqueado |
-|-----|-----------|--------------|
-| - | Nenhum TBD crítico | - |
+| TBD | Descrição | Sprint | Impacto |
+|-----|-----------|--------|---------|
+| TBD-004 | URLs oficiais (staging/prod) | 1 | Redirects e webhooks |
 
-## Outros Pendentes
+## Resolvidos ✅ (21 decisões)
 
-| TBD | Descrição | Sprint |
-|-----|-----------|--------|
-| TBD-001 | Regra para cadastro sem link | 1 |
-| TBD-004 | URLs oficiais (staging/prod) | 1 |
-| TBD-014 | Nome do metafield CV | 2 |
-| TBD-019 | Creatina mensal grátis | 7 |
-
-## Resolvidos ✅
-
-| TBD | Descrição | Decisão |
-|-----|-----------|---------|
-| TBD-008 | Cálculo de CV | Via metafield do produto |
-| TBD-009 | Refund/cancel | Reverte CV completamente |
-| TBD-010 | Job mensal | 1º dia às 00:00 BRT |
-| TBD-011 | Regras de níveis | Conforme documento canônico |
-| TBD-012 | Profundidade da rede | Ilimitada |
-| TBD-013 | Informações visíveis | Nome, email, CV, status, nível |
-| TBD-017 | Arredondamento | 2 casas decimais |
-| TBD-020 | Cálculo de comissões | Em tempo real |
-| TBD-022 | Perpétua diferenciada | Por tipo de N1 |
-| TBD-015 | Limite de saque PF | R$1.000/mês |
-| TBD-016 | Valor mínimo para saque | R$100/saque |
-| TBD-018 | Integração fintech | Asaas (PIX/TED) |
-| TBD-021 | Período de trava | Net-15 (15 dias após virada do mês) |
+| TBD | Descrição | Decisão | Data |
+|-----|-----------|---------|------|
+| TBD-001 | Cadastro sem link | House Account | 11/02/2026 |
+| TBD-002 | Preço de membro Shopify | Cliente configura na loja | 11/02/2026 |
+| TBD-003 | Tags/metacampos | Tags atuais + `nivel:<nivel>` | 11/02/2026 |
+| TBD-005 | Resync Shopify | Somente atualizar se divergente | 11/02/2026 |
+| TBD-006 | Formato ref_code | Sequencial BH00001 + customização admin | 11/02/2026 |
+| TBD-007 | Landing page | Redirect para /login (sem mudança) | 11/02/2026 |
+| TBD-008 | Cálculo de CV | Via metafield do produto | 07/01/2026 |
+| TBD-009 | Refund/cancel | Reverte CV completamente | 07/01/2026 |
+| TBD-010 | Job mensal | 1º dia às 00:00 BRT | 07/01/2026 |
+| TBD-011 | Regras de níveis | Conforme documento canônico | 09/01/2026 |
+| TBD-012 | Profundidade da rede | Ilimitada | 09/01/2026 |
+| TBD-013 | Informações visíveis | Nome, email, CV, status, nível | 09/01/2026 |
+| TBD-014 | Metafield CV | `custom.cv`, CV=0 se ausente | 11/02/2026 |
+| TBD-015 | Limite de saque PF | R$1.000/mês | 19/01/2026 |
+| TBD-016 | Valor mínimo para saque | R$100/saque | 19/01/2026 |
+| TBD-017 | Arredondamento | 2 casas decimais | 09/01/2026 |
+| TBD-018 | Integração fintech | Asaas (PIX/TED) | 19/01/2026 |
+| TBD-019 | Creatina grátis | Cupom Individual Mensal | 11/02/2026 |
+| TBD-020 | Cálculo de comissões | Em tempo real | 09/01/2026 |
+| TBD-021 | Período de trava | Net-15 (15 dias após virada do mês) | 19/01/2026 |
+| TBD-022 | Perpétua diferenciada | Por tipo de N1 | 10/01/2026 |
 
 ---
 
@@ -1377,16 +1650,18 @@ Dashboard mostra "Já utilizado"
 
 ### Sprint 1 ✅
 - [x] Cadastro com link vincula sponsor
-- [x] ref_code único gerado
+- [x] Cadastro sem link → House Account (TBD-001)
+- [x] ref_code sequencial BH00001 (TBD-006)
+- [x] Admin pode customizar ref_code
 - [x] Customer Shopify criado/atualizado
-- [x] Tags aplicadas corretamente
+- [x] Tags aplicadas (incluindo `nivel:` — TBD-003)
 - [x] Dashboard mostra link de convite
 - [x] Admin busca membro e executa resync
 - [x] RLS ativo
 
 ### Sprint 2 ✅
 - [x] Webhooks idempotentes
-- [x] CV via metafield do produto
+- [x] CV via metafield `custom.cv` (CV=0 se ausente — TBD-014)
 - [x] Status muda para active/inactive
 - [x] Job mensal fecha mês
 - [x] Admin pode ver/ajustar CV
@@ -1420,18 +1695,65 @@ Dashboard mostra "Já utilizado"
 - [x] Histórico de saques
 - [x] Integração Asaas definida (aguarda credenciais)
 
+### Sprint 6 ✅
+- [x] Regra de 6 meses inativo (compressão de rede)
+- [x] Dashboard global (KPIs)
+- [x] Gestão completa de membro (editar, ajustar, bloquear)
+- [x] Gestão de tags + sync Shopify
+- [x] Cron de compressão configurado
+
+### Sprint 7 ✅
+- [x] House Account implementado (TBD-001)
+- [x] Tag de nível `nivel:<nivel>` (TBD-003)
+- [x] ref_code sequencial BH00001 (TBD-006)
+- [x] CV=0 se metafield ausente (TBD-014)
+- [x] Cupom individual mensal creatina (TBD-019)
+- [x] Frontend exibe cupom no dashboard
+- [x] Cron mensal gera cupons (dia 2/mês)
+- [x] Webhook detecta uso de cupom CREATINA-*
+- [x] Admin pode customizar ref_code
+- [x] level/status passados no sync Shopify
+- [x] UNIQUE constraint em free_creatine_claims
+
 ---
 
 # 🎉 STATUS ATUAL
 
-**Sprint 5 — CONCLUÍDO!**
+**Todos os Sprints (1-7) — CONCLUÍDOS! ✅**
 
-**Data de conclusão:** 15/01/2026
+**Data de conclusão Sprint 7:** 11/02/2026
 
-**Próximo passo:** Iniciar Sprint 6 (Admin Avançado) e resolver TBD-018 para integração fintech
+**Testes de integração:** ✅ APROVADOS (04/02/2026)
 
-**Cobertura de FRs:** 79% (29/38 implementados)
+**Cobertura de FRs:** 98% (37/38 implementados)
+
+**TBDs resolvidos:** 21/22 (1 pendente: TBD-004 — URLs oficiais)
+
+## O que foi feito em 11/02/2026
+
+**Reunião de alinhamento → 6 decisões resolvidas e implementadas:**
+1. ✅ TBD-001 — Cadastro sem link → House Account
+2. ✅ TBD-003 — Tag de nível `nivel:<nivel>` no Shopify
+3. ✅ TBD-006 — ref_code sequencial BH00001 + customização admin
+4. ✅ TBD-007 — Landing page mantém redirect para /login
+5. ✅ TBD-014 — CV=0 se metafield ausente (sem fallback preço)
+6. ✅ TBD-019 — Cupom Individual Mensal para creatina grátis
+
+**Além das decisões, foram implementados:**
+- Cron mensal para geração automática de cupons
+- Frontend do cupom no dashboard (código + botão copiar)
+- Endpoint admin para customizar ref_code
+- Webhook detecta uso de cupom CREATINA-* e registra claim
+- UNIQUE constraint para evitar duplicação de claims
+- level/status propagados em todos os syncs com Shopify
+
+## Próximos Passos
+
+1. ⏳ Integração Asaas automática (aguardando credenciais)
+2. ⏳ Definir URLs oficiais staging/prod (TBD-004)
+3. ⏳ Remover senha da loja para produção
+4. ⏳ Testar fluxo completo de indicação (comissões em produção)
 
 ---
 
-**Última atualização:** 19/01/2026
+**Última atualização:** 11/02/2026

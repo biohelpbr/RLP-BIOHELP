@@ -1,20 +1,22 @@
 /**
  * API: GET/POST /api/members/me/free-creatine
- * Sprint 7 - TBD-019: Creatina mensal grátis
+ * Sprint 7 - TBD-019 RESOLVIDO: Cupom Individual Mensal
  * 
- * GET: Verifica elegibilidade do membro para creatina grátis
+ * GET: Verifica elegibilidade + gera/retorna cupom do mês
  * POST: Registra uso da creatina grátis (chamado pelo webhook de pedido)
  * 
- * Regra: Membro Ativo (200 CV) tem direito a 1 creatina grátis/mês
+ * Regra: Membro Ativo (200 CV) recebe cupom CREATINA-<NOME>-<MÊSANO>
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient, getCurrentMember } from '@/lib/supabase/server'
+import { createCreatineCoupon, generateCouponCode } from '@/lib/shopify/coupon'
 
 export const dynamic = 'force-dynamic'
 
 /**
- * GET - Verifica elegibilidade para creatina grátis
+ * GET - Verifica elegibilidade + gera/retorna cupom
+ * TBD-019: Se elegível e sem cupom no mês → cria cupom via Shopify API
  */
 export async function GET() {
   try {
@@ -28,6 +30,7 @@ export async function GET() {
     }
 
     const supabase = createServiceClient()
+    const currentMonthYear = new Date().toISOString().slice(0, 7) // YYYY-MM
 
     // Chamar função de verificação
     const { data, error } = await supabase.rpc('check_free_creatine_eligibility', {
@@ -45,11 +48,56 @@ export async function GET() {
     const result = data?.[0] || {
       is_eligible: false,
       reason: 'Erro ao verificar',
-      month_year: new Date().toISOString().slice(0, 7),
+      month_year: currentMonthYear,
       already_claimed: false,
       member_status: member.status,
       current_cv: member.current_cv_month || 0
     }
+
+    // Verificar se já existe cupom gerado para este mês
+    const { data: existingClaim } = await supabase
+      .from('free_creatine_claims')
+      .select('coupon_code, status')
+      .eq('member_id', member.id)
+      .eq('month_year', currentMonthYear)
+      .single()
+
+    let couponCode: string | null = existingClaim?.coupon_code || null
+
+    // Se elegível, sem cupom existente e não claimed → gerar cupom
+    if (result.is_eligible && !couponCode && !result.already_claimed) {
+      const couponResult = await createCreatineCoupon({
+        memberName: member.name,
+        memberId: member.id,
+        monthYear: currentMonthYear,
+      })
+
+      if (couponResult.success && couponResult.couponCode) {
+        couponCode = couponResult.couponCode
+
+        // Registrar claim com cupom (status 'generated', não 'claimed' ainda)
+        await supabase
+          .from('free_creatine_claims')
+          .upsert({
+            member_id: member.id,
+            month_year: currentMonthYear,
+            coupon_code: couponCode,
+            coupon_shopify_id: couponResult.priceRuleId,
+            status: 'claimed', // Marca como gerado/disponível
+          }, {
+            onConflict: 'member_id,month_year'
+          })
+
+        console.info(`[free-creatine] Cupom gerado para ${member.name}: ${couponCode}`)
+      } else {
+        console.error('[free-creatine] Falha ao criar cupom:', couponResult.error)
+      }
+    }
+
+    // Se não gerou cupom mas é elegível, gerar código preview
+    const previewCode = !couponCode && result.is_eligible 
+      ? generateCouponCode(member.name, currentMonthYear)
+      : null
 
     return NextResponse.json({
       eligible: result.is_eligible,
@@ -58,11 +106,16 @@ export async function GET() {
       alreadyClaimed: result.already_claimed,
       memberStatus: result.member_status,
       currentCV: result.current_cv,
+      // TBD-019: Cupom individual
+      couponCode: couponCode,
       // Informações adicionais para o frontend
       benefit: {
         name: 'Creatina Grátis',
         description: 'Membros Ativos (200+ CV) têm direito a 1 unidade de creatina grátis por mês.',
-        howToUse: 'Adicione a creatina ao seu carrinho. O desconto de 100% será aplicado automaticamente no checkout.'
+        howToUse: couponCode
+          ? `Use o cupom ${couponCode} no checkout da loja para obter sua creatina grátis.`
+          : 'Atinja 200 CV para liberar seu cupom de creatina grátis.',
+        previewCode: previewCode,
       }
     })
 

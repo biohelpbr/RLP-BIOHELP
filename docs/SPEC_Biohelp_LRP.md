@@ -1,11 +1,11 @@
 # SPEC.md — Biohelp Loyalty Reward Program (LRP)
 **Spec-Driven Development (SDD) / Documento Mestre do Projeto**  
 **Stack:** Next.js (App Router) + Supabase (Postgres/Auth/RLS) + Shopify (Admin API + Webhooks)  
-**Versão:** v3.0 (SDD)  
+**Versão:** v4.0 (SDD)  
 **Status:** Base para execução (contrato/escopo)  
 **Owner:** Biohelp  
 **Implementador:** (Seu time)  
-**Última atualização:** 19/01/2026
+**Última atualização:** 11/02/2026
 
 > **Regra de ouro do SDD:** qualquer mudança relevante neste SPEC.md (regras, fluxos, campos, endpoints, critérios de aceite) **é mudança de escopo** e deve passar por aprovação do cliente antes de implementar.
 
@@ -33,7 +33,7 @@ Esta seção mapeia todos os FRs do documento de escopo formal (`Biohelp_LRP_Esc
 | **FR-03** | Controle de permissões (RBAC) | Sprint 1 | ✅ Implementado |
 | **FR-04** | Cadastro de novo membro | Sprint 1 | ✅ Implementado |
 | **FR-05** | Captura de link de indicação | Sprint 1 | ✅ Implementado |
-| **FR-06** | Regra para cadastro sem link | Sprint 1 | ⏳ TBD-001 pendente |
+| **FR-06** | Regra para cadastro sem link | Sprint 1 | ⏳ TBD-001 ✅ Decidido (House Account) — implementação pendente |
 | **FR-07** | Geração de link único | Sprint 1 | ✅ Implementado |
 | **FR-08** | Ativação de preço de membro | Sprint 1 | ✅ Implementado (via tags) |
 | **FR-09** | Persistência da rede | Sprint 1 | ✅ Implementado |
@@ -84,7 +84,7 @@ Esta seção mapeia todos os FRs do documento de escopo formal (`Biohelp_LRP_Esc
 
 **Inclui:**
 - Cadastro com link (`ref` + UTM)
-- Regra de cadastro sem link (TBD-001 pendente - comportamento atual: bloqueia)
+- Regra de cadastro sem link (TBD-001 ✅ House Account — implementação pendente)
 - Geração de `ref_code` e link de convite
 - Auth (Supabase)
 - Dashboard do membro v1 (mínimo)
@@ -272,17 +272,20 @@ Esta seção mapeia todos os FRs do documento de escopo formal (`Biohelp_LRP_Esc
 - Cada membro é N0 de sua própria rede, independente de quantos níveis acima existam.
 
 ### 4.2 ref_code
-**FR-07**
+**FR-07** | **TBD-006 ✅ RESOLVIDO**
 - Código único do membro usado no link de indicação.
 - Deve ser **imutável** após criado.
-- Formato: UUID curto (ex.: `abc123xy`)
+- **Formato padrão:** Código alfanumérico sequencial — `BH` + 5 dígitos (ex.: `BH00001`, `BH00002`)
+- **Override pelo admin:** Admin pode customizar manualmente (ex.: `MARIA2026`), com validação de unicidade
+- ~~Formato antigo: UUID curto (ex.: `abc123xy`)~~ — membros existentes mantêm código atual
 
 ### 4.3 CV (Commission Volume)
-**FR-14**
+**FR-14** | **TBD-014 ✅ RESOLVIDO**
 - Pontuação associada aos produtos/pedidos.
 - **1 CV = R$ 1,00** (mas CV ≠ preço do produto)
-- **CV do item = valor do metafield/metacampo do produto** (ex.: `custom.cv` ou `lrp.cv`)
-- Fallback: se não houver metacampo, usar preço do item e logar warning
+- **CV do item = valor do metafield `custom.cv` do produto**
+- **Se metafield `custom.cv` não existir → CV = 0** (zero). Logar warning `missing_cv_metafield`.
+- ~~Fallback: se não houver metacampo, usar preço do item~~ — **REMOVIDO** (decisão 11/02/2026)
 - Medida mensal: soma do mês corrente.
 - Regra principal: **Ativa se CV >= 200 no mês**.
 - **Fonte canônica:** `documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
@@ -338,15 +341,20 @@ Esta seção mapeia todos os FRs do documento de escopo formal (`Biohelp_LRP_Esc
 - Link do membro funciona e atribui corretamente a hierarquia (parent/child)
 - Acesso a preço de membro funciona para o e-mail cadastrado
 
-### 5.2 Cadastro sem link (TBD-001)
+### 5.2 Cadastro sem link (TBD-001 ✅ RESOLVIDO)
 **FR-06**
 
-Definir UMA regra (precisa estar assinada no Anexo TBD):
-- **A)** Sponsor = "House Account" (um usuário raiz do sistema)  
-- **B)** Distribuição para uma lista de líderes elegíveis  
-- **C)** Sem sponsor (rede começa nele) *(não recomendado se gerar exceções)*
+**Decisão (11/02/2026):** ✅ **Opção A — House Account**
 
-> Implementar apenas após decisão assinada. Sem decisão, o comportamento padrão é bloquear com mensagem "cadastro indisponível sem convite".
+**Regra:**
+- Cadastro sem link (`/join` sem `?ref=`) → `sponsor_id` = House Account (conta raiz da empresa)
+- Comissões de compras desse membro vão para a empresa (Biohelp)
+- ~~Bloquear com mensagem "cadastro indisponível sem convite"~~ — **REMOVIDO**
+
+**Implementação:**
+- Criar membro especial "Biohelp House" (conta raiz, não aparece em listagens normais)
+- Se `ref` ausente ou inválido → `sponsor_id = house_account.id`
+- Evento registrado em `referral_events` com `ref_code_used = null`
 
 ### 5.3 Unicidade de membro
 **FR-04**
@@ -361,11 +369,21 @@ Definir UMA regra (precisa estar assinada no Anexo TBD):
   - Tags mínimas aplicadas
   - (Opcional) Metacampos mínimos
 
-**Tags recomendadas (ajustável por decisão do cliente):**
-- `lrp_member`
-- `lrp_ref:<ref_code>`
-- `lrp_sponsor:<sponsor_ref_code|none>`
-- `lrp_status:pending|active|inactive`
+**Tags finais (TBD-003 ✅ RESOLVIDO — 11/02/2026):**
+- `lrp_member` — identifica como membro do programa
+- `lrp_ref:<ref_code>` — código de referência do membro
+- `lrp_sponsor:<sponsor_ref_code|none>` — código de quem indicou
+- `lrp_status:pending|active|inactive` — status atual
+- `nivel:<nivel>` — **NOVA** — nível do membro no programa
+
+**Valores da tag `nivel:`:**
+- `nivel:membro`
+- `nivel:parceiro`
+- `nivel:lider`
+- `nivel:diretor`
+- `nivel:head`
+
+**Regra:** Quando o nível do membro muda, a tag `nivel:` deve ser atualizada na Shopify automaticamente.
 
 ### 5.5 Redirect pós-cadastro
 **FR-04**
@@ -417,19 +435,22 @@ No painel do membro, exibir:
 
 ## 6) Regras de Comissionamento
 
-### 6.1 Creatina Mensal Grátis ✅
+### 6.1 Creatina Mensal Grátis ✅ (Atualizado 11/02/2026)
 **TBD-019 — RESOLVIDO**
 - Todo Membro Ativo (200 CV) recebe 1 creatina grátis por mês
-- **Mecanismo:** Desconto de 100% aplicado no pedido real
+- **Mecanismo (atualizado):** Cupom Individual Mensal
 - **Regras:**
   - Membro deve estar ativo (CV >= 200 no mês)
   - Limite: 1 unidade por mês
   - Não acumula para o próximo mês
-  - Membro adiciona ao carrinho em pedido real
-  - Desconto aplicado automaticamente no checkout
+  - Sistema gera **código de cupom exclusivo** para cada membro ativo
+  - Cupom válido apenas no mês de geração
+  - Formato: `CREATINA-<NOME>-<MÊSANO>` (ex.: `CREATINA-MARIA-FEV2026`)
 - **Controle:** Tabela `free_creatine_claims` registra uso
-- **API:** `GET/POST /api/members/me/free-creatine`
-- **UI:** Card no dashboard mostra elegibilidade
+- **Geração:** Cupom criado via Shopify Admin API (Discount Code — 100% OFF, 1 uso, validade mensal)
+- **API:** `GET/POST /api/members/me/free-creatine` (retorna cupom do mês)
+- **UI:** Card no dashboard mostra cupom gerado para o membro
+- **Motivo da escolha:** Mais simples, mais barato, não exige Shopify Functions
 
 ### 6.2 Fast-Track
 **FR-22**
@@ -599,7 +620,7 @@ Se a N0 estiver recebendo Fast-Track de uma N1, só passa a receber a Comissão 
 ## 10) Rotas e páginas (Next.js App Router)
 
 ### 10.1 Públicas
-- `GET /` (landing simples ou redirect)
+- `GET /` → redirect 302 para `/login` (TBD-007 ✅ RESOLVIDO — manter como está)
 - `GET /join` (cadastro)
 - `GET /login` (login)
 
@@ -933,19 +954,19 @@ Se a N0 estiver recebendo Fast-Track de uma N1, só passa a receber a Comissão 
 
 | ID | Tema | Status |
 |----|------|--------|
-| TBD-001 | Regra de cadastro sem link | ⏳ Pendente |
+| TBD-001 | Regra de cadastro sem link | ✅ House Account (11/02/2026) |
 | TBD-002 | Como preço de membro é liberado na Shopify | ⏳ Pendente |
-| TBD-003 | Lista final de tags/metacampos | ⏳ Pendente |
+| TBD-003 | Lista final de tags/metacampos | ✅ Tags atuais + tag de nível (11/02/2026) |
 | TBD-004 | Domínios e URLs oficiais | ⏳ Pendente |
 | TBD-005 | Resync Shopify (o que reaplicar) | ⏳ Pendente |
-| TBD-006 | Formato do ref_code | ⏳ Pendente |
-| TBD-007 | Comportamento da landing page | ⏳ Pendente |
-| TBD-014 | Nome exato do metafield CV | ⏳ Pendente |
-| TBD-015 | Limite de saque PF | ⏳ Pendente |
-| TBD-016 | Valor mínimo para saque | ⏳ Pendente |
-| TBD-018 | Integração fintech | ⏳ Pendente |
-| TBD-019 | Creatina mensal grátis | ✅ Desconto 100% no pedido |
-| TBD-021 | Período de trava para saque | ⏳ Pendente |
+| TBD-006 | Formato do ref_code | ✅ Sequencial + customização admin (11/02/2026) |
+| TBD-007 | Comportamento da landing page | ✅ Redirect para /login (11/02/2026) |
+| TBD-014 | Nome exato do metafield CV | ✅ custom.cv, CV=0 se ausente (11/02/2026) |
+| TBD-015 | Limite de saque PF | ✅ R$1.000/mês |
+| TBD-016 | Valor mínimo para saque | ✅ R$100/saque |
+| TBD-018 | Integração fintech | ✅ Asaas |
+| TBD-019 | Creatina mensal grátis | ✅ Cupom Individual Mensal (atualizado 11/02/2026) |
+| TBD-021 | Período de trava para saque | ✅ Net-15 |
 
 ---
 

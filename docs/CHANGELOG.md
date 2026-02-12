@@ -6,6 +6,52 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 4.0 — 2026-02-11
+**Tipo:** Decisões de negócio (reunião de alinhamento com cliente)  
+**Mudanças:**
+
+### TBDs Resolvidos (5 decisões + 1 atualização)
+
+1. **TBD-001 — Cadastro sem link → ✅ House Account**
+   - Cadastro sem convite → sponsor = conta da empresa (Biohelp)
+   - Comissão de membros sem convite fica com a empresa
+   - FR-06 desbloqueado para implementação
+
+2. **TBD-003 — Tags → ✅ Manter padrão atual + nova tag de nível**
+   - Nova tag obrigatória: `nivel:<nivel>` (membro/parceiro/lider/diretor/head)
+   - Impacta: regras de comissão, hierarquia, relatórios
+   - Sync Shopify deve atualizar tag quando nível muda
+
+3. **TBD-006 — Formato ref_code → ✅ Sequencial + customização admin**
+   - Padrão: `BH00001` (sequencial automático)
+   - Admin pode customizar: ex. `MARIA2026`
+   - Validação de unicidade obrigatória
+
+4. **TBD-007 — Página inicial → ✅ Redirect para /login (manter como está)**
+   - Sem alteração necessária
+
+5. **TBD-014 — Metafield CV → ✅ custom.cv | CV=0 se ausente**
+   - Removido fallback para preço do item
+   - Se metafield não existir → CV = 0
+   - Evita distorção de comissão
+
+6. **TBD-019 — Creatina mensal → ✅ Cupom Individual Mensal (atualização)**
+   - Método alterado de "desconto automático" para "cupom individual"
+   - Sistema gera cupom exclusivo: `CREATINA-<NOME>-<MÊSANO>`
+   - Mais simples e mais barato (sem Shopify Functions)
+
+**FRs afetados:** FR-06 (desbloqueado), FR-07 (formato ref_code), FR-14 (CV sem fallback), FR-04/FR-08 (tags)
+
+**Impacto:**
+- Prazo: Requer implementação de FR-06 (House Account), novo formato ref_code, remoção de fallback CV, tag de nível, cupom individual
+- Custo: Incluso no escopo
+- Risco: Baixo (decisões alinham implementação ao modelo de negócio)
+
+**Aprovado por (cliente):** Reunião de alinhamento 11/02/2026  
+**Evidência:** Ata de reunião
+
+---
+
 ## Versão 3.0 — 2026-01-12
 **Tipo:** Atualização completa do SDD com mapeamento de FRs  
 **Mudanças:**

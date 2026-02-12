@@ -153,7 +153,7 @@ const Icons = {
   ),
 }
 
-// Interface para creatina grátis
+// Interface para creatina grátis (TBD-019: Cupom Individual)
 interface FreeCreatineData {
   eligible: boolean
   reason: string
@@ -161,6 +161,13 @@ interface FreeCreatineData {
   alreadyClaimed: boolean
   memberStatus: string
   currentCV: number
+  couponCode: string | null
+  benefit: {
+    name: string
+    description: string
+    howToUse: string
+    previewCode?: string | null
+  }
 }
 
 export default function DashboardPage() {
@@ -437,7 +444,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Creatina Grátis - Sprint 7 (TBD-019) */}
+        {/* Creatina Grátis - Sprint 7 (TBD-019: Cupom Individual Mensal) */}
         {freeCreatine && (
           <div className={`${styles.benefitCard} ${freeCreatine.eligible ? styles.benefitCardEligible : freeCreatine.alreadyClaimed ? styles.benefitCardClaimed : styles.benefitCardIneligible}`}>
             <div className={styles.benefitIcon}>
@@ -445,19 +452,41 @@ export default function DashboardPage() {
             </div>
             <div className={styles.benefitContent}>
               <h3 className={styles.benefitTitle}>Creatina Grátis do Mês</h3>
-              {freeCreatine.eligible ? (
+              {freeCreatine.couponCode ? (
+                <>
+                  <p className={styles.benefitStatus}>Seu cupom está pronto!</p>
+                  <div className={styles.couponCodeWrapper}>
+                    <code className={styles.couponCode}>{freeCreatine.couponCode}</code>
+                    <button 
+                      onClick={async () => {
+                        if (freeCreatine.couponCode) {
+                          await navigator.clipboard.writeText(freeCreatine.couponCode)
+                        }
+                      }}
+                      className={styles.couponCopyBtn}
+                      title="Copiar cupom"
+                    >
+                      {Icons.copy}
+                    </button>
+                  </div>
+                  <p className={styles.benefitDescription}>
+                    Use este cupom no checkout da loja para obter sua creatina grátis. 
+                    Válido para 1 uso neste mês.
+                  </p>
+                </>
+              ) : freeCreatine.eligible ? (
                 <>
                   <p className={styles.benefitStatus}>Disponível!</p>
                   <p className={styles.benefitDescription}>
                     Você tem direito a 1 unidade de creatina grátis este mês. 
-                    Adicione ao seu próximo pedido e o desconto será aplicado automaticamente.
+                    Seu cupom está sendo gerado...
                   </p>
                 </>
               ) : freeCreatine.alreadyClaimed ? (
                 <>
                   <p className={styles.benefitStatusUsed}>Já utilizado</p>
                   <p className={styles.benefitDescription}>
-                    Você já utilizou sua creatina grátis em {freeCreatine.month}. 
+                    Você já utilizou sua creatina grátis em {formatMonth(freeCreatine.month)}. 
                     O benefício renova no próximo mês!
                   </p>
                 </>

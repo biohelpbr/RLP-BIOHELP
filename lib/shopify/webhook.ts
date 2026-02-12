@@ -52,6 +52,11 @@ export interface ShopifyOrderWebhook {
     first_name: string
     last_name: string
   }
+  discount_codes?: Array<{
+    code: string
+    amount: string
+    type: 'percentage' | 'fixed_amount' | 'shipping'
+  }>
   refunds?: Array<{
     id: number
     created_at: string
@@ -178,6 +183,7 @@ export function extractOrderData(webhook: ShopifyOrderWebhook) {
       quantity: item.quantity,
       price: item.price
     })),
+    discountCodes: webhook.discount_codes || [],
     rawData: webhook
   }
 }
