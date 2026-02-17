@@ -568,6 +568,22 @@ Para um cadastro bem-sucedido (membro novo):
 
 ---
 
+## Checklist — Página de Produtos Admin (TBD-023)
+
+| # | Critério | Status |
+|---|----------|--------|
+| 1 | Página `/admin/products` carrega corretamente | ⏳ |
+| 2 | Lista todos os produtos da Shopify | ⏳ |
+| 3 | CV (metafield `custom.cv`) exibido corretamente | ⏳ |
+| 4 | Produtos sem CV indicados visualmente | ⏳ |
+| 5 | Cards de resumo (total, ativos, com CV, sem CV) | ⏳ |
+| 6 | Imagem, preço, SKU e status exibidos | ⏳ |
+| 7 | Apenas admins acessam (403 para não-admins) | ⏳ |
+| 8 | Sidebar admin com link funcional para Produtos | ⏳ |
+| 9 | Link "Configurações" removido do sidebar | ⏳ |
+
+---
+
 ## Progresso Geral
 
 | Sprint | FRs | Implementados | Parciais | Pendentes | % Completo |

@@ -6,6 +6,32 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 4.3 — 2026-02-16
+**Tipo:** Nova funcionalidade (Página de Produtos Admin) + Limpeza de sidebar  
+**TBD-023:** Aprovado pelo cliente
+
+### Página de Produtos (`/admin/products`)
+- Nova página no painel admin que lista produtos da Shopify com CV
+- **API:** `GET /api/admin/products` — proxy Shopify REST API + enriquecimento com metafield `custom.cv`
+- **UI:** Grid de cards com imagem, título, preço, SKU, status, CV (indicação visual de CV ausente)
+- **Cards resumo:** Total produtos, Ativos, Com CV, Sem CV
+- **Requer:** permissão `read_products` (já habilitada)
+
+### Limpeza do sidebar admin
+- Link "Produtos" atualizado para `/admin/products` (antes era placeholder)
+- Link "Configurações" removido (não havia funcionalidade associada)
+
+**Arquivos criados/alterados:**
+- `app/api/admin/products/route.ts` (novo)
+- `app/admin/products/page.tsx` (novo)
+- `app/admin/products/page.module.css` (novo)
+- `app/admin/page.tsx` (sidebar atualizado)
+- `app/admin/commissions/page.tsx` (sidebar atualizado)
+- `docs/DECISOES_TBD.md` (TBD-023 registrado)
+- `docs/SPEC_Biohelp_LRP.md` (seção 10.3)
+
+---
+
 ## Versão 4.2 — 2026-02-16
 **Tipo:** Nova funcionalidade (Página de Vendas)  
 **Mudanças:**

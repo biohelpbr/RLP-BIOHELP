@@ -19,8 +19,8 @@
 | Status | Quantidade |
 |--------|------------|
 | ⏳ Pendente | 1 |
-| ✅ Resolvido | 21 |
-| **Total** | **22** |
+| ✅ Resolvido | 22 |
+| **Total** | **23** |
 
 ### Por Sprint
 | Sprint | Pendentes | Resolvidos |
@@ -46,6 +46,30 @@
 
 **Responsável:** ________  
 **Data:** ________
+
+---
+
+### TBD-023 — Página de Produtos no Admin (Shopify) ✅
+**Por que importa:** Admin precisa visualizar produtos da loja virtual com seus CVs configurados, sem precisar acessar o Shopify Admin separadamente.
+**Aprovado por:** Cliente (16/02/2026)
+
+**Decisão:** ✅ Criar página `/admin/products` que lista produtos da Shopify via REST API  
+**Inclui:**
+- Lista de produtos com: nome, imagem, preço, SKU, status, CV (metafield `custom.cv`)
+- Indicação visual de quais produtos têm CV configurado e quais não
+- Dados puxados diretamente da Shopify Admin REST API (`GET /products.json`)
+
+**Escopo fora (por enquanto):**
+- ❌ Editar produtos pela plataforma LRP (edição continua no Shopify Admin)
+- ❌ Criar/deletar produtos
+
+**Implementação:**
+- API: `GET /api/admin/products` (proxy para Shopify REST API + enriquecimento com CV)
+- Página: `/admin/products`
+- Permissão: `read_products` (já habilitada no token Shopify)
+
+**Data:** 16/02/2026  
+**Evidência:** Solicitação direta do cliente durante sessão de desenvolvimento
 
 ---
 

@@ -640,6 +640,7 @@ Se a N0 estiver recebendo Fast-Track de uma N1, só passa a receber a Comissão 
 - `GET /admin`
 - `GET /admin/members/[id]` (detalhe do membro)
 - `GET /admin/commissions`
+- `GET /admin/products` — Listagem de produtos da Shopify com CV (TBD-023)
 
 ---
 
