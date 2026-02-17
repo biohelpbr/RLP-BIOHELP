@@ -634,6 +634,7 @@ Se a N0 estiver recebendo Fast-Track de uma N1, só passa a receber a Comissão 
 - `GET /dashboard`
 - `GET /dashboard/network`
 - `GET /dashboard/commissions`
+- `GET /dashboard/sales` — Página de vendas (pedidos próprios + vendas da rede N1)
 
 ### 10.3 Autenticadas (admin)
 - `GET /admin`
@@ -692,6 +693,11 @@ Se a N0 estiver recebendo Fast-Track de uma N1, só passa a receber a Comissão 
 
 ### 11.9 GET `/api/members/me/commissions`
 - Resumo de comissões do membro
+
+### 11.9b GET `/api/members/me/orders`
+- Pedidos próprios do membro com items e CV
+- Pedidos dos indicados diretos (N1) — vendas da rede
+- Resumo consolidado (total pedidos, CV, valor)
 
 ### 11.10 POST `/api/cron/close-monthly-cv`
 - Job de fechamento mensal

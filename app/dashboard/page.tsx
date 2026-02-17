@@ -344,7 +344,7 @@ export default function DashboardPage() {
               </Link>
             </li>
             <li className={styles.navItem}>
-              <Link href="/dashboard">
+              <Link href="/dashboard/sales">
                 <span className={styles.navIcon}>{Icons.shoppingBag}</span>
                 <span>Vendas</span>
               </Link>

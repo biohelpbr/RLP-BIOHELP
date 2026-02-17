@@ -6,6 +6,27 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 4.2 — 2026-02-16
+**Tipo:** Nova funcionalidade (Página de Vendas)  
+**Mudanças:**
+
+### Página de Vendas (`/dashboard/sales`)
+- Nova página no painel do membro para visualizar pedidos próprios e vendas da rede (N1)
+- **API:** `GET /api/members/me/orders` — retorna resumo, pedidos próprios com items/CV, vendas dos indicados diretos
+- **UI:** Cards de resumo (total pedidos, CV total, indicados N1), abas Minhas Compras / Vendas da Rede, tabela com expand para detalhes dos itens
+- **Design:** Consistente com as páginas existentes (dark theme, mesmo padrão visual)
+- **FRs relacionados:** FR-13, FR-14, FR-17 (complemento visual)
+- **SDD:** `docs/sdd/features/sales-page/`
+
+**Arquivos criados/alterados:**
+- `app/api/members/me/orders/route.ts` (novo)
+- `app/dashboard/sales/page.tsx` (novo)
+- `app/dashboard/sales/page.module.css` (novo)
+- `app/dashboard/page.tsx` (link sidebar atualizado)
+- `docs/SPEC_Biohelp_LRP.md` (seções 10.2 e 11.9b)
+
+---
+
 ## Versão 4.0 — 2026-02-11
 **Tipo:** Decisões de negócio (reunião de alinhamento com cliente)  
 **Mudanças:**

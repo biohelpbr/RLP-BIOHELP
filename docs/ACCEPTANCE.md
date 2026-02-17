@@ -533,6 +533,26 @@ Para um cadastro bem-sucedido (membro novo):
 
 ---
 
+## Página de Vendas — Aceite
+
+**Rota:** `/dashboard/sales`  
+**API:** `GET /api/members/me/orders`  
+**SDD:** `docs/sdd/features/sales-page/`
+
+### Checklist (Aceite)
+- [x] Página `/dashboard/sales` carrega corretamente
+- [x] Cards de resumo mostram totais (pedidos, CV, rede)
+- [x] Aba "Minhas Compras" exibe pedidos próprios do membro
+- [x] Aba "Vendas da Rede" exibe pedidos dos indicados N1
+- [x] Clique em pedido expande e mostra itens com CV por item
+- [x] Status dos pedidos (Pago/Reembolsado/Cancelado) visualmente distintos
+- [x] Empty state quando não há pedidos
+- [x] Link do sidebar atualizado para `/dashboard/sales`
+- [x] Design consistente com páginas existentes (dark theme)
+- [x] Build sem erros
+
+---
+
 ## Critérios de Aceite do Projeto (macro)
 
 **Do documento de escopo formal:**
