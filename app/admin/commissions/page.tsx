@@ -49,13 +49,6 @@ const Icons = {
       <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
     </svg>
   ),
-  network: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
-      <path d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
-    </svg>
-  ),
   box: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
@@ -198,12 +191,6 @@ export default function AdminCommissionsPage() {
               <Link href="/admin">
                 <span className={styles.navIcon}>{Icons.users}</span>
                 <span>Parceiras</span>
-              </Link>
-            </li>
-            <li className={styles.navItem}>
-              <Link href="/admin">
-                <span className={styles.navIcon}>{Icons.network}</span>
-                <span>Rede</span>
               </Link>
             </li>
             <li className={`${styles.navItem} ${styles.navItemActive}`}>
