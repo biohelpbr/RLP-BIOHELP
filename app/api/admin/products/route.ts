@@ -76,13 +76,15 @@ export async function GET() {
       )
     }
 
-    // 2. Buscar produtos da Shopify
+    console.info('[admin/products] Buscando produtos da Shopify...')
+
+    // 2. Buscar produtos da Shopify (sem filtro de status = retorna todos)
     const productsResult = await shopifyRest<{ products: ShopifyProduct[] }>(
-      '/products.json?limit=250&status=any'
+      '/products.json?limit=250'
     )
 
     if (productsResult.error || !productsResult.data) {
-      console.error('[admin/products] Erro Shopify:', productsResult.error)
+      console.error('[admin/products] Erro Shopify:', productsResult.error, 'Status:', productsResult.status)
       return NextResponse.json(
         { error: 'Erro ao buscar produtos da Shopify', detail: productsResult.error },
         { status: 500 }
@@ -90,6 +92,7 @@ export async function GET() {
     }
 
     const products = productsResult.data.products || []
+    console.info(`[admin/products] ${products.length} produtos encontrados`)
 
     // 3. Buscar CVs (metafield custom.cv) para cada produto
     const cvMap = new Map<number, number | null>()
@@ -99,15 +102,21 @@ export async function GET() {
     for (let i = 0; i < products.length; i += batchSize) {
       const batch = products.slice(i, i + batchSize)
       const promises = batch.map(async (product) => {
-        const metaResult = await shopifyRest<{ metafields: Array<{ namespace: string; key: string; value: string }> }>(
-          `/products/${product.id}/metafields.json?namespace=custom`
-        )
-        if (metaResult.data) {
-          const cvMeta = metaResult.data.metafields.find(
-            m => m.namespace === 'custom' && m.key === 'cv'
+        try {
+          const metaResult = await shopifyRest<{ metafields: Array<{ namespace: string; key: string; value: string }> }>(
+            `/products/${product.id}/metafields.json?namespace=custom`
           )
-          cvMap.set(product.id, cvMeta ? parseFloat(cvMeta.value) : null)
-        } else {
+          if (metaResult.data) {
+            const cvMeta = metaResult.data.metafields.find(
+              m => m.namespace === 'custom' && m.key === 'cv'
+            )
+            cvMap.set(product.id, cvMeta ? parseFloat(cvMeta.value) : null)
+          } else {
+            console.warn(`[admin/products] Metafield erro para produto ${product.id}:`, metaResult.error)
+            cvMap.set(product.id, null)
+          }
+        } catch (err) {
+          console.warn(`[admin/products] Exceção metafield produto ${product.id}:`, err)
           cvMap.set(product.id, null)
         }
       })
