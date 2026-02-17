@@ -36,7 +36,7 @@ async function shopifyRest<T>(
   endpoint: string
 ): Promise<{ data: T | null; error: string | null; status: number }> {
   const shopDomain = process.env.SHOPIFY_STORE_DOMAIN
-  const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN
+  const accessToken = process.env.SHOPIFY_ADMIN_API_TOKEN
 
   if (!shopDomain || !accessToken) {
     return { data: null, error: 'Missing Shopify env vars', status: 500 }
