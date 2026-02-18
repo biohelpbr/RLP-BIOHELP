@@ -1257,14 +1257,16 @@ Comissões futuras desse membro → conta da empresa
 
 **Motivo:** Evitar distorção de comissão. Produto sem CV configurado não deve gerar comissão.
 
-### TBD-019 — Cupom Individual Mensal de Creatina
+### TBD-019 — Cupom Individual Mensal de Creatina (Atualizado 18/02/2026)
 
 **Regra:** Membro Ativo (CV >= 200) recebe cupom exclusivo para 1 creatina grátis/mês.
 
-**Formato do cupom:** `CREATINA-<NOME>-<MÊSANO>`
-- Exemplo: `CREATINA-MARIA-FEV2026`
+**Formato do cupom:** `CREATINA-<NOME>-<HASH>-<MÊSANO>`
+- Exemplo: `CREATINA-MARIA-X7K9-FEV2026`
+- O **hash aleatório** (X7K9) torna o código único e não adivinhável
 
 **Como funciona:**
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                    FLUXO DA CREATINA GRÁTIS (Sprint 7)                      │
@@ -1275,14 +1277,15 @@ Comissões futuras desse membro → conta da empresa
    │  Cron job: /api/cron/generate-creatine-coupons
    │  Para cada membro ativo:
    │  ├── Cria Price Rule na Shopify (100% OFF, 1 uso)
-   │  └── Gera Discount Code: CREATINA-MARIA-FEV2026
+   │  ├── Restringe ao customer_id do membro (segurança)
+   │  └── Gera Discount Code: CREATINA-MARIA-X7K9-FEV2026
    │
    ▼
 2️⃣ MEMBRO ACESSA DASHBOARD
    │
    │  Card "Creatina Grátis do Mês"
    │  Mostra: "Seu cupom está pronto!"
-   │  Exibe código: CREATINA-MARIA-FEV2026
+   │  Exibe código: CREATINA-MARIA-X7K9-FEV2026
    │  Botão de copiar 📋
    │
    ▼
@@ -1290,14 +1293,15 @@ Comissões futuras desse membro → conta da empresa
    │
    │  Adiciona creatina ao carrinho
    │  No checkout, cola o cupom
+   │  ⚠️ Se outra pessoa tentar usar → Shopify rejeita (restrito ao dono)
    │  Desconto de 100% aplicado automaticamente
    │
    ▼
-4️⃣ WEBHOOK DETECTA USO
+4️⃣ WEBHOOK DETECTA USO + VALIDA SEGURANÇA
    │
    │  Webhook orders/paid detecta cupom CREATINA-*
-   │  Atualiza free_creatine_claims com order_id
-   │  Status = 'claimed'
+   │  ✅ Se dono correto → Atualiza status = 'claimed'
+   │  ⚠️ Se fraude → Registra em fraud_details
    │
    ▼
 5️⃣ DASHBOARD ATUALIZA
@@ -1313,6 +1317,53 @@ Comissões futuras desse membro → conta da empresa
 - 🟡 **Já utilizado** — Membro usou este mês
 - ⚪ **Indisponível** — Membro não atingiu 200 CV
 - ⏳ **Gerando...** — Cupom sendo gerado
+
+### Segurança Anti-Fraude do Cupom (Implementado 18/02/2026)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CAMADAS DE SEGURANÇA DO CUPOM                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+🔒 CAMADA 1: Código Não Adivinhável
+   │  Hash aleatório de 4 caracteres (ex: X7K9)
+   │  Impossível "chutar" o código de outro membro
+   │
+🔒 CAMADA 2: Restrição por Customer (Shopify)
+   │  Cupom vinculado ao shopify_customer_id do membro
+   │  Shopify rejeita se outra pessoa tentar usar
+   │
+🔒 CAMADA 3: Limite de 1 Uso Global
+   │  usage_limit: 1 → Uma vez usado, cupom inválido
+   │  once_per_customer: true → Extra segurança
+   │
+🔒 CAMADA 4: Validade Temporal
+   │  Cupom expira no último dia do mês
+   │  Não pode ser guardado para usar depois
+   │
+🔒 CAMADA 5: Unicidade no Banco
+   │  UNIQUE INDEX em coupon_code
+   │  Impossível gerar código duplicado
+   │
+🔒 CAMADA 6: Validação no Webhook
+   │  Webhook verifica se quem usou é o dono
+   │  Fraude detectada → Registra em fraud_details
+   │
+🔒 CAMADA 7: Auditoria Admin
+   │  View v_creatine_fraud_attempts
+   │  Admin pode ver todas as tentativas suspeitas
+```
+
+**O que acontece em cada cenário:**
+
+| Cenário | Resultado |
+|---------|-----------|
+| Membro usa seu próprio cupom | ✅ Funciona normalmente |
+| Alguém tenta usar cupom de outro | ❌ Shopify rejeita (customer_selection) |
+| Alguém "chuta" um código | ❌ Hash torna impossível adivinhar |
+| Membro tenta usar 2x no mês | ❌ usage_limit: 1 já foi usado |
+| Membro guarda para mês seguinte | ❌ ends_at expira fim do mês |
+| Fraude passa (edge case) | ⚠️ Webhook registra fraud_details |
 
 ## APIs Criadas/Atualizadas (Sprint 7)
 
@@ -1331,7 +1382,10 @@ Comissões futuras desse membro → conta da empresa
 | `ref_code_seq` | Sequência PostgreSQL para ref_code |
 | `free_creatine_claims.coupon_code` | Código do cupom gerado |
 | `free_creatine_claims.coupon_shopify_id` | ID do Discount na Shopify |
+| `free_creatine_claims.fraud_details` | JSON com detalhes de tentativa de fraude |
 | UNIQUE(member_id, month_year) | Garante 1 claim por membro/mês |
+| UNIQUE(coupon_code) | Garante código único (segurança) |
+| `v_creatine_fraud_attempts` | View para auditoria de fraudes |
 
 ## Testes Esperados (Sprint 7)
 

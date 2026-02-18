@@ -489,7 +489,7 @@ export async function POST(request: NextRequest) {
   }
 
   // =====================================================
-  // 16. [TBD-019] DETECTAR USO DE CUPOM CREATINA
+  // 16. [TBD-019] DETECTAR USO DE CUPOM CREATINA (COM VALIDAÇÃO DE SEGURANÇA)
   // =====================================================
   try {
     const creatineCoupon = extractedData.discountCodes?.find(
@@ -500,28 +500,48 @@ export async function POST(request: NextRequest) {
       const couponCode = creatineCoupon.code.toUpperCase()
       console.info(`[webhook] Cupom creatina detectado: ${couponCode} (membro: ${member.id})`)
 
-      // Buscar claim pelo coupon_code
+      // SEGURANÇA: Buscar claim pelo coupon_code (sem filtrar por member_id inicialmente)
       const { data: claim } = await supabase
         .from('free_creatine_claims')
-        .select('id')
+        .select('id, member_id')
         .eq('coupon_code', couponCode)
-        .eq('member_id', member.id)
         .single()
 
       if (claim) {
-        // Atualizar com order_id
-        await supabase
-          .from('free_creatine_claims')
-          .update({
-            order_id: newOrder.id,
-            status: 'claimed',
-          })
-          .eq('id', claim.id)
+        // SEGURANÇA: Verificar se o cupom pertence ao membro que fez a compra
+        if (claim.member_id !== member.id) {
+          console.error(`[webhook] ⚠️ FRAUDE DETECTADA: Cupom ${couponCode} pertence ao membro ${claim.member_id}, mas foi usado por ${member.id}`)
+          // Registrar tentativa de fraude (não bloqueia o pedido, mas loga)
+          await supabase
+            .from('free_creatine_claims')
+            .update({
+              status: 'fraud_attempt',
+              fraud_details: JSON.stringify({
+                attempted_by: member.id,
+                attempted_order: newOrder.id,
+                detected_at: new Date().toISOString(),
+              }),
+            })
+            .eq('id', claim.id)
+        } else {
+          // Cupom válido e pertence ao membro correto
+          await supabase
+            .from('free_creatine_claims')
+            .update({
+              order_id: newOrder.id,
+              status: 'claimed',
+              claimed_at: new Date().toISOString(),
+            })
+            .eq('id', claim.id)
 
-        console.info(`[webhook] Creatina claim atualizado: ${claim.id} → order ${newOrder.id}`)
+          console.info(`[webhook] ✅ Creatina claim atualizado: ${claim.id} → order ${newOrder.id}`)
+        }
       } else {
-        // Cupom usado sem claim prévio — registrar mesmo assim
+        // Cupom não encontrado no sistema - pode ser uso irregular
         const currentMonth = getCurrentMonthYear()
+        console.warn(`[webhook] ⚠️ Cupom creatina ${couponCode} usado mas não encontrado no sistema`)
+        
+        // Registrar para auditoria (não bloqueia)
         await supabase
           .from('free_creatine_claims')
           .upsert({
@@ -529,12 +549,13 @@ export async function POST(request: NextRequest) {
             month_year: currentMonth,
             order_id: newOrder.id,
             coupon_code: couponCode,
-            status: 'claimed',
+            status: 'claimed_untracked',
+            claimed_at: new Date().toISOString(),
           }, {
             onConflict: 'member_id,month_year'
           })
 
-        console.info(`[webhook] Creatina claim criado retroativamente para ${member.id}`)
+        console.info(`[webhook] Creatina claim criado para auditoria: ${member.id}`)
       }
     }
   } catch (creatineErr) {

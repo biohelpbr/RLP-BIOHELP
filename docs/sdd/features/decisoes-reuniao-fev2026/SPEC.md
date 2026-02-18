@@ -49,18 +49,34 @@ Implementar cada decisão conforme aprovado pelo cliente, alterando o código ex
 - **Seção SPEC:** 6.1
 - **Descrição**: Gerar cupom exclusivo via Shopify Admin API para cada membro ativo
 - **Entrada**: Membro ativo (CV >= 200)
-- **Saída**: Cupom `CREATINA-<NOME>-<MÊSANO>` criado na Shopify
-- **Regras**: 1 uso, válido no mês, 100% OFF, formato padronizado
+- **Saída**: Cupom `CREATINA-<NOME>-<HASH>-<MÊSANO>` criado na Shopify
+- **Regras**: 1 uso, válido no mês, 100% OFF, formato com hash aleatório
+
+### RF-06: Segurança anti-fraude do cupom (TBD-019 melhorado — 18/02/2026)
+- **Seção SPEC:** 6.1
+- **Descrição**: Impedir uso indevido do cupom de creatina por terceiros
+- **Entrada**: Tentativa de uso de cupom CREATINA-*
+- **Saída**: Validação de propriedade + registro de fraude se aplicável
+- **Regras**:
+  - Hash aleatório no código (não adivinhável)
+  - Cupom restrito ao shopify_customer_id do membro
+  - Limite global de 1 uso
+  - Webhook valida se quem usou é o dono
+  - Tentativas de fraude registradas em fraud_details
 
 ## Critérios de Aceite
 
-- [ ] CA-01: Produto sem metafield CV gera CV = 0 (não usa preço como fallback)
-- [ ] CA-02: Customer Shopify recebe tag `nivel:<nivel>` no cadastro e em mudanças de nível
-- [ ] CA-03: Cadastro sem link cria membro com sponsor = House Account
-- [ ] CA-04: Novos membros recebem ref_code no formato `BH00001`
-- [ ] CA-05: Admin pode customizar ref_code com validação de unicidade
-- [ ] CA-06: Membro ativo recebe cupom de creatina no formato `CREATINA-<NOME>-<MÊSANO>`
-- [ ] CA-07: Cupom criado na Shopify com 100% OFF, 1 uso, validade mensal
+- [x] CA-01: Produto sem metafield CV gera CV = 0 (não usa preço como fallback) ✅
+- [x] CA-02: Customer Shopify recebe tag `nivel:<nivel>` no cadastro e em mudanças de nível ✅
+- [x] CA-03: Cadastro sem link cria membro com sponsor = House Account ✅
+- [x] CA-04: Novos membros recebem ref_code no formato `BH00001` ✅
+- [x] CA-05: Admin pode customizar ref_code com validação de unicidade ✅
+- [x] CA-06: Membro ativo recebe cupom de creatina no formato `CREATINA-<NOME>-<HASH>-<MÊSANO>` ✅
+- [x] CA-07: Cupom criado na Shopify com 100% OFF, 1 uso, validade mensal ✅
+- [x] CA-08: Cupom restrito ao shopify_customer_id do membro ✅
+- [x] CA-09: Webhook valida se quem usou é o dono do cupom ✅
+- [x] CA-10: Tentativas de fraude registradas em fraud_details ✅
+- [x] CA-11: View v_creatine_fraud_attempts disponível para auditoria ✅
 
 ## Fora do Escopo
 - TBD-002 (preço de membro Shopify) — ainda pendente

@@ -360,18 +360,27 @@ Para um cadastro bem-sucedido (membro novo):
 
 ### Regras de Comissionamento (canônico: Biohelp___Loyalty_Reward_Program.md)
 
-**Creatina Mensal Grátis (TBD-019 ✅ RESOLVIDO — Atualizado 11/02/2026):**
+**Creatina Mensal Grátis (TBD-019 ✅ RESOLVIDO — Atualizado 18/02/2026):**
 - [x] Membro Ativo (200 CV) tem direito a 1 creatina grátis/mês
 - [x] Mecanismo: ~~Desconto 100% no pedido real~~ → **Cupom Individual Mensal**
 - [x] Tabela `free_creatine_claims` controla uso mensal
 - [x] API `/api/members/me/free-creatine` (GET/POST)
 - [x] Card no dashboard mostra elegibilidade
 - [x] Gerar cupom via Shopify Admin API (Discount Code — 100% OFF, 1 uso, validade mensal) ✅ `lib/shopify/coupon.ts`
-- [x] Formato do cupom: `CREATINA-<NOME>-<MÊSANO>` (ex.: `CREATINA-MARIA-FEV2026`) ✅
+- [x] Formato do cupom: `CREATINA-<NOME>-<HASH>-<MÊSANO>` (ex.: `CREATINA-MARIA-X7K9-FEV2026`) ✅
 - [x] Job mensal para gerar cupons para membros ativos ✅ `/api/cron/generate-creatine-coupons` (dia 2/mês, 05:00 UTC)
 - [x] Dashboard mostra cupom gerado para o membro ✅ Card com código + botão copiar
 - [x] Webhook detecta uso de cupom `CREATINA-*` e atualiza `free_creatine_claims` ✅
 - [x] UNIQUE constraint em `free_creatine_claims(member_id, month_year)` ✅
+
+**Segurança Anti-Fraude do Cupom (18/02/2026):**
+- [x] Hash aleatório no código (não adivinhável) ✅
+- [x] Cupom restrito ao `shopify_customer_id` do membro ✅
+- [x] Limite global de 1 uso (`usage_limit: 1`) ✅
+- [x] Índice UNIQUE em `coupon_code` (impossível duplicar) ✅
+- [x] Webhook valida se quem usou é o dono do cupom ✅
+- [x] Tentativas de fraude registradas em `fraud_details` (JSON) ✅
+- [x] View `v_creatine_fraud_attempts` para auditoria admin ✅
 
 **Fast-Track (primeiros 60 dias):**
 - [x] N0 recebe 30% CV de N1 (primeiros 30 dias)

@@ -6,6 +6,36 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 4.4 — 2026-02-18
+**Tipo:** Segurança (Anti-Fraude Cupom Creatina)  
+**Solicitação:** Cliente pediu proteção contra uso indevido do cupom de creatina
+
+### Segurança do Cupom de Creatina (TBD-019 melhorado)
+
+**Problema identificado:**
+- Código do cupom era previsível (`CREATINA-NOME-MES`)
+- Qualquer pessoa poderia tentar usar o cupom de outro membro
+
+**Solução implementada:**
+1. **Hash aleatório no código:** `CREATINA-NOME-X7K9-MES` (4 caracteres hex)
+2. **Restrição por customer:** Cupom vinculado ao `shopify_customer_id` do membro
+3. **Limite global:** `usage_limit: 1` + `once_per_customer: true`
+4. **Validade temporal:** Expira no último dia do mês
+5. **UNIQUE INDEX:** `coupon_code` não pode ser duplicado
+6. **Validação no webhook:** Detecta se quem usou é o dono
+7. **Registro de fraude:** Campo `fraud_details` (JSON) para auditoria
+8. **View de auditoria:** `v_creatine_fraud_attempts` para admin
+
+**Arquivos alterados:**
+- `lib/shopify/coupon.ts` — Hash aleatório + restrição customer
+- `app/api/members/me/free-creatine/route.ts` — Passa shopify_customer_id
+- `app/api/webhooks/shopify/orders/paid/route.ts` — Validação de fraude
+- `supabase/migrations/20260218_creatine_security.sql` — Índices + view
+
+**Migration aplicada:** Via Supabase MCP (`creatine_coupon_security_v2`)
+
+---
+
 ## Versão 4.3 — 2026-02-16
 **Tipo:** Nova funcionalidade (Página de Produtos Admin) + Limpeza de sidebar  
 **TBD-023:** Aprovado pelo cliente

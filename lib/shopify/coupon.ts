@@ -2,14 +2,18 @@
  * Geração de cupons na Shopify Admin API (REST)
  * TBD-019 RESOLVIDO: Cupom Individual Mensal para creatina grátis
  * 
- * Fluxo:
- * 1. Criar Price Rule (100% OFF, 1 uso, validade mensal)
- * 2. Criar Discount Code vinculado à Price Rule
- * 3. Retornar código para o membro usar na loja
+ * SEGURANÇA IMPLEMENTADA:
+ * 1. Código único com hash aleatório (não adivinhável)
+ * 2. Cupom restrito ao customer_id específico (Shopify valida)
+ * 3. Limite de 1 uso global + 1 uso por cliente
+ * 4. Validade mensal (expira fim do mês)
+ * 5. Registro em banco com member_id vinculado
  * 
- * Formato: CREATINA-<NOME>-<MÊSANO>
- * Exemplo: CREATINA-MARIA-FEV2026
+ * Formato: CREATINA-<NOME>-<HASH>-<MÊSANO>
+ * Exemplo: CREATINA-MARIA-X7K9-FEV2026
  */
+
+import { randomBytes } from 'crypto'
 
 // Versão da API
 const SHOPIFY_API_VERSION = '2024-10'
@@ -25,6 +29,7 @@ export interface CreateCouponParams {
   memberName: string
   memberId: string
   monthYear: string // formato YYYY-MM
+  shopifyCustomerId?: string // ID do customer na Shopify para restringir uso
 }
 
 export interface CouponResult {
@@ -36,7 +41,15 @@ export interface CouponResult {
 }
 
 /**
- * Gera o código do cupom no formato CREATINA-<NOME>-<MÊSANO>
+ * Gera hash aleatório curto para tornar código único e não adivinhável
+ */
+function generateSecureHash(): string {
+  return randomBytes(2).toString('hex').toUpperCase() // 4 caracteres hex (ex: X7K9)
+}
+
+/**
+ * Gera o código do cupom no formato CREATINA-<NOME>-<HASH>-<MÊSANO>
+ * O hash torna o código único e não adivinhável
  */
 export function generateCouponCode(memberName: string, monthYear: string): string {
   // Extrair primeiro nome e sanitizar
@@ -47,12 +60,16 @@ export function generateCouponCode(memberName: string, monthYear: string): strin
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // Remove acentos
     .replace(/[^A-Z0-9]/g, '') // Remove caracteres especiais
+    .slice(0, 8) // Limitar tamanho
 
   // Extrair mês/ano
   const [year, month] = monthYear.split('-')
   const mesAbrev = MESES_PT[parseInt(month)] || month
   
-  return `CREATINA-${firstName}-${mesAbrev}${year}`
+  // Adicionar hash aleatório para segurança
+  const hash = generateSecureHash()
+  
+  return `CREATINA-${firstName}-${hash}-${mesAbrev}${year}`
 }
 
 /**
@@ -126,26 +143,37 @@ export async function createCreatineCoupon(
   lastDay.setHours(23, 59, 59)
   const startsAt = new Date(year, month - 1, 1) // Primeiro dia do mês
   
-  // 1. Criar Price Rule
+  // SEGURANÇA: Configurar restrição de cliente
+  // Se temos o Shopify Customer ID, restringir o cupom a esse cliente específico
+  const hasCustomerRestriction = !!params.shopifyCustomerId
+  
+  // 1. Criar Price Rule com restrições de segurança
+  const priceRulePayload: Record<string, unknown> = {
+    title: couponCode,
+    target_type: 'line_item',
+    target_selection: 'all',
+    allocation_method: 'across',
+    value_type: 'percentage',
+    value: '-100.0', // 100% de desconto
+    once_per_customer: true,
+    usage_limit: 1, // Limite global: apenas 1 uso total
+    starts_at: startsAt.toISOString(),
+    ends_at: lastDay.toISOString(),
+  }
+  
+  // SEGURANÇA: Restringir ao cliente específico se disponível
+  if (hasCustomerRestriction) {
+    priceRulePayload.customer_selection = 'prerequisite'
+    priceRulePayload.prerequisite_customer_ids = [parseInt(params.shopifyCustomerId!)]
+  } else {
+    // Fallback: qualquer cliente (menos seguro, mas funciona)
+    priceRulePayload.customer_selection = 'all'
+  }
+  
   const priceRuleResult = await shopifyRest<{ price_rule: { id: number } }>(
     '/price_rules.json',
     'POST',
-    {
-      price_rule: {
-        title: couponCode,
-        target_type: 'line_item',
-        target_selection: 'all',
-        allocation_method: 'across',
-        value_type: 'percentage',
-        value: '-100.0', // 100% de desconto
-        once_per_customer: true,
-        usage_limit: 1,
-        starts_at: startsAt.toISOString(),
-        ends_at: lastDay.toISOString(),
-        // Nota: Para limitar a produtos específicos (creatina),
-        // configurar entitled_product_ids no futuro
-      }
-    }
+    { price_rule: priceRulePayload }
   )
 
   if (priceRuleResult.errors.length > 0 || !priceRuleResult.data?.price_rule?.id) {

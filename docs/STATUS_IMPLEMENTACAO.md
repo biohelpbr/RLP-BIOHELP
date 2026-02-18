@@ -300,8 +300,9 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 - [x] **TBD-019 — Cupom Individual Mensal Creatina:**
   - Helper `lib/shopify/coupon.ts` para criar Price Rule + Discount Code
   - API GET gera cupom automaticamente se elegível
-  - Formato: `CREATINA-<NOME>-<MÊSANO>`
+  - Formato: `CREATINA-<NOME>-<HASH>-<MÊSANO>` (hash aleatório para segurança)
   - Colunas `coupon_code` e `coupon_shopify_id` em `free_creatine_claims`
+  - **Segurança reforçada (18/02/2026):** Ver seção abaixo
 
 ### Entregas adicionais (11/02/2026 — sessão 2)
 | Item | Descrição | Status |
@@ -312,6 +313,17 @@ O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, com
 | UNIQUE constraint | `free_creatine_claims(member_id, month_year)` | ✅ Concluído |
 | Webhook creatina | Detectar uso de cupom `CREATINA-*` no pedido | ✅ Concluído |
 | Sync level/status | Join + webhook passam `level` e `status` | ✅ Concluído |
+
+### Segurança Anti-Fraude do Cupom (18/02/2026)
+| Item | Descrição | Status |
+|------|-----------|--------|
+| Hash aleatório | Código `CREATINA-NOME-X7K9-MES` não adivinhável | ✅ Concluído |
+| Customer restriction | Cupom restrito ao shopify_customer_id do membro | ✅ Concluído |
+| Limite 1 uso global | usage_limit: 1 + once_per_customer: true | ✅ Concluído |
+| UNIQUE coupon_code | Índice único impede duplicação | ✅ Concluído |
+| Validação webhook | Detecta fraude se outra pessoa usar | ✅ Concluído |
+| fraud_details JSON | Registra detalhes de tentativas de fraude | ✅ Concluído |
+| View auditoria | `v_creatine_fraud_attempts` para admin | ✅ Concluído |
 
 ### Pendências externas (Sprint 7)
 | Item | Descrição | Status |

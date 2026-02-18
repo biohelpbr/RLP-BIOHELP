@@ -66,10 +66,18 @@ export async function GET() {
 
     // Se elegível, sem cupom existente e não claimed → gerar cupom
     if (result.is_eligible && !couponCode && !result.already_claimed) {
+      // Buscar Shopify Customer ID para restringir o cupom ao cliente
+      const { data: shopifyCustomer } = await supabase
+        .from('shopify_customers')
+        .select('shopify_id')
+        .eq('member_id', member.id)
+        .single()
+      
       const couponResult = await createCreatineCoupon({
         memberName: member.name,
         memberId: member.id,
         monthYear: currentMonthYear,
+        shopifyCustomerId: shopifyCustomer?.shopify_id || undefined,
       })
 
       if (couponResult.success && couponResult.couponCode) {

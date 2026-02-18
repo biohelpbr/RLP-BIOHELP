@@ -79,7 +79,37 @@
 - **Dependências**: TASK-007
 - **Arquivo**: `app/api/members/me/free-creatine/route.ts`
 - **Descrição**: Alterar GET para gerar/retornar cupom individual mensal. Alterar POST para usar cupom.
-- **Critério de Done**: API retorna cupom `CREATINA-MARIA-FEV2026` para membro ativo
+- **Critério de Done**: API retorna cupom `CREATINA-MARIA-X7K9-FEV2026` para membro ativo
+
+### Fase 5: Segurança Anti-Fraude (18/02/2026)
+
+#### TASK-009: Hash aleatório no código do cupom
+- **Status**: ✅
+- **Prioridade**: P0
+- **Arquivo**: `lib/shopify/coupon.ts`
+- **Descrição**: Adicionar hash de 4 caracteres para tornar código não adivinhável.
+- **Critério de Done**: Código no formato `CREATINA-NOME-X7K9-MES`
+
+#### TASK-010: Restringir cupom ao customer específico
+- **Status**: ✅
+- **Prioridade**: P0
+- **Arquivo**: `lib/shopify/coupon.ts`, `app/api/members/me/free-creatine/route.ts`
+- **Descrição**: Usar `customer_selection: 'prerequisite'` com `prerequisite_customer_ids`.
+- **Critério de Done**: Shopify rejeita uso por outra pessoa
+
+#### TASK-011: Validação de fraude no webhook
+- **Status**: ✅
+- **Prioridade**: P0
+- **Arquivo**: `app/api/webhooks/shopify/orders/paid/route.ts`
+- **Descrição**: Verificar se quem usou o cupom é o dono. Registrar fraude se não for.
+- **Critério de Done**: fraud_details preenchido em caso de tentativa irregular
+
+#### TASK-012: Migration de segurança
+- **Status**: ✅
+- **Prioridade**: P1
+- **Arquivo**: `supabase/migrations/20260218_creatine_security.sql`
+- **Descrição**: Índice UNIQUE em coupon_code, coluna fraud_details, view de auditoria.
+- **Critério de Done**: Migration aplicada via Supabase MCP
 
 ## Resumo
 
@@ -89,4 +119,5 @@
 | Tags | 1 | 0 | 1 |
 | House Account + ref_code | 3 | 0 | 3 |
 | Cupom Creatina | 2 | 0 | 2 |
-| **Total** | **8** | **0** | **8** |
+| Segurança Anti-Fraude | 4 | 0 | 4 |
+| **Total** | **12** | **0** | **12** |

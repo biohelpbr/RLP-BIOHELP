@@ -441,22 +441,31 @@ No painel do membro, exibir:
 
 ## 6) Regras de Comissionamento
 
-### 6.1 Creatina Mensal Grátis ✅ (Atualizado 11/02/2026)
-**TBD-019 — RESOLVIDO**
+### 6.1 Creatina Mensal Grátis ✅ (Atualizado 18/02/2026)
+**TBD-019 — RESOLVIDO + SEGURANÇA REFORÇADA**
 - Todo Membro Ativo (200 CV) recebe 1 creatina grátis por mês
-- **Mecanismo (atualizado):** Cupom Individual Mensal
+- **Mecanismo (atualizado):** Cupom Individual Mensal com Segurança Anti-Fraude
 - **Regras:**
   - Membro deve estar ativo (CV >= 200 no mês)
   - Limite: 1 unidade por mês
   - Não acumula para o próximo mês
-  - Sistema gera **código de cupom exclusivo** para cada membro ativo
+  - Sistema gera **código de cupom exclusivo e único** para cada membro ativo
   - Cupom válido apenas no mês de geração
-  - Formato: `CREATINA-<NOME>-<MÊSANO>` (ex.: `CREATINA-MARIA-FEV2026`)
+  - Formato: `CREATINA-<NOME>-<HASH>-<MÊSANO>` (ex.: `CREATINA-MARIA-X7K9-FEV2026`)
 - **Controle:** Tabela `free_creatine_claims` registra uso
 - **Geração:** Cupom criado via Shopify Admin API (Discount Code — 100% OFF, 1 uso, validade mensal)
 - **API:** `GET/POST /api/members/me/free-creatine` (retorna cupom do mês)
 - **UI:** Card no dashboard mostra cupom gerado para o membro
 - **Motivo da escolha:** Mais simples, mais barato, não exige Shopify Functions
+
+**Segurança Implementada (18/02/2026):**
+- Hash aleatório no código (não adivinhável): `CREATINA-NOME-X7K9-MES`
+- Cupom restrito ao `shopify_customer_id` do membro (Shopify valida)
+- Limite global de 1 uso (`usage_limit: 1`)
+- Índice UNIQUE em `coupon_code` (impossível duplicar)
+- Webhook valida se quem usou é o dono do cupom
+- Tentativas de fraude registradas em `fraud_details` (JSON)
+- View `v_creatine_fraud_attempts` para auditoria admin
 
 ### 6.2 Fast-Track
 **FR-22**
