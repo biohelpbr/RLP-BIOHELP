@@ -59,7 +59,7 @@
         hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
         .progress-section { margin: 24px 0; }
         .progress-item { display: flex; align-items: center; gap: 16px; padding: 8px 0; }
-        .progress-label { width: 200px; font-size: 14px; color: var(--text); }
+        .progress-label { width: 220px; font-size: 14px; color: var(--text); }
         .progress-bar { flex: 1; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--green); border-radius: 4px; }
         .progress-fill.pending { background: var(--border); }
@@ -113,6 +113,9 @@
         .test-table th:last-child, .test-table td:last-child { text-align: center; width: 80px; }
         .fr-table { font-size: 13px; }
         .fr-table td:first-child { font-weight: 500; white-space: nowrap; }
+        .security-box { background: linear-gradient(135deg, var(--green-bg) 0%, var(--blue-bg) 100%); padding: 20px; border-radius: 8px; margin: 16px 0; }
+        .security-item { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
+        .security-icon { font-size: 18px; }
     </style>
 </head>
 <body>
@@ -120,46 +123,46 @@
         <!-- Header -->
         <header class="page-header">
             <div class="page-icon">📊</div>
-            <h1 class="page-title">Biohelp LRP<span class="status-inline">Sprint 5 ✓</span></h1>
-            <p class="page-description">Resumo Executivo do Projeto • Última atualização: 20/01/2026</p>
+            <h1 class="page-title">Biohelp LRP<span class="status-inline">Sprint 7 ✅ CONCLUÍDO</span></h1>
+            <p class="page-description">Resumo Executivo do Projeto • Última atualização: 18/02/2026</p>
         </header>
 
         <!-- Progress -->
         <section class="progress-section">
             <div class="progress-item">
-                <span class="progress-label">Sprint 1 — MVP</span>
+                <span class="progress-label">Sprint 1 — MVP Operacional</span>
                 <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✓</span>
+                <span class="progress-value">100% ✅</span>
             </div>
             <div class="progress-item">
                 <span class="progress-label">Sprint 2 — CV + Status</span>
                 <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✓</span>
+                <span class="progress-value">100% ✅</span>
             </div>
             <div class="progress-item">
                 <span class="progress-label">Sprint 3 — Rede Visual</span>
                 <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✓</span>
+                <span class="progress-value">100% ✅</span>
             </div>
             <div class="progress-item">
                 <span class="progress-label">Sprint 4 — Comissões</span>
                 <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✓</span>
+                <span class="progress-value">100% ✅</span>
             </div>
             <div class="progress-item">
                 <span class="progress-label">Sprint 5 — Saques</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 83%"></div></div>
-                <span class="progress-value">83% ✓</span>
+                <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
+                <span class="progress-value">92% ✅</span>
             </div>
             <div class="progress-item">
-                <span class="progress-label">Sprint 6 — Admin</span>
+                <span class="progress-label">Sprint 6 — Admin Avançado</span>
                 <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✓</span>
+                <span class="progress-value">100% ✅</span>
             </div>
             <div class="progress-item">
-                <span class="progress-label">Sprint 7 — Creatina</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 85%; background: var(--yellow)"></div></div>
-                <span class="progress-value">85% ⚠️</span>
+                <span class="progress-label">Sprint 7 — Creatina + Decisões</span>
+                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                <span class="progress-value">100% ✅</span>
             </div>
         </section>
 
@@ -169,1322 +172,176 @@
             <thead><tr><th>Categoria</th><th>Total</th><th>✅</th><th>⚠️</th><th>⏳</th><th>%</th></tr></thead>
             <tbody>
                 <tr><td>Identidade/Acesso</td><td>3</td><td>3</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Cadastro/Indicação</td><td>5</td><td>4</td><td>0</td><td>1</td><td>80%</td></tr>
+                <tr><td>Cadastro/Indicação</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
                 <tr><td>Rede/Visualização</td><td>4</td><td>4</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>CV/Status</td><td>5</td><td>4</td><td>1</td><td>0</td><td>90%</td></tr>
+                <tr><td>CV/Status</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
                 <tr><td>Níveis</td><td>3</td><td>3</td><td>0</td><td>0</td><td>100%</td></tr>
                 <tr><td>Comissões</td><td>7</td><td>7</td><td>0</td><td>0</td><td>100%</td></tr>
                 <tr><td>Saques</td><td>6</td><td>5</td><td>1</td><td>0</td><td>92%</td></tr>
                 <tr><td>Admin</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr style="font-weight: 600; background: var(--blue-bg);"><td>TOTAL</td><td>38</td><td>35</td><td>2</td><td>1</td><td>95%</td></tr>
+                <tr style="font-weight: 600; background: var(--green-bg);"><td>TOTAL</td><td>38</td><td>37</td><td>1</td><td>0</td><td>98%</td></tr>
             </tbody>
         </table>
 
         <hr>
 
-        <!-- TOC -->
-        <nav class="toc">
-            <a class="toc-item" href="#sprint1">🚀 Sprint 1 — MVP Operacional</a>
-            <a class="toc-item" href="#sprint2">📊 Sprint 2 — CV + Status</a>
-            <a class="toc-item" href="#sprint3">🌐 Sprint 3 — Rede Visual + Níveis</a>
-            <a class="toc-item" href="#sprint4">💰 Sprint 4 — Comissões + Ledger</a>
-            <a class="toc-item" href="#sprint5">💸 Sprint 5 — Saques + Fiscal</a>
-            <a class="toc-item" href="#futuro">🔮 Sprints Futuros</a>
-            <a class="toc-item" href="#testar">🧪 Como Testar</a>
-            <a class="toc-item" href="#testes-realizados">🧪 Testes Realizados (04/02/2026)</a>
-            <a class="toc-item" href="#tipos-compra">📊 Tipos de Compra</a>
-            <a class="toc-item" href="#tbd">📋 Decisões Pendentes</a>
-        </nav>
-
-        <hr>
-
-        <!-- Sprint 1 -->
-        <section id="sprint1">
-            <h1>🚀 Sprint 1 — MVP Operacional ✅</h1>
-            <p><strong>Data de conclusão:</strong> 07/01/2026 | <strong>FRs cobertos:</strong> FR-01 a FR-09</p>
-
-            <h3>O que foi entregue</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>FR</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>Cadastro com link</td><td>FR-04, FR-05</td><td><span class="tag green">✓</span></td><td>Cliente recebe link e se cadastra</td></tr>
-                    <tr><td>2</td><td>Autenticação membro</td><td>FR-01</td><td><span class="tag green">✓</span></td><td>Login/logout via Supabase Auth</td></tr>
-                    <tr><td>3</td><td>Autenticação admin</td><td>FR-02</td><td><span class="tag green">✓</span></td><td>Login com role admin</td></tr>
-                    <tr><td>4</td><td>Controle de permissões</td><td>FR-03</td><td><span class="tag green">✓</span></td><td>RLS ativo no banco</td></tr>
-                    <tr><td>5</td><td>Dashboard do membro</td><td>FR-01</td><td><span class="tag green">✓</span></td><td>Painel com dados e link de convite</td></tr>
-                    <tr><td>6</td><td>Painel administrativo</td><td>FR-02</td><td><span class="tag green">✓</span></td><td>Lista, busca e gerencia membros</td></tr>
-                    <tr><td>7</td><td>Integração Shopify</td><td>FR-04, FR-08</td><td><span class="tag green">✓</span></td><td>Cria/atualiza customer com tags</td></tr>
-                    <tr><td>8</td><td>Geração de link único</td><td>FR-07</td><td><span class="tag green">✓</span></td><td>ref_code único e imutável</td></tr>
-                    <tr><td>9</td><td>Persistência da rede</td><td>FR-09</td><td><span class="tag green">✓</span></td><td>sponsor_id vincula hierarquia</td></tr>
-                </tbody>
-            </table>
-
-            <details>
-                <summary>📋 Fluxo de Funcionamento — Cadastro</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>┌─────────────────────────────────────────────────────────────────────────────┐
-│                        FLUXO DE CADASTRO (Sprint 1)                         │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-1️⃣ PARCEIRA COMPARTILHA LINK
-   │  Exemplo: https://rlp-biohelp.vercel.app/join?ref=ABC123
-   ▼
-2️⃣ CLIENTE ACESSA O LINK
-   │  Sistema captura o ref_code (ABC123) da URL
-   │  Sistema busca o sponsor pelo ref_code
-   ▼
-3️⃣ CLIENTE PREENCHE FORMULÁRIO
-   │  Campos: Nome, Email, Senha
-   ▼
-4️⃣ SISTEMA VALIDA DADOS
-   │  ✓ Email único? (não pode existir)
-   │  ✓ Sponsor existe? (ref_code válido)
-   │  ✓ Senha forte?
-   ▼
-5️⃣ SISTEMA CRIA MEMBRO NO SUPABASE
-   │  ├── Cria usuário no Supabase Auth
-   │  ├── Cria registro na tabela `members`
-   │  │   ├── id: UUID gerado
-   │  │   ├── name: nome do cliente
-   │  │   ├── email: email do cliente
-   │  │   ├── ref_code: código único gerado (ex: XYZ789)
-   │  │   ├── sponsor_id: UUID do sponsor (quem indicou)
-   │  │   └── status: 'pending'
-   │  ├── Cria registro em `referral_events` (histórico)
-   │  └── Cria registro em `shopify_customers` (status: pending)
-   ▼
-6️⃣ SISTEMA SINCRONIZA COM SHOPIFY
-   │  Mutation GraphQL: customerSet
-   │  ├── Cria/atualiza Customer por email
-   │  └── Aplica tags:
-   │      ├── lrp_member (identifica como membro LRP)
-   │      ├── lrp_ref:XYZ789 (código do novo membro)
-   │      ├── lrp_sponsor:ABC123 (código de quem indicou)
-   │      └── lrp_status:pending (status inicial)
-   ▼
-7️⃣ SISTEMA REDIRECIONA PARA DASHBOARD
-   │  Membro vê: Seu nome, email, link de convite, sponsor, status
-   ▼
-8️⃣ MEMBRO PODE COMPRAR COM PREÇO DE MEMBRO
-   └── Na loja Shopify, o sistema reconhece a tag lrp_member</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>🏗️ Diagrama de Arquitetura</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>    ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-    │   CLIENTE    │────▶│   SISTEMA    │────▶│   SHOPIFY    │
-    │  (Browser)   │     │  (Next.js)   │     │  (Customer)  │
-    └──────────────┘     └──────────────┘     └──────────────┘
-           │                    │                    │
-           │  1. Acessa link    │                    │
-           │─────────────────▶  │                    │
-           │  2. Preenche form  │                    │
-           │─────────────────▶  │                    │
-           │                    │  3. Cria Customer  │
-           │                    │───────────────────▶│
-           │                    │  4. Aplica Tags    │
-           │                    │───────────────────▶│
-           │  5. Dashboard      │                    │
-           │◀─────────────────  │                    │
-    ┌──────────────┐     ┌──────────────┐
-    │   SUPABASE   │◀────│   SISTEMA    │
-    │  (Auth+DB)   │     │  (Backend)   │
-    └──────────────┘     └──────────────┘</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>🧪 Testes Realizados e Resultados</summary>
-                <div class="content">
-                    <h4>Cenário 1: Cadastro com link válido ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Acessar /join?ref=SPONSOR01</td><td>Página de cadastro carrega</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Preencher nome, email, senha</td><td>Formulário aceita dados</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Clicar em "Cadastrar"</td><td>Processamento inicia</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>4</td><td>Verificar Supabase</td><td>Registro em members criado</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>5</td><td>Verificar Shopify Admin</td><td>Customer existe com tags</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>6</td><td>Verificar redirect</td><td>Dashboard carrega</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 2: Email duplicado ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Tentar cadastrar email existente</td><td>Erro 409</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Mensagem exibida</td><td>"Email já cadastrado"</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Shopify</td><td>Não cria duplicado</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 3: Falha Shopify + Recuperação ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Simular falha Shopify</td><td>Membro criado mesmo assim</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Verificar shopify_customers</td><td>status = 'failed'</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Admin executa "Resync"</td><td>Customer criado no Shopify</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>4</td><td>Verificar shopify_customers</td><td>status = 'ok'</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <h3>Banco de Dados Criado</h3>
-            <table>
-                <thead><tr><th>Tabela</th><th>Descrição</th><th>Campos principais</th></tr></thead>
-                <tbody>
-                    <tr><td><code>members</code></td><td>Cadastro de membros</td><td>id, name, email, ref_code, sponsor_id, status</td></tr>
-                    <tr><td><code>referral_events</code></td><td>Histórico de indicações</td><td>member_id, ref_code_used, utm_json</td></tr>
-                    <tr><td><code>shopify_customers</code></td><td>Rastreamento de sync</td><td>member_id, shopify_customer_id, last_sync_status</td></tr>
-                    <tr><td><code>roles</code></td><td>Controle de permissões</td><td>member_id, role (member/admin)</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <!-- Sprint 2 -->
-        <section id="sprint2">
-            <h1>📊 Sprint 2 — CV + Status ✅</h1>
-            <p><strong>Data de conclusão:</strong> 08/01/2026 | <strong>FRs cobertos:</strong> FR-13, FR-14, FR-15, FR-16</p>
-
-            <h3>O que foi entregue</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>FR</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>Webhooks Shopify</td><td>FR-13</td><td><span class="tag green">✓</span></td><td>Recebe eventos de pedidos</td></tr>
-                    <tr><td>2</td><td>Cálculo de CV</td><td>FR-14</td><td><span class="tag green">✓</span></td><td>CV por produto via metafield</td></tr>
-                    <tr><td>3</td><td>Status automático</td><td>FR-15</td><td><span class="tag green">✓</span></td><td>Ativo se CV >= 200/mês</td></tr>
-                    <tr><td>4</td><td>Dashboard com CV</td><td>FR-14</td><td><span class="tag green">✓</span></td><td>Progresso visual da meta</td></tr>
-                    <tr><td>5</td><td>Histórico de CV</td><td>FR-14</td><td><span class="tag green">✓</span></td><td>Meses anteriores</td></tr>
-                    <tr><td>6</td><td>Job mensal</td><td>FR-16</td><td><span class="tag green">✓</span></td><td>Fechamento automático</td></tr>
-                    <tr><td>7</td><td>Ajuste manual</td><td>FR-14</td><td><span class="tag green">✓</span></td><td>Admin pode ajustar CV</td></tr>
-                </tbody>
-            </table>
-
-            <div class="callout yellow">
-                <span class="callout-icon">⚠️</span>
-                <div class="callout-content">
-                    <strong>CV é definido por PRODUTO, NÃO pelo preço!</strong>
-                    <p style="margin-top: 8px;">Cada produto tem um CV específico configurado via metafield no Shopify.</p>
-                    <p>Exemplo: Lemon Dreams custa R$159 mas tem CV = 77</p>
-                    <p><strong>CV do pedido = Σ(CV_do_produto × quantidade)</strong></p>
-                </div>
-            </div>
-
-            <details>
-                <summary>📋 Fluxo de Funcionamento — Compra → CV</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>┌─────────────────────────────────────────────────────────────────────────────┐
-│                    FLUXO DE COMPRA → CV (Sprint 2)                          │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-1️⃣ MEMBRO FAZ COMPRA NA LOJA SHOPIFY
-   │  Usa o email cadastrado no LRP
-   │  Compra produtos (ex: Lemon Dreams R$159)
-   ▼
-2️⃣ SHOPIFY PROCESSA PAGAMENTO
-   │  Pedido muda para status "paid"
-   │  Shopify dispara webhook
-   ▼
-3️⃣ WEBHOOK CHEGA NO SISTEMA
-   │  POST /api/webhooks/shopify/orders/paid
-   │  Payload: dados completos do pedido
-   ▼
-4️⃣ SISTEMA VALIDA WEBHOOK
-   │  ✓ Assinatura HMAC válida?
-   │  ✓ Domínio da loja correto?
-   │  ✓ Pedido já processado? (idempotência)
-   ▼
-5️⃣ SISTEMA IDENTIFICA MEMBRO
-   │  Busca membro pelo email do pedido
-   │  Se não encontrar → ignora (não é membro LRP)
-   ▼
-6️⃣ SISTEMA CALCULA CV DO PEDIDO
-   │  Para cada item do pedido:
-   │  ├── Busca CV no metafield do produto (ex: Lemon Dreams → CV = 77)
-   │  └── CV_item = CV_produto × quantidade
-   │  CV_pedido = Σ(CV_item)
-   ▼
-7️⃣ SISTEMA REGISTRA NO BANCO
-   │  ├── Cria registro em `orders`
-   │  ├── Cria registros em `order_items`
-   │  ├── Cria entradas no `cv_ledger`
-   │  └── Atualiza `members.current_cv_month`
-   ▼
-8️⃣ SISTEMA VERIFICA STATUS
-   │  Se CV_mensal >= 200: Status = "active" ✅
-   │  Se CV_mensal < 200: Status = "inactive" ou "pending"
-   ▼
-9️⃣ SISTEMA ATUALIZA SHOPIFY
-   └── Atualiza tag do Customer: lrp_status:active (ou inactive)</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>🔄 Fluxo de Refund/Cancelamento</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>1️⃣ ADMIN FAZ REFUND NO SHOPIFY
-   ▼
-2️⃣ SHOPIFY DISPARA WEBHOOK
-   │  POST /api/webhooks/shopify/orders/refunded (ou /cancelled)
-   ▼
-3️⃣ SISTEMA PROCESSA REVERSÃO
-   │  ├── Busca pedido original
-   │  ├── Cria entradas NEGATIVAS no cv_ledger
-   │  └── Recalcula CV mensal do membro
-   ▼
-4️⃣ SISTEMA VERIFICA NOVO STATUS
-   │  Se CV_mensal < 200 após reversão: Status muda para "inactive"
-   ▼
-5️⃣ SISTEMA ATUALIZA SHOPIFY
-   └── Atualiza tag: lrp_status:inactive</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>📅 Fluxo de Fechamento Mensal</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>⏰ EXECUÇÃO: 1º dia do mês às 03:00 UTC (00:00 BRT)
-   │  Cron job: /api/cron/close-monthly-cv
-   ▼
-Para cada membro:
-   │
-   ├── 1️⃣ Calcula CV do mês anterior (soma do cv_ledger do mês)
-   ├── 2️⃣ Determina status final: >= 200 → active | < 200 → inactive
-   ├── 3️⃣ Cria/atualiza cv_monthly_summary
-   ├── 4️⃣ Reseta CV para novo mês: members.current_cv_month = 0
-   └── 5️⃣ Atualiza tag no Shopify (se mudou)</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>🧪 Testes Realizados e Resultados</summary>
-                <div class="content">
-                    <h4>Cenário 1: Pedido pago gera CV ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Fazer pedido na loja</td><td>Webhook disparado</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Verificar orders</td><td>Registro criado com total_cv</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Verificar cv_ledger</td><td>Entradas com cv_type 'order_paid'</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>4</td><td>Verificar Dashboard</td><td>CV atualizado</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 2: Refund reverte CV ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Reembolsar pedido</td><td>Webhook disparado</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Verificar cv_ledger</td><td>Entradas negativas</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Verificar CV do membro</td><td>CV diminuiu</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 3: Idempotência ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Enviar mesmo webhook 2x</td><td>Apenas 1 registro</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Verificar CV</td><td>Não duplicou</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <h3>Banco de Dados Criado</h3>
-            <table>
-                <thead><tr><th>Tabela</th><th>Descrição</th><th>Campos principais</th></tr></thead>
-                <tbody>
-                    <tr><td><code>orders</code></td><td>Espelho dos pedidos Shopify</td><td>shopify_order_id, member_id, total_cv, status</td></tr>
-                    <tr><td><code>order_items</code></td><td>Itens dos pedidos</td><td>order_id, title, quantity, price, cv_value</td></tr>
-                    <tr><td><code>cv_ledger</code></td><td>Ledger auditável de CV</td><td>member_id, order_id, cv_amount, cv_type, month_year</td></tr>
-                    <tr><td><code>cv_monthly_summary</code></td><td>Resumo mensal por membro</td><td>member_id, month_year, total_cv, status_at_close</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <!-- Sprint 3 -->
-        <section id="sprint3">
-            <h1>🌐 Sprint 3 — Rede Visual + Níveis ✅</h1>
-            <p><strong>Data de conclusão:</strong> 09/01/2026 | <strong>FRs cobertos:</strong> FR-10, FR-11, FR-17 (parcial), FR-18, FR-19, FR-20</p>
-
-            <h3>O que foi entregue</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>FR</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>Visualização da rede (membro)</td><td>FR-10</td><td><span class="tag green">✓</span></td><td>Árvore visual com toda a rede</td></tr>
-                    <tr><td>2</td><td>Visualização da rede (admin)</td><td>FR-11</td><td><span class="tag green">✓</span></td><td>Admin vê rede de qualquer membro</td></tr>
-                    <tr><td>3</td><td>Níveis de liderança</td><td>FR-18</td><td><span class="tag green">✓</span></td><td>Cálculo automático de nível</td></tr>
-                    <tr><td>4</td><td>Progresso para próximo nível</td><td>FR-18</td><td><span class="tag green">✓</span></td><td>Requisitos e % de conclusão</td></tr>
-                    <tr><td>5</td><td>Líder em Formação (90 dias)</td><td>FR-19</td><td><span class="tag green">✓</span></td><td>Janela de promoção temporária</td></tr>
-                    <tr><td>6</td><td>Rebaixamento automático</td><td>FR-20</td><td><span class="tag green">✓</span></td><td>Perde nível se não mantiver requisitos</td></tr>
-                    <tr><td>7</td><td>Privacidade de telefone</td><td>-</td><td><span class="tag green">✓</span></td><td>Configuração de visibilidade</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Níveis de Liderança</h3>
-            <table>
-                <thead><tr><th>Nível</th><th>Requisitos</th><th>Benefícios</th></tr></thead>
-                <tbody>
-                    <tr><td><strong>Membro</strong></td><td>Cliente cadastrada</td><td>Preço de membro</td></tr>
-                    <tr><td><strong>Parceira</strong></td><td>Membro Ativo + CV_rede >= 500</td><td>Comissão 5% de clientes N1</td></tr>
-                    <tr><td><strong>Líder em Formação</strong></td><td>Parceira + 1ª Parceira em N1 (90 dias)</td><td>Comissão como Líder por 90 dias</td></tr>
-                    <tr><td><strong>Líder</strong></td><td>Parceira Ativa + 4 Parceiras Ativas em N1</td><td>Comissão 7% da rede</td></tr>
-                    <tr><td><strong>Diretora</strong></td><td>3 Líderes Ativas em N1 + 80.000 CV na rede</td><td>Leadership 3% + Comissão 10%</td></tr>
-                    <tr><td><strong>Head</strong></td><td>3 Diretoras Ativas em N1 + 200.000 CV na rede</td><td>Leadership 4% + Royalty</td></tr>
-                </tbody>
-            </table>
-
-            <details>
-                <summary>📋 Fluxo de Funcionamento — Visualização da Rede</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>1️⃣ MEMBRO ACESSA "MINHA REDE" → /dashboard/network
-   ▼
-2️⃣ SISTEMA BUSCA REDE COMPLETA
-   │  Função RPC: get_network_tree(member_id)
-   │  ├── CTE recursiva no banco
-   │  ├── Busca todos os indicados (N1, N2, N3...)
-   │  └── Limite técnico: 20 níveis de profundidade
-   ▼
-3️⃣ SISTEMA APLICA LAZY LOADING
-   │  Para redes grandes:
-   │  ├── Carrega N1 imediatamente
-   │  └── Carrega N2+ sob demanda (expand/collapse)
-   ▼
-4️⃣ EXIBE ÁRVORE VISUAL
-   │  Componente: NetworkTree
-   │  │  Você (N0)
-   │  │  ├── Maria (N1) - Parceira - Ativa - CV: 350
-   │  │  │   ├── Ana (N2) - Membro - Ativa - CV: 220
-   │  │  │   └── Carla (N2) - Membro - Inativa - CV: 50
-   │  │  ├── Julia (N1) - Membro - Ativa - CV: 200
-   │  │  └── Paula (N1) - Membro - Pendente - CV: 0
-   ▼
-5️⃣ EXIBE ESTATÍSTICAS DA REDE
-   └── Total de membros, Membros ativos, CV total da rede</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>📊 Fluxo de Cálculo de Níveis</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>1️⃣ TRIGGER: Após qualquer mudança de CV ou status
-   ▼
-2️⃣ SISTEMA AVALIA REQUISITOS (de cima para baixo)
-   │
-   │  HEAD? → 3 Diretoras Ativas em N1 + 200.000 CV rede? → nível = 'head'
-   │  DIRETORA? → 3 Líderes Ativas em N1 + 80.000 CV rede? → nível = 'diretora'
-   │  LÍDER? → Parceira Ativa + 4 Parceiras Ativas em N1? → nível = 'lider'
-   │  LÍDER EM FORMAÇÃO? → Parceira + 1ª Parceira N1 + janela 90 dias? → nível = 'lider_formacao'
-   │  PARCEIRA? → Membro Ativo (CV >= 200) + CV_rede >= 500? → nível = 'parceira'
-   │  Senão → nível = 'membro'
-   ▼
-3️⃣ SISTEMA ATUALIZA NÍVEL
-   │  ├── Atualiza members.level
-   │  ├── Registra em member_level_history (auditoria)
-   │  └── Atualiza level_updated_at
-   ▼
-4️⃣ SISTEMA VERIFICA REBAIXAMENTO
-   └── Se nível anterior > nível atual: Registra motivo do rebaixamento</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>🧪 Testes Realizados e Resultados</summary>
-                <div class="content">
-                    <h4>Cenário 1: Visualização da rede ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Acessar /dashboard/network</td><td>Página carrega</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Verificar árvore</td><td>N1 visível</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Expandir N1</td><td>N2 carrega</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>4</td><td>Verificar dados</td><td>Nome, status, CV corretos</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 2: Promoção para Parceira ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Membro atinge 200 CV</td><td>Status = active</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Rede atinge 500 CV</td><td>Nível = parceira</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Dashboard atualiza</td><td>Mostra novo nível</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 3: Rebaixamento automático ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Líder perde 1 Parceira N1</td><td>Nível = parceira</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Histórico registrado</td><td>Motivo do rebaixamento</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-        </section>
-
-        <hr>
-
-        <!-- Sprint 4 -->
-        <section id="sprint4">
-            <h1>💰 Sprint 4 — Comissões + Ledger ✅</h1>
-            <p><strong>Data de conclusão:</strong> 10/01/2026 | <strong>FRs cobertos:</strong> FR-21 a FR-27</p>
-
-            <h3>O que foi entregue</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>FR</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>Fast-Track</td><td>FR-22</td><td><span class="tag green">✓</span></td><td>30%/20% nos primeiros 60 dias</td></tr>
-                    <tr><td>2</td><td>Comissão Perpétua</td><td>FR-23</td><td><span class="tag green">✓</span></td><td>Diferenciada por tipo de N1</td></tr>
-                    <tr><td>3</td><td>Bônus 3</td><td>FR-24</td><td><span class="tag green">✓</span></td><td>R$250 / R$1.500 / R$8.000</td></tr>
-                    <tr><td>4</td><td>Leadership Bônus</td><td>FR-25</td><td><span class="tag green">✓</span></td><td>3%/4% para Diretora/Head</td></tr>
-                    <tr><td>5</td><td>Royalty</td><td>FR-26</td><td><span class="tag green">✓</span></td><td>3% quando Head forma Head</td></tr>
-                    <tr><td>6</td><td>Dashboard de comissões</td><td>FR-27</td><td><span class="tag green">✓</span></td><td>Saldo, histórico, detalhes</td></tr>
-                    <tr><td>7</td><td>Painel admin</td><td>FR-27</td><td><span class="tag green">✓</span></td><td>Gestão de todas comissões</td></tr>
-                    <tr><td>8</td><td>Ledger auditável</td><td>FR-21</td><td><span class="tag green">✓</span></td><td>Registro imutável</td></tr>
-                </tbody>
-            </table>
-
-            <div class="callout red">
-                <span class="callout-icon">🚨</span>
-                <div class="callout-content">
-                    <strong>Comissão Perpétua — REGRA IMPORTANTE!</strong>
-                    <p style="margin-top: 8px;">O percentual depende do nível do SPONSOR E do tipo do COMPRADOR (N1)!</p>
-                </div>
-            </div>
-
-            <h3>Tabela de Comissão Perpétua</h3>
-            <table>
-                <thead><tr><th>Nível Sponsor</th><th>Tipo de N1</th><th>Percentual</th></tr></thead>
-                <tbody>
-                    <tr><td>Parceira</td><td>Cliente</td><td>5%</td></tr>
-                    <tr><td>Parceira</td><td>Parceira+</td><td><span class="tag red">0% (NÃO recebe)</span></td></tr>
-                    <tr><td>Líder</td><td>Cliente</td><td>5%</td></tr>
-                    <tr><td>Líder</td><td>Parceira+</td><td>7%</td></tr>
-                    <tr><td>Diretora</td><td>Cliente</td><td>5%</td></tr>
-                    <tr><td>Diretora</td><td>Parceira</td><td>7%</td></tr>
-                    <tr><td>Diretora</td><td>Líder+</td><td>10%</td></tr>
-                    <tr><td>Head</td><td>Cliente</td><td>5%</td></tr>
-                    <tr><td>Head</td><td>Parceira</td><td>7%</td></tr>
-                    <tr><td>Head</td><td>Líder</td><td>10%</td></tr>
-                    <tr><td>Head</td><td>Rede</td><td>15%</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Fast-Track (60 dias)</h3>
-            <table>
-                <thead><tr><th>Período</th><th>Comissão</th></tr></thead>
-                <tbody>
-                    <tr><td>Dias 1-30</td><td>N0 recebe <strong>30%</strong> CV de N1</td></tr>
-                    <tr><td>Dias 31-60</td><td>N0 recebe <strong>20%</strong> CV de N1</td></tr>
-                    <tr><td>Após 60 dias</td><td>Comissão Perpétua (tabela acima)</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Bônus 3</h3>
-            <table>
-                <thead><tr><th>Valor</th><th>Requisito</th></tr></thead>
-                <tbody>
-                    <tr><td><strong>R$ 250</strong></td><td>3 Parceiras Ativas em N1 por 1 mês</td></tr>
-                    <tr><td><strong>R$ 1.500</strong></td><td>Cada N1 com 3 Parceiras Ativas</td></tr>
-                    <tr><td><strong>R$ 8.000</strong></td><td>Cada N2 com 3 Parceiras Ativas</td></tr>
-                </tbody>
-            </table>
-
-            <div class="columns">
-                <div class="column">
-                    <h4>Leadership Bônus</h4>
-                    <p>Diretora: <strong>3% CV</strong> da rede</p>
-                    <p>Head: <strong>4% CV</strong> da rede</p>
-                </div>
-                <div class="column">
-                    <h4>Royalty (Head forma Head)</h4>
-                    <p>Head N0 forma Head N1 → recebe <strong>3% CV</strong> da nova rede</p>
-                    <p style="font-size: 13px; color: var(--text-secondary);">A separação NÃO faz N0 perder status</p>
-                </div>
-            </div>
-
-            <details>
-                <summary>📋 Fluxo de Funcionamento — Cálculo de Comissões</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>1️⃣ PEDIDO PAGO (Webhook orders/paid)
-   │  Mesmo webhook do Sprint 2 - Após calcular CV, calcula comissões
-   ▼
-2️⃣ IDENTIFICA COMPRADOR E SPONSOR
-   │  ├── Comprador: membro que fez a compra (N1)
-   │  └── Sponsor: quem indicou o comprador (N0)
-   ▼
-3️⃣ VERIFICA JANELA FAST-TRACK
-   │  ├── Comprador cadastrado há menos de 30 dias? → Fast-Track 30% ✅
-   │  ├── Comprador cadastrado entre 31-60 dias? → Fast-Track 20% ✅
-   │  └── Comprador cadastrado há mais de 60 dias? → Comissão Perpétua ✅
-   ▼
-4️⃣ CALCULA FAST-TRACK (se aplicável)
-   │  Comissão = CV_pedido × percentual (30% ou 20%)
-   ▼
-5️⃣ CALCULA COMISSÃO PERPÉTUA (se Fast-Track expirou)
-   │  ├── Verifica nível do SPONSOR
-   │  ├── Verifica tipo do COMPRADOR (N1)
-   │  └── Aplica percentual conforme tabela
-   ▼
-6️⃣ CALCULA LEADERSHIP BÔNUS (se aplicável)
-   │  ├── Diretora: 3% CV da rede
-   │  └── Head: 4% CV da rede
-   ▼
-7️⃣ REGISTRA NO LEDGER
-   │  Para cada comissão calculada:
-   │  ├── Cria entrada em commission_ledger (imutável)
-   │  └── Atualiza commission_balances</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>🧪 Relatório de Testes — Sprint 4</summary>
-                <div class="content">
-                    <p style="color: var(--text-secondary);">Data de execução: 10/01/2026</p>
-
-                    <h4>Testes de Comissão Perpétua (Função RPC)</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Sponsor</th><th>Comprador</th><th>Resultado</th><th>Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>parceira</td><td>membro</td><td>5.00%</td><td>5% (cliente)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>parceira</td><td>parceira</td><td>0.00%</td><td>0% (NÃO recebe)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>parceira</td><td>lider</td><td>0.00%</td><td>0% (NÃO recebe)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>lider</td><td>membro</td><td>5.00%</td><td>5% (cliente)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>lider</td><td>parceira</td><td>7.00%</td><td>7% (rede)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>diretora</td><td>membro</td><td>5.00%</td><td>5% (cliente)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>diretora</td><td>parceira</td><td>7.00%</td><td>7% (parceira)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>diretora</td><td>lider</td><td>10.00%</td><td>10% (líder)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>head</td><td>membro</td><td>5.00%</td><td>5% (cliente)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>head</td><td>parceira</td><td>7.00%</td><td>7% (parceira)</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>head</td><td>lider</td><td>10.00%</td><td>10% (líder N1)</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Resumo dos Testes</h4>
-                    <table>
-                        <thead><tr><th>Categoria</th><th>Total</th><th>Passou</th><th>Falhou</th></tr></thead>
-                        <tbody>
-                            <tr><td>Schema/Estrutura</td><td>9</td><td>9</td><td>0</td></tr>
-                            <tr><td>RPC Functions</td><td>14</td><td>14</td><td>0</td></tr>
-                            <tr><td>RLS Policies</td><td>2</td><td>2</td><td>0</td></tr>
-                            <tr><td>Integridade</td><td>1</td><td>1</td><td>0</td></tr>
-                            <tr><td>Índices</td><td>6</td><td>6</td><td>0</td></tr>
-                            <tr><td>Dashboard Membro</td><td>7</td><td>7</td><td>0</td></tr>
-                            <tr><td>Painel Admin</td><td>5</td><td>5</td><td>0</td></tr>
-                            <tr style="font-weight: 600; background: var(--green-bg);"><td>TOTAL</td><td>44</td><td>44</td><td>0</td></tr>
-                        </tbody>
-                    </table>
-
-                    <div class="callout green">
-                        <span class="callout-icon">🎉</span>
-                        <div class="callout-content"><strong>Taxa de sucesso: 100%</strong></div>
-                    </div>
-                </div>
-            </details>
-
-            <h3>Banco de Dados Criado</h3>
-            <table>
-                <thead><tr><th>Tabela</th><th>Descrição</th><th>Campos principais</th></tr></thead>
-                <tbody>
-                    <tr><td><code>commission_ledger</code></td><td>Ledger imutável</td><td>member_id, commission_type, amount, cv_base, percentage</td></tr>
-                    <tr><td><code>commission_balances</code></td><td>Saldo consolidado</td><td>total_earned, total_withdrawn, available_balance</td></tr>
-                    <tr><td><code>fast_track_windows</code></td><td>Janelas de 60 dias</td><td>sponsor_id, member_id, phase_1_ends_at, phase_2_ends_at</td></tr>
-                    <tr><td><code>bonus_3_tracking</code></td><td>Elegibilidade Bônus 3</td><td>active_partners_n1, eligible_level_1/2/3</td></tr>
-                    <tr><td><code>royalty_networks</code></td><td>Redes separadas</td><td>original_head_id, new_head_id, royalty_percentage</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <!-- Sprint 5 -->
-        <section id="sprint5">
-            <h1>💸 Sprint 5 — Saques + Fiscal ✅</h1>
-            <p><strong>Data de conclusão:</strong> 15/01/2026 | <strong>FRs cobertos:</strong> FR-28, FR-29, FR-30, FR-31, FR-32 | FR-33 ⚠️</p>
-
-            <h3>O que foi entregue</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>FR</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>Saldo em análise</td><td>FR-28</td><td><span class="tag green">✓</span></td><td>Período de trava configurável</td></tr>
-                    <tr><td>2</td><td>Solicitação de saque</td><td>FR-29</td><td><span class="tag green">✓</span></td><td>Formulário com validação PF/PJ</td></tr>
-                    <tr><td>3</td><td>Upload de NF-e</td><td>FR-30</td><td><span class="tag green">✓</span></td><td>PJ envia nota fiscal</td></tr>
-                    <tr><td>4</td><td>Emissão de RPA</td><td>FR-31</td><td><span class="tag green">✓</span></td><td>Geração automática para PF</td></tr>
-                    <tr><td>5</td><td>Workflow de aprovação</td><td>FR-32</td><td><span class="tag green">✓</span></td><td>Admin aprova/rejeita saques</td></tr>
-                    <tr><td>6</td><td>Integração de pagamento</td><td>FR-33</td><td><span class="tag yellow">⚠️</span></td><td>Aguardando definição fintech</td></tr>
-                </tbody>
-            </table>
-
-            <div class="callout blue">
-                <span class="callout-icon">💰</span>
-                <div class="callout-content">
-                    <strong>Regras de Saque Implementadas</strong>
-                    <p style="margin-top: 8px;"><strong>PF:</strong> Limite R$1.000/mês, RPA automático</p>
-                    <p><strong>PJ:</strong> Sem limite, NF-e obrigatória</p>
-                    <p><strong>Geral:</strong> Mínimo R$100, Net-15 (disponível 15 dias após virada do mês)</p>
-                    <p><strong>Pagamento:</strong> Via Asaas (PIX/TED)</p>
-                    <p><strong>Cancelamento:</strong> Chargeback, Cancelamento ou Devolução apagam comissão</p>
-                </div>
-            </div>
-
-            <details>
-                <summary>📋 Fluxo de Funcionamento — Solicitação de Saque</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>┌─────────────────────────────────────────────────────────────────────────────┐
-│                    FLUXO DE SOLICITAÇÃO DE SAQUE (Sprint 5)                 │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-1️⃣ MEMBRO ACESSA "MEUS SAQUES"
-   │  URL: /dashboard/payouts
-   ▼
-2️⃣ SISTEMA EXIBE SALDO DISPONÍVEL
-   │  ├── Saldo total (total_earned)
-   │  ├── Já sacado (total_withdrawn)
-   │  ├── Em análise (pending_amount)
-   │  └── Disponível (available_balance)
-   ▼
-3️⃣ MEMBRO PREENCHE FORMULÁRIO
-   │  ├── Valor do saque
-   │  ├── Tipo de pessoa (PF ou PJ)
-   │  ├── CPF ou CNPJ
-   │  └── Dados bancários
-   ▼
-4️⃣ SISTEMA VALIDA REQUISITOS
-   │  ├── Saldo disponível >= valor?
-   │  ├── Valor >= mínimo (R$100)?
-   │  └── Se PF: limite mensal não excedido (R$1.000)?
-   ▼
-5️⃣ SISTEMA CRIA SOLICITAÇÃO
-   │  ├── Status: 'pending' (PF) ou 'awaiting_document' (PJ)
-   │  └── Atualiza pending_amount
-   ▼
-6️⃣ FLUXO PF vs PJ
-   │  SE PF: Sistema gera RPA → aguarda aprovação
-   │  SE PJ: Membro deve enviar NF-e</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>📄 Fluxo de Upload NF-e (PJ)</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>1️⃣ MEMBRO PJ COM SAQUE PENDENTE
-   │  Status: 'awaiting_document'
-   ▼
-2️⃣ MEMBRO FAZ UPLOAD DA NF-e
-   │  POST /api/members/me/payouts/[id]/documents
-   │  ├── Arquivo: PDF ou XML
-   │  ├── Número da nota
-   │  └── Valor da nota
-   ▼
-3️⃣ SISTEMA ARMAZENA DOCUMENTO
-   │  ├── Upload para Supabase Storage
-   │  └── Status muda para 'under_review'
-   ▼
-4️⃣ ADMIN VALIDA NF-e
-   │  ├── Verifica valor NF-e = valor saque
-   │  └── Aprova ou rejeita</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>✅ Fluxo de Aprovação (Admin)</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>1️⃣ ADMIN ACESSA "GESTÃO DE SAQUES"
-   │  URL: /admin/payouts
-   ▼
-2️⃣ LISTA DE SOLICITAÇÕES PENDENTES
-   │  Filtros: status, tipo (PF/PJ), membro
-   ▼
-3️⃣ ADMIN ANALISA SOLICITAÇÃO
-   │  ├── Dados do membro
-   │  ├── Histórico de saques
-   │  └── Documentos anexados
-   ▼
-4️⃣ ADMIN APROVA OU REJEITA
-   │  SE APROVAR:
-   │  ├── Status = 'approved'
-   │  └── Atualiza total_withdrawn
-   │
-   │  SE REJEITAR:
-   │  ├── Status = 'rejected'
-   │  └── Devolve valor para available_balance
-   ▼
-5️⃣ PAGAMENTO (via Asaas)
-   └── Transferência automática PIX/TED</pre>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>🧪 Testes Realizados e Resultados</summary>
-                <div class="content">
-                    <h4>Cenário 1: Solicitação de saque PF ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Acessar /dashboard/payouts</td><td>Página carrega com saldo</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Preencher formulário PF</td><td>Validação de CPF</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Solicitar R$100</td><td>Solicitação criada</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>4</td><td>Verificar limite mensal</td><td>Atualizado</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 2: Solicitação de saque PJ ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Preencher formulário PJ</td><td>Validação de CNPJ</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Solicitar R$500</td><td>Status = 'awaiting_document'</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Upload NF-e</td><td>Documento armazenado</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>4</td><td>Verificar status</td><td>Mudou para 'under_review'</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 3: Aprovação pelo Admin ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>Acessar /admin/payouts</td><td>Lista de solicitações</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>Aprovar solicitação</td><td>Status = 'approved'</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Verificar saldo</td><td>total_withdrawn atualizado</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-
-                    <h4>Cenário 4: Limite PF mensal ✅</h4>
-                    <table class="test-table">
-                        <thead><tr><th>Passo</th><th>Ação</th><th>Resultado Esperado</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>1</td><td>PF solicita R$1.000</td><td>Aprovado</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>2</td><td>PF solicita mais R$100</td><td>Erro: limite excedido</td><td><span class="tag green">✓</span></td></tr>
-                            <tr><td>3</td><td>Próximo mês</td><td>Limite resetado</td><td><span class="tag green">✓</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <h3>Banco de Dados Criado</h3>
-            <table>
-                <thead><tr><th>Tabela</th><th>Descrição</th><th>Campos principais</th></tr></thead>
-                <tbody>
-                    <tr><td><code>payout_requests</code></td><td>Solicitações de saque</td><td>member_id, amount, status, person_type, bank_*</td></tr>
-                    <tr><td><code>payout_documents</code></td><td>Documentos anexados</td><td>payout_request_id, document_type, file_path</td></tr>
-                    <tr><td><code>payout_history</code></td><td>Histórico de mudanças</td><td>payout_request_id, old_status, new_status</td></tr>
-                    <tr><td><code>payout_monthly_limits</code></td><td>Controle limite PF</td><td>member_id, month_year, total_requested</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <!-- Sprint 7 -->
+        <!-- Sprint 7 Highlight -->
         <section id="sprint7">
-            <h1>🎁 Sprint 7 — Creatina Mensal ⚠️</h1>
+            <h1>🎁 Sprint 7 — Creatina + Decisões Fev/2026 ✅</h1>
+            <p><strong>Data de conclusão:</strong> 11/02/2026 + Segurança 18/02/2026 | <strong>Status:</strong> CONCLUÍDO (100%)</p>
 
-            <div class="callout yellow">
-                <span class="callout-icon">⚠️</span>
+            <div class="callout green">
+                <span class="callout-icon">✅</span>
                 <div class="callout-content">
-                    <strong>Status: PARCIAL (85%)</strong>
-                    <p>Backend implementado, aguardando configuração do Shopify Discount para aplicar desconto automático no checkout.</p>
+                    <strong>6 Decisões resolvidas e implementadas + Segurança Anti-Fraude</strong>
+                    <p style="margin-top: 8px;">TBD-001, TBD-003, TBD-006, TBD-007, TBD-014, TBD-019</p>
                 </div>
             </div>
 
-            <h2>TBD-019 — Creatina Mensal Grátis ✅ RESOLVIDO</h2>
-            <p><strong>Decisão:</strong> Desconto de 100% aplicado no pedido real</p>
+            <h3>O que foi entregue</h3>
+            <table>
+                <thead><tr><th>#</th><th>Funcionalidade</th><th>TBD/FR</th><th>Status</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>House Account</td><td>TBD-001</td><td><span class="tag green">✅</span></td><td>Cadastro sem link → sponsor = empresa</td></tr>
+                    <tr><td>2</td><td>Tag de nível</td><td>TBD-003</td><td><span class="tag green">✅</span></td><td>Tag <code>nivel:&lt;nivel&gt;</code> no Shopify</td></tr>
+                    <tr><td>3</td><td>ref_code sequencial</td><td>TBD-006</td><td><span class="tag green">✅</span></td><td>Formato BH00001 + customização admin</td></tr>
+                    <tr><td>4</td><td>Landing page</td><td>TBD-007</td><td><span class="tag green">✅</span></td><td>Redirect para /login</td></tr>
+                    <tr><td>5</td><td>CV sem fallback</td><td>TBD-014</td><td><span class="tag green">✅</span></td><td>CV=0 se metafield ausente</td></tr>
+                    <tr><td>6</td><td>Cupom creatina</td><td>TBD-019</td><td><span class="tag green">✅</span></td><td>Cupom individual mensal via Shopify API</td></tr>
+                    <tr><td>7</td><td>Segurança anti-fraude</td><td>-</td><td><span class="tag green">✅</span></td><td>7 camadas de proteção no cupom</td></tr>
+                </tbody>
+            </table>
 
-            <h3>Regra</h3>
+            <h2>TBD-019 — Cupom Individual Mensal de Creatina</h2>
+            
+            <p><strong>Regra:</strong> Membro Ativo (CV >= 200) recebe cupom exclusivo para 1 creatina grátis/mês.</p>
+            
+            <p><strong>Formato do cupom:</strong> <code>CREATINA-&lt;NOME&gt;-&lt;HASH&gt;-&lt;MÊSANO&gt;</code></p>
             <ul class="bullet">
-                <li><strong>Quem tem direito:</strong> Membro Ativo (CV >= 200 no mês)</li>
-                <li><strong>Limite:</strong> 1 unidade por mês</li>
-                <li><strong>Não acumula</strong> para o próximo mês</li>
+                <li>Exemplo: <code>CREATINA-MARIA-X7K9-FEV2026</code></li>
+                <li>O <strong>hash aleatório</strong> (X7K9) torna o código único e não adivinhável</li>
             </ul>
 
-            <h3>Como funciona</h3>
-            <ol class="numbered">
-                <li>Membro acessa o dashboard e vê o card "Creatina Grátis do Mês"</li>
-                <li>Se elegível, adiciona a creatina ao carrinho em um pedido real</li>
-                <li>O desconto de 100% é aplicado automaticamente no checkout</li>
-                <li>Sistema registra o uso (1x por mês)</li>
-            </ol>
+            <details open>
+                <summary>📋 Fluxo da Creatina Grátis</summary>
+                <div class="content">
+                    <div class="diagram">
+<pre>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    FLUXO DA CREATINA GRÁTIS (Sprint 7)                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1️⃣ SISTEMA GERA CUPONS (dia 2 de cada mês, automático)
+   │
+   │  Cron job: /api/cron/generate-creatine-coupons
+   │  Para cada membro ativo:
+   │  ├── Cria Price Rule na Shopify (100% OFF, 1 uso)
+   │  ├── Restringe ao customer_id do membro (segurança)
+   │  └── Gera Discount Code: CREATINA-MARIA-X7K9-FEV2026
+   │
+   ▼
+2️⃣ MEMBRO ACESSA DASHBOARD
+   │
+   │  Card "Creatina Grátis do Mês"
+   │  Mostra: "Seu cupom está pronto!"
+   │  Exibe código: CREATINA-MARIA-X7K9-FEV2026
+   │  Botão de copiar 📋
+   │
+   ▼
+3️⃣ MEMBRO USA NA LOJA
+   │
+   │  Adiciona creatina ao carrinho
+   │  No checkout, cola o cupom
+   │  ⚠️ Se outra pessoa tentar usar → Shopify rejeita (restrito ao dono)
+   │  Desconto de 100% aplicado automaticamente
+   │
+   ▼
+4️⃣ WEBHOOK DETECTA USO + VALIDA SEGURANÇA
+   │
+   │  Webhook orders/paid detecta cupom CREATINA-*
+   │  ✅ Se dono correto → Atualiza status = 'claimed'
+   │  ⚠️ Se fraude → Registra em fraud_details
+   │
+   ▼
+5️⃣ DASHBOARD ATUALIZA
+   │
+   │  Card mostra: "Já utilizado este mês ✅"
+   │  Próximo cupom: mês seguinte
+   │
+   └── FIM DO FLUXO</pre>
+                    </div>
+                </div>
+            </details>
 
             <h3>Estados do Card no Dashboard</h3>
             <table>
                 <thead><tr><th>Estado</th><th>Cor</th><th>Descrição</th></tr></thead>
                 <tbody>
-                    <tr><td>Disponível</td><td><span class="tag green">🟢 Verde</span></td><td>Membro ativo, ainda não usou</td></tr>
+                    <tr><td>Cupom pronto</td><td><span class="tag green">🟢 Verde</span></td><td>Exibe código + botão copiar</td></tr>
                     <tr><td>Já utilizado</td><td><span class="tag yellow">🟡 Amarelo</span></td><td>Membro usou este mês</td></tr>
                     <tr><td>Indisponível</td><td><span class="tag gray">⚪ Cinza</span></td><td>Membro não atingiu 200 CV</td></tr>
+                    <tr><td>Gerando...</td><td><span class="tag blue">⏳ Azul</span></td><td>Cupom sendo gerado</td></tr>
                 </tbody>
             </table>
 
-            <h3>O que foi implementado</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>Decisão TBD-019</td><td><span class="tag green">✅</span></td><td>Desconto 100% no pedido real</td></tr>
-                    <tr><td>2</td><td>Tabela de controle</td><td><span class="tag green">✅</span></td><td><code>free_creatine_claims</code></td></tr>
-                    <tr><td>3</td><td>API de elegibilidade</td><td><span class="tag green">✅</span></td><td><code>GET /api/members/me/free-creatine</code></td></tr>
-                    <tr><td>4</td><td>API de registro</td><td><span class="tag green">✅</span></td><td><code>POST /api/members/me/free-creatine</code></td></tr>
-                    <tr><td>5</td><td>Card no dashboard</td><td><span class="tag green">✅</span></td><td>Mostra status do benefício</td></tr>
-                    <tr><td>6</td><td>Shopify Discount</td><td><span class="tag yellow">⏳</span></td><td>Configuração na loja pendente</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Próximos Passos</h3>
-            <ol class="numbered">
-                <li><strong>Configurar no Shopify:</strong> Criar Discount Function ou Script para aplicar 100% OFF</li>
-                <li><strong>Webhook de pedido:</strong> Detectar quando creatina foi comprada com desconto</li>
-                <li><strong>Testar fluxo completo</strong></li>
-            </ol>
-        </section>
-
-        <hr>
-
-        <!-- Sprints Futuros -->
-        <section id="futuro">
-            <h1>🔮 Sprints Futuros</h1>
-
-            <h2>Sprint 8 — Integrações ⏳</h2>
-
-            <h3>Funcionalidades planejadas</h3>
-            <ul class="bullet">
-                <li>Integração Asaas automática (após credenciais)</li>
-                <li>Configuração Shopify Discount para creatina</li>
-                <li>Melhorias de UX baseadas em feedback</li>
-            </ul>
-        </section>
-
-        <hr>
-
-        <!-- Como Testar -->
-        <section id="testar">
-            <h1>🧪 Como Testar</h1>
-
-            <h3>URLs de Acesso</h3>
-            <table>
-                <thead><tr><th>Página</th><th>URL</th></tr></thead>
-                <tbody>
-                    <tr><td>Home</td><td><a href="https://rlp-biohelp.vercel.app/">https://rlp-biohelp.vercel.app/</a></td></tr>
-                    <tr><td>Login</td><td><a href="https://rlp-biohelp.vercel.app/login">https://rlp-biohelp.vercel.app/login</a></td></tr>
-                    <tr><td>Cadastro</td><td><a href="https://rlp-biohelp.vercel.app/join?ref=SPONSOR01">https://rlp-biohelp.vercel.app/join?ref=SPONSOR01</a></td></tr>
-                    <tr><td>Dashboard</td><td><a href="https://rlp-biohelp.vercel.app/dashboard">https://rlp-biohelp.vercel.app/dashboard</a></td></tr>
-                    <tr><td>Minha Rede</td><td><a href="https://rlp-biohelp.vercel.app/dashboard/network">https://rlp-biohelp.vercel.app/dashboard/network</a></td></tr>
-                    <tr><td>Comissões</td><td><a href="https://rlp-biohelp.vercel.app/dashboard/commissions">https://rlp-biohelp.vercel.app/dashboard/commissions</a></td></tr>
-                    <tr><td>Saques</td><td><a href="https://rlp-biohelp.vercel.app/dashboard/payouts">https://rlp-biohelp.vercel.app/dashboard/payouts</a></td></tr>
-                    <tr><td>Admin</td><td><a href="https://rlp-biohelp.vercel.app/admin">https://rlp-biohelp.vercel.app/admin</a></td></tr>
-                    <tr><td>Admin Saques</td><td><a href="https://rlp-biohelp.vercel.app/admin/payouts">https://rlp-biohelp.vercel.app/admin/payouts</a></td></tr>
-                </tbody>
-            </table>
-
-            <h3>Loja Shopify de Teste</h3>
-            <table>
-                <thead><tr><th>Item</th><th>Valor</th></tr></thead>
-                <tbody>
-                    <tr><td>URL da Loja</td><td><a href="https://biohelp-dev.myshopify.com/">https://biohelp-dev.myshopify.com/</a></td></tr>
-                    <tr><td>Senha de Acesso</td><td><code>nowcli</code></td></tr>
-                    <tr><td>Produto de Teste</td><td>Creatina Teste LRP ($150.00)</td></tr>
-                </tbody>
-            </table>
-
-            <h4>Pagamentos de Teste (Gateway Fictício)</h4>
-            <p>A loja está configurada com o <strong>Gateway Fictício (Bogus Gateway)</strong> para testes:</p>
-            <table>
-                <thead><tr><th>Campo</th><th>Valor para APROVAR</th><th>Valor para RECUSAR</th></tr></thead>
-                <tbody>
-                    <tr><td>Número do cartão</td><td><code>1</code></td><td><code>2</code></td></tr>
-                    <tr><td>Data de validade</td><td>Qualquer data futura (ex: 12/28)</td><td>Qualquer data futura</td></tr>
-                    <tr><td>CVV</td><td>Qualquer 3 dígitos (ex: 123)</td><td>Qualquer 3 dígitos</td></tr>
-                    <tr><td>Nome no cartão</td><td>Qualquer nome</td><td>Qualquer nome</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Logins de Teste</h3>
-            <table>
-                <thead><tr><th>Portal</th><th>Email</th><th>Senha</th></tr></thead>
-                <tbody>
-                    <tr><td>Admin</td><td><code>admin@biohelp.test</code></td><td><code>123456</code></td></tr>
-                    <tr><td>Parceira</td><td><code>sponsor@biohelp.test</code></td><td><code>sponsor123</code></td></tr>
-                </tbody>
-            </table>
-
-            <details open>
-                <summary>Teste 0: Compra de Teste na Shopify (Fluxo Completo)</summary>
-                <div class="content">
-                    <p><strong>Pré-requisitos:</strong> Ter um membro cadastrado no LRP e conhecer o email usado no cadastro.</p>
-                    <ol class="numbered">
-                        <li>Acesse a loja: <a href="https://biohelp-dev.myshopify.com/">https://biohelp-dev.myshopify.com/</a> e digite a senha: <code>nowcli</code></li>
-                        <li>Adicione "Creatina Teste LRP" ao carrinho e clique em "Check out"</li>
-                        <li>Preencha o <strong>email</strong> (MESMO email do cadastro no LRP), endereço fictício e escolha frete "Economy - FREE"</li>
-                        <li>Pague com cartão de teste: Número <code>1</code>, Data <code>12/28</code>, CVV <code>123</code></li>
-                        <li>Clique em "Pay now" e aguarde 1-2 minutos</li>
-                        <li>Acesse <a href="https://rlp-biohelp.vercel.app/dashboard">https://rlp-biohelp.vercel.app/dashboard</a> e verifique se o CV foi atualizado</li>
-                    </ol>
-                    <div class="callout blue">
-                        <span class="callout-icon">💡</span>
-                        <div class="callout-content">
-                            <strong>Importante:</strong> O sistema identifica o membro pelo EMAIL do pedido. Use o mesmo email do cadastro no LRP.
-                        </div>
-                    </div>
+            <h2>🔒 Segurança Anti-Fraude do Cupom (18/02/2026)</h2>
+            
+            <div class="security-box">
+                <div class="security-item">
+                    <span class="security-icon">🔒</span>
+                    <div><strong>CAMADA 1: Código Não Adivinhável</strong><br>Hash aleatório de 4 caracteres (ex: X7K9). Impossível "chutar" o código de outro membro.</div>
                 </div>
-            </details>
-
-            <details>
-                <summary>Teste 1: Dashboard da Parceira</summary>
-                <div class="content">
-                    <ol class="numbered">
-                        <li>Acesse <a href="https://rlp-biohelp.vercel.app/login">https://rlp-biohelp.vercel.app/login</a></li>
-                        <li>Login com: <code>sponsor@biohelp.test</code> / <code>sponsor123</code></li>
-                        <li>Resultado esperado:</li>
-                    </ol>
-                    <ul class="checklist">
-                        <li>Card de CV com valor atual</li>
-                        <li>Barra de progresso da meta (200 CV)</li>
-                        <li>Status "Ativo" (badge verde) se CV >= 200</li>
-                        <li>Link de convite copiável</li>
-                        <li>Informações do sponsor</li>
-                    </ul>
+                <div class="security-item">
+                    <span class="security-icon">🔒</span>
+                    <div><strong>CAMADA 2: Restrição por Customer (Shopify)</strong><br>Cupom vinculado ao shopify_customer_id do membro. Shopify rejeita se outra pessoa tentar usar.</div>
                 </div>
-            </details>
-
-            <details>
-                <summary>Teste 2: Minha Rede</summary>
-                <div class="content">
-                    <ol class="numbered">
-                        <li>No dashboard, clique em "Minha Rede"</li>
-                        <li>Resultado esperado:</li>
-                    </ol>
-                    <ul class="checklist">
-                        <li>Árvore visual com indicados</li>
-                        <li>Cada nó mostra: nome, status, nível, CV</li>
-                        <li>Estatísticas da rede</li>
-                    </ul>
+                <div class="security-item">
+                    <span class="security-icon">🔒</span>
+                    <div><strong>CAMADA 3: Limite de 1 Uso Global</strong><br>usage_limit: 1 → Uma vez usado, cupom inválido. once_per_customer: true → Extra segurança.</div>
                 </div>
-            </details>
-
-            <details>
-                <summary>Teste 3: Comissões</summary>
-                <div class="content">
-                    <ol class="numbered">
-                        <li>No dashboard, clique em "Comissões"</li>
-                        <li>Resultado esperado:</li>
-                    </ol>
-                    <ul class="checklist">
-                        <li>Saldo total</li>
-                        <li>Breakdown por tipo (Fast-Track, Perpétua, etc.)</li>
-                        <li>Histórico de comissões</li>
-                    </ul>
+                <div class="security-item">
+                    <span class="security-icon">🔒</span>
+                    <div><strong>CAMADA 4: Validade Temporal</strong><br>Cupom expira no último dia do mês. Não pode ser guardado para usar depois.</div>
                 </div>
-            </details>
-
-            <details>
-                <summary>Teste 4: Painel Admin</summary>
-                <div class="content">
-                    <ol class="numbered">
-                        <li>Acesse <a href="https://rlp-biohelp.vercel.app/login">https://rlp-biohelp.vercel.app/login</a></li>
-                        <li>Login com: <code>admin@biohelp.test</code> / <code>123456</code></li>
-                        <li>Resultado esperado:</li>
-                    </ol>
-                    <ul class="checklist">
-                        <li>Lista de parceiras</li>
-                        <li>Busca por nome/email</li>
-                        <li>Botão "CV" para ver detalhes</li>
-                        <li>Botão "Resync" para sincronizar Shopify</li>
-                    </ul>
+                <div class="security-item">
+                    <span class="security-icon">🔒</span>
+                    <div><strong>CAMADA 5: Unicidade no Banco</strong><br>UNIQUE INDEX em coupon_code. Impossível gerar código duplicado.</div>
                 </div>
-            </details>
-        </section>
-
-        <hr>
-
-        <!-- Testes Realizados -->
-        <section id="testes-realizados">
-            <h1>🧪 Testes Realizados (04/02/2026)</h1>
-
-            <div class="callout green">
-                <span class="callout-icon">✅</span>
-                <div class="callout-content">
-                    <strong>Teste de Integração Completa - APROVADO</strong>
-                    <p style="margin-top: 8px;"><strong>Data:</strong> 04/02/2026 | <strong>Ambiente:</strong> Produção (Vercel) + Loja de Desenvolvimento (Shopify)</p>
+                <div class="security-item">
+                    <span class="security-icon">🔒</span>
+                    <div><strong>CAMADA 6: Validação no Webhook</strong><br>Webhook verifica se quem usou é o dono. Fraude detectada → Registra em fraud_details.</div>
+                </div>
+                <div class="security-item">
+                    <span class="security-icon">🔒</span>
+                    <div><strong>CAMADA 7: Auditoria Admin</strong><br>View v_creatine_fraud_attempts. Admin pode ver todas as tentativas suspeitas.</div>
                 </div>
             </div>
 
-            <h3>Cenário Testado: Autoconsumo (Parceira compra para si)</h3>
+            <h3>O que acontece em cada cenário</h3>
             <table>
-                <thead><tr><th>Etapa</th><th>Ação</th><th>Resultado</th><th>Status</th></tr></thead>
+                <thead><tr><th>Cenário</th><th>Resultado</th></tr></thead>
                 <tbody>
-                    <tr><td>1</td><td>Cadastro no LRP</td><td>Membro "eduardo" criado com código <code>J6QTY7hy</code></td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>2</td><td>Acesso à loja Shopify</td><td>Login com senha <code>nowcli</code></td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>3</td><td>Compra #1002</td><td>Creatina Teste LRP ($150.00)</td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>4</td><td>Webhook processado</td><td>CV creditado automaticamente</td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>5</td><td>Compra #1003</td><td>2x Creatina Teste LRP ($300.00)</td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>6</td><td>Dashboard atualizado</td><td>450 CV, Status: Ativa, 100% da meta</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td>Membro usa seu próprio cupom</td><td><span class="tag green">✅ Funciona normalmente</span></td></tr>
+                    <tr><td>Alguém tenta usar cupom de outro</td><td><span class="tag red">❌ Shopify rejeita (customer_selection)</span></td></tr>
+                    <tr><td>Alguém "chuta" um código</td><td><span class="tag red">❌ Hash torna impossível adivinhar</span></td></tr>
+                    <tr><td>Membro tenta usar 2x no mês</td><td><span class="tag red">❌ usage_limit: 1 já foi usado</span></td></tr>
+                    <tr><td>Membro guarda para mês seguinte</td><td><span class="tag red">❌ ends_at expira fim do mês</span></td></tr>
+                    <tr><td>Fraude passa (edge case)</td><td><span class="tag yellow">⚠️ Webhook registra fraud_details</span></td></tr>
                 </tbody>
             </table>
 
-            <h3>Evidências Coletadas</h3>
-            <div class="columns">
-                <div class="column">
-                    <h4>Dashboard do Membro</h4>
-                    <ul class="bullet">
-                        <li>CV do Mês: <strong>450 CV</strong></li>
-                        <li>Meta: <strong>200 CV</strong> (100% atingida)</li>
-                        <li>Status de Ativação: <strong>Ativa</strong></li>
-                        <li>Nível: <strong>Parceira</strong></li>
-                        <li>Código: <strong>J6QTY7hy</strong></li>
-                    </ul>
-                </div>
-                <div class="column">
-                    <h4>Shopify Admin - Pedidos</h4>
-                    <ul class="bullet">
-                        <li>Pedido #1002: $150.00 - Pago - Processado</li>
-                        <li>Pedido #1003: $300.00 - Pago - Processado</li>
-                    </ul>
-                </div>
-            </div>
-
-            <h3>Fluxos Validados</h3>
+            <h3>APIs e Banco de Dados (Sprint 7)</h3>
             <table>
-                <thead><tr><th>Fluxo</th><th>Descrição</th><th>Status</th></tr></thead>
+                <thead><tr><th>Item</th><th>Descrição</th></tr></thead>
                 <tbody>
-                    <tr><td>Cadastro</td><td>Criação de membro via link de convite</td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>Webhooks</td><td>Recebimento e processamento de <code>orders/paid</code></td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>CV</td><td>Cálculo e crédito automático de CV</td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>Status</td><td>Mudança automática para "Ativa" ao atingir 200 CV</td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>Dashboard</td><td>Exibição correta de CV, status, código</td><td><span class="tag green">✅</span></td></tr>
-                    <tr><td>Sync Shopify</td><td>Customer criado com tags corretas</td><td><span class="tag green">✅</span></td></tr>
+                    <tr><td><code>GET /api/members/me/free-creatine</code></td><td>Elegibilidade + gera cupom</td></tr>
+                    <tr><td><code>PATCH /api/admin/members/[id]</code></td><td>Customizar ref_code</td></tr>
+                    <tr><td><code>GET /api/cron/generate-creatine-coupons</code></td><td>Cron mensal (dia 2, 05:00 UTC)</td></tr>
+                    <tr><td><code>free_creatine_claims.coupon_code</code></td><td>Código do cupom gerado</td></tr>
+                    <tr><td><code>free_creatine_claims.fraud_details</code></td><td>JSON com detalhes de fraude</td></tr>
+                    <tr><td><code>v_creatine_fraud_attempts</code></td><td>View para auditoria de fraudes</td></tr>
+                    <tr><td>UNIQUE(coupon_code)</td><td>Garante código único (segurança)</td></tr>
                 </tbody>
             </table>
-
-            <div class="callout yellow">
-                <span class="callout-icon">⏳</span>
-                <div class="callout-content">
-                    <strong>Cenário Pendente: Indicação de Cliente</strong>
-                    <p style="margin-top: 8px;">Para validar o sistema de <strong>comissões</strong>, é necessário testar:</p>
-                    <ol class="numbered" style="margin-top: 8px;">
-                        <li>Criar um cliente pelo link <code>https://rlp-biohelp.vercel.app/join?ref=J6QTY7hy</code></li>
-                        <li>Cliente faz compra na loja</li>
-                        <li>Verificar se a parceira recebe <strong>comissão Fast-Track 30%</strong></li>
-                    </ol>
-                </div>
-            </div>
-        </section>
-
-        <hr>
-
-        <!-- Entendendo os Tipos de Compra -->
-        <section id="tipos-compra">
-            <h1>📊 Entendendo os Dois Tipos de Compra</h1>
-
-            <div class="columns">
-                <div class="column">
-                    <h3>Tipo 1: Autoconsumo</h3>
-                    <p><strong>Parceira compra para si mesma</strong></p>
-                    <pre><code>Parceira (você)
-    │
-    ▼
-Compra na loja (usando SEU email)
-    │
-    ▼
-CV é creditado para VOCÊ
-    │
-    ▼
-Você atinge meta de 200 CV → Status ATIVA
-
-⚠️ Você NÃO recebe comissão (é sua própria compra)</code></pre>
-                </div>
-                <div class="column">
-                    <h3>Tipo 2: Indicação</h3>
-                    <p><strong>Cliente compra pelo seu link</strong></p>
-                    <pre><code>1️⃣ Você compartilha seu link de convite
-    │
-    ▼
-2️⃣ Cliente se cadastra (você vira sponsor)
-    │
-    ▼
-3️⃣ Cliente compra na loja (email DELE)
-    │
-    ▼
-4️⃣ CV é creditado para o CLIENTE
-    │
-    ▼
-5️⃣ VOCÊ recebe COMISSÃO:
-   • Fast-Track 30% (dias 1-30)
-   • Fast-Track 20% (dias 31-60)
-   • Perpétua 5-15% (após 60 dias)</code></pre>
-                </div>
-            </div>
-
-            <h3>Resumo das Diferenças</h3>
-            <table>
-                <thead><tr><th>Aspecto</th><th>Autoconsumo</th><th>Indicação</th></tr></thead>
-                <tbody>
-                    <tr><td>Quem compra</td><td>Você (parceira)</td><td>Seu cliente indicado</td></tr>
-                    <tr><td>Email no checkout</td><td>Seu email</td><td>Email do cliente</td></tr>
-                    <tr><td>CV vai para</td><td>Você</td><td>Cliente</td></tr>
-                    <tr><td>Você recebe comissão?</td><td><span class="tag red">❌ Não</span></td><td><span class="tag green">✅ Sim (30%/20%/5-15%)</span></td></tr>
-                    <tr><td>Ajuda sua meta?</td><td><span class="tag green">✅ Sim</span></td><td><span class="tag red">❌ Não</span> (ajuda a meta do cliente)</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <!-- Decisões Pendentes -->
-        <section id="tbd">
-            <h1>📋 Decisões Pendentes (TBD)</h1>
-
-            <h3>Críticos para Sprint 6</h3>
-            <table>
-                <thead><tr><th>TBD</th><th>Descrição</th><th>FR Bloqueado</th></tr></thead>
-                <tbody>
-                    <tr><td>-</td><td>Nenhum TBD crítico</td><td>-</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Outros Pendentes</h3>
-            <table>
-                <thead><tr><th>TBD</th><th>Descrição</th><th>Sprint</th></tr></thead>
-                <tbody>
-                    <tr><td>TBD-001</td><td>Regra para cadastro sem link</td><td>1</td></tr>
-                    <tr><td>TBD-004</td><td>URLs oficiais (staging/prod)</td><td>1</td></tr>
-                    <tr><td>TBD-014</td><td>Nome do metafield CV</td><td>2</td></tr>
-                    <tr><td>TBD-019</td><td>Creatina mensal grátis</td><td>7</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Resolvidos ✅</h3>
-            <table>
-                <thead><tr><th>TBD</th><th>Descrição</th><th>Decisão</th></tr></thead>
-                <tbody>
-                    <tr><td>TBD-008</td><td>Cálculo de CV</td><td>Via metafield do produto</td></tr>
-                    <tr><td>TBD-009</td><td>Refund/cancel</td><td>Reverte CV completamente</td></tr>
-                    <tr><td>TBD-010</td><td>Job mensal</td><td>1º dia às 00:00 BRT</td></tr>
-                    <tr><td>TBD-011</td><td>Regras de níveis</td><td>Conforme documento canônico</td></tr>
-                    <tr><td>TBD-012</td><td>Profundidade da rede</td><td>Ilimitada</td></tr>
-                    <tr><td>TBD-013</td><td>Informações visíveis</td><td>Nome, email, CV, status, nível</td></tr>
-                    <tr><td>TBD-017</td><td>Arredondamento</td><td>2 casas decimais</td></tr>
-                    <tr><td>TBD-020</td><td>Cálculo de comissões</td><td>Em tempo real</td></tr>
-                    <tr><td>TBD-022</td><td>Perpétua diferenciada</td><td>Por tipo de N1</td></tr>
-                    <tr><td>TBD-015</td><td>Limite de saque PF</td><td>R$1.000/mês</td></tr>
-                    <tr><td>TBD-016</td><td>Valor mínimo para saque</td><td>R$100/saque</td></tr>
-                    <tr><td>TBD-018</td><td>Integração fintech</td><td>Asaas (PIX/TED)</td></tr>
-                    <tr><td>TBD-021</td><td>Período de trava</td><td>Net-15 (15 dias após virada do mês)</td></tr>
-                </tbody>
-            </table>
-        </section>
-
-        <hr>
-
-        <!-- Checklist de Aceite -->
-        <section>
-            <h1>✅ Checklist de Aceite</h1>
-
-            <div class="columns">
-                <div class="column">
-                    <h4>Sprint 1 ✅</h4>
-                    <ul class="checklist">
-                        <li>Cadastro com link vincula sponsor</li>
-                        <li>ref_code único gerado</li>
-                        <li>Customer Shopify criado/atualizado</li>
-                        <li>Tags aplicadas corretamente</li>
-                        <li>Dashboard mostra link de convite</li>
-                        <li>Admin busca membro e executa resync</li>
-                        <li>RLS ativo</li>
-                    </ul>
-                </div>
-                <div class="column">
-                    <h4>Sprint 2 ✅</h4>
-                    <ul class="checklist">
-                        <li>Webhooks idempotentes</li>
-                        <li>CV via metafield do produto</li>
-                        <li>Status muda para active/inactive</li>
-                        <li>Job mensal fecha mês</li>
-                        <li>Admin pode ver/ajustar CV</li>
-                        <li>Ledger auditável</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <h4>Sprint 3 ✅</h4>
-                    <ul class="checklist">
-                        <li>API de rede funcionando</li>
-                        <li>API de nível funcionando</li>
-                        <li>Página "Minha Rede" com árvore visual</li>
-                        <li>Progresso para próximo nível</li>
-                        <li>Privacidade de telefone</li>
-                    </ul>
-                </div>
-                <div class="column">
-                    <h4>Sprint 4 ✅</h4>
-                    <ul class="checklist">
-                        <li>Fast-Track 30%/20%</li>
-                        <li>Perpétua diferenciada por tipo de N1</li>
-                        <li>Bônus 3 implementado</li>
-                        <li>Leadership 3%/4%</li>
-                        <li>Royalty implementado</li>
-                        <li>Dashboard de comissões</li>
-                        <li>Ledger auditável</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <h4>Sprint 5 ✅</h4>
-                    <ul class="checklist">
-                        <li>Solicitação de saque (PF e PJ)</li>
-                        <li>Validação de saldo disponível</li>
-                        <li>Upload de NF-e (PJ)</li>
-                        <li>Geração de RPA (PF)</li>
-                        <li>Limite mensal PF (R$1.000)</li>
-                        <li>Valor mínimo R$100/saque</li>
-                        <li>Net-15 (disponível 15 dias após virada)</li>
-                        <li>Workflow de aprovação admin</li>
-                        <li>Histórico de saques</li>
-                        <li>Integração Asaas definida</li>
-                    </ul>
-                </div>
-                <div class="column">
-                    <h4>Sprint 5 — Aguardando</h4>
-                    <ul class="bullet">
-                        <li>Credenciais Asaas para ativar pagamentos</li>
-                    </ul>
-                </div>
-            </div>
         </section>
 
         <hr>
@@ -1496,26 +353,100 @@ Você atinge meta de 200 CV → Status ATIVA
             <div class="callout green">
                 <span class="callout-icon">✅</span>
                 <div class="callout-content">
-                    <strong>Sprint 6 — CONCLUÍDO! | Sprint 7 — EM ANDAMENTO (85%)</strong>
-                    <p style="margin-top: 8px;"><strong>Data de conclusão Sprint 6:</strong> 20/01/2026</p>
-                    <p style="margin-top: 8px;"><strong>Testes de integração:</strong> ✅ APROVADOS (04/02/2026)</p>
-                    <p style="margin-top: 8px;"><strong>Cobertura de FRs:</strong> 95% (35/38 implementados)</p>
+                    <strong>Todos os Sprints (1-7) — CONCLUÍDOS!</strong>
+                    <p style="margin-top: 8px;"><strong>Data de conclusão Sprint 7:</strong> 11/02/2026</p>
+                    <p><strong>Segurança anti-fraude:</strong> 18/02/2026</p>
+                    <p><strong>Testes de integração:</strong> ✅ APROVADOS (04/02/2026)</p>
+                    <p><strong>Cobertura de FRs:</strong> 98% (37/38 implementados)</p>
+                    <p><strong>TBDs resolvidos:</strong> 21/22 (1 pendente: TBD-004 — URLs oficiais)</p>
                 </div>
             </div>
 
+            <h3>O que foi feito em 11/02/2026</h3>
+            <p><strong>Reunião de alinhamento → 6 decisões resolvidas e implementadas:</strong></p>
+            <ol class="numbered">
+                <li>✅ TBD-001 — Cadastro sem link → House Account</li>
+                <li>✅ TBD-003 — Tag de nível <code>nivel:&lt;nivel&gt;</code> no Shopify</li>
+                <li>✅ TBD-006 — ref_code sequencial BH00001 + customização admin</li>
+                <li>✅ TBD-007 — Landing page mantém redirect para /login</li>
+                <li>✅ TBD-014 — CV=0 se metafield ausente (sem fallback preço)</li>
+                <li>✅ TBD-019 — Cupom Individual Mensal para creatina grátis</li>
+            </ol>
+
+            <h3>O que foi feito em 18/02/2026</h3>
+            <p><strong>Segurança anti-fraude do cupom de creatina:</strong></p>
+            <ul class="bullet">
+                <li>Hash aleatório no código (não adivinhável)</li>
+                <li>Cupom restrito ao shopify_customer_id do membro</li>
+                <li>Validação no webhook detecta fraude</li>
+                <li>Campo fraud_details para registro</li>
+                <li>View v_creatine_fraud_attempts para auditoria</li>
+            </ul>
+
             <h3>Próximos Passos</h3>
             <ul class="bullet">
-                <li>⏳ Testar fluxo de indicação (comissões)</li>
-                <li>⏳ Configurar Shopify Discount para creatina grátis</li>
-                <li>⏳ Integração Asaas (aguardando credenciais)</li>
+                <li>⏳ Integração Asaas automática (aguardando credenciais)</li>
+                <li>⏳ Definir URLs oficiais staging/prod (TBD-004)</li>
                 <li>⏳ Remover senha da loja para produção</li>
+                <li>⏳ Testar fluxo completo de indicação (comissões em produção)</li>
             </ul>
+        </section>
+
+        <hr>
+
+        <!-- Checklist de Aceite -->
+        <section>
+            <h1>✅ Checklist de Aceite — Sprint 7</h1>
+
+            <ul class="checklist">
+                <li>House Account implementado (TBD-001)</li>
+                <li>Tag de nível <code>nivel:&lt;nivel&gt;</code> (TBD-003)</li>
+                <li>ref_code sequencial BH00001 (TBD-006)</li>
+                <li>CV=0 se metafield ausente (TBD-014)</li>
+                <li>Cupom individual mensal creatina (TBD-019)</li>
+                <li>Frontend exibe cupom no dashboard</li>
+                <li>Cron mensal gera cupons (dia 2/mês)</li>
+                <li>Webhook detecta uso de cupom CREATINA-*</li>
+                <li>Admin pode customizar ref_code</li>
+                <li>level/status passados no sync Shopify</li>
+                <li>UNIQUE constraint em free_creatine_claims</li>
+                <li>Segurança anti-fraude com 7 camadas</li>
+                <li>View de auditoria para admin</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <!-- TBDs -->
+        <section id="tbd">
+            <h1>📋 Decisões (TBD)</h1>
+
+            <h3>Pendentes (1 restante)</h3>
+            <table>
+                <thead><tr><th>TBD</th><th>Descrição</th><th>Sprint</th><th>Impacto</th></tr></thead>
+                <tbody>
+                    <tr><td>TBD-004</td><td>URLs oficiais (staging/prod)</td><td>1</td><td>Redirects e webhooks</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Resolvidos ✅ (21 decisões)</h3>
+            <table>
+                <thead><tr><th>TBD</th><th>Descrição</th><th>Decisão</th><th>Data</th></tr></thead>
+                <tbody>
+                    <tr><td>TBD-001</td><td>Cadastro sem link</td><td>House Account</td><td>11/02/2026</td></tr>
+                    <tr><td>TBD-002</td><td>Preço de membro Shopify</td><td>Cliente configura na loja</td><td>11/02/2026</td></tr>
+                    <tr><td>TBD-003</td><td>Tags/metacampos</td><td>Tags atuais + <code>nivel:&lt;nivel&gt;</code></td><td>11/02/2026</td></tr>
+                    <tr><td>TBD-006</td><td>Formato ref_code</td><td>Sequencial BH00001 + customização</td><td>11/02/2026</td></tr>
+                    <tr><td>TBD-014</td><td>Metafield CV</td><td><code>custom.cv</code>, CV=0 se ausente</td><td>11/02/2026</td></tr>
+                    <tr><td>TBD-019</td><td>Creatina grátis</td><td>Cupom Individual Mensal + Segurança</td><td>18/02/2026</td></tr>
+                </tbody>
+            </table>
         </section>
 
         <!-- Footer -->
         <footer class="page-footer">
             <p>Biohelp LRP — Resumo Executivo</p>
-            <p>Última atualização: 04/02/2026</p>
+            <p>Última atualização: 18/02/2026</p>
         </footer>
     </div>
 </body>
