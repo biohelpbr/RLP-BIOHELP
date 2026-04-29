@@ -1,0 +1,130 @@
+.list {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table td {
+  padding: 0.85rem 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.refCode {
+  font-family: 'SF Mono', ui-monospace, monospace;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8rem;
+}
+
+.date {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+.statusBadge {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.status_active {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+}
+
+.status_pending {
+  background: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+}
+
+.status_inactive {
+  background: rgba(156, 163, 175, 0.18);
+  color: #9ca3af;
+}
+
+.empty {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty h3 {
+  color: #fff;
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty p {
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .table td {
+    padding: 0.25rem 0;
+    border: none;
+  }
+
+  .name {
+    font-size: 1rem;
+  }
+}
