@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biohelp LRP — Resumo Executivo</title>
+    <title>Biohelp LRP — Pivô V2 · Resumo Executivo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
             line-height: 1.6;
             font-size: 16px;
         }
-        .page { max-width: 900px; margin: 0 auto; padding: 80px 96px; }
+        .page { max-width: 960px; margin: 0 auto; padding: 80px 96px; }
         @media (max-width: 768px) { .page { padding: 40px 24px; } }
         .page-header { margin-bottom: 48px; }
         .page-icon { font-size: 78px; margin-bottom: 16px; }
@@ -46,9 +46,11 @@
         .page-description { color: var(--text-secondary); font-size: 16px; }
         .status-inline {
             display: inline-flex; align-items: center; gap: 6px;
-            background: var(--green-bg); color: var(--green);
+            background: var(--purple-bg); color: var(--purple);
             padding: 3px 8px; border-radius: 3px; font-size: 14px; font-weight: 500; margin-left: 8px;
         }
+        .status-inline.green { background: var(--green-bg); color: var(--green); }
+        .status-inline.yellow { background: var(--yellow-bg); color: var(--yellow); }
         h1 { font-size: 30px; font-weight: 600; margin: 48px 0 16px; letter-spacing: -0.01em; }
         h2 { font-size: 24px; font-weight: 600; margin: 40px 0 12px; letter-spacing: -0.01em; }
         h3 { font-size: 20px; font-weight: 600; margin: 32px 0 8px; }
@@ -59,11 +61,13 @@
         hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
         .progress-section { margin: 24px 0; }
         .progress-item { display: flex; align-items: center; gap: 16px; padding: 8px 0; }
-        .progress-label { width: 220px; font-size: 14px; color: var(--text); }
+        .progress-label { width: 240px; font-size: 14px; color: var(--text); }
         .progress-bar { flex: 1; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--green); border-radius: 4px; }
-        .progress-fill.pending { background: var(--border); }
-        .progress-value { width: 70px; text-align: right; font-size: 14px; color: var(--text-secondary); }
+        .progress-fill.partial { background: var(--yellow); }
+        .progress-fill.todo { background: var(--gray-bg); }
+        .progress-fill.blocked { background: var(--red); opacity: 0.4; }
+        .progress-value { width: 90px; text-align: right; font-size: 14px; color: var(--text-secondary); }
         .callout { display: flex; gap: 12px; padding: 16px; border-radius: 4px; margin: 16px 0; }
         .callout-icon { font-size: 20px; flex-shrink: 0; }
         .callout-content { flex: 1; }
@@ -82,6 +86,7 @@
         .tag.yellow { background: var(--yellow-bg); color: var(--yellow); }
         .tag.red { background: var(--red-bg); color: var(--red); }
         .tag.blue { background: var(--blue-bg); color: var(--blue); }
+        .tag.purple { background: var(--purple-bg); color: var(--purple); }
         .tag.gray { background: var(--gray-bg); color: var(--text-secondary); }
         code { font-family: 'IBM Plex Mono', monospace; background: var(--bg-secondary); padding: 2px 5px; border-radius: 3px; font-size: 14px; color: var(--red); }
         pre { font-family: 'IBM Plex Mono', monospace; background: var(--bg-secondary); padding: 16px; border-radius: 4px; overflow-x: auto; font-size: 12px; line-height: 1.4; margin: 16px 0; white-space: pre-wrap; }
@@ -92,361 +97,543 @@
         details[open] summary::before { transform: rotate(90deg); }
         summary::-webkit-details-marker { display: none; }
         details > .content { padding: 16px; }
-        .toc { margin: 24px 0; }
-        .toc-item { display: block; padding: 6px 0; color: var(--text-secondary); text-decoration: none; font-size: 14px; border-radius: 3px; transition: background 0.1s; }
-        .toc-item:hover { color: var(--text); background: var(--bg-hover); padding-left: 8px; }
-        .checklist { list-style: none; margin: 8px 0; }
-        .checklist li { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; font-size: 15px; }
-        .checklist li::before { content: '☑'; color: var(--green); font-size: 16px; }
         ul.bullet { list-style: none; margin: 8px 0; }
         ul.bullet li { position: relative; padding-left: 24px; margin: 4px 0; }
         ul.bullet li::before { content: '•'; position: absolute; left: 8px; color: var(--text-light); }
         ol.numbered { list-style: none; counter-reset: item; margin: 8px 0; }
         ol.numbered li { position: relative; padding-left: 32px; margin: 6px 0; counter-increment: item; }
         ol.numbered li::before { content: counter(item) "."; position: absolute; left: 8px; color: var(--text-light); font-weight: 500; }
-        .columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 16px 0; }
-        .column { padding: 16px; background: var(--bg-secondary); border-radius: 4px; }
+        .columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 16px 0; }
+        .column { padding: 16px; background: var(--bg-secondary); border-radius: 6px; border-left: 4px solid var(--border); }
+        .column.red { border-left-color: var(--red); background: var(--red-bg); }
+        .column.blue { border-left-color: var(--blue); background: var(--blue-bg); }
+        .column.green { border-left-color: var(--green); background: var(--green-bg); }
         .column h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-        .diagram { background: var(--bg-secondary); border-radius: 4px; padding: 20px; margin: 16px 0; overflow-x: auto; }
-        .diagram pre { background: none; padding: 0; margin: 0; font-size: 11px; line-height: 1.3; }
+        .column ul.bullet li { font-size: 13px; padding-left: 20px; }
+        .column ul.bullet li::before { left: 4px; }
+        .timeline-table { font-size: 13px; }
+        .timeline-table th { white-space: nowrap; }
+        .timeline-table td.day { font-weight: 600; white-space: nowrap; width: 110px; }
+        .timeline-table td.holiday { background: var(--gray-bg); color: var(--text-light); }
+        .timeline-table td.weekend { background: var(--bg-secondary); color: var(--text-light); }
+        .timeline-table td.done { background: var(--green-bg); }
+        .timeline-table td.deadline { background: var(--purple-bg); font-weight: 600; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+        .feature-card { padding: 14px; background: var(--bg-secondary); border-radius: 6px; border-left: 4px solid var(--text-light); }
+        .feature-card.done { border-left-color: var(--green); }
+        .feature-card.ready { border-left-color: var(--blue); }
+        .feature-card.partial { border-left-color: var(--yellow); }
+        .feature-card.blocked { border-left-color: var(--red); opacity: 0.85; }
+        .feature-card .id { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-secondary); }
+        .feature-card .name { font-weight: 600; margin: 4px 0; font-size: 14px; }
+        .feature-card .meta { font-size: 12px; color: var(--text-secondary); }
         .page-footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-light); font-size: 13px; text-align: center; }
-        .test-table th:last-child, .test-table td:last-child { text-align: center; width: 80px; }
-        .fr-table { font-size: 13px; }
-        .fr-table td:first-child { font-weight: 500; white-space: nowrap; }
-        .security-box { background: linear-gradient(135deg, var(--green-bg) 0%, var(--blue-bg) 100%); padding: 20px; border-radius: 8px; margin: 16px 0; }
-        .security-item { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
-        .security-icon { font-size: 18px; }
+        .key-box { background: linear-gradient(135deg, var(--purple-bg) 0%, var(--blue-bg) 100%); padding: 24px; border-radius: 8px; margin: 16px 0; }
+        .key-box h3 { margin-top: 0; }
     </style>
 </head>
 <body>
     <div class="page">
         <!-- Header -->
         <header class="page-header">
-            <div class="page-icon">📊</div>
-            <h1 class="page-title">Biohelp LRP<span class="status-inline">Sprint 7 ✅ CONCLUÍDO</span></h1>
-            <p class="page-description">Resumo Executivo do Projeto • Última atualização: 18/02/2026</p>
+            <div class="page-icon">🔄</div>
+            <h1 class="page-title">Biohelp LRP <span class="status-inline">Pivô V2 em migração</span></h1>
+            <p class="page-description">Resumo Executivo · Atualizado em 29/04/2026 · Deadline da migração: <strong>11/05/2026</strong></p>
         </header>
 
-        <!-- Progress -->
-        <section class="progress-section">
-            <div class="progress-item">
-                <span class="progress-label">Sprint 1 — MVP Operacional</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
+        <!-- Banner principal -->
+        <div class="callout purple">
+            <span class="callout-icon">📣</span>
+            <div class="callout-content">
+                <strong>Modelo do programa foi redefinido.</strong>
+                <p style="margin-top: 6px;">O modelo MLM/CV original (Sprints 1-7, 98% das funcionalidades v1 entregues) foi <strong>descontinuado</strong> pela direção da Biohelp em 28/04/2026, baseado no novo fluxograma e nos comentários no escopo. O novo modelo é <strong>afiliação de 1 nível</strong> com promoção a <strong>Founder ao atingir 5 ativos no clube</strong>, comissão <strong>50% por convite</strong>, créditos Shopify pré-Founder e saque cash via NF de serviço.</p>
+                <p style="margin-top: 8px;"><strong>Prazo:</strong> migração completa até <strong>11/05/2026</strong> (13 dias corridos / 8 dias úteis a partir de hoje).</p>
             </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 2 — CV + Status</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 3 — Rede Visual</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 4 — Comissões</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 5 — Saques</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
-                <span class="progress-value">92% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 6 — Admin Avançado</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 7 — Creatina + Decisões</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-        </section>
+        </div>
 
-        <!-- Cobertura FRs -->
-        <h3>Cobertura de Requisitos Funcionais (FRs)</h3>
-        <table>
-            <thead><tr><th>Categoria</th><th>Total</th><th>✅</th><th>⚠️</th><th>⏳</th><th>%</th></tr></thead>
+        <!-- Status da migração -->
+        <h1 id="status">📈 Status da migração</h1>
+        <p>Progresso por onda do pivô V2:</p>
+
+        <div class="progress-section">
+            <div class="progress-item">
+                <span class="progress-label">Onda 0 — Documentação + infra</span>
+                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                <span class="progress-value">100% ✅</span>
+            </div>
+            <div class="progress-item">
+                <span class="progress-label">Onda 1 — Decisões do cliente</span>
+                <div class="progress-bar"><div class="progress-fill partial" style="width: 61%"></div></div>
+                <span class="progress-value">11/18 ⏳</span>
+            </div>
+            <div class="progress-item">
+                <span class="progress-label">Onda 2 — Foundation V2 (P0)</span>
+                <div class="progress-bar"><div class="progress-fill todo" style="width: 0%"></div></div>
+                <span class="progress-value">0% 🚀</span>
+            </div>
+            <div class="progress-item">
+                <span class="progress-label">Onda 3 — Comissão + saque</span>
+                <div class="progress-bar"><div class="progress-fill todo" style="width: 0%"></div></div>
+                <span class="progress-value">0% ⏸</span>
+            </div>
+            <div class="progress-item">
+                <span class="progress-label">Onda 4 — Founder + UX</span>
+                <div class="progress-bar"><div class="progress-fill partial" style="width: 33%"></div></div>
+                <span class="progress-value">1/3 🟡</span>
+            </div>
+            <div class="progress-item">
+                <span class="progress-label">Onda 5 — Conteúdo + comunidade</span>
+                <div class="progress-bar"><div class="progress-fill todo" style="width: 0%"></div></div>
+                <span class="progress-value">0% ⏸</span>
+            </div>
+            <div class="progress-item">
+                <span class="progress-label">Onda 6 — Cleanup do V1</span>
+                <div class="progress-bar"><div class="progress-fill todo" style="width: 0%"></div></div>
+                <span class="progress-value">0% ⏳</span>
+            </div>
+        </div>
+
+        <div class="callout green">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+                <strong>Já entregue (28-29/04/2026)</strong>
+                <ul class="bullet" style="margin-top: 6px;">
+                    <li>Documentação canônica do pivô (PIVOT-V2.md, PLAYBOOK.md, etc.) — fonte única de verdade</li>
+                    <li>Infra V2: feature flag <code>LRP_V2</code> (default OFF, sem impacto em produção)</li>
+                    <li>Estrutura dos novos módulos (subscriptions, commissions-v2, credits, founder, content)</li>
+                    <li>Sinalização DEPRECATED no código V1 (sem remoção — opera 100% normal)</li>
+                    <li><strong>Feature F-V11 (Visão restrita da rede)</strong> — primeira feature do V2 implementada e validada</li>
+                    <li>Insumos do cliente versionados no projeto (fluxograma, regras, escopo com comentários)</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- O que mudou -->
+        <h1 id="mudancas">🔄 O que mudou no projeto</h1>
+
+        <div class="columns">
+            <div class="column red">
+                <h4>❌ REMOVIDO do modelo</h4>
+                <ul class="bullet">
+                    <li>CV (Commissionable Value)</li>
+                    <li>Múltiplos níveis (N0/N1/N2)</li>
+                    <li>Rankings Parceira/Líder/Diretora/Head</li>
+                    <li>Status mensal por 200 CV</li>
+                    <li>Reset mensal de CV</li>
+                    <li>Compressão de rede após 6 meses</li>
+                    <li>Fast-Track 30%/20%</li>
+                    <li>Comissão Perpétua diferenciada</li>
+                    <li>Bônus 1, 2, 3</li>
+                    <li>Leadership Bônus</li>
+                    <li>Royalty</li>
+                    <li>RPA / CPF / limite R$1.000</li>
+                    <li>House Account (cadastro sem ref)</li>
+                </ul>
+            </div>
+
+            <div class="column blue">
+                <h4>🔄 ALTERADO (mantém com regra nova)</h4>
+                <ul class="bullet">
+                    <li><strong>Cadastro:</strong> ref obrigatório (link OU código). Sem ref → bloqueia</li>
+                    <li><strong>Status ativo:</strong> assinatura paga (não mais CV)</li>
+                    <li><strong>Visão da rede:</strong> só sponsor + indicados diretos (1 nível)</li>
+                    <li><strong>ref_code:</strong> mantém formato BH00001 + opção de digitar código manual</li>
+                    <li><strong>Pagamento:</strong> Cashin (provável) ou crédito em loja. CPF e CNPJ ambos podem receber</li>
+                    <li><strong>Sync Shopify:</strong> tags + Locksmith continuam liberando preço de clube</li>
+                    <li><strong>Cupom de creatina:</strong> vira sistema de campanhas (admin define quem/quando)</li>
+                </ul>
+            </div>
+
+            <div class="column green">
+                <h4>➕ NOVO no V2</h4>
+                <ul class="bullet">
+                    <li>Integração com <strong>Guru</strong> (assinatura)</li>
+                    <li>Comissão <strong>50% direta</strong> sobre assinatura do convidado</li>
+                    <li><strong>Saldo + créditos Shopify 1:1</strong></li>
+                    <li>Promoção a <strong>Founder ≥5 ativos</strong> no clube</li>
+                    <li>Saque cash via <strong>Cashin + NF de serviço</strong> (Founder com CNPJ)</li>
+                    <li>Ranking de Founders</li>
+                    <li>Área de <strong>conteúdo</strong> (texto/vídeo/PDF)</li>
+                    <li>Link de <strong>WhatsApp</strong> por Founder</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Cronograma -->
+        <h1 id="cronograma">📅 Cronograma — Migração até 11/05/2026</h1>
+
+        <div class="callout yellow">
+            <span class="callout-icon">⏰</span>
+            <div class="callout-content">
+                <strong>Prazo apertado mas viável.</strong> 13 dias corridos / 8 dias úteis (excluindo 01/05 — feriado do trabalhador — e fins de semana). Entrega completa depende do cliente responder os <strong>12 TBDs ainda abertos</strong> até <strong>02/05/2026</strong>. Se isso não acontecer, parte das features ficará fora do escopo da entrega de 11/05 e entra numa segunda janela.
+            </div>
+        </div>
+
+        <table class="timeline-table">
+            <thead>
+                <tr>
+                    <th>Dia</th>
+                    <th>Atividade prevista</th>
+                    <th>Features</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
             <tbody>
-                <tr><td>Identidade/Acesso</td><td>3</td><td>3</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Cadastro/Indicação</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Rede/Visualização</td><td>4</td><td>4</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>CV/Status</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Níveis</td><td>3</td><td>3</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Comissões</td><td>7</td><td>7</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Saques</td><td>6</td><td>5</td><td>1</td><td>0</td><td>92%</td></tr>
-                <tr><td>Admin</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr style="font-weight: 600; background: var(--green-bg);"><td>TOTAL</td><td>38</td><td>37</td><td>1</td><td>0</td><td>98%</td></tr>
+                <tr class="done">
+                    <td class="day done">Qua 29/04</td>
+                    <td class="done">Pivô declarado · Docs canônicas · Infra V2 (flag <code>LRP_V2</code>) · F-V11 entregue · Adequação documental · TBDs respondidos pelo cliente processados</td>
+                    <td class="done"><span class="tag green">F-V11 ✅</span></td>
+                    <td class="done"><span class="tag green">Concluído</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Qui 30/04</td>
+                    <td>Início da <strong>F-V01</strong> (cadastro com ref obrigatório). SPEC + branch + implementação. Em paralelo: SPEC de F-V02 enviada pra Wink confirmar abordagem Guru→Shopify.</td>
+                    <td><span class="tag blue">F-V01</span></td>
+                    <td><span class="tag blue">Planejado</span></td>
+                </tr>
+                <tr>
+                    <td class="day holiday">Sex 01/05</td>
+                    <td class="holiday">🇧🇷 Feriado — Dia do Trabalhador</td>
+                    <td class="holiday">—</td>
+                    <td class="holiday">—</td>
+                </tr>
+                <tr>
+                    <td class="day weekend">Sáb-Dom 02-03/05</td>
+                    <td class="weekend">Reservado pra cliente responder os 12 TBDs em aberto · Wink validar abordagem técnica de Guru</td>
+                    <td class="weekend">—</td>
+                    <td class="weekend"><span class="tag yellow">Cliente</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Seg 04/05</td>
+                    <td>Conclusão de <strong>F-V01</strong> (testes + merge). Início de <strong>F-V02</strong> (Guru via webhook Shopify) assumindo confirmação do Wink.</td>
+                    <td><span class="tag blue">F-V01 ✅<br>F-V02</span></td>
+                    <td><span class="tag blue">Planejado</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Ter 05/05</td>
+                    <td>Conclusão de <strong>F-V02</strong>. Início de <strong>F-V03</strong> (status ativo via assinatura — depende de F-V02). Início de <strong>F-V05</strong> (saldo + créditos Shopify 1:1) em paralelo.</td>
+                    <td><span class="tag blue">F-V02 ✅<br>F-V03 + F-V05</span></td>
+                    <td><span class="tag blue">Planejado</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Qua 06/05</td>
+                    <td>Conclusão de <strong>F-V03</strong> e <strong>F-V05</strong>. Início de <strong>F-V06</strong> (Founder ao atingir 5 ativos). Início de <strong>F-V04</strong> (comissão 50%) <strong>se TBD-1 e TBD-2 já vieram do cliente</strong>.</td>
+                    <td><span class="tag blue">F-V03 ✅<br>F-V05 ✅<br>F-V06 + F-V04*</span></td>
+                    <td><span class="tag yellow">Depende TBD</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Qui 07/05</td>
+                    <td>Conclusão de <strong>F-V04</strong> (comissão) e <strong>F-V06</strong> (Founder). Início de <strong>F-V07</strong> (saque Cashin + NF). UI de cadastro bancário e validação automática da NF.</td>
+                    <td><span class="tag blue">F-V04* ✅<br>F-V06 ✅<br>F-V07</span></td>
+                    <td><span class="tag yellow">Depende TBD</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Sex 08/05</td>
+                    <td>Conclusão de <strong>F-V07</strong>. <strong>F-V08, F-V09, F-V10, F-V13</strong> só rodam se os TBDs respectivos chegaram. Testes integrados V2 end-to-end em ambiente de staging.</td>
+                    <td><span class="tag blue">F-V07 ✅<br>F-V08/V09/V10/V13*</span></td>
+                    <td><span class="tag yellow">Depende TBD</span></td>
+                </tr>
+                <tr>
+                    <td class="day weekend">Sáb-Dom 09-10/05</td>
+                    <td class="weekend">Buffer pra correções de bugs encontrados nos testes integrados. Validação manual da matriz de aceite das features.</td>
+                    <td class="weekend">—</td>
+                    <td class="weekend"><span class="tag gray">Buffer</span></td>
+                </tr>
+                <tr>
+                    <td class="day deadline">Seg 11/05</td>
+                    <td class="deadline"><strong>🎯 DEADLINE.</strong> Deploy em staging final · Smoke tests · Ativação da flag <code>LRP_V2=true</code> em produção (com rollback de 1 var pronto) · Início da janela de monitoramento.</td>
+                    <td class="deadline"><span class="tag purple">Migração V2 live</span></td>
+                    <td class="deadline"><span class="tag purple">Deploy</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">* Features marcadas com asterisco dependem de TBDs ainda em aberto. Se as decisões não vierem até <strong>02/05</strong>, essas features migram pra uma segunda janela pós-11/05.</p>
+
+        <hr>
+
+        <!-- Status das features -->
+        <h1 id="features">📦 Status das 13 features V2</h1>
+
+        <div class="feature-grid">
+            <div class="feature-card done">
+                <div class="id">F-V11 · classe B</div>
+                <div class="name">✅ Visão restrita da rede</div>
+                <div class="meta">Concluída 29/04/2026</div>
+            </div>
+            <div class="feature-card ready">
+                <div class="id">F-V01 · classe C</div>
+                <div class="name">🚀 Cadastro com ref obrigatório</div>
+                <div class="meta">Destravada · começa 30/04</div>
+            </div>
+            <div class="feature-card ready">
+                <div class="id">F-V02 · classe D</div>
+                <div class="name">🚀 Integração Guru via Shopify</div>
+                <div class="meta">Destravada · aguarda OK do Wink</div>
+            </div>
+            <div class="feature-card ready">
+                <div class="id">F-V03 · classe C</div>
+                <div class="name">🚀 Status ativo = assinatura paga</div>
+                <div class="meta">Destravada · depende F-V02</div>
+            </div>
+            <div class="feature-card blocked">
+                <div class="id">F-V04 · classe D</div>
+                <div class="name">🚫 Comissão 50% por convite</div>
+                <div class="meta">Bloqueada · TBD-1 e TBD-2</div>
+            </div>
+            <div class="feature-card ready">
+                <div class="id">F-V05 · classe C</div>
+                <div class="name">🚀 Saldo + créditos Shopify 1:1</div>
+                <div class="meta">Destravada</div>
+            </div>
+            <div class="feature-card partial">
+                <div class="id">F-V06 · classe B</div>
+                <div class="name">🟡 Promoção a Founder ≥5 ativos</div>
+                <div class="meta">Hipótese padrão: status definitivo</div>
+            </div>
+            <div class="feature-card partial">
+                <div class="id">F-V07 · classe D</div>
+                <div class="name">🟡 Saque Cashin + NF</div>
+                <div class="meta">UI/upload OK · cálculo depende F-V04</div>
+            </div>
+            <div class="feature-card blocked">
+                <div class="id">F-V08 · classe B</div>
+                <div class="name">🚫 Ranking de Founders</div>
+                <div class="meta">Bloqueada · TBD-11 (critério)</div>
+            </div>
+            <div class="feature-card blocked">
+                <div class="id">F-V09 · classe B</div>
+                <div class="name">🚫 Área de conteúdo</div>
+                <div class="meta">Bloqueada · TBD-15 (escopo)</div>
+            </div>
+            <div class="feature-card blocked">
+                <div class="id">F-V10 · classe A</div>
+                <div class="name">🚫 Link WhatsApp por Founder</div>
+                <div class="meta">Bloqueada · TBD-16 (validação)</div>
+            </div>
+            <div class="feature-card blocked">
+                <div class="id">F-V12 · classe D</div>
+                <div class="name">🧹 Cleanup V1 (CV/níveis/RPA)</div>
+                <div class="meta">Pós-V2 estável (~4 sem após go-live)</div>
+            </div>
+            <div class="feature-card blocked">
+                <div class="id">F-V13 · classe C</div>
+                <div class="name">🚫 Cupom creatina como campanha</div>
+                <div class="meta">Bloqueada · TBD-22 (UX)</div>
+            </div>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+            <strong>Legenda:</strong>
+            <span class="tag green">✅ Concluída</span>
+            <span class="tag blue">🚀 Destravada</span>
+            <span class="tag yellow">🟡 Parcial</span>
+            <span class="tag red">🚫 Bloqueada</span>
+        </p>
+
+        <hr>
+
+        <!-- Decisões do cliente -->
+        <h1 id="decisoes">📋 Decisões do cliente</h1>
+
+        <h2>✅ 11 decisões registradas em 29/04/2026</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">TBD</th>
+                    <th>Tema</th>
+                    <th>Decisão registrada</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>TBD-3</td><td>Provider de pagamento</td><td><strong>Cashin</strong> (provável) ou PIX manual. Asaas descartado.</td></tr>
+                <tr><td>TBD-4</td><td>Aprovação de saque</td><td>Aprovação <strong>manual</strong> do admin + validação <strong>automática</strong> da NF (formato/dados/valor) no upload.</td></tr>
+                <tr><td>TBD-5</td><td>CPF no fluxo</td><td>CPF <strong>NÃO</strong> está fora — recebe via Cashin ou crédito. CNPJ obrigatório só pra emitir NF de serviço.</td></tr>
+                <tr><td>TBD-6</td><td>Integração ERP</td><td><strong>Sem integração com ERP</strong> nessa fase.</td></tr>
+                <tr><td>TBD-7</td><td>Webhook do Guru</td><td>Guru cria pedido na Shopify; <strong>lemos via webhook Shopify</strong> (Wink confirma técnica).</td></tr>
+                <tr><td>TBD-10</td><td>House Account</td><td><strong>Descontinuada</strong>. Cadastro sem ref bloqueia no V2.</td></tr>
+                <tr><td>TBD-13</td><td>Prazo do saldo</td><td>Membro <strong>ATIVO</strong>: sem prazo. Inativo: ainda a definir (TBD-21).</td></tr>
+                <tr><td>TBD-14</td><td>Saldo → crédito Shopify</td><td><strong>1:1, sem prazo</strong> após resgate.</td></tr>
+                <tr><td>TBD-17</td><td>Cupom de creatina</td><td><strong>Mantém com escopo alterado</strong> — vira sistema de campanhas configuráveis pelo admin.</td></tr>
+                <tr><td>TBD-18</td><td>Saque RPA/CPF antigo</td><td><strong>Descontinua</strong>.</td></tr>
+                <tr><td>TBD-001 (v1)</td><td>House Account legado</td><td>Descontinuada (sobreposto pelo TBD-10).</td></tr>
+            </tbody>
+        </table>
+
+        <h2>⏳ 12 decisões ainda pendentes — URGENTE até 02/05</h2>
+
+        <div class="callout red">
+            <span class="callout-icon">🚨</span>
+            <div class="callout-content">
+                <strong>Sem essas decisões, 6 features ficam fora do prazo de 11/05.</strong>
+                <p style="margin-top: 6px;">Lista priorizada por impacto no cronograma:</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">TBD</th>
+                    <th>Pergunta</th>
+                    <th>Bloqueia</th>
+                    <th>Prioridade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>TBD-1</td><td>Comissão é sempre 50% ou tem casos diferentes (produto x assinatura, primeira compra x renovação)?</td><td>F-V04, F-V07 (cálculo)</td><td><span class="tag red">P0</span></td></tr>
+                <tr><td>TBD-2</td><td>"Menos impostos e taxas" — LRP retém ISS/IR antes do payout, ou repassa bruto?</td><td>F-V04, F-V07</td><td><span class="tag red">P0</span></td></tr>
+                <tr><td>TBD-19</td><td>Cashin é o fornecedor confirmado pra pagamentos? (Resposta TBD-3 disse "provavelmente")</td><td>F-V07</td><td><span class="tag red">P0</span></td></tr>
+                <tr><td>TBD-20</td><td>Founder com CPF pode usar Cashin, ou só CNPJ pode ser Founder?</td><td>F-V06, F-V07</td><td><span class="tag red">P0</span></td></tr>
+                <tr><td>TBD-11</td><td>Critério do ranking de Founder: tamanho do clube? faturamento? média mensal? combinação?</td><td>F-V08</td><td><span class="tag yellow">P1</span></td></tr>
+                <tr><td>TBD-15</td><td>Conteúdo: admin posta global, ou cada Founder tem mural próprio?</td><td>F-V09</td><td><span class="tag yellow">P1</span></td></tr>
+                <tr><td>TBD-16</td><td>Link WhatsApp por Founder — admin valida antes ou Founder publica direto?</td><td>F-V10</td><td><span class="tag yellow">P1</span></td></tr>
+                <tr><td>TBD-22</td><td>UX da gestão de campanhas de cupom (admin escolhe segmentos/períodos como?)</td><td>F-V13</td><td><span class="tag yellow">P1</span></td></tr>
+                <tr><td>TBD-12</td><td>Founder pode "desfounderar" se cair abaixo de 5 ativos, ou status é definitivo?</td><td>F-V06 (não-bloqueante)</td><td><span class="tag gray">P2</span></td></tr>
+                <tr><td>TBD-21</td><td>Prazo de saldo pra membro INATIVO — qual X dias?</td><td>F-V05 (não-bloqueante)</td><td><span class="tag gray">P2</span></td></tr>
+                <tr><td>TBD-8</td><td>Inativo: link/código continua válido pra trazer cadastros, ou bloqueia?</td><td>F-V01 (não-bloqueante)</td><td><span class="tag gray">P2</span></td></tr>
+                <tr><td>TBD-9</td><td>Código manual: imutável ou pode regerar/expirar?</td><td>F-V01 (não-bloqueante)</td><td><span class="tag gray">P2</span></td></tr>
+            </tbody>
+        </table>
+
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+            <strong>P0 (vermelho):</strong> sem essas, F-V04 e F-V07 (parte cálculo) não saem ·
+            <strong>P1 (amarelo):</strong> sem essas, F-V08/V09/V10/V13 ficam fora do prazo ·
+            <strong>P2 (cinza):</strong> não bloqueiam — temos hipóteses padrão documentadas se não vierem.
+        </p>
+
+        <hr>
+
+        <!-- O que precisamos do cliente -->
+        <h1 id="cliente">🤝 O que precisamos da Biohelp</h1>
+
+        <div class="key-box">
+            <h3>Para fechar dia 11/05, precisamos:</h3>
+            <ol class="numbered">
+                <li><strong>Decisões pendentes (12 TBDs):</strong> idealmente até <strong>02/05/2026</strong>. Os 4 itens P0 (TBD-1, 2, 19, 20) são os mais urgentes — sem eles, o cálculo de comissão e o saque cash não saem.</li>
+                <li><strong>Confirmação técnica do Wink:</strong> a abordagem de ler eventos do Guru via webhook do Shopify cobre todos os casos? Se precisar de webhook direto do Guru, vamos saber até <strong>02/05</strong>.</li>
+                <li><strong>Acesso ao Cashin:</strong> credenciais de sandbox/produção (chave de API, conta, etc.) para integração de F-V07. Pode chegar mais tarde — o código é construído com interface agnóstica de provider.</li>
+                <li><strong>Validação manual</strong> em staging entre 09-10/05: alguém da Biohelp testa o cadastro com ref, a tela de saque, o cálculo de comissão. Janela curta.</li>
+                <li><strong>Janela de ativação</strong> em produção no dia 11/05: idealmente fora do horário comercial pra reduzir risco. A migração é reversível em ~1 minuto (basta desligar a flag <code>LRP_V2</code>).</li>
+            </ol>
+        </div>
+
+        <hr>
+
+        <!-- Riscos e mitigação -->
+        <h1 id="riscos">⚠️ Riscos identificados e mitigação</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Risco</th>
+                    <th>Impacto</th>
+                    <th>Mitigação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cliente não responder os 12 TBDs até 02/05</td>
+                    <td>Atrasa F-V04, V07, V08, V09, V10, V13</td>
+                    <td>Hipóteses padrão documentadas para os P2 · Entrega parcial em 11/05 com features bloqueadas pra segunda janela</td>
+                </tr>
+                <tr>
+                    <td>Wink não validar Guru→Shopify a tempo</td>
+                    <td>Atrasa F-V02, V03 (cascata)</td>
+                    <td>SPEC já enviado pra revisão · Construção paralela com mocks · Plano B: webhook direto do Guru com 1 dia adicional</td>
+                </tr>
+                <tr>
+                    <td>Cashin demora pra liberar credenciais</td>
+                    <td>F-V07 fica sem rail real</td>
+                    <td>Interface de provider agnóstica permite conectar qualquer rail depois sem refactor · PIX manual fica como fallback temporário</td>
+                </tr>
+                <tr>
+                    <td>Bug em produção após go-live</td>
+                    <td>Membros existentes afetados</td>
+                    <td>Flag <code>LRP_V2</code> permite rollback em 1 min · Janela de ativação fora do horário comercial · Monitoramento de logs nas primeiras 48h</td>
+                </tr>
+                <tr>
+                    <td>Migração de dados existentes</td>
+                    <td>Pequeno</td>
+                    <td>V2 não migra dado — coexiste com V1 atrás da flag. Membros V1 continuam funcionando até onda 6 (cleanup, ~4 semanas após go-live)</td>
+                </tr>
             </tbody>
         </table>
 
         <hr>
 
-        <!-- Sprint 7 Highlight -->
-        <section id="sprint7">
-            <h1>🎁 Sprint 7 — Creatina + Decisões Fev/2026 ✅</h1>
-            <p><strong>Data de conclusão:</strong> 11/02/2026 + Segurança 18/02/2026 | <strong>Status:</strong> CONCLUÍDO (100%)</p>
+        <!-- Histórico V1 (colapsado) -->
+        <h1 id="historico">📚 Histórico — O que foi entregue antes do pivô</h1>
 
-            <div class="callout green">
-                <span class="callout-icon">✅</span>
-                <div class="callout-content">
-                    <strong>6 Decisões resolvidas e implementadas + Segurança Anti-Fraude</strong>
-                    <p style="margin-top: 8px;">TBD-001, TBD-003, TBD-006, TBD-007, TBD-014, TBD-019</p>
-                </div>
+        <details>
+            <summary>📦 Sprints 1-7 do modelo V1 (98% das funcionalidades originais entregues)</summary>
+            <div class="content">
+                <p>Antes da decisão de pivô em 28/04/2026, o projeto entregou <strong>37 das 38 funcionalidades v1</strong> ao longo de 7 sprints. Esse trabalho permanece funcional em produção com a flag <code>LRP_V2=false</code> (default) e é a base sobre a qual o V2 foi construído. Será removido fisicamente apenas na <strong>Onda 6</strong>, após o V2 estar estável em produção por ~4 semanas.</p>
+
+                <h3>Cobertura V1 por categoria</h3>
+                <table>
+                    <thead><tr><th>Categoria</th><th>Total</th><th>✅</th><th>⚠️</th><th>%</th></tr></thead>
+                    <tbody>
+                        <tr><td>Identidade/Acesso</td><td>3</td><td>3</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Cadastro/Indicação</td><td>5</td><td>5</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Rede/Visualização</td><td>4</td><td>4</td><td>0</td><td>100%</td></tr>
+                        <tr><td>CV/Status</td><td>5</td><td>5</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Níveis</td><td>3</td><td>3</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Comissões</td><td>7</td><td>7</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Saques</td><td>6</td><td>5</td><td>1</td><td>92%</td></tr>
+                        <tr><td>Admin</td><td>5</td><td>5</td><td>0</td><td>100%</td></tr>
+                        <tr style="font-weight: 600; background: var(--gray-bg);"><td>TOTAL</td><td>38</td><td>37</td><td>1</td><td>98%</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Sprint 7 — Última entrega antes do pivô (11-18/02/2026)</h3>
+                <ul class="bullet">
+                    <li>House Account (cadastro sem link) — <em>descontinuada no V2 pelo TBD-10</em></li>
+                    <li>Tag de nível no Shopify — <em>descontinuada no V2 (sem níveis)</em></li>
+                    <li>ref_code sequencial BH00001 — <em>mantém no V2</em></li>
+                    <li>CV sem fallback (CV=0 se metafield ausente) — <em>descontinuado no V2</em></li>
+                    <li>Cupom mensal de creatina — <em>vira sistema de campanhas no V2 (F-V13, TBD-17)</em></li>
+                    <li>Segurança anti-fraude do cupom (7 camadas) — <em>preservada e reusada na F-V13</em></li>
+                </ul>
+
+                <h3>Onde encontrar a documentação técnica original</h3>
+                <ul class="bullet">
+                    <li><code>docs/SPEC_Biohelp_LRP.md</code> — SPEC técnica V1 (com banner DEPRECATED no topo)</li>
+                    <li><code>docs/ACCEPTANCE.md</code> — Critérios de aceite V1</li>
+                    <li><code>docs/CHANGELOG.md</code> — Histórico completo (entrada v5.0 = pivô declarado, v5.1 = TBDs respondidos)</li>
+                    <li><code>documentos_projeto_iniciais_MD/</code> — Documentos canônicos iniciais V1</li>
+                </ul>
             </div>
-
-            <h3>O que foi entregue</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>TBD/FR</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>House Account</td><td>TBD-001</td><td><span class="tag green">✅</span></td><td>Cadastro sem link → sponsor = empresa</td></tr>
-                    <tr><td>2</td><td>Tag de nível</td><td>TBD-003</td><td><span class="tag green">✅</span></td><td>Tag <code>nivel:&lt;nivel&gt;</code> no Shopify</td></tr>
-                    <tr><td>3</td><td>ref_code sequencial</td><td>TBD-006</td><td><span class="tag green">✅</span></td><td>Formato BH00001 + customização admin</td></tr>
-                    <tr><td>4</td><td>Landing page</td><td>TBD-007</td><td><span class="tag green">✅</span></td><td>Redirect para /login</td></tr>
-                    <tr><td>5</td><td>CV sem fallback</td><td>TBD-014</td><td><span class="tag green">✅</span></td><td>CV=0 se metafield ausente</td></tr>
-                    <tr><td>6</td><td>Cupom creatina</td><td>TBD-019</td><td><span class="tag green">✅</span></td><td>Cupom individual mensal via Shopify API</td></tr>
-                    <tr><td>7</td><td>Segurança anti-fraude</td><td>-</td><td><span class="tag green">✅</span></td><td>7 camadas de proteção no cupom</td></tr>
-                </tbody>
-            </table>
-
-            <h2>TBD-019 — Cupom Individual Mensal de Creatina</h2>
-            
-            <p><strong>Regra:</strong> Membro Ativo (CV >= 200) recebe cupom exclusivo para 1 creatina grátis/mês.</p>
-            
-            <p><strong>Formato do cupom:</strong> <code>CREATINA-&lt;NOME&gt;-&lt;HASH&gt;-&lt;MÊSANO&gt;</code></p>
-            <ul class="bullet">
-                <li>Exemplo: <code>CREATINA-MARIA-X7K9-FEV2026</code></li>
-                <li>O <strong>hash aleatório</strong> (X7K9) torna o código único e não adivinhável</li>
-            </ul>
-
-            <details open>
-                <summary>📋 Fluxo da Creatina Grátis</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>┌─────────────────────────────────────────────────────────────────────────────┐
-│                    FLUXO DA CREATINA GRÁTIS (Sprint 7)                      │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-1️⃣ SISTEMA GERA CUPONS (dia 2 de cada mês, automático)
-   │
-   │  Cron job: /api/cron/generate-creatine-coupons
-   │  Para cada membro ativo:
-   │  ├── Cria Price Rule na Shopify (100% OFF, 1 uso)
-   │  ├── Restringe ao customer_id do membro (segurança)
-   │  └── Gera Discount Code: CREATINA-MARIA-X7K9-FEV2026
-   │
-   ▼
-2️⃣ MEMBRO ACESSA DASHBOARD
-   │
-   │  Card "Creatina Grátis do Mês"
-   │  Mostra: "Seu cupom está pronto!"
-   │  Exibe código: CREATINA-MARIA-X7K9-FEV2026
-   │  Botão de copiar 📋
-   │
-   ▼
-3️⃣ MEMBRO USA NA LOJA
-   │
-   │  Adiciona creatina ao carrinho
-   │  No checkout, cola o cupom
-   │  ⚠️ Se outra pessoa tentar usar → Shopify rejeita (restrito ao dono)
-   │  Desconto de 100% aplicado automaticamente
-   │
-   ▼
-4️⃣ WEBHOOK DETECTA USO + VALIDA SEGURANÇA
-   │
-   │  Webhook orders/paid detecta cupom CREATINA-*
-   │  ✅ Se dono correto → Atualiza status = 'claimed'
-   │  ⚠️ Se fraude → Registra em fraud_details
-   │
-   ▼
-5️⃣ DASHBOARD ATUALIZA
-   │
-   │  Card mostra: "Já utilizado este mês ✅"
-   │  Próximo cupom: mês seguinte
-   │
-   └── FIM DO FLUXO</pre>
-                    </div>
-                </div>
-            </details>
-
-            <h3>Estados do Card no Dashboard</h3>
-            <table>
-                <thead><tr><th>Estado</th><th>Cor</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>Cupom pronto</td><td><span class="tag green">🟢 Verde</span></td><td>Exibe código + botão copiar</td></tr>
-                    <tr><td>Já utilizado</td><td><span class="tag yellow">🟡 Amarelo</span></td><td>Membro usou este mês</td></tr>
-                    <tr><td>Indisponível</td><td><span class="tag gray">⚪ Cinza</span></td><td>Membro não atingiu 200 CV</td></tr>
-                    <tr><td>Gerando...</td><td><span class="tag blue">⏳ Azul</span></td><td>Cupom sendo gerado</td></tr>
-                </tbody>
-            </table>
-
-            <h2>🔒 Segurança Anti-Fraude do Cupom (18/02/2026)</h2>
-            
-            <div class="security-box">
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 1: Código Não Adivinhável</strong><br>Hash aleatório de 4 caracteres (ex: X7K9). Impossível "chutar" o código de outro membro.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 2: Restrição por Customer (Shopify)</strong><br>Cupom vinculado ao shopify_customer_id do membro. Shopify rejeita se outra pessoa tentar usar.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 3: Limite de 1 Uso Global</strong><br>usage_limit: 1 → Uma vez usado, cupom inválido. once_per_customer: true → Extra segurança.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 4: Validade Temporal</strong><br>Cupom expira no último dia do mês. Não pode ser guardado para usar depois.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 5: Unicidade no Banco</strong><br>UNIQUE INDEX em coupon_code. Impossível gerar código duplicado.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 6: Validação no Webhook</strong><br>Webhook verifica se quem usou é o dono. Fraude detectada → Registra em fraud_details.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 7: Auditoria Admin</strong><br>View v_creatine_fraud_attempts. Admin pode ver todas as tentativas suspeitas.</div>
-                </div>
-            </div>
-
-            <h3>O que acontece em cada cenário</h3>
-            <table>
-                <thead><tr><th>Cenário</th><th>Resultado</th></tr></thead>
-                <tbody>
-                    <tr><td>Membro usa seu próprio cupom</td><td><span class="tag green">✅ Funciona normalmente</span></td></tr>
-                    <tr><td>Alguém tenta usar cupom de outro</td><td><span class="tag red">❌ Shopify rejeita (customer_selection)</span></td></tr>
-                    <tr><td>Alguém "chuta" um código</td><td><span class="tag red">❌ Hash torna impossível adivinhar</span></td></tr>
-                    <tr><td>Membro tenta usar 2x no mês</td><td><span class="tag red">❌ usage_limit: 1 já foi usado</span></td></tr>
-                    <tr><td>Membro guarda para mês seguinte</td><td><span class="tag red">❌ ends_at expira fim do mês</span></td></tr>
-                    <tr><td>Fraude passa (edge case)</td><td><span class="tag yellow">⚠️ Webhook registra fraud_details</span></td></tr>
-                </tbody>
-            </table>
-
-            <h3>APIs e Banco de Dados (Sprint 7)</h3>
-            <table>
-                <thead><tr><th>Item</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td><code>GET /api/members/me/free-creatine</code></td><td>Elegibilidade + gera cupom</td></tr>
-                    <tr><td><code>PATCH /api/admin/members/[id]</code></td><td>Customizar ref_code</td></tr>
-                    <tr><td><code>GET /api/cron/generate-creatine-coupons</code></td><td>Cron mensal (dia 2, 05:00 UTC)</td></tr>
-                    <tr><td><code>free_creatine_claims.coupon_code</code></td><td>Código do cupom gerado</td></tr>
-                    <tr><td><code>free_creatine_claims.fraud_details</code></td><td>JSON com detalhes de fraude</td></tr>
-                    <tr><td><code>v_creatine_fraud_attempts</code></td><td>View para auditoria de fraudes</td></tr>
-                    <tr><td>UNIQUE(coupon_code)</td><td>Garante código único (segurança)</td></tr>
-                </tbody>
-            </table>
-        </section>
+        </details>
 
         <hr>
 
-        <!-- Status Atual -->
-        <section>
-            <h1>🎉 Status Atual</h1>
+        <!-- Próximos passos -->
+        <h1 id="proximos">🚀 Próximos passos imediatos</h1>
 
-            <div class="callout green">
-                <span class="callout-icon">✅</span>
-                <div class="callout-content">
-                    <strong>Todos os Sprints (1-7) — CONCLUÍDOS!</strong>
-                    <p style="margin-top: 8px;"><strong>Data de conclusão Sprint 7:</strong> 11/02/2026</p>
-                    <p><strong>Segurança anti-fraude:</strong> 18/02/2026</p>
-                    <p><strong>Testes de integração:</strong> ✅ APROVADOS (04/02/2026)</p>
-                    <p><strong>Cobertura de FRs:</strong> 98% (37/38 implementados)</p>
-                    <p><strong>TBDs resolvidos:</strong> 21/22 (1 pendente: TBD-004 — URLs oficiais)</p>
-                </div>
+        <ol class="numbered">
+            <li><strong>Hoje (29/04):</strong> Cliente recebe este resumo + questionário V2 com os 12 TBDs ainda em aberto. Wink recebe SPEC da F-V02 pra validação técnica.</li>
+            <li><strong>30/04 - 04/05:</strong> Implementação de F-V01, F-V02 e F-V03. Cliente responde TBDs em paralelo.</li>
+            <li><strong>05/05 - 08/05:</strong> Implementação das demais features destravadas. Testes integrados V2 em staging.</li>
+            <li><strong>09-10/05:</strong> Validação manual em staging (cliente + equipe técnica). Buffer de correções.</li>
+            <li><strong>11/05:</strong> Deploy + ativação da flag em produção. Janela de monitoramento.</li>
+        </ol>
+
+        <div class="callout blue">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+                <strong>Importante saber.</strong>
+                <p style="margin-top: 6px;">A migração foi desenhada de forma <strong>reversível e gradual</strong>: o código V1 continua funcional, o V2 fica atrás de uma feature flag (<code>LRP_V2</code>). Se algo der errado em produção, voltar pro V1 é uma mudança de 1 variável de ambiente — leva menos de 1 minuto. Os dados dos membros existentes não são alterados na migração.</p>
             </div>
-
-            <h3>O que foi feito em 11/02/2026</h3>
-            <p><strong>Reunião de alinhamento → 6 decisões resolvidas e implementadas:</strong></p>
-            <ol class="numbered">
-                <li>✅ TBD-001 — Cadastro sem link → House Account</li>
-                <li>✅ TBD-003 — Tag de nível <code>nivel:&lt;nivel&gt;</code> no Shopify</li>
-                <li>✅ TBD-006 — ref_code sequencial BH00001 + customização admin</li>
-                <li>✅ TBD-007 — Landing page mantém redirect para /login</li>
-                <li>✅ TBD-014 — CV=0 se metafield ausente (sem fallback preço)</li>
-                <li>✅ TBD-019 — Cupom Individual Mensal para creatina grátis</li>
-            </ol>
-
-            <h3>O que foi feito em 18/02/2026</h3>
-            <p><strong>Segurança anti-fraude do cupom de creatina:</strong></p>
-            <ul class="bullet">
-                <li>Hash aleatório no código (não adivinhável)</li>
-                <li>Cupom restrito ao shopify_customer_id do membro</li>
-                <li>Validação no webhook detecta fraude</li>
-                <li>Campo fraud_details para registro</li>
-                <li>View v_creatine_fraud_attempts para auditoria</li>
-            </ul>
-
-            <h3>Próximos Passos</h3>
-            <ul class="bullet">
-                <li>⏳ Integração Asaas automática (aguardando credenciais)</li>
-                <li>⏳ Definir URLs oficiais staging/prod (TBD-004)</li>
-                <li>⏳ Remover senha da loja para produção</li>
-                <li>⏳ Testar fluxo completo de indicação (comissões em produção)</li>
-            </ul>
-        </section>
-
-        <hr>
-
-        <!-- Checklist de Aceite -->
-        <section>
-            <h1>✅ Checklist de Aceite — Sprint 7</h1>
-
-            <ul class="checklist">
-                <li>House Account implementado (TBD-001)</li>
-                <li>Tag de nível <code>nivel:&lt;nivel&gt;</code> (TBD-003)</li>
-                <li>ref_code sequencial BH00001 (TBD-006)</li>
-                <li>CV=0 se metafield ausente (TBD-014)</li>
-                <li>Cupom individual mensal creatina (TBD-019)</li>
-                <li>Frontend exibe cupom no dashboard</li>
-                <li>Cron mensal gera cupons (dia 2/mês)</li>
-                <li>Webhook detecta uso de cupom CREATINA-*</li>
-                <li>Admin pode customizar ref_code</li>
-                <li>level/status passados no sync Shopify</li>
-                <li>UNIQUE constraint em free_creatine_claims</li>
-                <li>Segurança anti-fraude com 7 camadas</li>
-                <li>View de auditoria para admin</li>
-            </ul>
-        </section>
-
-        <hr>
-
-        <!-- TBDs -->
-        <section id="tbd">
-            <h1>📋 Decisões (TBD)</h1>
-
-            <h3>Pendentes (1 restante)</h3>
-            <table>
-                <thead><tr><th>TBD</th><th>Descrição</th><th>Sprint</th><th>Impacto</th></tr></thead>
-                <tbody>
-                    <tr><td>TBD-004</td><td>URLs oficiais (staging/prod)</td><td>1</td><td>Redirects e webhooks</td></tr>
-                </tbody>
-            </table>
-
-            <h3>Resolvidos ✅ (21 decisões)</h3>
-            <table>
-                <thead><tr><th>TBD</th><th>Descrição</th><th>Decisão</th><th>Data</th></tr></thead>
-                <tbody>
-                    <tr><td>TBD-001</td><td>Cadastro sem link</td><td>House Account</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-002</td><td>Preço de membro Shopify</td><td>Cliente configura na loja</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-003</td><td>Tags/metacampos</td><td>Tags atuais + <code>nivel:&lt;nivel&gt;</code></td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-006</td><td>Formato ref_code</td><td>Sequencial BH00001 + customização</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-014</td><td>Metafield CV</td><td><code>custom.cv</code>, CV=0 se ausente</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-019</td><td>Creatina grátis</td><td>Cupom Individual Mensal + Segurança</td><td>18/02/2026</td></tr>
-                </tbody>
-            </table>
-        </section>
+        </div>
 
         <!-- Footer -->
         <footer class="page-footer">
-            <p>Biohelp LRP — Resumo Executivo</p>
-            <p>Última atualização: 18/02/2026</p>
+            Biohelp LRP · Pivô V2 · Atualizado em 29/04/2026 · Deadline da migração: 11/05/2026<br>
+            Documentação canônica: <code>docs/sdd/PIVOT-V2.md</code> · Workflow: <code>docs/sdd/PLAYBOOK.md</code>
         </footer>
     </div>
 </body>
