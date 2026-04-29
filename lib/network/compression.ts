@@ -1,4 +1,19 @@
 /**
+ * @deprecated V1 LEGACY — descontinuado em 28/04/2026 pelo Pivô V2.
+ *
+ * A regra de saída após 6 meses inativo + compressão da rede foi REMOVIDA
+ * pelo cliente no comentário C6 do escopo (ver biohelp_lrp_contexto §7).
+ * No v2 inatividade não remove membro nem comprime rede.
+ * Mantido apenas até a onda 6 (F-V12 — cleanup).
+ *
+ * O cron `app/api/cron/network-compression/route.ts` ainda dispara mensalmente
+ * com a flag default OFF (LRP_V2=false). Quando LRP_V2=true em produção,
+ * pausar via env CRON_DISABLED_V2=true.
+ *
+ * Ver: docs/sdd/PIVOT-V2.md
+ */
+
+/**
  * Compressão de Rede — Sprint 6 (FR-12)
  * 
  * Regra: Membro que fica 6 meses consecutivos sem atingir 200 CV

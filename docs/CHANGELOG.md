@@ -6,6 +6,51 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 5.0 — 2026-04-28 (PIVÔ V2 declarado)
+**Tipo:** Major / Pivô de produto
+**Solicitação:** Cliente realinhou o modelo de negócio em reunião e via fluxograma novo (`documentos_escopo/Fluxograma.jpg.jpeg`).
+
+### Resumo
+O modelo MLM CV-based (Sprints 1-7, 98% dos FRs v1) foi declarado **descontinuado**.
+Novo modelo: afiliação 1-nível + comissão 50% direta + Founder ao atingir 5 ativos no clube + créditos Shopify pré-Founder + saque cash via NF de serviço (Asaas, CNPJ obrigatório).
+
+### Documentos canônicos do v2
+- `docs/sdd/PIVOT-V2.md` (fonte de verdade)
+- `docs/sdd/PLAYBOOK.md` (workflow operacional)
+- `docs/sdd/QUESTIONARIO-CLIENTE-V2.md` (18 TBDs ao cliente)
+- `docs/sdd/PROMPT-NOVA-SESSAO.md` (prompt self-contained pra sessões CLI)
+- `docs/sdd/features/F-V11-visao-restrita-rede/SPEC.md` (1ª feature destravada)
+
+### Insumos do cliente persistidos
+- `documentos_escopo/Fluxograma.jpg.jpeg` (28/04/2026)
+- `documentos_escopo/Fluxo.txt` (regras condensadas)
+- `documentos_escopo/Biohelp _ Loyalty Reward Program.docx` (escopo v1 com comentários)
+
+### Removido do modelo (mas código v1 mantido até onda 6 / F-V12)
+- CV (Commissionable Value) e relação 1 CV = R$1
+- Múltiplos níveis N0/N1/N2/N3 e rankings Parceira/Líder/Diretora/Head
+- Status ativo/inativo por 200 CV mensais e reset mensal
+- Compressão de rede após 6 meses inativo
+- Fast-Track 30%/20%, Comissão Perpétua, Bônus 1/2/3, Leadership, Royalty
+- RPA/CPF e limite mensal R$1.000
+- Visualização multinível pro membro
+
+### Adicionado (28-29/04/2026)
+- Feature flag `LRP_V2` (default OFF) em `lib/utils/featureFlags.ts`
+- Vars `LRP_V2` e `CRON_DISABLED_V2` em `.env.example` e `.env.local`
+- Shells dos módulos novos: `lib/subscriptions/`, `lib/commissions-v2/`, `lib/credits/`, `lib/founder/`, `lib/content/`
+- Banner DEPRECATED em 5 docs v1 (`SPEC_Biohelp_LRP.md`, `ACCEPTANCE.md`, `DECISOES_TBD.md`, `WORKFLOW.md`, `PR_TEMPLATE.md`)
+- Comentário `@deprecated` em 6 arquivos de código v1 (`lib/cv/calculator.ts`, `lib/levels/calculator.ts`, `lib/commissions/{calculator,bonus3,royalty}.ts`, `lib/network/compression.ts`)
+- `docs/README.md` reorganizado priorizando v2
+
+### TBDs abertos
+**18 TBDs** aguardando decisão do cliente. Lista em `docs/sdd/PIVOT-V2.md` §4. Bloqueiam F-V01..F-V10 e F-V12 (10 das 12 features v2). F-V11 (visão restrita da rede) é a única feature destravada — SPEC pronta em `docs/sdd/features/F-V11-visao-restrita-rede/SPEC.md`.
+
+### Cleanup do código v1
+Programado para a onda 6 (F-V12), apenas após `LRP_V2=true` em produção por ~4 semanas com 0 incidentes. Até lá, código v1 permanece funcional e é o único caminho ativo (flag default OFF).
+
+---
+
 ## Versão 4.4 — 2026-02-18
 **Tipo:** Segurança (Anti-Fraude Cupom Creatina)  
 **Solicitação:** Cliente pediu proteção contra uso indevido do cupom de creatina

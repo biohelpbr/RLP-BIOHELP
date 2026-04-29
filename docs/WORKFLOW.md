@@ -1,3 +1,10 @@
+> ⚠️ **DOCUMENTO V1 — SUPERSEDED PELO PIVÔ V2 (28/04/2026)**
+>
+> Este workflow refere-se ao modelo MLM/CV original (FRs v1, Sprints 1-7).
+> **Workflow vigente está em [sdd/PLAYBOOK.md](sdd/PLAYBOOK.md)** (loops, classes A/B/C/D, estados CONTINUE/PAUSE/BLOQUEADO, template de SPEC, Validation Mode).
+
+---
+
 # Workflow Diário — SDD (Uso Obrigatório)
 
 **Última atualização:** 12/01/2026

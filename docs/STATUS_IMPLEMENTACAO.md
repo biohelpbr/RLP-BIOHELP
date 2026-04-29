@@ -1,11 +1,73 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** 11/02/2026  
-**Sprint Atual:** Sprint 7 (Creatina Mensal + Decisões Desbloqueadas) — EM PROGRESSO  
-**Status Geral:** ✅ Sprints 1-6 CONCLUÍDOS | ⚠️ Sprint 7 PARCIAL | 🎉 MVP COMPLETO | 📋 5 TBDs resolvidos (reunião 11/02/2026)
+**Data:** 28/04/2026 (PIVÔ V2 declarado)
+**Sprint Atual:** ⏸️ Sprints v1 (1-7) CONGELADOS | 🚧 Pivô V2 em planejamento
+**Status Geral:** ✅ V1 entregue (37/38 FRs) | ⚠️ V1 sendo descontinuado | 📋 18 TBDs aguardando cliente
 
 ---
 
-## 🎯 Resumo Executivo
+## ⚠️ PIVÔ V2 — 28/04/2026 (em planejamento)
+
+**Cliente realinhou o modelo de negócio.** O modelo MLM CV-based (Sprints 1-7, 98% FRs) está sendo descontinuado. Novo modelo: afiliação 1-nível, comissão 50% por assinatura de convidado, promoção a Founder ao atingir 5 ativos no clube, créditos Shopify pré-Founder, saque cash apenas Founder com CNPJ+NF.
+
+📄 **Documento canônico do pivot:** [docs/sdd/PIVOT-V2.md](sdd/PIVOT-V2.md)
+📄 **Workflow operacional pós-pivot:** [docs/sdd/PLAYBOOK.md](sdd/PLAYBOOK.md)
+📥 **Insumos do cliente:** `documentos_escopo/Biohelp _ Loyalty Reward Program.docx` (escopo v1 com comentários do cliente), `documentos_escopo/Fluxograma.jpg.jpeg` (fluxograma novo, 28/04), `Fluxo.txt` (regras condensadas).
+
+### Resumo do que muda
+- ❌ **REMOVIDO:** CV, níveis (Parceira/Líder/Diretora/Head), Fast-Track, Bônus 1/2/3, Leadership Bônus, Royalty, RPA/CPF, reset mensal de CV, compressão após 6 meses inativo, ledger CV-based.
+- 🔄 **ALTERADO:** cadastro exige ref obrigatório (link OU código manual); status ativo = assinatura paga (não CV); membro vê só sponsor + indicados diretos; pagamento = NF de serviço + Asaas (apenas Founder).
+- ➕ **NOVO:** integração Guru, comissão 50% direta, saldo + créditos Shopify, Founder@5, ranking de Founders, área de conteúdo, link WhatsApp por Founder.
+- ⏸️ **PAUSADOS:** crons `close-monthly-cv` e `network-compression` (desligar via env quando flag v2 ON).
+
+### Backlog v2 — 12 features (detalhe em PIVOT-V2.md §2)
+| Onda | Features | Status |
+|---|---|---|
+| 0 (docs) | PIVOT-V2.md, PLAYBOOK.md, este update | ✅ Concluído (28/04/2026) |
+| 1 (TBDs) | 18 TBDs com cliente | ⏳ Aguardando |
+| 2 (foundation) | F-V01, F-V02, F-V03 | ⏸️ Bloqueado por TBDs |
+| 3 (commissão) | F-V04, F-V05, F-V07 | ⏸️ Bloqueado |
+| 4 (Founder) | F-V06, F-V08, F-V11 | ⏸️ Bloqueado |
+| 5 (conteúdo) | F-V09, F-V10 | ⏸️ Bloqueado |
+| 6 (cleanup) | F-V12 (remover v1 morto) | depende |
+
+### Bloqueios atuais
+- **18 TBDs** aguardando decisão do cliente (`PIVOT-V2.md` §4). Sem isso, ondas 2-5 não podem começar.
+- Confirmar destino do **Sprint 7** (House Account TBD-16, creatina TBD-17) e **Sprint 5** (RPA/CPF TBD-18) — saiem do modelo ou são reaproveitados?
+
+### Trabalho em andamento (sem bloqueio de TBD)
+- ✅ **Frente 1** (feature flag `LRP_V2`) concluída em 28/04/2026 — `lib/utils/featureFlags.ts`, `LRP_V2` e `CRON_DISABLED_V2` em `.env.example` e `.env.local`.
+- ✅ **Frente 3** (shells dos módulos novos) concluída em 28/04/2026 — `lib/subscriptions/`, `lib/commissions-v2/`, `lib/credits/`, `lib/founder/`, `lib/content/`.
+- ✅ **F-V11** (visão restrita da rede) — implementação concluída em 29/04/2026 na branch `feat/F-V11-visao-restrita-rede`. Build/typecheck limpos. Validação manual pendente (dev server + flag `LRP_V2=true`). Detalhe em `docs/sdd/features/F-V11-visao-restrita-rede/SPEC.md` (matriz preenchida).
+- ✅ **Adequação documental V2** concluída em 29/04/2026 — banner DEPRECATED nos 5 docs v1 (`SPEC_Biohelp_LRP.md`, `ACCEPTANCE.md`, `DECISOES_TBD.md`, `WORKFLOW.md`, `PR_TEMPLATE.md`); comentário `@deprecated` em 6 arquivos de código v1 (`lib/cv/`, `lib/levels/`, `lib/commissions/{calculator,bonus3,royalty}.ts`, `lib/network/compression.ts`); entrada v5.0 no `docs/CHANGELOG.md`; insumos do cliente persistidos em `documentos_escopo/Fluxo.txt`; índice `docs/README.md` reorganizado priorizando v2.
+
+### Próximo passo
+1. Cliente responder os 18 TBDs (questionário pronto em `docs/sdd/QUESTIONARIO-CLIENTE-V2.md`).
+2. Implementar **F-V11** (independe de TBDs).
+3. Após desbloqueio dos TBDs P0 (1, 2, 3, 7, 10, 11, 16): iniciar **F-V01** (cadastro com ref obrigatório).
+
+### Status de cada feature v2 (atualizar conforme avanço)
+| ID | Feature | Classe | Onda | Status |
+|---|---|---|---|---|
+| F-V01 | Cadastro com ref obrigatório | C | 2 | 🚫 Aguarda TBD |
+| F-V02 | Integração Guru | D | 2 | 🚫 Aguarda TBD |
+| F-V03 | Status ativo = subscription_paid | C | 2 | 🚫 Aguarda TBD |
+| F-V04 | Comissão 50% por assinatura | D | 3 | 🚫 Aguarda TBD |
+| F-V05 | Saldo + créditos Shopify | C | 3 | 🚫 Aguarda TBD |
+| F-V06 | Promoção a Founder ≥5 ativos | B | 4 | 🚫 Aguarda TBD |
+| F-V07 | Saque Founder + CNPJ + NF + Asaas | D | 3 | 🚫 Aguarda TBD |
+| F-V08 | Ranking de Founders | B | 4 | 🚫 Aguarda TBD |
+| F-V09 | Área de conteúdo | B | 5 | 🚫 Aguarda TBD |
+| F-V10 | Link WhatsApp Founder | A | 5 | 🚫 Aguarda TBD |
+| F-V11 | Visão restrita da rede | B | 4 (antecipada) | ✅ Implementada 29/04/2026 — pendente validação manual em dev |
+| F-V12 | Cleanup v1 (remover CV, níveis, RPA, etc.) | D | 6 | depende v2 estável |
+
+---
+
+> ℹ️ **Tudo abaixo desta seção é histórico do modelo v1 (Sprints 1-7).** Permanece como referência do que foi entregue, mas **NÃO é fonte de verdade pro v2**. Para regras vigentes, ler `PIVOT-V2.md`.
+
+---
+
+## 🎯 Resumo Executivo (v1 — histórico)
 
 O projeto concluiu as **Fases 1-6**, com sistema completo de cadastro, rede, comissões, saques e administração. **Todos os sprints planejados foram concluídos!**
 

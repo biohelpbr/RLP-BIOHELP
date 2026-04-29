@@ -1,3 +1,15 @@
+> ⚠️ **DOCUMENTO V1 — SUPERSEDED PELO PIVÔ V2 (28/04/2026)**
+>
+> Este documento descreve o modelo MLM/CV original (Sprints 1-7), descontinuado pelo cliente.
+> Para regras vigentes consulte primeiro:
+> - **Fonte de verdade v2:** [sdd/PIVOT-V2.md](sdd/PIVOT-V2.md)
+> - **Workflow operacional:** [sdd/PLAYBOOK.md](sdd/PLAYBOOK.md)
+> - **Estado e backlog:** [STATUS_IMPLEMENTACAO.md](STATUS_IMPLEMENTACAO.md) (seção "PIVÔ V2" no topo)
+>
+> O conteúdo abaixo é mantido apenas como histórico do v1. **Não use como fonte de verdade.**
+
+---
+
 # SPEC.md — Biohelp Loyalty Reward Program (LRP)
 **Spec-Driven Development (SDD) / Documento Mestre do Projeto**  
 **Stack:** Next.js (App Router) + Supabase (Postgres/Auth/RLS) + Shopify (Admin API + Webhooks)  

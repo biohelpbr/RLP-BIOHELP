@@ -1,3 +1,10 @@
+> ⚠️ **DOCUMENTO V1 — SUPERSEDED PELO PIVÔ V2 (28/04/2026)**
+>
+> Os TBDs registrados aqui são do modelo MLM/CV descontinuado e estão **resolvidos ou irrelevantes** após o pivô.
+> **TBDs vigentes do v2 estão em [sdd/PIVOT-V2.md](sdd/PIVOT-V2.md) §4** (18 TBDs aguardando decisão do cliente).
+
+---
+
 # DECISÕES TBD — Biohelp LRP
 **Objetivo:** registrar decisões obrigatórias (pendentes) que afetam regra de negócio, escopo, banco e integração.  
 **Regra:** nada marcado como **TBD** deve ser implementado sem aprovação formal do cliente (assinatura/ok por escrito).  

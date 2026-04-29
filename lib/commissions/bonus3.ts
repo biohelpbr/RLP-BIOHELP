@@ -1,4 +1,14 @@
 /**
+ * @deprecated V1 LEGACY — descontinuado em 28/04/2026 pelo Pivô V2.
+ *
+ * Bônus 1/2/3 (R$250 / R$1.500 / R$8.000) baseados em N1/N2 com Parceiras
+ * Ativas: REMOVIDO no v2. Não há mais múltiplos níveis nem ranking
+ * Parceira. Mantido apenas até a onda 6 (F-V12 — cleanup).
+ *
+ * Ver: docs/sdd/PIVOT-V2.md
+ */
+
+/**
  * Cálculo de Bônus 3
  * Sprint 4 - Biohelp LRP
  * 

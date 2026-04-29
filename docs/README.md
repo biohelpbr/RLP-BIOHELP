@@ -1,54 +1,69 @@
-# Docs — Biohelp LRP (SDD)
+# Docs — Biohelp LRP
 
-Este diretório contém os documentos oficiais do projeto no modelo **Spec-Driven Development (SDD)**.
+Diretório oficial de documentação do projeto.
 
-## 📌 Hierarquia de Documentos (ordem de precedência)
+## ⚠️ PIVÔ V2 ativo desde 28/04/2026
 
-1. **Regras de Negócio Canônicas:** `../documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
-   - Fonte definitiva para regras de negócio (CV, níveis, comissões, saques)
-   - Em caso de conflito, este documento prevalece
+O projeto está em transição do modelo **MLM/CV (v1)** para **afiliação 1-nível (v2)**.
+**Sempre consulte os docs v2 primeiro.** Os docs v1 listados abaixo são mantidos apenas como histórico.
 
-2. **SPEC Técnico Canônico:** `SPEC_Biohelp_LRP.md`
-   - Especificação técnica de implementação
-   - Derivado das regras de negócio canônicas
+### 📌 Hierarquia atual (v2)
 
-3. **Decisões pendentes (assináveis):** `DECISOES_TBD.md`
-4. **Critérios de aceite e roteiros de teste:** `ACCEPTANCE.md`
-5. **Histórico de mudanças aprovadas:** `CHANGELOG.md`
-6. **Status de implementação:** `STATUS_IMPLEMENTACAO.md`
-7. **Guia de trabalho diário:** `WORKFLOW.md`
+1. **Fonte de verdade do pivô:** [`sdd/PIVOT-V2.md`](sdd/PIVOT-V2.md) — delta v1→v2, backlog F-V01..F-V12 (A/B/C/D), Anti-SPEC, 18 TBDs, plano em ondas
+2. **Workflow operacional:** [`sdd/PLAYBOOK.md`](sdd/PLAYBOOK.md) — loops, classes, estados CONTINUE/PAUSE/BLOQUEADO, template SPEC, CI mínimo
+3. **Estado e backlog:** [`STATUS_IMPLEMENTACAO.md`](STATUS_IMPLEMENTACAO.md) — seção "PIVÔ V2" no topo
+4. **Questionário ao cliente:** [`sdd/QUESTIONARIO-CLIENTE-V2.md`](sdd/QUESTIONARIO-CLIENTE-V2.md) — texto pra WhatsApp com os 18 TBDs
+5. **Prompt para nova sessão CLI:** [`sdd/PROMPT-NOVA-SESSAO.md`](sdd/PROMPT-NOVA-SESSAO.md) — autocontido, basta colar
+6. **SPECs por feature v2:** [`sdd/features/F-VNN-<slug>/SPEC.md`](sdd/features/)
 
-## 📚 Materiais de origem (referência)
-- **Regra de Negócio (CANÔNICO):** `../documentos_projeto_iniciais_MD/Biohelp___Loyalty_Reward_Program.md`
-- Escopo do Projeto: `../documentos_projeto_iniciais_MD/Biohelp_LRP_Escopo_Projeto_v1.md`
-- Matriz Esforço x Impacto: `../documentos_projeto_iniciais_MD/Biohelp_LRP_Matriz_Esforco_Impacto_Completa_FULL.md`
-- Cronograma: `../documentos_projeto_iniciais_MD/Biohelp_LRP_Cronograma_Completo_Detalhado_FULL.md`
+### 📥 Insumos do cliente (v2)
 
-## 📊 Documentos para Cliente
-- **Resumo Executivo:** `RESUMO_PARA_CLIENTE.md` / `RESUMO_PARA_CLIENTE.html`
-  - Visão consolidada do progresso do projeto
-  - Diagramas e fluxos visuais
-  - Status de cada sprint
+- [`../documentos_escopo/Fluxograma.jpg.jpeg`](../documentos_escopo/) — fluxograma novo (28/04/2026)
+- [`../documentos_escopo/Fluxo.txt`](../documentos_escopo/Fluxo.txt) — regras condensadas
+- [`../documentos_escopo/Biohelp _ Loyalty Reward Program.docx`](../documentos_escopo/) — escopo v1 com comentários do cliente apontando o que muda
 
-## Como trabalhar (regra do time)
-1. Antes de implementar qualquer coisa, **ler o documento de regras de negócio canônico**.
-2. Em seguida, **ler o SPEC técnico** (`SPEC_Biohelp_LRP.md`).
-3. Consultar o **WORKFLOW.md** para o processo de implementação.
-4. Se algo não estiver no SPEC, registrar em **DECISOES_TBD** ou abrir **Mudança de Escopo**.
-5. Ao concluir itens, marcar **ACCEPTANCE** e anexar evidências.
-6. Toda mudança aprovada entra no **CHANGELOG** e atualiza o SPEC quando necessário.
+### 🛠 Como trabalhar (regra do time pós-pivô)
 
-## 📁 Estrutura da Pasta
+1. Antes de implementar qualquer coisa, ler `sdd/PIVOT-V2.md` + `sdd/PLAYBOOK.md`.
+2. Para cada feature: criar SPEC em `sdd/features/F-VNN-<slug>/SPEC.md` com classe A/B/C/D, DoR, CAs, arquivos permitidos.
+3. Em conflito de docs: **PIVOT-V2.md > PLAYBOOK.md > SPEC_Biohelp_LRP.md (v1) > WORKFLOW.md (v1) > documentos_projeto_iniciais_MD/\* (v1)**.
+4. Ao concluir uma feature: marcar SPEC como Done + atualizar `STATUS_IMPLEMENTACAO.md` + atualizar tabela em `PIVOT-V2.md` §2.
+5. Mudança no PIVOT-V2.md ou Anti-SPEC v2 exige autorização humana explícita.
+
+---
+
+## 📦 Documentos V1 (histórico — não use como fonte de verdade)
+
+Os documentos abaixo descrevem o modelo MLM/CV descontinuado pelo pivô V2. Mantidos apenas como referência do que foi entregue até 11/02/2026 (Sprints 1-7, 98% dos FRs v1).
+
+- [`SPEC_Biohelp_LRP.md`](SPEC_Biohelp_LRP.md) — SPEC v1 (CV, níveis Parceira/Líder/Diretora/Head, Fast-Track, comissões multinível, RPA/CPF)
+- [`ACCEPTANCE.md`](ACCEPTANCE.md) — CAs do v1
+- [`DECISOES_TBD.md`](DECISOES_TBD.md) — TBDs do v1 (TBDs novos do v2 estão em `sdd/PIVOT-V2.md` §4)
+- [`WORKFLOW.md`](WORKFLOW.md) — workflow v1 (substituído por `sdd/PLAYBOOK.md`)
+- [`CHANGELOG.md`](CHANGELOG.md) — histórico de mudanças (entrada v5.0 = pivô)
+- `../documentos_projeto_iniciais_MD/` — documentos canônicos iniciais v1
+
+## 📊 Documentos para cliente
+
+- [`docs para cliente/RESUMO_PARA_CLIENTE.md`](docs%20para%20cliente/RESUMO_PARA_CLIENTE.md)
+- [`docs para cliente/status_projeto.html`](docs%20para%20cliente/status_projeto.html)
+
+## 📁 Estrutura
 
 ```
 docs/
-├── README.md                    # Este arquivo (índice)
-├── SPEC_Biohelp_LRP.md         # SPEC técnico canônico
-├── ACCEPTANCE.md               # Critérios de aceite
-├── CHANGELOG.md                # Histórico de mudanças
-├── DECISOES_TBD.md             # Decisões pendentes
-├── STATUS_IMPLEMENTACAO.md     # Status por sprint
-├── WORKFLOW.md                 # Guia de trabalho diário
-├── RESUMO_PARA_CLIENTE.md      # Resumo executivo (Markdown)
-└── RESUMO_PARA_CLIENTE.html    # Resumo executivo (HTML visual)
+├── README.md                       # Este arquivo (índice)
+├── sdd/                            # Documentos V2 (atual)
+│   ├── PIVOT-V2.md                 # Fonte de verdade do pivô
+│   ├── PLAYBOOK.md                 # Workflow operacional
+│   ├── PROMPT-NOVA-SESSAO.md       # Prompt self-contained pra CLI
+│   ├── QUESTIONARIO-CLIENTE-V2.md  # 18 TBDs ao cliente
+│   └── features/F-VNN-<slug>/SPEC.md
+├── STATUS_IMPLEMENTACAO.md         # Estado atual + backlog v2 (no topo)
+├── SPEC_Biohelp_LRP.md             # ⚠️ V1 (histórico)
+├── ACCEPTANCE.md                   # ⚠️ V1 (histórico)
+├── CHANGELOG.md                    # Histórico de mudanças
+├── DECISOES_TBD.md                 # ⚠️ V1 (histórico)
+├── WORKFLOW.md                     # ⚠️ V1 (histórico — substituído por sdd/PLAYBOOK.md)
+└── docs para cliente/              # Resumos para cliente
 ```

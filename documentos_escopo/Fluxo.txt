@@ -1,0 +1,31 @@
+O cliente recebe o link de filiação ou código de um membro.
+
+O cliente se cadastra e é redirecionado para o checkout do guru, onde ele compra a assinatura.
+
+Entre o momento do cadastro e da ativação da assinatura, o cliente possui o status de inativo. Assim que a assinatura é processada ele se torna um membro ativo.
+
+O membro que o convidou receberá 50% (menos impostos e taxas) sobre a assinatura do convidado, que passará a ser um membro do clube daquele que o convidou.
+
+REGRAS DE SAQUE E CRÉDITOS
+
+REGRAS REEMBOLSO
+
+O Membro Ativo terá acesso aos produtos com preço de custo (mesma coisa do clube antigo com locksmith) e acesso ao LRP, onde ele terá seu próprio link de filiação.
+
+Enquanto inativo, o link/código de afiliação não será válido (?)
+
+Enquanto inativo, o membro terá X dias para sacar o saldo disponível (?)
+
+Depois de 5 pessoas em seu clube (rede), o membro é promovido a Founder e pode sacar o dinheiro (É obrigatório que seja CNPJ e emita nota fiscal para poder sacar).
+
+Antes de ser Founder o Membro só pode converter seu saldo em créditos na loja. (continua sendo possível para o Founder converter o saldo em créditos)
+
+Os Founders serão ranqueados com base em seu clube (lembrando que só tem um nível abaixo do Founder).
+
+Temos que definir como será calculado o ranking (tamanho do clube, faturamento, média mensal de itens por cliente, etc...)
+
+Não há mais múltiplos níveis, então cada membro só tem visibilidade dos dados daquele que o trouxe para o clube e dos membros que ele próprio trouxe.
+
+Precisamos de uma área para conteúdo, textos, vídeos, imagens, pdfs.
+
+Deve haver a possibilidade do founder disponibilizar um link para grupo de wpp para seu clube.
