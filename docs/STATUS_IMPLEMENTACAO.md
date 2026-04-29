@@ -31,8 +31,12 @@
 | 6 (cleanup) | F-V12 (remover v1 morto) | depende |
 
 ### Bloqueios atuais
-- **18 TBDs** aguardando decisão do cliente (`PIVOT-V2.md` §4). Sem isso, ondas 2-5 não podem começar.
-- Confirmar destino do **Sprint 7** (House Account TBD-16, creatina TBD-17) e **Sprint 5** (RPA/CPF TBD-18) — saiem do modelo ou são reaproveitados?
+- **12 TBDs** aguardando decisão do cliente (`PIVOT-V2.md` §4.1). 11/18 respondidos em 29/04/2026; 4 novos derivados (TBD-19/20/21/22) gerados pelas respostas.
+- F-V04, F-V07 (parte cálculo), F-V08, F-V09, F-V10, F-V13 ainda bloqueadas.
+- F-V01, F-V02, F-V03, F-V05 ✅ **destravadas em 29/04/2026** — prontas pra começar.
+- Confirmação técnica pendente: **Wink** (abordagem Guru → Shopify), **fornecedor de pagamento** (Cashin? — TBD-19).
+- ✅ Sprint 7 — House Account descontinuada (TBD-10); creatina mantida com escopo alterado (TBD-17 → F-V13).
+- ✅ Sprint 5 — RPA/CPF descontinuado (TBD-18). UI escondida atrás do flag v2; remoção física em F-V12.
 
 ### Trabalho em andamento (sem bloqueio de TBD)
 - ✅ **Frente 1** (feature flag `LRP_V2`) concluída em 28/04/2026 — `lib/utils/featureFlags.ts`, `LRP_V2` e `CRON_DISABLED_V2` em `.env.example` e `.env.local`.
@@ -41,25 +45,29 @@
 - ✅ **Adequação documental V2** concluída em 29/04/2026 — banner DEPRECATED nos 5 docs v1 (`SPEC_Biohelp_LRP.md`, `ACCEPTANCE.md`, `DECISOES_TBD.md`, `WORKFLOW.md`, `PR_TEMPLATE.md`); comentário `@deprecated` em 6 arquivos de código v1 (`lib/cv/`, `lib/levels/`, `lib/commissions/{calculator,bonus3,royalty}.ts`, `lib/network/compression.ts`); entrada v5.0 no `docs/CHANGELOG.md`; insumos do cliente persistidos em `documentos_escopo/Fluxo.txt`; índice `docs/README.md` reorganizado priorizando v2.
 
 ### Próximo passo
-1. Cliente responder os 18 TBDs (questionário pronto em `docs/sdd/QUESTIONARIO-CLIENTE-V2.md`).
-2. Implementar **F-V11** (independe de TBDs).
-3. Após desbloqueio dos TBDs P0 (1, 2, 3, 7, 10, 11, 16): iniciar **F-V01** (cadastro com ref obrigatório).
+1. **F-V01** (cadastro com ref obrigatório) — destravada em 29/04/2026. Porta de entrada do v2.
+2. **F-V02** (integração Guru via webhook Shopify) — destravada. Confirmar abordagem técnica com Wink antes de mergear.
+3. **F-V03** (status ativo = subscription_paid) — destravada, depende de F-V02.
+4. **F-V05** (saldo + créditos 1:1) — destravada.
+5. Cliente responder os **12 TBDs ainda abertos** (8 originais + 4 derivados). Sem isso F-V04, F-V07 (cálculo), F-V08, F-V09, F-V10, F-V13 ficam bloqueadas.
+6. Confirmação do fornecedor de pagamento (TBD-19 — Cashin?).
 
 ### Status de cada feature v2 (atualizar conforme avanço)
 | ID | Feature | Classe | Onda | Status |
 |---|---|---|---|---|
-| F-V01 | Cadastro com ref obrigatório | C | 2 | 🚫 Aguarda TBD |
-| F-V02 | Integração Guru | D | 2 | 🚫 Aguarda TBD |
-| F-V03 | Status ativo = subscription_paid | C | 2 | 🚫 Aguarda TBD |
-| F-V04 | Comissão 50% por assinatura | D | 3 | 🚫 Aguarda TBD |
-| F-V05 | Saldo + créditos Shopify | C | 3 | 🚫 Aguarda TBD |
-| F-V06 | Promoção a Founder ≥5 ativos | B | 4 | 🚫 Aguarda TBD |
-| F-V07 | Saque Founder + CNPJ + NF + Asaas | D | 3 | 🚫 Aguarda TBD |
-| F-V08 | Ranking de Founders | B | 4 | 🚫 Aguarda TBD |
-| F-V09 | Área de conteúdo | B | 5 | 🚫 Aguarda TBD |
-| F-V10 | Link WhatsApp Founder | A | 5 | 🚫 Aguarda TBD |
+| F-V01 | Cadastro com ref obrigatório | C | 2 | ✅ Destravada (TBD-10 resolvido) — pronta pra iniciar |
+| F-V02 | Integração Guru via webhook Shopify | D | 2 | ✅ Destravada (TBD-7 resolvido — Shopify-first) |
+| F-V03 | Status ativo = subscription_paid | C | 2 | ✅ Destravada (depende F-V02) |
+| F-V04 | Comissão 50% por assinatura | D | 3 | 🚫 Bloqueada (TBD-1, TBD-2) |
+| F-V05 | Saldo + créditos Shopify 1:1 | C | 3 | ✅ Destravada (TBD-14 resolvido) |
+| F-V06 | Promoção a Founder ≥5 ativos | B | 4 | 🟡 Parcial (TBD-12 hipótese padrão: definitivo) |
+| F-V07 | Saque Founder via Cashin + NF | D | 3 | 🟡 Parcial — fluxo OK, valor depende F-V04. UI/upload pode iniciar |
+| F-V08 | Ranking de Founders | B | 4 | 🚫 Bloqueada (TBD-11) |
+| F-V09 | Área de conteúdo | B | 5 | 🚫 Bloqueada (TBD-15) |
+| F-V10 | Link WhatsApp Founder | A | 5 | 🚫 Bloqueada (TBD-16) |
 | F-V11 | Visão restrita da rede | B | 4 (antecipada) | ✅ Implementada 29/04/2026 — pendente validação manual em dev |
 | F-V12 | Cleanup v1 (remover CV, níveis, RPA, etc.) | D | 6 | depende v2 estável |
+| F-V13 | Cupom de creatina como campanha configurável | C | 5 | 🚫 Bloqueada (TBD-22) — substitui cron mensal automático |
 
 ---
 

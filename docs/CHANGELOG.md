@@ -6,6 +6,45 @@ Este changelog registra **toda alteração aprovada** que afete o SPEC, escopo, 
 
 ---
 
+## Versão 5.1 — 2026-04-29 (Pivô V2 — primeira leva de TBDs respondidos)
+**Tipo:** Documental / desbloqueio parcial
+**Solicitação:** Cliente respondeu 11 dos 18 TBDs do questionário enviado em 29/04/2026.
+
+### Decisões registradas (TBDs resolvidos)
+- **TBD-3:** Pagamento via **Cashin** (provável) ou PIX manual. Asaas descartado.
+- **TBD-4:** Aprovação **manual** do admin + validação **automática** da NF (formato/dados/valor) no upload.
+- **TBD-5:** CPF **não está fora** — pode receber via Cashin ou crédito em loja. CNPJ é obrigatório só pra emitir NF de serviço.
+- **TBD-6:** **Sem integração com ERP** nessa fase.
+- **TBD-7:** Guru cria pedido na Shopify, **lemos via webhook Shopify** (Wink valida abordagem).
+- **TBD-10:** **House Account descontinuada** no v2.
+- **TBD-13 (parcial):** Saldo do **ATIVO** sem prazo. Inativo TBD.
+- **TBD-14:** Saldo → crédito Shopify **1:1, sem prazo** após resgate.
+- **TBD-17:** Cupom de creatina **mantém com escopo alterado** — sistema de campanhas configuráveis pelo admin.
+- **TBD-18:** Saque RPA/CPF **descontinua**.
+
+### TBDs derivados (4 novos)
+- **TBD-19:** Cashin é o fornecedor confirmado? (resposta TBD-3 disse "provavelmente")
+- **TBD-20:** Founder com CPF pode usar Cashin ou só CNPJ pode ser Founder?
+- **TBD-21:** Prazo de saldo pra membro INATIVO (TBD-13 deixou em aberto).
+- **TBD-22:** UX de gestão de campanhas de cupom (deriva de TBD-17 alterado).
+
+### Features afetadas
+- ✅ **Destravadas:** F-V01, F-V02, F-V03, F-V05.
+- 🟡 **Parcialmente destravadas:** F-V06, F-V07.
+- 🚫 **Ainda bloqueadas:** F-V04, F-V08, F-V09, F-V10, F-V13.
+- 🆕 **Nova feature criada:** F-V13 (cupom de creatina como campanha configurável — substitui cron mensal).
+
+### Anti-SPEC v2 atualizada
+- §8: House Account marcada como descontinuada.
+- §9: Cupom de creatina marcado com escopo alterado (campanhas).
+- §10: RPA/CPF marcado como descontinuado.
+- §11 (novo): provider de pagamento — Cashin/PIX manual (TBD-19 confirma); construir `lib/payouts/v2/` com interface de provider agnóstica.
+
+### TBDs ainda abertos (12 — bloqueando 6 features)
+1, 2, 8, 9, 11, 12, 15, 16, 19, 20, 21, 22. Detalhe em `docs/sdd/PIVOT-V2.md` §4.1.
+
+---
+
 ## Versão 5.0 — 2026-04-28 (PIVÔ V2 declarado)
 **Tipo:** Major / Pivô de produto
 **Solicitação:** Cliente realinhou o modelo de negócio em reunião e via fluxograma novo (`documentos_escopo/Fluxograma.jpg.jpeg`).

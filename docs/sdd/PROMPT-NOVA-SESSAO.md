@@ -42,25 +42,33 @@ Você está continuando o trabalho no projeto **Biohelp LRP** (Loyalty Reward Pr
 - F-V11 SPEC criada: `docs/sdd/features/F-V11-visao-restrita-rede/SPEC.md` (status: Approved).
 - **Adequação documental V2 (29/04/2026):** banner DEPRECATED nos 5 docs v1 (`SPEC_Biohelp_LRP.md`, `ACCEPTANCE.md`, `DECISOES_TBD.md`, `WORKFLOW.md`, `PR_TEMPLATE.md`); comentário `@deprecated` em 6 arquivos de código v1 (`lib/cv/calculator.ts`, `lib/levels/calculator.ts`, `lib/commissions/{calculator,bonus3,royalty}.ts`, `lib/network/compression.ts`); entrada v5.0 no `docs/CHANGELOG.md`; insumos do cliente persistidos (`documentos_escopo/Fluxo.txt`); índice `docs/README.md` reorganizado priorizando v2. **Importante:** todo o código v1 continua funcional (flag `LRP_V2=false` por default) — adequação foi sinalização, não remoção.
 
-**Próxima ação imediata:**
-- **Implementar F-V11** (visão restrita da rede pro membro). Classe B, ~3h, independente de TBDs.
+**Próxima ação imediata (29/04/2026 — pós-respostas):**
+- **F-V11** já entregue ✅.
+- **F-V01, F-V02, F-V03, F-V05** ✅ destravadas — qualquer uma pode começar. Recomendação: F-V01 primeiro (porta de entrada).
+- **F-V06, F-V07** 🟡 parciais (podem começar com hipóteses padrão / partes não bloqueadas).
 
-**Bloqueado por cliente** (18 TBDs em `PIVOT-V2.md` §4): F-V01, F-V02, F-V03, F-V04, F-V05, F-V06, F-V07, F-V08, F-V09, F-V10, F-V12.
+**Ainda bloqueado por TBDs abertos** (12 em `PIVOT-V2.md` §4.1): F-V04, F-V08, F-V09, F-V10, F-V13.
+
+**TBDs respondidos em 29/04/2026** (11/18) — `PIVOT-V2.md` §4.2:
+- **3** Cashin/PIX (Asaas descartado) · **4** aprovação manual + validação NF automática · **5** CPF via Cashin/crédito · **6** sem ERP · **7** Guru → Shopify webhook · **10** House Account descontinua · **13** ativo sem prazo (inativo TBD-21) · **14** saldo→crédito 1:1 sem prazo · **17** creatina vira campanhas (F-V13 nova) · **18** RPA/CPF descontinua.
+
+**TBDs derivados (novos)**: 19 (Cashin confirmado?), 20 (Founder CPF?), 21 (prazo saldo inativo), 22 (UX campanhas creatina).
 
 ### O que fazer nesta sessão
 
 Antes de qualquer código, pergunte ao usuário:
-1. **Os TBDs já foram respondidos pelo cliente?** Se sim, mostrar resumo das decisões e pedir pra atualizar `PIVOT-V2.md` §4 (mover TBDs resolvidos pra rodapé com a decisão registrada). Isso desbloqueia features.
-2. **Implementar F-V11 agora?** Se sim, seguir o passo-a-passo da SPEC:
-   - Branch `feat/F-V11-visao-restrita-rede`.
-   - Estender `types/database.ts` com `MemberNetworkResponseV2`.
-   - Refactor `app/api/members/me/network/route.ts` (gated por `isV2Enabled()`).
-   - Criar `app/components/SponsorCard.tsx` e `app/components/DirectReportsList.tsx`.
-   - Refactor `app/dashboard/network/page.tsx`.
-   - **Validation Mode** (estados vazios, RLS, toggle de flag, House Account sem sponsor).
-   - Preencher matriz com evidência real (curl, screenshot).
-   - Atualizar `STATUS_IMPLEMENTACAO.md` quando done.
-3. **Outra coisa?** Qualquer feature nova → criar SPEC em `docs/sdd/features/F-VNN-<slug>/SPEC.md` seguindo o template em `PLAYBOOK.md` antes de codar.
+1. **Implementar F-V01** (cadastro com ref obrigatório)? Recomendação primária — porta de entrada do v2. TBD-10 resolvido (House Account descontinua). Hipóteses padrão documentadas pra TBD-8 (link de inativo bloqueia novos cadastros) e TBD-9 (código manual imutável).
+2. **Implementar F-V02** (integração Guru via webhook Shopify)? Classe D — antes de mergear, **confirmar com Wink** se a abordagem Shopify-first cobre todos os eventos do Guru ou se precisa webhook direto do Guru também.
+3. **Implementar F-V03** (status ativo = subscription_paid)? Depende de F-V02 estar em curso.
+4. **Implementar F-V05** (saldo + créditos Shopify 1:1)? Pode rolar paralela — sem bloqueios pra a parte ativa; prazo do inativo (TBD-21) tem hipótese padrão (90 dias).
+5. **Outra coisa?** Qualquer feature nova → criar SPEC em `docs/sdd/features/F-VNN-<slug>/SPEC.md` seguindo o template em `PLAYBOOK.md` antes de codar.
+
+Para cada feature destravada que iniciar:
+- Branch `feat/F-VNN-<slug>` a partir de `main` (ou da última branch mergeada).
+- SPEC em `docs/sdd/features/F-VNN-<slug>/SPEC.md` com classe, DoR, RFs, CAs, arquivos permitidos, plano e matriz vazia.
+- Toda lógica v2 atrás do flag `LRP_V2` (default OFF). Helper em `lib/utils/featureFlags.ts`.
+- QA em Validation Mode (PLAYBOOK §11-A) com matriz preenchida.
+- Atualizar `STATUS_IMPLEMENTACAO.md` + `PIVOT-V2.md §2` quando concluir.
 
 ### Comportamento esperado
 
@@ -103,4 +111,4 @@ Comece lendo os 4 arquivos da seção "Passo zero". Quando terminar, faça um re
 
 ---
 
-*Última atualização: 2026-04-29 (sessão de adequação documental V2 — banner DEPRECATED nos docs v1, `@deprecated` no código v1, CHANGELOG v5.0, insumos do cliente persistidos, índice reorganizado).*
+*Última atualização: 2026-04-29 segunda sessão — TBDs respondidos pelo cliente (11/18). F-V01, F-V02, F-V03, F-V05 destravadas. 4 TBDs derivados criados (19/20/21/22). F-V13 nova feature (cupom de creatina como campanha configurável). Anti-SPEC §8/9/10 atualizadas, novo §11 (provider de pagamento). CHANGELOG v5.1.*
