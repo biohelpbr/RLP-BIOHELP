@@ -214,15 +214,16 @@ export function mapFinancialStatus(
 /**
  * Tipos de status para eventos de webhook
  */
-export type WebhookEventStatus = 
-  | 'received' 
-  | 'processing' 
-  | 'success' 
-  | 'error' 
+export type WebhookEventStatus =
+  | 'received'
+  | 'processing'
+  | 'success'
+  | 'error'
   | 'skipped'
   | 'commissions_created'
   | 'commissions_skipped'
   | 'commissions_error'
+  | 'event_tag_applied'
 
 /**
  * Cria log estruturado para webhook
