@@ -140,6 +140,7 @@ NÃO mexer sem autorização explícita do humano:
 | **TBD-24** *(novo, 29/04 PM)* | Eventos têm entry-fee (ingresso pago) ou são gratuitos com bônus de ativação? Como o "bônus de ativação" é creditado (saldo? badge? cashback Cashin)? | F-V15 (não-bloqueante — hipótese padrão: gratuito + tag em quem comprar pelo link/período) |
 | **TBD-25** *(novo, 29/04 PM)* | "Preço sugerido" pro membro vender (vendas manuais F-V14) — é fixado pelo admin por produto, ou margem em cima do "preço de custo"? Custo é exibido pra todo membro ou só pra Founders? | F-V14 (não-bloqueante — hipótese padrão: admin define preço sugerido manual por produto; preço de custo só visível admin) |
 | **TBD-26** *(novo, 29/04 PM)* | TBD-11 foi substituído por hipótese padrão (ranking por nº de pessoas no clube) — confirmar critério final. Pode ser combinação (pessoas + receita + retenção)? | F-V08 (não-bloqueante — começa com nº de pessoas) |
+| **TBD-27** *(novo, S2 — 06/05/2026)* | Dados Biohelp pra emissão de NF (CNPJ, razão social, endereço, IE, descrição do serviço) estão **hardcoded** em `components/biohelp/WithdrawDialog.tsx` (linhas 64-70). Os valores atuais (`12.345.678/0001-90`, `Av. Paulista, 1000`) são placeholders do Loveable mock. Confirmar dados reais com cliente em demo de 13/05 e mover pra env ou tabela `system_config` em S5. | F-V07 (não-bloqueante — UI funciona com placeholders; ajusta antes da Cashin live) |
 
 ### 4.2 TBDs resolvidos (11 — registrados em 29/04/2026)
 
