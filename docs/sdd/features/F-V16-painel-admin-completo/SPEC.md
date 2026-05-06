@@ -18,11 +18,11 @@ Reunião 29/04 PM: cliente apresentou layout admin completo com 9 áreas ativas.
 | Crescimento | `/admin/growth` | F-V16 (gráficos + projeção) | — | ✅ S3 (06/05/2026) |
 | Consumo | `/admin/consumption` | F-V16 (Shopify reads + admin manual) | — | ✅ S3 (06/05/2026) |
 | Produtos | `/admin/products` | F-V16 (já existe; refator layout + preço sugerido + custo) | — | ✅ S3 (06/05/2026) |
-| Eventos | `/admin/events` | F-V15 | F-V15 SPEC | 🚧 S4 (06/05/2026) |
-| Financeiro | `/admin/finance` | F-V04 (comissões) + F-V05 (saldo) + F-V16 | F-V04 SPEC + F-V05 SPEC | 🚧 S4 (06/05/2026) |
-| Resgates | `/admin/payouts` | F-V07 | F-V07 SPEC | 🚧 S4 (06/05/2026) |
-| Academy | `/admin/academy` | F-V09 | F-V09 SPEC | 🚧 S4 (06/05/2026) |
-| Orders Analytics | `/admin/orders` | F-V16 | — | 🚧 S4 (06/05/2026) |
+| Eventos | `/admin/events` | F-V15 | F-V15 SPEC | ✅ S4 (06/05/2026) |
+| Financeiro | `/admin/finance` | F-V04 (comissões) + F-V05 (saldo) + F-V16 | F-V04 SPEC + F-V05 SPEC | ✅ S4 (06/05/2026) — placeholder F-V04 |
+| Resgates | `/admin/payouts` | F-V07 | F-V07 SPEC | ✅ S4 (06/05/2026) — switch v1/v2 |
+| Academy | `/admin/academy` | F-V09 | F-V09 SPEC | ✅ S4 (06/05/2026) |
+| Orders Analytics | `/admin/orders` | F-V16 | — | ✅ S4 (06/05/2026) |
 
 ## Definition of Ready
 - [x] RFs definidos

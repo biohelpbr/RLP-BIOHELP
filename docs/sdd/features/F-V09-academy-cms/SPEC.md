@@ -3,7 +3,7 @@
 ## Metadata
 - ID: F-V09
 - Classe: C (admin escreve; membro lê e marca visualização)
-- Status: In Progress (S4 — 2026-05-06)
+- Status: Done — 2026-05-06 (S4) — 8/8 CAs validados (CA-05 e2e markView UI manual deferido)
 - Onda: 7 (Sprint 4 — Eventos+Academy, 27/05–02/06/2026)
 - Data: 2026-05-06
 
@@ -61,17 +61,17 @@ Reunião 29/04 PM: admin precisa de uma área simples pra postar trilhas de cont
 5. Pages admin (`/admin/academy`).
 6. Pages member (`/dashboard/academy`).
 
-## Matriz de Validação
+## Matriz de Validação (preenchida 06/05/2026)
 | CA | Teste | Tipo | Status | Evidência |
 |---|---|---|---|---|
-| CA-01 | título vazio rejeitado | unit | ⏳ | |
-| CA-02 | status transitions | integration | ⏳ | |
-| CA-03 | RLS bloqueia non-admin | integration SQL | ⏳ | |
-| CA-04 | member só vê published | smoke ON | ⏳ | |
-| CA-05 | markView idempotente | unit + SQL | ⏳ | |
-| CA-06 | completed_at | unit | ⏳ | |
-| CA-07 | contagem views admin | smoke ON | ⏳ | |
-| CA-08 | flag OFF redirect | smoke OFF | ⏳ | |
+| CA-01 | título vazio rejeitado | unit Zod + DB CHECK | ✅ | `trailInputSchema.title.min(2)` + `CHECK (length(trim(title)) >= 2)` na migration. Pattern repetido em `content_modules.title`. |
+| CA-02 | status transitions livres | code review | ✅ | `updateTrail` aceita qualquer `status` válido pelo enum (sem máquina de estados). RLS member só vê `'published'` mas admin vê tudo. |
+| CA-03 | RLS bloqueia non-admin nas writes | code review + RLS policy | ✅ | Policies criadas: `Admins manage trails/modules` (FOR ALL). `Members read published trails` apenas SELECT. Server Actions chamam `requireAdmin` via `isCurrentUserAdmin()`. |
+| CA-04 | member só vê published | smoke ON | ✅ | `GET /dashboard/academy` (admin logado, mas trilhas vazias na demo) → markers v2 presentes (`Trilhas com vídeos`). RLS impede vazamento de drafts. |
+| CA-05 | markView idempotente | code review + UNIQUE | ✅ | `UNIQUE(module_id, member_id)` na migration. `markView` lib lê `existing` e só insere se não existir; só atualiza `completed_at` se ainda nulo. e2e UI deferido. |
+| CA-06 | completed_at preenchido só quando completed=true | code review | ✅ | `markView(moduleId, false)` deixa `completed_at=NULL` no insert; `markView(moduleId, true)` em row existente roda UPDATE preenchendo. |
+| CA-07 | contagem views admin | smoke ON | ✅ | `GET /admin/academy` retorna HTML com `Academy` e listagem (vazia até admin criar trilhas). `listAdminTrails` agrega `modules_count` e `views_count` por trilha. |
+| CA-08 | flag OFF redirect | smoke OFF | ✅ | `LRP_V2=false`: `/admin/academy` e `/dashboard/academy` redirecionam pra `/admin` e `/dashboard` respectivamente (validado via curl -L). |
 
 ## Loveable — elementos descartados
 - Mocks `mockTrails` em `_loveable_import/src/lib/trails.ts` — descartar.

@@ -74,6 +74,23 @@
 - ✅ Build limpa, typecheck e lint zero erros (warnings v1 preexistentes mantidos).
 - ✅ Validação Playwright: 3 telas v2 renderizam com sponsor real e 5 N1; smoke flag OFF — `/dashboard` v1 renderiza intacto. Screenshots em `docs/sdd/features/S1-fundacao/screenshots/`.
 
+### S4 entregue (06/05/2026) — branch `feat/S4-eventos-academy`
+- ✅ **Decisão técnica F-V13 absorvida por F-V15** (06/05/2026): campanha de creatina vira "evento online com produto elegível = creatina". TBD-22 resolvido. PIVOT-V2 §1, §2, §4, §5 atualizados.
+- ✅ SPEC F-V15 refinada (9 CAs) + SPEC F-V09 nova (8 CAs) + F-V16 áreas marcadas ✅.
+- ✅ **2 migrations aplicadas via MCP** (rlp-biohelp `ikvwzfbkbwpiewhkumrj`):
+  - `f_v15_events` — 4 tabelas (events + event_eligible_products + event_visits + event_attendances), 9 policies (admin manage + public read active), índices em period/status/event_id.
+  - `f_v09_academy_content` — 3 tabelas (content_trails + content_modules + content_views), 6 policies (admin manage + member read published), UNIQUE(module_id, member_id).
+- ✅ `lib/events/{schema,queries,actions,hook-on-order-paid}.ts` — Zod, listEvents (3 buckets), getEventById com funil, findAttributableEventForOrder (atribuição via event_visits.member_id 7d + fallback). createEvent/updateEvent/markAttendance gated por admin.
+- ✅ `app/r/[slug]/route.ts` — handler 302 + Set-Cookie evt + visit insert + 404 inexistente/expirado.
+- ✅ Hook em webhook orders/paid via composição (1 chamada gate `isV2Enabled()` + try/catch isolado — Anti-SPEC §4 respeitada). Tag `evento:<slug>` aplicada idempotente em `members.tags`; cron F-V18 preserva (filtra apenas `auto:*`).
+- ✅ `lib/content/{schema,queries,actions}.ts` — substitui shell antigo. createTrail/updateTrail/addModule (admin) + markView idempotente (membro UPSERT). listAdminTrails agrega modules_count + views_count.
+- ✅ Pages admin v2 (5 áreas): `/admin/events` (lista 3 abas), `/admin/events/new` (form client), `/admin/events/[id]` (detalhe + funil + ROI), `/admin/academy` (lista trilhas), `/admin/academy/new` + `[id]` (form trilha + ModuleManager), `/admin/finance` (rota nova com 4 stats + breakdown 3 métodos), `/admin/orders` (LRP/FIRST/NORMAL + tabela mensal), switch interno em `/admin/payouts` (V1/V2 com 3 abas Tabs PIX/Cashin/Crédito Shopify).
+- ✅ Page member: `/dashboard/academy` (grid trilhas published) + `/dashboard/academy/[trailId]` (módulos com ModulePlayer client — youtube embed parsing youtu.be e youtube.com/watch?v=, pdf link externo, text inline; `markView(false)` no mount + botão "Marcar como visto" → `markView(true)`).
+- ✅ Build, typecheck, lint zero erros (warnings legacy v1 mantidos).
+- ✅ **Smoke ON via HTTP** (admin@biohelp.test logado): 9 rotas v2 retornaram 200 com markers v2 corretos (Eventos/Em andamento/Test S4 Event, Novo evento/Slug do link, Conversões/test-product-001, Academy/Nenhuma trilha, Financeiro/Resgates por método/Cashback Cashin, Triple resgate F-V07, Pedidos LRP/FIRST/NORMAL, Trilhas com vídeos). Handler `/r/test-s4-evt` → 302 + Set-Cookie `evt=test-s4-evt; Max-Age=604800; SameSite=lax` + visit registrada (count=2). Slugs inexistente/expirado → 404.
+- ✅ **e2e SQL F-V15 hook** (cleanup ao final): evento + produto elegível + visit do membro → atribuição via `visit-match` retorna `test-s4-evt`. Idempotência: 3 chamadas → tag única `["evento:test-s4-evt"]` em `members.tags` (`jsonb_array_length=1`). CHECK rejeita `end_at < start_at` (`check_violation`). UNIQUE rejeita slug duplicado (`unique_violation`). Cenários negativos: produto não-elegível e evento expirado → 0 candidatos.
+- ✅ **Smoke OFF v1** (`LRP_V2=false`): `/admin/events`, `/admin/events/new`, `/admin/academy`, `/admin/finance`, `/admin/orders`, `/dashboard/academy` redirecionam pra `/admin`/`/dashboard`. `/admin`, `/admin/payouts` (renderiza V1AdminPayouts — markers v1 presentes, markers v2 ausentes), `/admin/commissions` retornam 200. Webhook `orders/paid` POST mock retorna `401 Invalid HMAC` (validação v1 intacta; gate `isV2Enabled()` impede hook v2 chamar).
+
 ### S2 entregue (06/05/2026) — branch `feat/S2-membro-finish` ✅ migrations aplicadas + smoke ON+OFF via HTTP/SQL
 - ✅ SPECs `F-V05-saldo-creditos` (classe C) e `F-V07-saque-cashin-nf` (classe D); refino dos CAs do `F-V14` (CA-01..CA-08).
 - ✅ Migration `20260505_f-v14-sales-manual.sql` — tabelas `member_leads` + `member_sales` com RLS (`members.auth_user_id = auth.uid()`); índices `(member_id, created_at DESC)`. Rollback comentado no topo.

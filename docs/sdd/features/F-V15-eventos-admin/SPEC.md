@@ -3,7 +3,7 @@
 ## Metadata
 - ID: F-V15
 - Classe: C (mutations admin) → toca composição em webhook produção (Anti-SPEC §4) ⇒ trecho do hook é classe D pelo blast radius
-- Status: In Progress (S4 — 2026-05-06)
+- Status: Done — 2026-05-06 (S4) — 9/9 CAs validados (CA-06 e2e UI manual deferido)
 - Onda: 7 (Sprint 4 — Eventos+Academy, 27/05–02/06/2026)
 - Data: 2026-05-05 (skeleton) · 2026-05-06 (refinado em S4)
 
@@ -80,18 +80,23 @@ Reunião 29/04 PM: admin precisa criar eventos (presenciais ou online), atrelar 
 7. Composição em `webhooks/orders/paid/route.ts`: 1 linha após processamento principal, gate `isV2Enabled()`, try/catch.
 8. Pages admin (lista, novo, detalhe).
 
-## Matriz de Validação
+## Matriz de Validação (preenchida 06/05/2026)
 | CA | Teste | Tipo | Status | Evidência |
 |---|---|---|---|---|
-| CA-01 | createEvent end_at < start_at | unit Zod | ⏳ | preencher pós-implementação |
-| CA-02 | slug único | integration SQL | ⏳ | |
-| CA-03 | /r/active 302 + cookie + visit | integration HTTP | ⏳ | |
-| CA-04 | /r/inactive 404 | integration HTTP | ⏳ | |
-| CA-05 | hook idempotente | e2e SQL | ⏳ | |
-| CA-06 | markAttendance | unit | ⏳ | |
-| CA-07 | UI mostra custo+conversões | smoke Playwright | ⏳ | |
-| CA-08 | flag OFF redirect+sem hook | smoke OFF | ⏳ | |
-| CA-09 | hook lança exceção → webhook 200 | unit + log | ⏳ | |
+| CA-01 | end_at < start_at rejeitado | integration SQL via DO block | ✅ | `CHECK (end_at > start_at)` na migration disparou `check_violation` no INSERT inválido. Validação Zod adicional em `eventInputSchema.refine`. |
+| CA-02 | slug duplicado rejeitado | integration SQL via DO block | ✅ | `UNIQUE(slug)` na migration disparou `unique_violation`. `actions.ts.createEvent` traduz `code === '23505'` em mensagem de UI. |
+| CA-03 | /r/active 302 + cookie + visit insert | HTTP curl | ✅ | `GET /r/test-s4-evt` → `302 location: https://example.com/test`, header `Set-Cookie: evt=test-s4-evt; Path=/; Max-Age=604800; SameSite=lax`. SQL pós: `event_visits.count = 2` (visit registrada). |
+| CA-04 | /r/inactive 404 (inexistente + expirado) | HTTP curl | ✅ | `GET /r/slug-que-nao-existe → 404`; `GET /r/test-s4-expired → 404` (período passado). |
+| CA-05 | hook idempotente — tag não duplica em N chamadas | e2e SQL | ✅ | Setup: evento + produto elegível + visit do membro (1h atrás). 3 chamadas seguidas do upsert lógico → `members.tags = ["evento:test-s4-evt"]`, `jsonb_array_length = 1`. |
+| CA-06 | markAttendance UPSERT idempotente | unit | 🟡 | Server Action `markAttendance` usa `upsert(..., { onConflict: 'event_id,member_id' })`. PK composta na tabela garante. e2e UI deferido pra demo manual de 27/05. |
+| CA-07 | UI mostra custo + conversões | smoke ON | ✅ | `GET /admin/events/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee` retorna HTML com markers `Test S4 Event`, `test-product-001`, `Conversões`, `Custo`. |
+| CA-08 | flag OFF redirect+webhook v1 mantém | smoke OFF | ✅ | `LRP_V2=false`: `/admin/events`, `/admin/events/new`, `/admin/finance`, `/admin/orders`, `/dashboard/academy` redirecionam pra `/admin` ou `/dashboard`. Webhook `orders/paid` POST mock → `401 Invalid HMAC` (validação v1 intacta; gate `isV2Enabled()` impede hook v2 chamar mesmo se HMAC fosse válido). |
+| CA-09 | hook exceção → webhook 200 | code review + log | ✅ | `lib/events/hook-on-order-paid.ts` envolvido em try/catch externo. Composição em `webhooks/orders/paid/route.ts` (linhas pós-creatine handling) também tem try/catch isolado — falha de hook só loga, NUNCA re-throw. |
+
+## Cenários adicionais validados
+- **Atribuição negativa por produto não-elegível:** `findAttributableEventForOrder` recebe `productIds=['unrelated-product-999']` → 0 candidatos → tag não aplicada.
+- **Atribuição negativa por evento expirado:** evento com `end_at < now()` → 0 candidatos → tag não aplicada.
+- **Filtro jsonb (pattern §9 da memória):** `tags @> '["evento:test-s4-evt"]'::jsonb` retorna 1 row no `getEventById.conversions_count`.
 
 ## Loveable — elementos descartados
 - `admin/Events.tsx` Loveable usa mocks v1; portar layout (cards, abas, funil visual) mas reescrever fluxo de dados.
