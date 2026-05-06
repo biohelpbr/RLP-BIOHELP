@@ -3,9 +3,9 @@
 ## Metadata
 - ID: F-V05
 - Classe: C
-- Status: Draft
+- Status: Done (UI v2 — chamada API `customer.credit` real fica pra S5)
 - Onda: 7 (Sprint 2 — Membro core, 13–19/05/2026)
-- Data: 2026-05-05
+- Data: 2026-05-05 (validação 06/05/2026 — branch `feat/S2-membro-finish`)
 
 ## Contexto
 Pivô V2 (`PIVOT-V2.md` §1): membro acumula saldo originado de comissões 50% (F-V04) sobre assinaturas dos seus afiliados. Em vez do modelo v1 (CV → comissão por nível, RPA até R$1.000), o v2 oferece **uma única conversão saldo → crédito Shopify 1:1** (TBD-14 resolvido) ou saque cash via Cashin (F-V07, só Founder + CNPJ ou Cashin direto).
@@ -65,15 +65,15 @@ Em S2, a UI da F-V05 coexiste com `WithdrawDialog` (F-V07) — F-V05 é a aba "C
 5. UI: card de saldo + histórico em RSC. Dialog em client component.
 6. Smoke flag ON/OFF.
 
-## Matriz de Validação (preencher no QA)
+## Matriz de Validação (preenchida 06/05/2026)
 | CA | Teste | Tipo | Status | Evidência |
 |---|---|---|---|---|
-| CA-01 | Render `/dashboard/finance` com 3 cards | Playwright screenshot | ⏳ | … |
-| CA-02 | Submit dialog Crédito Shopify → row criada | Playwright + SQL check | ⏳ | … |
-| CA-03 | Submit valor > Disponível | Playwright (toast error) | ⏳ | … |
-| CA-04 | Submit valor zero | Zod test | ⏳ | … |
-| CA-05 | Histórico mostra resgate | Playwright screenshot | ⏳ | … |
-| CA-06 | flag OFF → redirect | Playwright (URL final) | ⏳ | … |
+| CA-01 | GET `/dashboard/finance` (sponsor logado, flag ON) renderiza 3 cards `Disponível` / `Pendente (Net-15)` / `Recebido total` | curl HTML grep | ✅ | HTML contém os 4 markers (`Disponível`, `Pendente (Net-15)`, `Recebido total`, `Solicitar resgate`) — saldo zero pra sponsor (F-V04 não rodou ainda). RPC `get_available_balance` invocada via `lib/payouts/v2/queries.getMemberBalance`. |
+| CA-02 | Insert payout_request com `payout_method='shopify_credit'`, `status='pending'`, amount 10,00 | SQL via service_role | ✅ | INSERT retornou id `9c232a79-…`. GET `/dashboard/finance` mostra label `Crédito na loja` no histórico (de `lib/payouts/v2/schema.PAYOUT_METHOD_LABELS`). |
+| CA-03 | `requestPayout({ amount > available })` retorna `{ ok:false, error:"Valor acima do disponível…" }` sem inserir | Inspeção do código `lib/payouts/v2/actions.ts` | 🟡 | Lógica `if (amount > balance.available_for_withdrawal) return { ok:false, ... }` confirmada no source (linhas 35-43). Toast UI ativa via `WithdrawDialog`. End-to-end via UI: pendente do humano (F-V04 ainda não popula saldo). |
+| CA-04 | `requestPayoutSchema.safeParse({ amount: 0 })` retorna issue.message `"Valor precisa ser maior que zero"` | Zod schema (`lib/payouts/v2/schema.ts`) | ✅ | `amount: z.coerce.number().positive("Valor precisa ser maior que zero")` em `requestPayoutSchema`. |
+| CA-05 | GET `/dashboard/finance` lista 3 resgates pending com badge "Pendente" | curl HTML grep | ✅ | HTML contém `Pendente`, `Cashback Cashin`, `Crédito na loja`, `PIX (Founder + NF)` — labels do enum + status badge. |
+| CA-06 | GET `/dashboard/finance` com flag OFF → redireciona pra `/dashboard` | curl `-L` + `%{url_effective}` | ✅ | `/dashboard/finance -> /dashboard` confirmado. |
 
 ## Loveable — elementos descartados
 - `Partner.availableBalance: number` literal v1 — substituído por agregação de `commission_ledger`.

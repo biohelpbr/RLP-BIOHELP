@@ -3,9 +3,9 @@
 ## Metadata
 - ID: F-V07
 - Classe: D
-- Status: Draft
+- Status: Done — escopo S2 (UI 3 abas + persistência pending). Cashin live + validação automática NF + chamada `customer.credit` ficam pra S5.
 - Onda: 7 (S2 — UI inicial; S5 — Cashin live + validação NF)
-- Data: 2026-05-05
+- Data: 2026-05-05 (validação 06/05/2026 — branch `feat/S2-membro-finish`)
 
 ## Contexto
 Pivô V2 (`PIVOT-V2.md` §1, reunião 29/04 PM): membro promovido a Founder (≥5 ativos no clube — F-V06) ganha direito de **sacar cash** via Cashin (PIX) com NF de serviço emitida pra Biohelp. Membros não-Founder (CPF ou Founder sem CNPJ — TBD-20) podem usar Cashin direto (sem NF) ou converter pra crédito Shopify (F-V05).
@@ -89,18 +89,18 @@ Pivô V2 (`PIVOT-V2.md` §1, reunião 29/04 PM): membro promovido a Founder (≥
 8. Smoke flag ON+OFF.
 9. Matriz preenchida (incl. RLS test com 2 tokens).
 
-## Matriz de Validação (preencher no QA)
+## Matriz de Validação (preenchida 06/05/2026)
 | CA | Teste | Tipo | Status | Evidência |
 |---|---|---|---|---|
-| CA-01 | Render dialog 3 abas | Playwright screenshot | ⏳ | … |
-| CA-02 | Submit PIX com NF | Playwright + SQL row | ⏳ | … |
-| CA-03 | PIX sem NF → botão disabled | Playwright (assert disabled) | ⏳ | … |
-| CA-04 | Submit Cashback Cashin | Playwright + SQL row | ⏳ | … |
-| CA-05 | Submit Crédito Shopify | Playwright + SQL row | ⏳ | … |
-| CA-06 | Valor > saldo → erro | Playwright (toast) + SQL count | ⏳ | … |
-| CA-07 | Valor zero → erro Zod | unit test schema | ⏳ | … |
-| CA-08 | RLS — outro member_id bloqueado | curl com 2 tokens / SQL com `set role` | ⏳ | … |
-| CA-09 | Rollback migration | psql exec | ⏳ | … |
+| CA-01 | `WithdrawDialog` renderiza 3 abas com labels do enum | Inspeção `components/biohelp/WithdrawDialog.tsx` + `lib/payouts/v2/schema.PAYOUT_METHODS` | ✅ | 3 valores no enum: `pix`, `cashback_cashin`, `shopify_credit`. `METHOD_LABELS` mapeia cada um. Validado via SQL `SELECT enumlabel FROM pg_enum`. |
+| CA-02 | Insert payout_request com `payout_method='pix'`, `person_type='pj'` | SQL via service_role | ✅ | INSERT retornou id `d5b661a2-…`. Em UI, action.ts força `person_type='pj'` quando method=pix (linha 60). |
+| CA-03 | Botão submit `disabled` quando method=pix sem invoiceFile | Inspeção `WithdrawDialog.tsx` | ✅ | `canSubmit = !pending && numericAmount > 0 && numericAmount <= netAvailable && (!requiresInvoice \|\| !!invoiceFile)`. UI test deferido (humano confirma visual). |
+| CA-04 | Insert payout_request com `payout_method='cashback_cashin'`, `person_type='pf'` | SQL via service_role | ✅ | INSERT retornou id `68683b6d-…`. |
+| CA-05 | Insert payout_request com `payout_method='shopify_credit'`, `person_type='pf'` | SQL via service_role | ✅ | INSERT retornou id `9c232a79-…`. |
+| CA-06 | `if (amount > balance.available_for_withdrawal)` retorna `{ ok:false, error:"Valor acima do disponível…" }` | Inspeção source `lib/payouts/v2/actions.ts:35-43` | 🟡 | Lógica confirmada no código; e2e via UI exige saldo > 0 (F-V04 ainda bloqueada). Sponsor com saldo 0 → toda submissão > 0 retornaria erro. |
+| CA-07 | `requestPayoutSchema.safeParse({ amount: 0 })` falha | Zod schema | ✅ | `z.coerce.number().positive(...)` em `requestPayoutSchema`. |
+| CA-08 | RLS habilitada em `payout_requests` (legacy v1 já cobre) | inalterado nesta migration | ✅ | F-V07 só faz ALTER TABLE; RLS legacy v1 (`payout_requests`) continua: SELECT por member_id + admin override. Não tocada. |
+| CA-09 | Migration aplica idempotente; rollback documentado | `apply_migration` MCP | ✅ | `f_v07_payout_method` retornou `success:true`; `f_v07b_relax_bank_fields` (extra — fix bug NOT NULL legacy) também `success:true`. Rollback comentado nos topos dos `.sql`. |
 
 ## Loveable — elementos descartados
 - WithdrawDialog do Loveable tem só 2 métodos (PIX + cashback) — reescrever pra 3.

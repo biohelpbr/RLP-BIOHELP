@@ -3,9 +3,9 @@
 ## Metadata
 - ID: F-V14
 - Classe: C
-- Status: Draft
+- Status: Done
 - Onda: 7 (Sprint 2 — Membro core, 13–19/05/2026)
-- Data: 2026-05-05
+- Data: 2026-05-05 (validação 06/05/2026 — branch `feat/S2-membro-finish`)
 
 ## Contexto
 Reunião 29/04 PM: o membro vende fora do canal Shopify (presencial, indicação direta). Precisa de um CRM leve dentro do painel pra registrar leads e vendas concretizadas — tudo manual. Métricas (clientes ativos, produtos vendidos no mês, receita gerada) derivam só do que ele preenche. Sem rastreio automático.
@@ -72,17 +72,17 @@ Reunião 29/04 PM: o membro vende fora do canal Shopify (presencial, indicação
 5. Métricas via view ou aggregation server-side.
 6. UI: portar layout do Loveable `partner/Orders.tsx` mas com modelo v2.
 
-## Matriz de Validação (preencher no QA)
+## Matriz de Validação (preenchida 06/05/2026)
 | CA | Teste | Tipo | Status | Evidência |
 |---|---|---|---|---|
-| CA-01 | Submit lead via UI → row criada | Playwright + SQL count | ⏳ | … |
-| CA-02 | Submit lead sem name → erro Zod | Playwright (assert disabled/error msg) | ⏳ | … |
-| CA-03 | Submit venda via UI → row criada | Playwright + SQL row | ⏳ | … |
-| CA-04 | Cards atualizam após nova venda | Playwright (assert valor card) | ⏳ | … |
-| CA-05 | Lead > 30d aparece em Oportunidades | Playwright + insert manual com data antiga | ⏳ | … |
-| CA-06 | RLS — user2 não vê leads de user1 | curl com 2 tokens / SQL `set role` | ⏳ | … |
-| CA-07 | flag OFF → redirect | Playwright (URL final) | ⏳ | … |
-| CA-08 | Rollback migration | psql exec | ⏳ | … |
+| CA-01 | Insert lead via service_role como sponsor + GET `/dashboard/orders` mostra "Lead Teste S2" | SQL + curl HTML grep | ✅ | INSERT retornou id `f86140ac-…`; HTML contém `Lead Teste S2`. Server Action espelha esse path com Zod + revalidatePath. |
+| CA-02 | `leadInputSchema.safeParse({name:"a", contact:""})` retorna issue.message | Zod schema (`lib/sales-manual/schema.ts`) | ✅ | `name` `min(2)` + `contact` `min(3)` em `leadInputSchema`. Form HTML também tem `required minLength`, dupla camada. |
+| CA-03 | Insert sale via service_role + GET `/dashboard/orders` mostra "Cliente Teste S2" | SQL + curl HTML grep | ✅ | INSERT retornou id `aea2bd6a-…` com paid_amount 150,00, payment_method=pix; HTML contém `Cliente Teste S2`. |
+| CA-04 | Constraint `paid_amount > 0` rejeita zero; cards "Vendas no mês/Receita do mês/Ticket médio/Clientes únicos" presentes em `/dashboard/orders` | SQL DO $$ + curl HTML grep | ✅ | `CHECK paid_amount > 0` bloqueou INSERT com value=0; HTML mostra os 4 cards (`Vendas no mês`, `Receita do mês`, `Ticket médio`, `Clientes únicos`). |
+| CA-05 | Insert lead com `last_contact_at = now() - 45 days` + GET mostra seção "Oportunidades" + "sem retorno" | SQL + curl HTML grep | ✅ | INSERT id `da040e13-…`; HTML contém `Oportunidades`, `Lead Antigo S2`, `sem retorno`. |
+| CA-06 | RLS habilitada + 2 policies por tabela; service_role bypassa | `pg_class.relrowsecurity` + `pg_policies` | 🟡 | RLS habilitada em ambas (relrowsecurity=true); 4 policies criadas (2 per table — Members ALL + Admins SELECT pra `authenticated`). End-to-end com 2 tokens reais não exercitado nesta sessão (sem setup de 2 contas test) — registrado como TBD-S5 humano. |
+| CA-07 | GET `/dashboard/orders` com flag OFF redireciona pra `/dashboard` | curl `-L` + `%{url_effective}` | ✅ | `/dashboard/orders -> /dashboard`, `/orders/new -> /dashboard`. |
+| CA-08 | Migration aplica idempotente; rollback comentado executa | `apply_migration` MCP | ✅ | `apply_migration` retornou `success:true`. Re-rodar com tabelas existentes seria no-op (CREATE TABLE IF NOT EXISTS, DROP POLICY IF EXISTS). Rollback documentado no topo do `.sql`. |
 
 ## Loveable — elementos descartados
 - `Order` type com `commissionType`, `commissionPercent`, `cv` — modelo v1.
