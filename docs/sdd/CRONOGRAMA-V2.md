@@ -16,7 +16,7 @@
 | Sprint | Período | Dias úteis | Foco | Estado |
 |---|---|---|---|---|
 | **S1** | 06–12/05 (qua–ter) | 5 | Fundação + 3 telas membro (Dashboard, Club, Profile) | ✅ Entregue 06/05/2026 (branch `feat/S1-fundacao-loveable`) |
-| **S2** | 13–19/05 (qua–ter) | 5 | Membro finish (Store, Orders=F-V14, Finance triple) + Login refator | 🟡 Código entregue 05/05/2026 (branch `feat/S2-membro-finish`) — smoke + migrations pendentes do humano |
+| **S2** | 13–19/05 (qua–ter) | 5 | Membro finish (Store, Orders=F-V14, Finance triple) + Login refator | ✅ Entregue 06/05/2026 (PR #3 — `feat/S2-membro-finish`) — 3 migrations aplicadas, smoke ON+OFF via HTTP+SQL, matrizes preenchidas |
 | **S3** | 20–26/05 (qua–ter) | 5 | Admin core (Overview, Community+F-V18, Growth, Consumption, Products) | ⏳ |
 | **S4** | 27/05–02/06 (qua–ter) | 5 | Eventos (F-V15) + Academy (F-V09) + Finance/Payouts admin + OrdersAnalytics | ⏳ |
 | **S5** | 03–09/06 (qua–ter) | 5 | F-V17 (SSO Shopify) + Cashin live + validação NF + QA + matrizes | ⏳ |
