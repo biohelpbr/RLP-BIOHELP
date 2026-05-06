@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { createServiceClient, getCurrentMember } from "@/lib/supabase/server"
 import { requestPayoutSchema } from "./schema"
 import { getMemberBalance } from "./queries"
+import { validateInvoice } from "./nfe-validator"
 
 type ActionResult<T = void> =
   | { ok: true; data?: T }
@@ -23,13 +24,33 @@ export async function requestPayout(
     return { ok: false, error: issue.message, field: issue.path.join(".") }
   }
 
-  const { amount, payout_method, invoice_filename } = parsed.data
+  const { amount, payout_method, invoice_filename, invoice_data_url } = parsed.data
 
   if (payout_method === "pix" && !invoice_filename) {
     return {
       ok: false,
       error: "Anexe a nota fiscal pra resgatar via PIX.",
       field: "invoice_filename",
+    }
+  }
+
+  // F-V07c: validação automática NF (síncrona) antes de gravar payout
+  if (payout_method === "pix" && invoice_data_url) {
+    const buffer = decodeDataUrl(invoice_data_url)
+    if (!buffer) {
+      return {
+        ok: false,
+        error: "Arquivo de NF inválido (formato não reconhecido).",
+        field: "invoice_filename",
+      }
+    }
+    const validation = validateInvoice(buffer, invoice_filename || "invoice.pdf")
+    if (!validation.valid) {
+      return {
+        ok: false,
+        error: validation.reason || "NF inválida.",
+        field: "invoice_filename",
+      }
     }
   }
 
@@ -80,3 +101,18 @@ export const PAYOUT_FEES = {
   cashback_cashin: { fixed: 0, rate: 0 },
   shopify_credit: { fixed: 0, rate: 0 },
 } as const
+
+/**
+ * F-V07c: decodifica data URL (`data:application/pdf;base64,...`) ou base64 puro
+ * em `Uint8Array`. Retorna null se inválido.
+ */
+function decodeDataUrl(input: string): Uint8Array | null {
+  if (!input) return null
+  try {
+    const commaIdx = input.indexOf(",")
+    const b64 = commaIdx >= 0 ? input.slice(commaIdx + 1) : input
+    return new Uint8Array(Buffer.from(b64, "base64"))
+  } catch {
+    return null
+  }
+}

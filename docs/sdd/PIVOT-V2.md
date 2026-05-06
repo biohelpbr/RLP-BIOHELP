@@ -79,7 +79,7 @@
 |---|---|---|---|---|
 | F-V01 | Cadastro com ref obrigatório (link OU código manual) | C | P0 | ✅ Destravada (TBD-10 resolvido). TBD-9 (código imutável?) com hipótese padrão. |
 | F-V02 | Integração Guru via webhook Shopify | D | P0 | ✅ Destravada (TBD-7 resolvido — Shopify-first; confirmar com Wink). |
-| F-V03 | Status ativo = subscription_paid | C | P0 | ✅ Destravada (depende de F-V02). |
+| F-V03 | Status ativo = subscription_paid | C | P0 | ✅ **Implementada 06/05/2026 (S5)** — destrava F-V18, F-V06, F-V08. |
 | F-V04 | Comissão 50% por assinatura de convidado (1 nível) | D | P0 | 🚫 Bloqueada — TBD-1, TBD-2 abertos. |
 | F-V05 | Saldo + conversão para crédito Shopify (1:1) | C | P1 | ✅ Destravada (TBD-14 resolvido). TBD-21 (prazo inativo) não bloqueia início. |
 | F-V06 | Promoção a Founder (≥5 ativos no clube) | B | P1 | 🟡 Parcial — TBD-12 (perde status?) aberto. Hipótese padrão: status definitivo. |
@@ -93,7 +93,7 @@
 | F-V14 | Vendas manuais do membro (CRM leve) | C | P1 | ✅ Destravada — sem TBD pendente. |
 | F-V15 | Eventos admin (criação + funil + link/tag) | C | P1 | ✅ Destravada — TBD-24 (entry-fee?) e TBD-25 (bônus de ativação?) não bloqueiam início. |
 | F-V16 | Painel admin completo (9 áreas) | B | P1 | ✅ Destravada — depende de F-V04, F-V05 pra dados reais; UI/shells podem começar. |
-| F-V17 | SSO Shopify → Painel (sem duplo login) | D | P1 | 🟡 Parcial — depende de validação técnica da API Shopify (multipass, customer accounts). Pode iniciar prova de conceito. |
+| F-V17 | SSO Shopify → Painel (sem duplo login) | D | P1 | ✅ **Implementada 06/05/2026 (S5) via App Proxy** — Multipass descartado (loja sem Plus). Default OFF via `LRP_V2_SSO=false`. |
 | F-V18 | Tags automáticas Líder (≥5) / Influenciador (≥40) | B | P2 | ✅ Destravada — regra simples, depende de F-V06 ter contagem de "ativos no clube". |
 
 **Legenda:** P0 = bloqueia o novo fluxo. P1 = essencial pro MVP v2. P2 = pós-MVP v2. ✅ = destravada / 🟡 = parcial / 🚫 = bloqueada.

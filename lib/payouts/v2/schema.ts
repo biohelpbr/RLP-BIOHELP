@@ -16,6 +16,8 @@ export const requestPayoutSchema = z.object({
     .max(1_000_000, "Valor acima do permitido"),
   payout_method: z.enum(PAYOUT_METHODS),
   invoice_filename: z.string().trim().max(200).optional().or(z.literal("")),
+  /** F-V07c: data URL ou base64 do arquivo de NF (PDF/XML). Validado server-side. */
+  invoice_data_url: z.string().max(15_000_000).optional().or(z.literal("")),
 })
 
 export type RequestPayoutInput = z.infer<typeof requestPayoutSchema>

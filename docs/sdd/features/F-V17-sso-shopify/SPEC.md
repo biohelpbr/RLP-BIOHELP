@@ -3,9 +3,22 @@
 ## Metadata
 - ID: F-V17
 - Classe: D
-- Status: Draft (precisa prova-de-conceito antes de aprovar)
+- Status: Approved (S5 — App Proxy escolhido; loja Biohelp não tem Plus)
 - Onda: 7 (Sprint 5 — Integrações finais, 03–09/06/2026)
-- Data: 2026-05-05
+- Data: 2026-05-06 (refinada)
+
+## Decisão de implementação (S5)
+**Caminho escolhido: Shopify App Proxy.**
+
+Razão: Multipass é exclusivo do plano Shopify Plus. A loja Biohelp atual está em plano Standard (confirmado via `SHOPIFY_STORE_DOMAIN=biohelp-dev.myshopify.com` no env e ausência de header `X-Shopify-Plus`). App Proxy funciona em qualquer plano, exige apenas que o app esteja instalado na loja, e usa HMAC sobre query string com `SHOPIFY_API_SECRET` (já no env).
+
+**Fluxo:**
+1. Cliente logado na Shopify clica em link interno tipo `https://biohelp-dev.myshopify.com/apps/clube` (configurado no Partner Dashboard como App Proxy → `/api/sso/shopify/proxy`).
+2. Shopify proxy adiciona `signature` + `logged_in_customer_id` + `shop` na query string.
+3. Nosso endpoint valida a `signature` (HMAC SHA256 dos params alfabeticamente) com `SHOPIFY_API_SECRET`.
+4. Se válido + `logged_in_customer_id` presente → busca `shopify_customers` table → encontra `member_id` → cria magic-link Supabase via Admin API → redireciona pra `/dashboard?auth=<token>`.
+5. Se sem `logged_in_customer_id` (cliente Shopify não logada) → redireciona pra `/login`.
+6. Se member não encontrado → redireciona pra `/join` (F-V01).
 
 ## Contexto
 Reunião 29/04 PM (minuto 03:33–05:14): cliente quer que a usuária logada na Shopify clique no atalho "clube" e caia direto em `/dashboard` sem novo login. Wink mencionou implementação análoga puxando dado do Stripe pra Cliente. Mateus citou sessão memorizada no navegador, mas Léo deixou claro: **não pode haver duplo login**.
