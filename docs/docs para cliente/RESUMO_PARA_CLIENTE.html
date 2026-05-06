@@ -167,7 +167,7 @@
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <header class="page-header">
             <div class="page-icon">📋</div>
-            <h1 class="page-title">Biohelp LRP <span class="status-inline">Em transição V1 → V2 · Sprint 3 em andamento</span></h1>
+            <h1 class="page-title">Biohelp LRP <span class="status-inline">Em transição V1 → V2 · Sprint 5 / 5 começando</span></h1>
             <p class="page-description">Resumo executivo do projeto · Atualizado em 6 de maio de 2026 · Próximo marco: <strong>11 de junho de 2026</strong></p>
         </header>
 
@@ -180,7 +180,7 @@
             <span class="callout-icon">📍</span>
             <div class="callout-content">
                 <strong>Onde estamos hoje (06/05).</strong>
-                <p style="margin-top: 4px;">Depois da reunião do dia 29/04 — quando vocês mostraram o desenho das telas feito no Loveable e fecharam o escopo — fizemos um replanejamento. Em 1 semana já entregamos <strong>2 sprints completas</strong>: a fundação visual nova (cores Biohelp, sidebar, layout) + 3 telas do membro (visão geral, comunidade, perfil) + sistema de vendas manuais + tela de resgate com 3 opções (PIX, Cashback, Crédito Shopify). Agora estamos na <strong>Sprint 3</strong>, construindo o painel admin completo. Faltam <strong>3 sprints</strong> até a entrega final.</p>
+                <p style="margin-top: 4px;">Avanço significativo desde a reunião 29/04. Em uma semana já entregamos <strong>4 das 5 sprints planejadas</strong>: fundação visual + 3 telas do membro (S1) · sistema de vendas manuais + triple resgate + login refator (S2) · painel admin completo + tags automáticas Líder/Influenciador (S3) · eventos admin + Academy + finanças e resgates admin (S4). Falta apenas <strong>S5 (integrações finais)</strong> — login único Shopify, Cashin ao vivo e validação automática de NF. Tudo entregue no ambiente de teste atrás da chave V2.</p>
             </div>
         </div>
 
@@ -188,23 +188,23 @@
         <div class="meta-card">
             <div class="meta-item green">
                 <div class="meta-label">Já entregue</div>
-                <div class="meta-value">38 + 8 funções</div>
-                <div class="meta-detail">programa antigo (V1) + base V2 + 3 telas membro + vendas manuais + triple resgate</div>
+                <div class="meta-value">4 / 5 sprints</div>
+                <div class="meta-detail">membro completo + admin completo + eventos + academy + triple resgate</div>
             </div>
             <div class="meta-item blue">
-                <div class="meta-label">Em construção agora</div>
-                <div class="meta-value">Sprint 3 / 5</div>
-                <div class="meta-detail">painel admin completo (5 áreas) + tags Líder/Influenciador automáticas</div>
+                <div class="meta-label">Próxima sprint</div>
+                <div class="meta-value">S5 — Integrações</div>
+                <div class="meta-detail">login único Shopify · Cashin live · validação automática NF · status via assinatura</div>
             </div>
             <div class="meta-item yellow">
                 <div class="meta-label">Aguardando vocês</div>
                 <div class="meta-value">12 decisões</div>
-                <div class="meta-detail">8 originais + 4 novas surgiram da reunião de 29/04</div>
+                <div class="meta-detail">8 originais + 4 novas da reunião 29/04 · cobramos nas demos</div>
             </div>
             <div class="meta-item purple">
                 <div class="meta-label">Entrega final</div>
                 <div class="meta-value">11/06/2026</div>
-                <div class="meta-detail">5 sprints + 2 dias de buffer · 27 dias úteis a partir de hoje</div>
+                <div class="meta-detail">5 sprints + 2 dias de buffer · adiantadas no cronograma</div>
             </div>
         </div>
 
@@ -489,8 +489,56 @@
             <li>Que as regras de banco (Row Level Security) estão ativas — cada membro só vê os próprios dados</li>
         </ul>
 
-        <h3>🚧 Sprint 3 — Painel Admin completo (20-26/05) <span class="tag blue" style="margin-left: 8px;">Em andamento</span></h3>
-        <p>5 áreas do painel administrativo + sistema de tags automáticas (Líder e Influenciador). Detalhe na seção 06.</p>
+        <h3>✅ Sprint 3 — Painel Admin completo (20-26/05) <span class="tag green" style="margin-left: 8px;">Concluída</span></h3>
+        <ul class="checklist">
+            <li class="done"><strong>5 áreas do painel administrativo entregues:</strong>
+                <ul class="checklist" style="margin-top: 6px; margin-left: 16px;">
+                    <li class="done"><strong>Visão Geral</strong> — total de membros, ativos, novos no mês, churn 90 dias, breakdown por status (PreFounder/Founder/Inativo).</li>
+                    <li class="done"><strong>Comunidade</strong> — lista de membros com filtros por status e por tag (Líder, Influenciador, Founder), paginada.</li>
+                    <li class="done"><strong>Crescimento</strong> — gráficos mensais (membros novos, receita, comissões) com projeção 3 meses.</li>
+                    <li class="done"><strong>Consumo</strong> — produtos com qty vendida, receita, contribuição líquida (admin-only), preço sugerido.</li>
+                    <li class="done"><strong>Produtos</strong> — refator com campo de preço sugerido + preço de custo (admin-only).</li>
+                </ul>
+            </li>
+            <li class="done"><strong>F-V18 implementada — tags automáticas Líder e Influenciador.</strong> Job diário (3h da manhã) varre todos os membros e aplica:
+                <ul class="checklist" style="margin-top: 6px; margin-left: 16px;">
+                    <li class="done">≥ 5 indicados ativos → tag <code>auto:lider</code></li>
+                    <li class="done">≥ 40 indicados ativos → tag <code>auto:influenciador</code></li>
+                </ul>
+                Tags <code>manual:*</code> e <code>FOUNDER</code> são preservadas pelo job. <em>Hoje em produção 0 membros qualificam — precisamos da F-V03 (status via assinatura paga, S5) pra começar a tagear.</em>
+            </li>
+            <li class="done"><strong>2 bugs reais corrigidos durante a sprint</strong> (descobertos no smoke): cache do Next.js que impedia cálculo correto + filtro por tag jsonb que não funcionava. Soluções padronizadas e adicionadas ao manual interno.</li>
+        </ul>
+
+        <h3>✅ Sprint 4 — Eventos + Academy + Finanças admin (27/05-02/06) <span class="tag green" style="margin-left: 8px;">Concluída</span></h3>
+        <ul class="checklist">
+            <li class="done"><strong>F-V15 — Eventos admin:</strong>
+                <ul class="checklist" style="margin-top: 6px; margin-left: 16px;">
+                    <li class="done">Admin cria evento (nome, período, online/presencial, produtos elegíveis, link único).</li>
+                    <li class="done">Métricas de funil: visitas no link → membros que compraram → ROI (custo declarado vs receita).</li>
+                    <li class="done">Quem comprar pelo link no período + produto elegível recebe tag <code>evento:&lt;slug&gt;</code> automaticamente.</li>
+                    <li class="done">Hook plugado no webhook de pedido pago em modo seguro: se algo der errado no cálculo da tag, o webhook v1 continua funcionando 100% (Anti-SPEC §4 honrada).</li>
+                </ul>
+            </li>
+            <li class="done"><strong>F-V13 absorvida por F-V15.</strong> A "campanha de creatina" agora é só um evento online com produto elegível = creatina. Mesmo mecanismo, uma ferramenta só pra admin gerenciar. Decisão registrada e aprovada.</li>
+            <li class="done"><strong>F-V09 — Academy CMS leve:</strong>
+                <ul class="checklist" style="margin-top: 6px; margin-left: 16px;">
+                    <li class="done">Admin posta trilhas com módulos (vídeo YouTube, PDF, texto). Status draft / published / archived.</li>
+                    <li class="done">Membro vê trilhas published em <code>/dashboard/academy</code>, abre módulo, marca como visto. Métricas globais (qtd inícios + qtd completos) por módulo.</li>
+                </ul>
+            </li>
+            <li class="done"><strong>3 áreas admin complementares:</strong> Financeiro (agregação de comissões + saldo + payouts), Resgates v2 (3 abas — PIX, Cashback, Crédito), Análise de pedidos (LRP/FIRST/NORMAL com ranking de produtos).</li>
+            <li class="done"><strong>2 atualizações no banco aplicadas em produção:</strong> 7 tabelas novas + 13 regras de segurança. Validadas com testes SQL e cenários de erro (data inválida, slug duplicado, atribuição idempotente).</li>
+        </ul>
+
+        <h3>🚧 Sprint 5 — Integrações finais (03-09/06) <span class="tag blue" style="margin-left: 8px;">Próxima</span></h3>
+        <ul class="bullet">
+            <li><strong>F-V17 — Login único Shopify → painel.</strong> Cliente logada na Shopify clica e cai direto no painel sem novo login. Exige prova de conceito antes (depende de plano Shopify Plus pra Multipass, ou App Proxy como alternativa).</li>
+            <li><strong>F-V03 — Status ativo via assinatura paga.</strong> Substitui a regra antiga de "200 CV no mês". Quando a assinatura via Guru é confirmada, membro vira "ativo". Destrava as tags Líder/Influenciador, qualificação Founder e cálculo de comissão real.</li>
+            <li><strong>F-V04 — Comissão de 50% direta.</strong> Calcula e registra a comissão a cada assinatura paga. Depende das respostas das perguntas P0 (1, 2 e 20) pra fechar regra exata.</li>
+            <li><strong>Cashin ao vivo</strong> — efetiva as transferências PIX e Cashback (hoje os pedidos ficam pendentes em status "aguardando aprovação"). Depende das credenciais que vocês precisam liberar.</li>
+            <li><strong>Validação automática da NF</strong> no upload — formato e dados básicos verificados antes de aceitar (se inválida, devolve erro pro membro na hora).</li>
+        </ul>
 
         <h3>✅ Visão restrita da rede (F-V11) — primeira funcionalidade visível V2</h3>
         <div class="callout green">
