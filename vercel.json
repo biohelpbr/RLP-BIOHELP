@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/generate-creatine-coupons",
       "schedule": "0 5 2 * *"
+    },
+    {
+      "path": "/api/cron/auto-tags",
+      "schedule": "0 3 * * *"
     }
   ]
 }
