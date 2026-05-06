@@ -31,7 +31,7 @@
 | 4 (Founder) | F-V06, F-V08, F-V11, F-V18 | F-V11 ✅ feita · F-V08 ✅ destravada · F-V18 ✅ destravada |
 | 5 (conteúdo) | F-V09, F-V10, F-V13 | F-V09 🟡 · F-V10 🚫 · F-V13 🚫 (pode ser absorvida por F-V15) |
 | 6 (cleanup) | F-V12 (remover v1 morto) | depende v2 estável |
-| **7 (front)** | **F-V14, F-V15, F-V16, F-V17, F-V18** + portar todas as outras features migradas | 🚧 **Em execução** — S1 inicia 06/05 |
+| **7 (front)** | **F-V14, F-V15, F-V16, F-V17, F-V18** + portar todas as outras features migradas | 🚧 **Em execução** — S1 ✅ entregue (06/05) |
 
 ### Bloqueios atuais (snapshot 05/05/2026)
 - **8 TBDs originais ainda abertos** (`PIVOT-V2.md` §4.1) + 4 derivados (TBD-23/24/25/26 da reunião 29/04 PM). Total: 12 abertos de 26 catalogados (14 respondidos).
@@ -56,8 +56,26 @@
   - `PIVOT-V2.md` atualizado com Anti-SPEC §12-13, novos TBDs, F-V14..F-V18, Onda 7.
 - ✅ **`_loveable_import/`** — ZIP do Loveable extraído na raiz do projeto. Gitignored. Fonte de design, não de código.
 
-### Próximo passo (snapshot 05/05/2026)
-1. **S1 — Fundação do front** (06–12/05/2026): Tailwind + shadcn + design tokens + shells de layout. Detalhe em `CRONOGRAMA-V2.md`.
+### S1 entregue (06/05/2026) — branch `feat/S1-fundacao-loveable`
+- ✅ Tailwind 3 + plugins (`tailwindcss-animate`, `@tailwindcss/typography`).
+- ✅ shadcn/ui inicializado + 17 primitivos (`button`, `card`, `input`, `label`, `tabs`, `dialog`, `sheet`, `dropdown-menu`, `tooltip`, `sonner`, `avatar`, `badge`, `select`, `separator`, `skeleton`, `table`, `form`).
+- ✅ Tokens HSL Biohelp em `app/globals.css` (vars Loveable + bloco `--legacy-*` preservando v1).
+- ✅ Plus Jakarta Sans via `next/font/google` em `app/layout.tsx` (var `--font-jakarta`).
+- ✅ `lib/utils.ts` com `cn` helper (clsx + tailwind-merge).
+- ✅ Deps runtime: @tanstack/react-query, react-hook-form, @hookform/resolvers, recharts, sonner, lucide-react, date-fns, class-variance-authority.
+- ✅ Componentes biohelp: `BHCard`, `BHAvatar`, `BHStat`, `PeriodFilter`, `NavLink`.
+- ✅ Sidebars client: `components/layouts/PartnerSidebar.tsx`, `AdminSidebar.tsx`.
+- ✅ Shells: `components/layouts/PartnerShell.tsx`, `AdminShell.tsx`.
+- ✅ Layouts: `app/(member)/layout.tsx` e `app/admin/layout.tsx` (passthrough — shell aplicado nas pages v2 explicitamente).
+- ✅ 3 telas membro v2 (read-only) atrás de `LRP_V2`:
+  - `/dashboard` — switch interno (`V2Dashboard` quando ON, `V1Dashboard` quando OFF — v1 movida pra `app/dashboard/V1Dashboard.tsx`).
+  - `/dashboard/club` — sponsor + N1 via F-V11 (`lib/network/v2.ts`).
+  - `/dashboard/profile` — read-only.
+- ✅ Build limpa, typecheck e lint zero erros (warnings v1 preexistentes mantidos).
+- ✅ Validação Playwright: 3 telas v2 renderizam com sponsor real e 5 N1; smoke flag OFF — `/dashboard` v1 renderiza intacto. Screenshots em `docs/sdd/features/S1-fundacao/screenshots/`.
+
+### Próximo passo (snapshot 06/05/2026)
+1. **S2 — Membro finish + Login** (13–19/05/2026): Store, Orders (F-V14), Finance (F-V05+F-V07 triple resgate), Login refator. Detalhe em `CRONOGRAMA-V2.md`.
 2. **F-V01** (cadastro com ref obrigatório) — pode rodar em paralelo a S1 se decidir começar backend antes do front.
 3. Cliente responder os **12 TBDs ainda abertos** (8 originais + 4 da reunião 29/04 PM). Cobrar nas demos quartas-feiras.
 4. **Validação técnica antes de S5:**
