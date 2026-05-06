@@ -43,6 +43,8 @@ import {
   type MemberForCommission,
   type FastTrackWindow
 } from '@/lib/commissions/calculator'
+import { isV2Enabled } from '@/lib/utils/featureFlags'
+import { hookOnOrderPaid } from '@/lib/events/hook-on-order-paid'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -563,8 +565,33 @@ export async function POST(request: NextRequest) {
     console.error('[webhook] Erro ao processar cupom creatina:', creatineErr)
   }
 
+  // =====================================================
+  // 17. [F-V15] HOOK V2 — atribuição de tag evento:<slug>
+  // Composição mínima isolada (Anti-SPEC §4). Falha NUNCA derruba webhook v1.
+  // =====================================================
+  if (isV2Enabled()) {
+    try {
+      const productIds = extractedData.lineItems
+        .map((li) => li.productId)
+        .filter((id): id is string => !!id)
+      const hookRes = await hookOnOrderPaid({
+        memberId: member.id,
+        memberEmail: extractedData.customerEmail,
+        productIds,
+      })
+      if (hookRes.applied) {
+        logWebhookEvent('orders/paid', shopifyOrderId, 'event_tag_applied', {
+          memberId: member.id,
+          eventSlug: hookRes.eventSlug,
+        })
+      }
+    } catch (hookErr) {
+      console.error('[webhook] F-V15 hook failed (isolated)', hookErr)
+    }
+  }
+
   const duration = Date.now() - startTime
-  
+
   logWebhookEvent('orders/paid', shopifyOrderId, 'success', {
     memberId: member.id,
     orderId: newOrder.id,
