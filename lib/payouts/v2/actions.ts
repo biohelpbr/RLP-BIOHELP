@@ -47,11 +47,17 @@ export async function requestPayout(
   const supabase = createServiceClient()
   const now = new Date().toISOString()
 
+  // gross_amount é NOT NULL legacy (v1 calculava taxa); em v2 sem dedução
+  // o gross é igual ao amount solicitado.
+  // bank_name/agency/account/account_type/cpf_cnpj/holder_name foram
+  // relaxados em F-V07b — só PIX exige preenchimento (futura UI S5).
   const { data, error } = await supabase
     .from("payout_requests")
     .insert({
       member_id: member.id,
       amount,
+      gross_amount: amount,
+      net_amount: amount,
       payout_method,
       status: "pending",
       person_type: payout_method === "pix" ? "pj" : "pf",
