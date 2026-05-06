@@ -60,7 +60,7 @@ export function OrdersClientList({ leads, sales }: OrdersClientListProps) {
         <BHCard className="space-y-3">
           {sales.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
-              Você ainda não registrou vendas. Use o botão "Nova venda" no topo.
+              Você ainda não registrou vendas. Use o botão &ldquo;Nova venda&rdquo; no topo.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -103,7 +103,7 @@ export function OrdersClientList({ leads, sales }: OrdersClientListProps) {
         <BHCard className="space-y-3">
           {leads.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
-              Você ainda não registrou leads. Use o botão "Novo lead" no topo.
+              Você ainda não registrou leads. Use o botão &ldquo;Novo lead&rdquo; no topo.
             </p>
           ) : (
             <ul className="space-y-2">
