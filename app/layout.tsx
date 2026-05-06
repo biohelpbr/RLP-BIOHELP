@@ -1,10 +1,13 @@
-/**
- * Root Layout - Next.js App Router
- * SPEC: Seção 11 - Next.js App Router (TypeScript)
- */
-
 import type { Metadata } from 'next'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Biohelp LRP',
@@ -17,17 +20,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link 
-          href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" 
-          rel="stylesheet" 
-        />
-      </head>
+    <html lang="pt-BR" className={jakarta.variable}>
       <body>{children}</body>
     </html>
   )
 }
-

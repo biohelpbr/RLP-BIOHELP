@@ -89,7 +89,7 @@
   justify-content: center;
   width: 64px;
   height: 64px;
-  background: var(--primary);
+  background: var(--legacy-primary);
   color: white;
   font-size: 1.75rem;
   font-weight: 700;
@@ -191,7 +191,7 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--legacy-primary);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
@@ -260,7 +260,7 @@
 }
 
 .loginLink a {
-  color: var(--primary);
+  color: var(--legacy-primary);
   font-weight: 500;
 }
 
@@ -282,7 +282,7 @@
 .sponsorIcon {
   display: flex;
   align-items: center;
-  color: var(--primary);
+  color: var(--legacy-primary);
 }
 
 .sponsorInfo span {
@@ -291,7 +291,7 @@
 }
 
 .sponsorInfo strong {
-  color: var(--primary);
+  color: var(--legacy-primary);
   font-weight: 600;
 }
 

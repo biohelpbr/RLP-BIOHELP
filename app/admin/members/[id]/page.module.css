@@ -28,7 +28,7 @@
 }
 
 .backLink:hover {
-  color: var(--primary);
+  color: var(--legacy-primary);
 }
 
 .memberHeader {
@@ -47,7 +47,7 @@
   justify-content: center;
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--legacy-primary) 0%, var(--primary-dark) 100%);
   color: white;
   font-size: 1.5rem;
   font-weight: 700;
@@ -127,7 +127,7 @@
   width: 36px;
   height: 36px;
   background: var(--primary-bg);
-  color: var(--primary);
+  color: var(--legacy-primary);
   border-radius: var(--radius-lg);
 }
 
@@ -160,7 +160,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary) 0%, #8b5cf6 100%);
+  background: linear-gradient(90deg, var(--legacy-primary) 0%, #8b5cf6 100%);
   border-radius: var(--radius-full);
   transition: width 0.3s ease;
 }
@@ -184,7 +184,7 @@
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--white);
-  background: var(--primary);
+  background: var(--legacy-primary);
   border: none;
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -233,7 +233,7 @@
   width: 40px;
   height: 40px;
   background: var(--primary-bg);
-  color: var(--primary);
+  color: var(--legacy-primary);
   border-radius: var(--radius-lg);
 }
 
@@ -329,7 +329,7 @@
 .typeadjustment,
 .typemanual {
   background: var(--primary-bg);
-  color: var(--primary);
+  color: var(--legacy-primary);
 }
 
 /* Order Status */
@@ -489,9 +489,9 @@
 }
 
 .typeBtnActive {
-  color: var(--primary);
+  color: var(--legacy-primary);
   background: var(--primary-bg);
-  border-color: var(--primary);
+  border-color: var(--legacy-primary);
 }
 
 .formGroup {
@@ -520,7 +520,7 @@
 .formGroup input:focus,
 .formGroup textarea:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--legacy-primary);
   background: var(--white);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
@@ -560,7 +560,7 @@
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--white);
-  background: var(--primary);
+  background: var(--legacy-primary);
   border: none;
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -673,7 +673,7 @@
   padding: 2px 8px;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--legacy-primary);
   background: var(--primary-light);
   border-radius: var(--radius-full);
   text-transform: capitalize;
@@ -726,7 +726,7 @@
 
 .formGroup select:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--legacy-primary);
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 

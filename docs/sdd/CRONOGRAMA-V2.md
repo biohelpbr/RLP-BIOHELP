@@ -15,7 +15,7 @@
 
 | Sprint | Período | Dias úteis | Foco | Estado |
 |---|---|---|---|---|
-| **S1** | 06–12/05 (qua–ter) | 5 | Fundação + 3 telas membro (Dashboard, Club, Profile) | ⏳ Aguardando início |
+| **S1** | 06–12/05 (qua–ter) | 5 | Fundação + 3 telas membro (Dashboard, Club, Profile) | ✅ Entregue 06/05/2026 (branch `feat/S1-fundacao-loveable`) |
 | **S2** | 13–19/05 (qua–ter) | 5 | Membro finish (Store, Orders=F-V14, Finance triple) + Login refator | ⏳ |
 | **S3** | 20–26/05 (qua–ter) | 5 | Admin core (Overview, Community+F-V18, Growth, Consumption, Products) | ⏳ |
 | **S4** | 27/05–02/06 (qua–ter) | 5 | Eventos (F-V15) + Academy (F-V09) + Finance/Payouts admin + OrdersAnalytics | ⏳ |

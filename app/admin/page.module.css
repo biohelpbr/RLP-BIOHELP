@@ -39,7 +39,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--legacy-primary);
   color: white;
   font-size: 1.25rem;
   font-weight: 700;
@@ -103,7 +103,7 @@
 }
 
 .navItemActive a {
-  background: var(--primary);
+  background: var(--legacy-primary);
   color: white;
 }
 
@@ -205,7 +205,7 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--legacy-primary);
   background: var(--white);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
@@ -257,7 +257,7 @@
 
 .memberName {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--legacy-primary);
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -414,7 +414,7 @@
   padding: 6px 12px;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--legacy-primary);
   background: var(--primary-bg);
   border: none;
   border-radius: var(--radius-md);
@@ -427,7 +427,7 @@
 }
 
 .resyncBtn:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--legacy-primary);
   color: white;
 }
 
@@ -642,7 +642,7 @@
 
 .filterSelect:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--legacy-primary);
   background: var(--white);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
@@ -659,7 +659,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid var(--gray-200);
-  border-top-color: var(--primary);
+  border-top-color: var(--legacy-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -923,7 +923,7 @@
   font-family: var(--font-display);
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--legacy-primary);
   background: var(--primary-light);
   padding: 2px 8px;
   border-radius: var(--radius-full);
