@@ -39,3 +39,7 @@ Thumbs.db
 _loveable_import/
 docs/docs para cliente/biohelp-project.zip
 
+# Claude Code workspace files
+.claude/
+.playwright-mcp/
+

@@ -39,7 +39,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--legacy-primary);
   color: white;
   font-size: 1.25rem;
   font-weight: 700;
@@ -103,7 +103,7 @@
 }
 
 .navItemActive a {
-  background: var(--primary);
+  background: var(--legacy-primary);
   color: white;
 }
 
@@ -237,7 +237,7 @@
 }
 
 .statCardPurple {
-  border-color: var(--primary);
+  border-color: var(--legacy-primary);
 }
 
 .statCardYellow {
@@ -329,7 +329,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: 0.875rem 1.25rem;
-  background: var(--primary);
+  background: var(--legacy-primary);
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
@@ -428,7 +428,7 @@
 
 /* CV Card - Sprint 2 */
 .cvCard {
-  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--legacy-primary) 0%, #7c3aed 100%);
   border-radius: var(--radius-xl);
   padding: var(--space-xl);
   color: white;
@@ -803,7 +803,7 @@
   display: inline-block;
   width: 4px;
   height: 16px;
-  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--legacy-primary) 0%, #7c3aed 100%);
   border-radius: 2px;
 }
 
@@ -840,8 +840,8 @@
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
-  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  color: var(--legacy-primary);
+  background: linear-gradient(135deg, var(--legacy-primary) 0%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
