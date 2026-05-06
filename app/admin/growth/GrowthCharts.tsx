@@ -82,7 +82,7 @@ export function GrowthCharts({ history, projection }: GrowthChartsProps) {
                 tickFormatter={fmtBRL}
               />
               <Tooltip
-                formatter={(v: number) => fmtBRL(v)}
+                formatter={(v) => fmtBRL(typeof v === "number" ? v : Number(v ?? 0))}
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
                   border: "1px solid hsl(var(--border))",

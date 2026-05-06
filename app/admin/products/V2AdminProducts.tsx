@@ -39,8 +39,8 @@ export default async function V2AdminProducts() {
           <h1 className="text-3xl font-bold text-foreground">Produtos</h1>
           <p className="text-muted-foreground">
             Catálogo + métricas de vendas. Em S3 mostra produtos com pelo menos
-            1 venda manual (F-V14). Cadastro de "preço sugerido" e "preço de
-            custo" entra em S4.
+            1 venda manual (F-V14). Cadastro de &ldquo;preço sugerido&rdquo; e
+            &ldquo;preço de custo&rdquo; entra em S4.
           </p>
         </header>
 
