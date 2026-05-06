@@ -74,8 +74,23 @@
 - ✅ Build limpa, typecheck e lint zero erros (warnings v1 preexistentes mantidos).
 - ✅ Validação Playwright: 3 telas v2 renderizam com sponsor real e 5 N1; smoke flag OFF — `/dashboard` v1 renderiza intacto. Screenshots em `docs/sdd/features/S1-fundacao/screenshots/`.
 
-### Próximo passo (snapshot 06/05/2026)
-1. **S2 — Membro finish + Login** (13–19/05/2026): Store, Orders (F-V14), Finance (F-V05+F-V07 triple resgate), Login refator. Detalhe em `CRONOGRAMA-V2.md`.
+### S2 entregue em código (05/05/2026) — branch `feat/S2-membro-finish` 🟡 código verde, smoke pendente
+- ✅ SPECs `F-V05-saldo-creditos` (classe C) e `F-V07-saque-cashin-nf` (classe D); refino dos CAs do `F-V14` (CA-01..CA-08).
+- ✅ Migration `20260505_f-v14-sales-manual.sql` — tabelas `member_leads` + `member_sales` com RLS (`members.auth_user_id = auth.uid()`); índices `(member_id, created_at DESC)`. Rollback comentado no topo.
+- ✅ Migration `20260505_f-v07-payout-method.sql` — enum `payout_method_v2` + coluna em `payout_requests` (default 'pix'). Rollback comentado.
+- ✅ `lib/sales-manual/{schema,queries,actions}.ts` — Zod, `createLead/createSale/deleteLead/deleteSale`, agregados mês.
+- ✅ `lib/payouts/v2/{schema,queries,actions}.ts` — `requestPayout` 3 métodos + `getMemberBalance` (RPC `get_available_balance`) + `listMemberPayouts`.
+- ✅ Pages v2 atrás de `LRP_V2`: `/dashboard/store` (RSC + atalho Shopify), `/dashboard/orders` + `/orders/new` (RSC + client form F-V14), `/dashboard/finance` (RSC + saldo/histórico + `WithdrawDialog` 3 abas).
+- ✅ `WithdrawDialog v2` reescrito (Anti-SPEC §13) — 3 métodos vs 2 do mock Loveable; chama Server Action; PIX exige NF.
+- ✅ Login refator visual atrás de `LRP_V2` (Pattern §1) — `app/login/page.tsx` switch RSC; `V1Login.tsx` deprecated; `V2Login.tsx` com tabs Parceira/Admin Biohelp + visual Loveable. Lógica auth (signInWithPassword via `/api/auth/login`) preservada.
+- ✅ Build, typecheck, lint exit 0.
+- ⏳ **Pendente humano:** aplicar as 2 migrations no DB Supabase real (`supabase db push` ou `psql -f`); rodar Playwright smoke ON+OFF (`/dashboard/orders`, `/orders/new`, `/dashboard/finance`, `/dashboard/store`, `/login` v1+v2; submits de lead/venda/3 resgates); preencher matrizes de validação F-V05/F-V07/F-V14.
+- ⏳ **Decisão técnica registrada:** WithdrawDialog usa 3 abas Tabs (não Select único) — pivota fácil pra Select se demo de 13/05 mostrar fricção.
+- ⏳ **Decisão técnica registrada:** login mantém signInWithPassword em vez de magic link — Supabase Auth do projeto não foi configurado pra OTP. Conversão pra magic link fica como TBD pós-S5.
+
+### Próximo passo (snapshot 05/05/2026 pós-S2-código)
+1. Humano valida S2 (rodar migrations + smoke); merge PR S2.
+2. **S3 — Admin core** (20–26/05/2026): Overview, Community+F-V18, Growth, Consumption, Products. Detalhe em `CRONOGRAMA-V2.md`.
 2. **F-V01** (cadastro com ref obrigatório) — pode rodar em paralelo a S1 se decidir começar backend antes do front.
 3. Cliente responder os **12 TBDs ainda abertos** (8 originais + 4 da reunião 29/04 PM). Cobrar nas demos quartas-feiras.
 4. **Validação técnica antes de S5:**
@@ -91,16 +106,16 @@
 | F-V02 | Integração Guru via webhook Shopify | D | 2 | ✅ Destravada (TBD-7 resolvido) |
 | F-V03 | Status ativo = subscription_paid | C | 2 | ✅ Destravada (depende F-V02) |
 | F-V04 | Comissão 50% por assinatura | D | 3 | 🚫 Bloqueada (TBD-1, TBD-2) |
-| F-V05 | Saldo + créditos Shopify 1:1 | C | 3 | ✅ Destravada (TBD-14 refinado: API `customer.credit`) |
+| F-V05 | Saldo + créditos Shopify 1:1 | C | 3 | 🟡 UI entregue em S2 (05/05) — chamada API `customer.credit` real fica pra S5 |
 | F-V06 | Promoção a Founder ≥5 ativos | B | 4 | 🟡 Parcial (TBD-12 hipótese padrão: definitivo) |
-| F-V07 | Saque Founder via Cashin + NF + triple resgate | D | 3 | 🟡 Parcial — Cashin confirmado (TBD-19), valor depende F-V04. UI/upload pode iniciar |
+| F-V07 | Saque Founder via Cashin + NF + triple resgate | D | 3 | 🟡 UI 3 abas + persistência pending entregue em S2 (05/05); Cashin live + validação NF auto + chamada `customer.credit` em S5 |
 | F-V08 | Ranking de Founders | B | 4 | ✅ Destravada (TBD-11 resolvido — nº pessoas como critério inicial) |
 | F-V09 | Área de conteúdo (Academy CMS) | B | 5 | 🟡 Parcial (TBD-15 hipótese padrão: global gerenciado pelo admin) |
 | F-V10 | Link WhatsApp Founder | A | 5 | 🚫 Bloqueada (TBD-16) |
 | F-V11 | Visão restrita da rede | B | 4 (antecipada) | ✅ Implementada 29/04/2026 — pendente validação manual |
 | F-V12 | Cleanup v1 (remover CV, níveis, RPA, etc.) | D | 6 | depende v2 estável |
 | F-V13 | Cupom de creatina como campanha configurável | C | 5 | 🚫 Bloqueada (TBD-22) — pode ser absorvida por F-V15 |
-| **F-V14** | **Vendas manuais do membro (CRM leve)** | **C** | **7 (S2)** | ✅ **Destravada (nova — 29/04 PM)** |
+| **F-V14** | **Vendas manuais do membro (CRM leve)** | **C** | **7 (S2)** | 🟡 **Código entregue em S2 (05/05) — migration + smoke pendentes do humano** |
 | **F-V15** | **Eventos admin (criação + funil + link/tag)** | **C** | **7 (S4)** | ✅ **Destravada (nova — 29/04 PM)** |
 | **F-V16** | **Painel admin completo (9 áreas)** | **B** | **7 (S3-S4)** | ✅ **Destravada (nova — 29/04 PM)** |
 | **F-V17** | **SSO Shopify → Painel** | **D** | **7 (S5)** | 🟡 **Parcial — exige PoC Multipass/App Proxy** |
