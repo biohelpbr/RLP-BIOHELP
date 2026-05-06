@@ -69,17 +69,23 @@ Sem mudanças em `lib/tags/auto-classifier.ts` nem em `app/api/cron/auto-tags/ro
 5. Hook em F-V03 — quando `subscription_status` muda, dispara `recompute(sponsor_id)` (não esperar cron).
 6. UI badges em F-V16 (Comunidade).
 
-## Matriz de Validação
+## Matriz de Validação (preenchida 06/05/2026)
 | CA | Teste | Tipo | Status | Evidência |
 |---|---|---|---|---|
-| CA-01 | Seed 5 ativos + recompute(M) → SQL `tags @> '["auto:lider"]'` | SQL via MCP | ⏳ | preencher pós-smoke |
-| CA-02 | Seed 40 ativos + recompute(M) → ambas tags | SQL via MCP | ⏳ | preencher pós-smoke |
-| CA-03 | Reduzir 40→39→4 + recompute → remoções corretas | SQL sequencial | ⏳ | preencher pós-smoke |
-| CA-04 | Set `manual:vip` + recompute → `manual:*` preservada | SQL via MCP | ⏳ | preencher pós-smoke |
-| CA-05 | GET `/admin/community?tag=auto:lider` → lista correta | curl HTML grep | ⏳ | preencher pós-smoke |
-| CA-06 | recompute() 2x consecutivos → segunda chamada `{updated: 0}` | endpoint cron | ⏳ | preencher pós-smoke |
-| CA-07 | curl POST sem `Authorization` → 401 | curl | ⏳ | preencher pós-smoke |
-| CA-08 | recompute(M) single vs recompute() all | inspeção lib | ⏳ | preencher pós-smoke |
+| CA-01 | Seed 5 affiliates `status='active'` (sponsor=sponsor@biohelp.test) + GET /api/cron/auto-tags → SQL `tags='["auto:lider"]'` | SQL via MCP + curl Bearer | ✅ | INSERT 5 rows TST00001..05; recompute retornou `{ok:true, scanned:18, updated:1, unchanged:17}`; SQL: `tags=["auto:lider"]` na sponsor. |
+| CA-02 | Seed 35 mais (40 total) + recompute → ambas tags | SQL + curl | ✅ | view active_count=40; recompute → SQL: `tags=["auto:influenciador","auto:lider"]`. |
+| CA-03 | UPDATE 36 rows pra status=inactive (4 ativos) + recompute | SQL + curl | ✅ | view active_count=4; recompute → tags `auto:*` removidas (somente `manual:vip` preservada). |
+| CA-04 | UPDATE tags=`["manual:vip","auto:lider","auto:influenciador"]` antes do recompute → após preserva só `manual:vip` | SQL via MCP | ✅ | Pré-recompute: 3 tags. Pós-recompute (4 ativos): `tags=["manual:vip"]`. `manual:*` separada por prefix. |
+| CA-05 | GET `/admin/community?tag=auto:lider` (admin@biohelp.test logado) | curl HTML grep | ✅ | Após bug fix `.filter("tags","cs",JSON.stringify([tag]))` (jsonb format), HTML mostra `Sponsor Teste` + `sponsor@biohelp.test` + `SPONSOR01` no listing. Bug detectado e corrigido na sessão. |
+| CA-06 | 2x recompute consecutivos | curl | ✅ | 1ª `{ok:true,scanned:53,updated:1,unchanged:52}`; 2ª `{ok:true,scanned:53,updated:0,unchanged:53}`. Idempotente. |
+| CA-07 | GET sem Authorization → 401; com Bearer errado → 401; com Bearer correto → 200 | curl | ✅ | Sem header: 401. `Bearer wrong`: 401. `Bearer $CRON_SECRET`: 200. |
+| CA-08 | recompute(M) single vs recompute() all | inspeção `lib/tags/auto-classifier.ts` | ✅ | `if (memberId) countsQuery = countsQuery.eq("member_id", memberId)` — single member; sem param → all rows da view. |
+
+## Bug fix detectado na validação S3
+Durante o smoke, 2 bugs reais (não-cosméticos) foram corrigidos antes de fechar a SPEC:
+
+1. **Cache de `fetch` Next 14 dedupando leituras de service_role** — `recompute()` rodava 2x e ambas chamadas viam só 18 rows mesmo quando a view tinha 53 (cacheado da 1ª chamada). Fix em `lib/supabase/server.ts:createServiceClient` adicionando `global.fetch` override com `cache: 'no-store'`. Service_role queries são sempre dynamic — esse override é seguro pra todas as libs (overview-v2, community, growth, consumption também ganham coerência).
+2. **`.contains("tags", [tag])` incompatível com jsonb** — supabase-js serializa como `cs.{auto:lider}` (Postgres array format), mas `tags` é jsonb e exige `cs.["auto:lider"]`. Fix em `lib/admin/community.ts` trocando por `.filter("tags","cs",JSON.stringify([tag]))`. Sintaxe alternativa documentada no comentário.
 
 ## Loveable — elementos descartados
 - `PartnerRank: PARTNER | LEADER | DIRECTOR | HEAD` — substituir por tags v2 (`auto:lider`, `auto:influenciador`, `FOUNDER`).
