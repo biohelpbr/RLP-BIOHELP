@@ -45,6 +45,7 @@ import {
 } from '@/lib/commissions/calculator'
 import { isV2Enabled } from '@/lib/utils/featureFlags'
 import { hookOnOrderPaid } from '@/lib/events/hook-on-order-paid'
+import { hookOnOrderPaidSubscription } from '@/lib/subscriptions/hook-on-order-paid'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -587,6 +588,31 @@ export async function POST(request: NextRequest) {
       }
     } catch (hookErr) {
       console.error('[webhook] F-V15 hook failed (isolated)', hookErr)
+    }
+  }
+
+  // =====================================================
+  // 18. [F-V03] HOOK V2 — subscription_status=paid em produto-clube
+  // Composição mínima isolada (Anti-SPEC §4). Falha NUNCA derruba webhook v1.
+  // =====================================================
+  if (isV2Enabled()) {
+    try {
+      const subRes = await hookOnOrderPaidSubscription({
+        memberId: member.id,
+        totalAmount: extractedData.totalAmount,
+        lineItems: extractedData.lineItems.map((li) => ({
+          title: li.title,
+          productId: li.productId,
+        })),
+      })
+      if (subRes.applied) {
+        logWebhookEvent('orders/paid', shopifyOrderId, 'subscription_marked_paid', {
+          memberId: member.id,
+          matched: subRes.matched,
+        })
+      }
+    } catch (hookErr) {
+      console.error('[webhook] F-V03 hook failed (isolated)', hookErr)
     }
   }
 

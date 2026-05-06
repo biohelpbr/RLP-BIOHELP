@@ -4,25 +4,31 @@
  * Lida com integração Guru → Shopify e estado de assinatura do membro.
  * Substitui a lógica de "ativo via 200 CV mensais" do v1.
  *
- * Status: SHELL — aguardando TBD-7 (Guru webhook direto vs leitura via Shopify)
- * Feature: F-V02 (PIVOT-V2.md §2)
- *
- * NÃO IMPORTAR EM PRODUÇÃO ainda — só após implementação completa atrás de LRP_V2 flag.
+ * F-V03 (S5): subscription_status enum (pending|paid|cancelled) em members.
+ * Coluna populada pelo hook em webhooks/orders/paid quando produto for de
+ * assinatura/clube. View member_active_affiliate_count usa esta coluna.
  */
 
-export type SubscriptionStatus = 'pending' | 'active' | 'cancelled' | 'paused'
+export type {
+  SubscriptionStatusV2,
+  SubscriptionState,
+} from "./queries"
 
-export interface MemberSubscription {
-  member_id: string
-  status: SubscriptionStatus
-  guru_subscription_id?: string
-  shopify_order_id?: string
-  started_at?: string
-  cancelled_at?: string
-  // TODO(F-V02): definir campos finais após TBD-7
-}
+export {
+  getSubscriptionStatus,
+  getActiveAffiliateCount,
+} from "./queries"
 
-// TODO(F-V02): implementar quando TBD-7 estiver resolvido
-//   - getSubscriptionStatus(memberId)
-//   - syncFromGuruWebhook(payload)
-//   - syncFromShopifyOrder(orderId)
+export {
+  markSubscriptionPaid,
+  cancelSubscription,
+} from "./actions"
+
+export {
+  detectSubscriptionPurchase,
+  hookOnOrderPaidSubscription,
+} from "./hook-on-order-paid"
+export type {
+  OrderPaidHookInput,
+  OrderPaidHookResult,
+} from "./hook-on-order-paid"

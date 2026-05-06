@@ -224,6 +224,7 @@ export type WebhookEventStatus =
   | 'commissions_skipped'
   | 'commissions_error'
   | 'event_tag_applied'
+  | 'subscription_marked_paid'
 
 /**
  * Cria log estruturado para webhook

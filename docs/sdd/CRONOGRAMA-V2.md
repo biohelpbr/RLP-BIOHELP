@@ -19,7 +19,7 @@
 | **S2** | 13–19/05 (qua–ter) | 5 | Membro finish (Store, Orders=F-V14, Finance triple) + Login refator | ✅ Entregue 06/05/2026 (PR #3 — `feat/S2-membro-finish`) — 3 migrations aplicadas, smoke ON+OFF via HTTP+SQL, matrizes preenchidas |
 | **S3** | 20–26/05 (qua–ter) | 5 | Admin core (Overview, Community+F-V18, Growth, Consumption, Products) | ✅ Entregue 06/05/2026 (PR #4 — `feat/S3-admin-core`) — F-V18 8/8 CAs ✅ + 5 áreas admin v2 |
 | **S4** | 27/05–02/06 (qua–ter) | 5 | Eventos (F-V15) + Academy (F-V09) + Finance/Payouts admin + OrdersAnalytics | ✅ Entregue 06/05/2026 (branch `feat/S4-eventos-academy`) — F-V15 9/9 + F-V09 8/8 + F-V13 absorvida + 5 áreas admin + Academy membro |
-| **S5** | 03–09/06 (qua–ter) | 5 | F-V17 (SSO Shopify) + Cashin live + validação NF + QA + matrizes | ⏳ |
+| **S5** | 03–09/06 (qua–ter) | 5 | F-V17 (SSO Shopify) + Cashin live + validação NF + QA + matrizes | 🚧 Em execução 06/05/2026 (branch `feat/S5-integracoes`) — F-V03 ✅ + F-V17 (App Proxy) ✅ + F-V07b Cashin (mock+sandbox) ✅ + F-V07c NF auto ✅ |
 | **Buffer** | 10–11/06 (qua–qui) | 2 | Polimento + retrabalho de feedback do cliente | ⏳ |
 
 > **Total: 27 dias úteis** (vs 30 da versão anterior — corte de ~13%).
@@ -121,11 +121,12 @@
 **Objetivo:** SSO Shopify funcional, Cashin live, validações automáticas, matriz por feature preenchida.
 
 ### Entregáveis
-- [ ] **F-V17 SSO Shopify:** PoC validada (Multipass ou App Proxy) → implementação → rollout gradual com flag `LRP_V2_SSO=false` por default.
-- [ ] **Cashin live:** `lib/payouts/v2/cashin.ts` integrado com API real (sandbox + prod), webhook de status do pagamento.
-- [ ] **Validação automática NF:** `lib/payouts/v2/nfe-validator.ts` — formato + dados básicos. Inválida → erro síncrono no upload.
-- [ ] Matriz de Validação preenchida pra todas as features migradas (F-V05, F-V07, F-V11, F-V14, F-V15, F-V16, F-V17, F-V18 mínimo).
-- [ ] Smoke test em staging com `LRP_V2=true` por 5 dias antes de prod.
+- [x] **F-V03 Status via assinatura** *(antecipada — destrava F-V18/F-V06/F-V08)*: migration aplicada, hook em webhook `orders/paid`, view recriada usando `subscription_status='paid'`. e2e validado.
+- [x] **F-V17 SSO Shopify (App Proxy):** Multipass descartado (loja sem Plus). App Proxy implementado: HMAC SHA256 + magic link Supabase + redirect. `auth_audit` table + setup doc completa. Default OFF via `LRP_V2_SSO=false`.
+- [x] **Cashin live (sandbox):** `lib/payouts/v2/cashin.ts` interface agnóstica + Mock/Sandbox/Live clients + factory. `transferPayout` + endpoint admin + webhook receiver. Default OFF via `LRP_V2_CASHIN_LIVE=false`. Sandbox aguarda creds reais.
+- [x] **Validação automática NF:** `lib/payouts/v2/nfe-validator.ts` — formato + dados básicos. Inválida → erro síncrono no upload via `requestPayout`.
+- [x] Matrizes de Validação preenchidas pra F-V03, F-V07b, F-V07c, F-V17.
+- [ ] Smoke test em staging com `LRP_V2=true` por 5 dias antes de prod (humano após PR mergear).
 - [ ] **Runbook:** como ativar flag em prod, rollback, ownership.
 
 ### Definition of Done
