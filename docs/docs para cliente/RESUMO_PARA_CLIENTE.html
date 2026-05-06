@@ -727,18 +727,18 @@
                 <div class="meta">🟡 <strong>UI entregue em S2</strong> · Cashin live + validação automática NF em S5</div>
             </div>
 
-            <div class="feature-card blocked">
+            <div class="feature-card partial">
                 <div class="id">F-V08</div>
                 <div class="name">Ranking de Founders</div>
-                <div class="description">Lista pública dos Founders com mais... (a definir o critério: tamanho do clube? faturamento? média mensal de itens por cliente?)</div>
-                <div class="meta">🚫 Aguarda Biohelp — <strong>pergunta 11</strong></div>
+                <div class="description">Lista pública dos Founders com mais indicados ativos no clube (critério inicial: nº de pessoas — confirmado na reunião 29/04 PM). Iteração futura pode incluir receita e retenção.</div>
+                <div class="meta">🟡 Destravada — começa após F-V03 popular ativos via assinatura</div>
             </div>
 
-            <div class="feature-card blocked">
+            <div class="feature-card done">
                 <div class="id">F-V09</div>
-                <div class="name">Área de conteúdo</div>
-                <div class="description">Página com textos, vídeos, imagens e PDFs disponíveis pros membros. Pode ser global (admin posta tudo) ou por Founder (cada um tem mural próprio).</div>
-                <div class="meta">🚫 Aguarda Biohelp — <strong>pergunta 15</strong></div>
+                <div class="name">Área de conteúdo (Academy)</div>
+                <div class="description">Trilhas com vídeos YouTube, PDFs e textos curtos. Admin posta global no <code>/admin/academy</code>; membro consome em <code>/dashboard/academy</code>. Métricas: qtd inícios + qtd completos por módulo. Hipótese padrão: global (TBD-15 pode trocar pra mural por Founder se quiserem).</div>
+                <div class="meta">✅ <strong>Concluída</strong> em 02/06 (Sprint 4)</div>
             </div>
 
             <div class="feature-card blocked">
@@ -755,11 +755,11 @@
                 <div class="meta">⏳ Programada pra ~junho/2026</div>
             </div>
 
-            <div class="feature-card blocked">
-                <div class="id">F-V13</div>
-                <div class="name">Cupom de creatina como campanha</div>
-                <div class="description">Substitui o cron mensal automático. Admin cria campanhas ("clientes novos em maio ganham cupom") em vez de gerar pra todo mundo todo mês. Pode ser absorvida pela F-V15 (eventos com link/tag).</div>
-                <div class="meta">🚫 Aguarda Biohelp — <strong>pergunta 22</strong></div>
+            <div class="feature-card done" style="border-left-color: var(--text-light); opacity: 0.85;">
+                <div class="id">F-V13 · Absorvida</div>
+                <div class="name">Cupom de creatina (virou evento online)</div>
+                <div class="description">A "campanha de creatina" agora é só um <strong>evento online</strong> com produto elegível = creatina. Mesmo mecanismo de F-V15: admin cria, gera link único, quem comprar no período recebe a tag. Decisão aprovada em 06/05/2026 — uma ferramenta só pra admin gerenciar.</div>
+                <div class="meta">✅ <strong>Absorvida</strong> por F-V15 (sem feature separada)</div>
             </div>
 
             <!-- ═══════ Features novas da reunião 29/04 PM ═══════ -->
@@ -771,18 +771,18 @@
                 <div class="meta">✅ <strong>Concluída</strong> em 19/05 (Sprint 2)</div>
             </div>
 
-            <div class="feature-card ready">
+            <div class="feature-card done">
                 <div class="id">F-V15 · Nova 29/04 PM</div>
                 <div class="name">Eventos admin (com link e tag)</div>
-                <div class="description">Admin cria evento (presencial ou online), gera link de adesão único, mede funil (topo → WhatsApp → presentes → convertidos). Quem comprar pelo link no período recebe tag. Pode absorver F-V13.</div>
-                <div class="meta">🚀 Sprint 4 (27/05–02/06)</div>
+                <div class="description">Admin cria evento (presencial ou online), gera link de adesão único (<code>/r/&lt;slug&gt;</code>), mede funil (visitas → compras → ROI). Quem comprar pelo link no período + produto elegível recebe tag <code>evento:&lt;slug&gt;</code> automaticamente. Cobre o caso da campanha de creatina (absorve F-V13).</div>
+                <div class="meta">✅ <strong>Concluída</strong> em 02/06 (Sprint 4)</div>
             </div>
 
-            <div class="feature-card ready">
+            <div class="feature-card done">
                 <div class="id">F-V16 · Nova 29/04 PM</div>
-                <div class="name">Painel admin completo</div>
-                <div class="description">9 áreas no painel admin: Visão Geral, Comunidade, Crescimento, Consumo, Produtos, Eventos, Financeiro, Resgates, Academy. Alertas e Configurações ficam pós-MVP por decisão de vocês.</div>
-                <div class="meta">🚀 Sprint 3-4 (em andamento)</div>
+                <div class="name">Painel admin completo (9 áreas)</div>
+                <div class="description">Visão Geral, Comunidade, Crescimento, Consumo, Produtos (S3) + Eventos, Academy, Financeiro, Resgates (S4). Alertas e Configurações ficam pós-MVP por decisão de vocês.</div>
+                <div class="meta">✅ <strong>Concluída</strong> em S3+S4 (7 áreas — 2 pós-MVP)</div>
             </div>
 
             <div class="feature-card partial">
@@ -792,11 +792,11 @@
                 <div class="meta">🟡 Sprint 5 — depende de prova de conceito</div>
             </div>
 
-            <div class="feature-card ready">
+            <div class="feature-card done">
                 <div class="id">F-V18 · Nova 29/04 PM</div>
                 <div class="name">Tags automáticas Líder e Influenciador</div>
-                <div class="description">≥ 5 indicados ativos = vira "Líder". ≥ 40 = vira "Influenciador". Aplicado automaticamente por job diário. Ajuda admin a filtrar comunidade e identificar destaques. Convive com Founder@5 (que é diferente — exige assinatura paga + opção de saque cash).</div>
-                <div class="meta">🚀 Sprint 3 (20–26/05) — em andamento</div>
+                <div class="description">≥ 5 indicados ativos = vira "Líder". ≥ 40 = vira "Influenciador". Aplicado automaticamente por job diário (3h da manhã UTC). Hoje 0 membros qualificam — destrava quando F-V03 (S5) começar a marcar membros como ativos via assinatura paga.</div>
+                <div class="meta">✅ <strong>Concluída</strong> em 26/05 (Sprint 3)</div>
             </div>
         </div>
 
