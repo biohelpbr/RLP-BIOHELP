@@ -1,4 +1,14 @@
 /**
+ * @deprecated V1 LEGACY — descontinuado em 28/04/2026 pelo Pivô V2.
+ *
+ * Royalty (3% CV de nova rede quando Head forma outra Head): REMOVIDO no v2.
+ * Não há mais Head, não há mais CV, não há mais formação multinível.
+ * Mantido apenas até a onda 6 (F-V12 — cleanup).
+ *
+ * Ver: docs/sdd/PIVOT-V2.md
+ */
+
+/**
  * Cálculo de Royalty
  * Sprint 4 - Biohelp LRP
  * 

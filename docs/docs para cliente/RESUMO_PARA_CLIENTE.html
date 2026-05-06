@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biohelp LRP — Resumo Executivo</title>
+    <title>Biohelp LRP — Resumo Executivo · Pivô V2 e Cronograma 11/05</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -35,10 +35,10 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.65;
             font-size: 16px;
         }
-        .page { max-width: 900px; margin: 0 auto; padding: 80px 96px; }
+        .page { max-width: 960px; margin: 0 auto; padding: 80px 96px; }
         @media (max-width: 768px) { .page { padding: 40px 24px; } }
         .page-header { margin-bottom: 48px; }
         .page-icon { font-size: 78px; margin-bottom: 16px; }
@@ -46,26 +46,40 @@
         .page-description { color: var(--text-secondary); font-size: 16px; }
         .status-inline {
             display: inline-flex; align-items: center; gap: 6px;
-            background: var(--green-bg); color: var(--green);
+            background: var(--purple-bg); color: var(--purple);
             padding: 3px 8px; border-radius: 3px; font-size: 14px; font-weight: 500; margin-left: 8px;
         }
-        h1 { font-size: 30px; font-weight: 600; margin: 48px 0 16px; letter-spacing: -0.01em; }
+        .status-inline.green { background: var(--green-bg); color: var(--green); }
+        .status-inline.yellow { background: var(--yellow-bg); color: var(--yellow); }
+        h1 { font-size: 32px; font-weight: 700; margin: 56px 0 16px; letter-spacing: -0.01em; }
         h2 { font-size: 24px; font-weight: 600; margin: 40px 0 12px; letter-spacing: -0.01em; }
-        h3 { font-size: 20px; font-weight: 600; margin: 32px 0 8px; }
-        h4 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; }
+        h3 { font-size: 19px; font-weight: 600; margin: 28px 0 8px; }
+        h4 { font-size: 16px; font-weight: 600; margin: 20px 0 6px; }
         p { margin: 8px 0; color: var(--text); }
         a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 2px; }
         a:hover { text-decoration-color: var(--text); }
-        hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+        .lead { font-size: 17px; color: var(--text); line-height: 1.7; }
+        .meta-card { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 24px 0; }
+        .meta-item { background: var(--bg-secondary); padding: 16px; border-radius: 6px; border-left: 4px solid var(--text-light); }
+        .meta-item.green { border-left-color: var(--green); background: var(--green-bg); }
+        .meta-item.blue { border-left-color: var(--blue); background: var(--blue-bg); }
+        .meta-item.yellow { border-left-color: var(--yellow); background: var(--yellow-bg); }
+        .meta-item.purple { border-left-color: var(--purple); background: var(--purple-bg); }
+        .meta-item .meta-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .meta-item .meta-value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+        .meta-item .meta-detail { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
         .progress-section { margin: 24px 0; }
         .progress-item { display: flex; align-items: center; gap: 16px; padding: 8px 0; }
-        .progress-label { width: 220px; font-size: 14px; color: var(--text); }
+        .progress-label { width: 260px; font-size: 14px; color: var(--text); }
         .progress-bar { flex: 1; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--green); border-radius: 4px; }
-        .progress-fill.pending { background: var(--border); }
-        .progress-value { width: 70px; text-align: right; font-size: 14px; color: var(--text-secondary); }
-        .callout { display: flex; gap: 12px; padding: 16px; border-radius: 4px; margin: 16px 0; }
-        .callout-icon { font-size: 20px; flex-shrink: 0; }
+        .progress-fill.partial { background: var(--yellow); }
+        .progress-fill.todo { background: var(--gray-bg); }
+        .progress-fill.blocked { background: var(--red); opacity: 0.4; }
+        .progress-value { width: 110px; text-align: right; font-size: 14px; color: var(--text-secondary); }
+        .callout { display: flex; gap: 12px; padding: 16px 18px; border-radius: 6px; margin: 16px 0; }
+        .callout-icon { font-size: 22px; flex-shrink: 0; line-height: 1.4; }
         .callout-content { flex: 1; }
         .callout.gray { background: var(--gray-bg); }
         .callout.yellow { background: var(--yellow-bg); }
@@ -74,379 +88,1076 @@
         .callout.red { background: var(--red-bg); }
         .callout.purple { background: var(--purple-bg); }
         table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
-        th { text-align: left; padding: 8px 12px; background: var(--bg-secondary); font-weight: 500; color: var(--text-secondary); border: 1px solid var(--border); }
-        td { padding: 8px 12px; border: 1px solid var(--border); vertical-align: top; }
+        th { text-align: left; padding: 10px 12px; background: var(--bg-secondary); font-weight: 600; color: var(--text-secondary); border: 1px solid var(--border); }
+        td { padding: 10px 12px; border: 1px solid var(--border); vertical-align: top; }
         tr:hover td { background: var(--bg-secondary); }
-        .tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-weight: 500; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: 500; }
         .tag.green { background: var(--green-bg); color: var(--green); }
         .tag.yellow { background: var(--yellow-bg); color: var(--yellow); }
         .tag.red { background: var(--red-bg); color: var(--red); }
         .tag.blue { background: var(--blue-bg); color: var(--blue); }
+        .tag.purple { background: var(--purple-bg); color: var(--purple); }
         .tag.gray { background: var(--gray-bg); color: var(--text-secondary); }
-        code { font-family: 'IBM Plex Mono', monospace; background: var(--bg-secondary); padding: 2px 5px; border-radius: 3px; font-size: 14px; color: var(--red); }
+        code { font-family: 'IBM Plex Mono', monospace; background: var(--bg-secondary); padding: 2px 5px; border-radius: 3px; font-size: 13px; color: var(--blue); }
         pre { font-family: 'IBM Plex Mono', monospace; background: var(--bg-secondary); padding: 16px; border-radius: 4px; overflow-x: auto; font-size: 12px; line-height: 1.4; margin: 16px 0; white-space: pre-wrap; }
         pre code { background: none; padding: 0; color: var(--text); }
-        details { margin: 8px 0; border: 1px solid var(--border); border-radius: 4px; }
-        summary { cursor: pointer; padding: 12px 16px; font-weight: 500; list-style: none; display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); }
+        details { margin: 8px 0; border: 1px solid var(--border); border-radius: 6px; }
+        summary { cursor: pointer; padding: 14px 18px; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); }
         summary::before { content: '▶'; font-size: 10px; color: var(--text-light); transition: transform 0.2s; }
         details[open] summary::before { transform: rotate(90deg); }
         summary::-webkit-details-marker { display: none; }
-        details > .content { padding: 16px; }
-        .toc { margin: 24px 0; }
-        .toc-item { display: block; padding: 6px 0; color: var(--text-secondary); text-decoration: none; font-size: 14px; border-radius: 3px; transition: background 0.1s; }
-        .toc-item:hover { color: var(--text); background: var(--bg-hover); padding-left: 8px; }
-        .checklist { list-style: none; margin: 8px 0; }
-        .checklist li { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; font-size: 15px; }
-        .checklist li::before { content: '☑'; color: var(--green); font-size: 16px; }
+        details > .content { padding: 18px; }
         ul.bullet { list-style: none; margin: 8px 0; }
-        ul.bullet li { position: relative; padding-left: 24px; margin: 4px 0; }
+        ul.bullet li { position: relative; padding-left: 24px; margin: 6px 0; }
         ul.bullet li::before { content: '•'; position: absolute; left: 8px; color: var(--text-light); }
         ol.numbered { list-style: none; counter-reset: item; margin: 8px 0; }
-        ol.numbered li { position: relative; padding-left: 32px; margin: 6px 0; counter-increment: item; }
-        ol.numbered li::before { content: counter(item) "."; position: absolute; left: 8px; color: var(--text-light); font-weight: 500; }
-        .columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 16px 0; }
-        .column { padding: 16px; background: var(--bg-secondary); border-radius: 4px; }
-        .column h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-        .diagram { background: var(--bg-secondary); border-radius: 4px; padding: 20px; margin: 16px 0; overflow-x: auto; }
-        .diagram pre { background: none; padding: 0; margin: 0; font-size: 11px; line-height: 1.3; }
+        ol.numbered li { position: relative; padding-left: 32px; margin: 8px 0; counter-increment: item; }
+        ol.numbered li::before { content: counter(item); position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-secondary); color: var(--text); font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        ul.checklist { list-style: none; margin: 8px 0; }
+        ul.checklist li { position: relative; padding-left: 28px; margin: 6px 0; }
+        ul.checklist li.done::before { content: '✓'; position: absolute; left: 4px; top: 0; color: var(--green); font-weight: 700; font-size: 16px; }
+        ul.checklist li.todo::before { content: '○'; position: absolute; left: 4px; top: 0; color: var(--text-light); font-weight: 400; font-size: 16px; }
+        ul.checklist li.partial::before { content: '◐'; position: absolute; left: 4px; top: 0; color: var(--yellow); font-weight: 400; font-size: 16px; }
+        .columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 16px 0; }
+        .column { padding: 18px; background: var(--bg-secondary); border-radius: 6px; border-left: 4px solid var(--border); }
+        .column.red { border-left-color: var(--red); background: var(--red-bg); }
+        .column.blue { border-left-color: var(--blue); background: var(--blue-bg); }
+        .column.green { border-left-color: var(--green); background: var(--green-bg); }
+        .column.yellow { border-left-color: var(--yellow); background: var(--yellow-bg); }
+        .column h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .column ul.bullet li { font-size: 13.5px; padding-left: 20px; margin: 5px 0; }
+        .column ul.bullet li::before { left: 4px; }
+        .timeline-table { font-size: 13.5px; }
+        .timeline-table th { white-space: nowrap; }
+        .timeline-table td.day { font-weight: 600; white-space: nowrap; width: 130px; }
+        .timeline-table td.holiday { background: var(--gray-bg); color: var(--text-light); font-style: italic; }
+        .timeline-table td.weekend { background: var(--bg-secondary); color: var(--text-light); }
+        .timeline-table td.done { background: var(--green-bg); }
+        .timeline-table td.deadline { background: var(--purple-bg); font-weight: 600; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
+        .feature-card { padding: 16px; background: var(--bg-secondary); border-radius: 6px; border-left: 4px solid var(--text-light); }
+        .feature-card.done { border-left-color: var(--green); }
+        .feature-card.ready { border-left-color: var(--blue); }
+        .feature-card.partial { border-left-color: var(--yellow); }
+        .feature-card.blocked { border-left-color: var(--red); opacity: 0.92; }
+        .feature-card .id { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .feature-card .name { font-weight: 700; margin: 4px 0; font-size: 15px; }
+        .feature-card .description { font-size: 13px; color: var(--text-secondary); margin: 6px 0; line-height: 1.5; }
+        .feature-card .meta { font-size: 12px; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
         .page-footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-light); font-size: 13px; text-align: center; }
-        .test-table th:last-child, .test-table td:last-child { text-align: center; width: 80px; }
-        .fr-table { font-size: 13px; }
-        .fr-table td:first-child { font-weight: 500; white-space: nowrap; }
-        .security-box { background: linear-gradient(135deg, var(--green-bg) 0%, var(--blue-bg) 100%); padding: 20px; border-radius: 8px; margin: 16px 0; }
-        .security-item { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
-        .security-icon { font-size: 18px; }
+        .key-box { background: linear-gradient(135deg, var(--purple-bg) 0%, var(--blue-bg) 100%); padding: 24px 28px; border-radius: 8px; margin: 24px 0; }
+        .key-box h3 { margin-top: 0; }
+        .quote-box { background: var(--bg-secondary); border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 0 6px 6px 0; margin: 16px 0; font-style: italic; color: var(--text-secondary); }
+        .toc { background: var(--bg-secondary); padding: 20px 24px; border-radius: 6px; margin: 24px 0; }
+        .toc h4 { margin-top: 0; }
+        .toc-item { display: block; padding: 4px 0; color: var(--text-secondary); text-decoration: none; font-size: 14px; }
+        .toc-item:hover { color: var(--text); }
+        .toc-item .num { font-family: 'IBM Plex Mono', monospace; color: var(--text-light); margin-right: 8px; font-size: 12px; }
+        .scenario-card { background: var(--bg-secondary); padding: 16px 20px; border-radius: 6px; margin: 12px 0; border: 1px solid var(--border); }
+        .scenario-card .scenario-title { font-weight: 600; margin-bottom: 6px; color: var(--text); }
+        .scenario-card .scenario-step { font-size: 14px; padding: 4px 0 4px 20px; position: relative; color: var(--text-secondary); }
+        .scenario-card .scenario-step::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
     </style>
 </head>
 <body>
     <div class="page">
-        <!-- Header -->
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- HEADER                                                          -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <header class="page-header">
-            <div class="page-icon">📊</div>
-            <h1 class="page-title">Biohelp LRP<span class="status-inline">Sprint 7 ✅ CONCLUÍDO</span></h1>
-            <p class="page-description">Resumo Executivo do Projeto • Última atualização: 18/02/2026</p>
+            <div class="page-icon">📋</div>
+            <h1 class="page-title">Biohelp LRP <span class="status-inline">Em transição V1 → V2</span></h1>
+            <p class="page-description">Resumo executivo do projeto · Atualizado em 29 de abril de 2026 · Próximo marco: <strong>11 de maio de 2026</strong></p>
         </header>
 
-        <!-- Progress -->
-        <section class="progress-section">
-            <div class="progress-item">
-                <span class="progress-label">Sprint 1 — MVP Operacional</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 2 — CV + Status</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 3 — Rede Visual</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 4 — Comissões</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 5 — Saques</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
-                <span class="progress-value">92% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 6 — Admin Avançado</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-label">Sprint 7 — Creatina + Decisões</span>
-                <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                <span class="progress-value">100% ✅</span>
-            </div>
-        </section>
+        <p class="lead">
+            Olá, equipe Biohelp. Este documento mostra <strong>tudo o que já está pronto e funcionando</strong> no aplicativo, <strong>o que está mudando</strong> com base no novo modelo que vocês definiram, e o <strong>cronograma detalhado</strong> para deixar tudo migrado até <strong>segunda-feira, 11 de maio</strong>.
+            Foi escrito em linguagem direta, sem termos técnicos. Onde aparecer alguma palavra mais específica, ela está explicada no <a href="#glossario">glossário no final</a>.
+        </p>
 
-        <!-- Cobertura FRs -->
-        <h3>Cobertura de Requisitos Funcionais (FRs)</h3>
-        <table>
-            <thead><tr><th>Categoria</th><th>Total</th><th>✅</th><th>⚠️</th><th>⏳</th><th>%</th></tr></thead>
+        <!-- Indicadores principais -->
+        <div class="meta-card">
+            <div class="meta-item green">
+                <div class="meta-label">Já entregue</div>
+                <div class="meta-value">38 funções</div>
+                <div class="meta-detail">do programa antigo + visão restrita da rede</div>
+            </div>
+            <div class="meta-item blue">
+                <div class="meta-label">Em construção</div>
+                <div class="meta-value">12 funções</div>
+                <div class="meta-detail">do novo programa V2 — 4 prontas pra começar</div>
+            </div>
+            <div class="meta-item yellow">
+                <div class="meta-label">Aguardando vocês</div>
+                <div class="meta-value">12 decisões</div>
+                <div class="meta-detail">precisamos das respostas até 02/05</div>
+            </div>
+            <div class="meta-item purple">
+                <div class="meta-label">Prazo final</div>
+                <div class="meta-value">11/05/2026</div>
+                <div class="meta-detail">8 dias úteis a partir de hoje</div>
+            </div>
+        </div>
+
+        <!-- Sumário -->
+        <div class="toc">
+            <h4>📑 O que tem neste documento</h4>
+            <a class="toc-item" href="#contexto"><span class="num">01</span>O que aconteceu — contexto da mudança</a>
+            <a class="toc-item" href="#funcionando"><span class="num">02</span>O que já funciona hoje no aplicativo</a>
+            <a class="toc-item" href="#mudancas"><span class="num">03</span>O que muda com o novo modelo</a>
+            <a class="toc-item" href="#entregue-v2"><span class="num">04</span>O que já entregamos do novo modelo</a>
+            <a class="toc-item" href="#cronograma"><span class="num">05</span>Cronograma detalhado até 11/05</a>
+            <a class="toc-item" href="#features-v2"><span class="num">06</span>As 13 funcionalidades novas explicadas</a>
+            <a class="toc-item" href="#decisoes"><span class="num">07</span>Decisões da Biohelp registradas</a>
+            <a class="toc-item" href="#perguntas"><span class="num">08</span>Perguntas pendentes — precisamos das respostas</a>
+            <a class="toc-item" href="#cliente"><span class="num">09</span>O que precisamos de vocês</a>
+            <a class="toc-item" href="#seguranca"><span class="num">10</span>Como garantimos que nada quebra</a>
+            <a class="toc-item" href="#proximos"><span class="num">11</span>Próximos passos imediatos</a>
+            <a class="toc-item" href="#historico"><span class="num">12</span>Histórico — o que foi entregue antes</a>
+            <a class="toc-item" href="#glossario"><span class="num">13</span>Glossário</a>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 01 · CONTEXTO                                                   -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="contexto">01 · O que aconteceu — contexto da mudança</h1>
+
+        <p>
+            Entre dezembro de 2023 e fevereiro de 2026, construímos o <strong>aplicativo do programa de fidelidade da Biohelp</strong> seguindo o escopo original: um sistema com vários níveis (Parceira, Líder, Diretora, Head), cálculo de "CV" (valor comissionável) por pedido, status mensal baseado em quantidade de CV, comissões em cascata por toda a rede, bônus por desempenho e saques via RPA.
+            Esse trabalho foi entregue em 7 etapas (chamadas internamente de "sprints"), e <strong>98% das funcionalidades originais estão prontas e em produção</strong>.
+        </p>
+
+        <p>
+            <strong>Em 28 de abril de 2026</strong>, a direção da Biohelp definiu uma nova direção pro programa. O novo fluxograma e os comentários no escopo antigo deixaram claro que vários conceitos do modelo MLM tradicional (CV, múltiplos níveis, bônus em cascata) <strong>não fazem mais parte do programa</strong>. O programa fica mais simples, mais alinhado a um modelo de <strong>afiliação direta de 1 nível</strong>, parecido com programas de afiliados modernos.
+        </p>
+
+        <div class="callout purple">
+            <span class="callout-icon">📣</span>
+            <div class="callout-content">
+                <strong>Resumo da mudança em uma frase:</strong>
+                <p style="margin-top: 6px;">Sai o modelo de marketing multinível com vários níveis, status mensal por consumo e comissões em cascata. Entra um modelo de afiliação simples — quem indicou ganha 50% sobre a assinatura do convidado, e quem indicou 5 pessoas vira "Founder" e pode sacar dinheiro. Sem níveis, sem CV, sem reset mensal.</p>
+            </div>
+        </div>
+
+        <p>
+            Como o programa <strong>já está em produção</strong> com membros reais cadastrados, a transição precisa ser feita <strong>com cuidado, sem quebrar nada</strong>. Foi por isso que escolhemos uma estratégia de migração gradual com uma "chave" interna que liga e desliga o novo modelo. Detalhamos isso na <a href="#seguranca">seção 10</a>.
+        </p>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 02 · O QUE JÁ FUNCIONA HOJE                                     -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="funcionando">02 · O que já funciona hoje no aplicativo</h1>
+
+        <p class="lead">
+            Esta é a foto do que está <strong>operacional e em uso</strong> no aplicativo neste momento (29/04/2026). Os clientes e a equipe da Biohelp já conseguem usar tudo isso sem nenhum tipo de bloqueio.
+        </p>
+
+        <h2>👤 Cadastro e acesso</h2>
+        <ul class="checklist">
+            <li class="done"><strong>Cadastro de novos membros</strong> pela página pública de inscrição, com validação de e-mail e senha</li>
+            <li class="done"><strong>Login do membro</strong> e <strong>login do administrador</strong>, com permissões diferentes para cada perfil</li>
+            <li class="done"><strong>Captura automática do link de indicação</strong> — quando alguém é convidado por outro membro, a relação fica registrada</li>
+            <li class="done"><strong>Geração de link único</strong> para cada membro convidar pessoas</li>
+            <li class="done"><strong>Código de indicação no formato BH00001, BH00002...</strong> (sequencial, fácil de divulgar de boca)</li>
+            <li class="done"><strong>Customização do código pelo admin</strong> — possível trocar o código padrão por algo personalizado (ex: MARIA2026)</li>
+        </ul>
+
+        <h2>🛍 Integração automática com a Shopify</h2>
+        <ul class="checklist">
+            <li class="done"><strong>Sincronização automática do cliente</strong> entre o app e a loja Shopify</li>
+            <li class="done"><strong>Aplicação automática de tags</strong> no perfil Shopify do membro (ex: <code>member</code>, <code>nivel:parceira</code>) — usado pra liberar preços de clube via Locksmith</li>
+            <li class="done"><strong>Webhooks dos pedidos pagos</strong> — toda venda na loja é automaticamente espelhada no app</li>
+            <li class="done"><strong>Webhooks de reembolso e cancelamento</strong> — pedidos cancelados/reembolsados revertem a comissão automaticamente</li>
+            <li class="done"><strong>Validação automática</strong> de quem usou o cupom, no momento do pedido</li>
+        </ul>
+
+        <h2>📊 Painel do membro</h2>
+        <ul class="checklist">
+            <li class="done"><strong>Dashboard principal</strong> com saudação, status atual e atalhos pras principais áreas</li>
+            <li class="done"><strong>Visualização da rede</strong> — agora no formato novo (apenas quem trouxe + indicados diretos), conforme decidido no pivô (<em>entregue em 29/04 — feature F-V11</em>)</li>
+            <li class="done"><strong>Acompanhamento de comissões</strong> com totais por mês, separados por tipo</li>
+            <li class="done"><strong>Histórico de saques</strong> e status (pendente, aprovado, pago, recusado)</li>
+            <li class="done"><strong>Solicitação de saque</strong> com upload de documento fiscal</li>
+            <li class="done"><strong>Página de vendas</strong> mostrando pedidos próprios e da rede direta</li>
+            <li class="done"><strong>Card de cupom de creatina</strong> grátis (1 por mês) com código copiável e estados visuais (pronto, já usado, indisponível)</li>
+            <li class="done"><strong>Telefone com privacidade configurável</strong> (público / só rede / privado)</li>
+        </ul>
+
+        <h2>🛠 Painel do administrador</h2>
+        <ul class="checklist">
+            <li class="done"><strong>Dashboard global</strong> com indicadores: total de membros, ativos, novos do mês, comissões pagas, saques pendentes</li>
+            <li class="done"><strong>Listagem completa de membros</strong> com busca e filtros</li>
+            <li class="done"><strong>Edição de dados de membro</strong> (nome, e-mail, telefone, status)</li>
+            <li class="done"><strong>Bloqueio e desbloqueio de membros</strong></li>
+            <li class="done"><strong>Ajuste manual de comissões</strong> (quando precisa corrigir algo)</li>
+            <li class="done"><strong>Visualização da rede completa</strong> (visão expandida que o membro comum não tem mais)</li>
+            <li class="done"><strong>Aprovação/recusa de saques</strong> com workflow controlado</li>
+            <li class="done"><strong>Gestão de tags Shopify</strong> com sincronização automática</li>
+            <li class="done"><strong>Customização de código de indicação</strong></li>
+            <li class="done"><strong>Visualização de tentativas de fraude do cupom</strong> (auditoria)</li>
+        </ul>
+
+        <h2>💰 Sistema financeiro (modelo antigo, em transição)</h2>
+        <ul class="checklist">
+            <li class="done"><strong>Cálculo automático de CV</strong> a cada pedido pago (modelo V1 — será substituído pelo modelo V2)</li>
+            <li class="done"><strong>Status mensal Ativo/Inativo</strong> baseado em CV (V1 — será substituído por status via assinatura)</li>
+            <li class="done"><strong>Reset mensal automático</strong> de CV (V1 — será removido)</li>
+            <li class="done"><strong>Cálculo de comissões em cascata</strong> Fast-Track, Perpétua, Bônus 1/2/3, Leadership e Royalty (V1 — será substituído por comissão direta de 50%)</li>
+            <li class="done"><strong>Trava de 15 dias</strong> antes da comissão ficar disponível pra saque (V1 — será reavaliada no V2)</li>
+            <li class="done"><strong>Validação de NF eletrônica</strong> no fluxo de saque</li>
+            <li class="done"><strong>Limite de R$ 1.000/mês para saque CPF</strong> via RPA (V1 — será descontinuado conforme decisão da Biohelp)</li>
+        </ul>
+
+        <h2>🎁 Cupom mensal de creatina (Sprint 7)</h2>
+        <ul class="checklist">
+            <li class="done"><strong>Geração automática</strong> no dia 2 de cada mês para todo membro ativo</li>
+            <li class="done"><strong>Código único por membro e por mês</strong> (ex: <code>CREATINA-MARIA-X7K9-MAI2026</code>)</li>
+            <li class="done"><strong>7 camadas de segurança anti-fraude</strong>: hash aleatório, restrição por cliente Shopify, limite de 1 uso, validação no webhook, registro de tentativas indevidas</li>
+            <li class="done"><strong>Atualização automática</strong> do estado do cupom no dashboard depois do uso</li>
+        </ul>
+
+        <div class="callout green">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+                <strong>Em resumo: o aplicativo está 100% operacional.</strong>
+                <p style="margin-top: 6px;">Os membros existentes não vão sentir nenhuma mudança até o dia <strong>11/05</strong> (data prevista de ativação do novo modelo). Tudo descrito acima continua funcionando exatamente como hoje. As mudanças do V2 estão sendo construídas em paralelo, sem afetar o que já roda.</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 03 · O QUE MUDA COM O NOVO MODELO                               -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="mudancas">03 · O que muda com o novo modelo (V2)</h1>
+
+        <p>
+            O novo modelo simplifica bastante o programa. Ao invés de várias regras encadeadas, fica uma estrutura mais clara:
+        </p>
+
+        <ul class="bullet">
+            <li>O membro indica → quem é indicado vira "membro inativo" até pagar a assinatura → quando paga, vira <strong>membro ativo</strong></li>
+            <li>Quem indicou recebe <strong>50% (já com impostos descontados)</strong> sobre o valor da assinatura do convidado</li>
+            <li>O saldo acumulado pode ser <strong>convertido em crédito na loja</strong> (1 real = 1 real de crédito)</li>
+            <li>Quando o membro chega a <strong>5 pessoas ativas no clube</strong> dele, vira <strong>"Founder"</strong> e desbloqueia o saque em dinheiro</li>
+            <li>Founder com CNPJ saca via NF de serviço; CPF saca via Cashin direto ou converte em crédito</li>
+            <li>O membro só vê <strong>uma camada da rede</strong> — quem trouxe ele e quem ele trouxe. Não vê mais a árvore inteira</li>
+        </ul>
+
+        <div class="columns">
+            <div class="column red">
+                <h4>❌ Sai do programa</h4>
+                <ul class="bullet">
+                    <li>O conceito de "CV" (valor comissionável). A comissão vira percentual direto sobre a assinatura.</li>
+                    <li>Os níveis Parceira / Líder em Formação / Líder / Diretora / Head. Só existe Membro e Founder.</li>
+                    <li>Status Ativo/Inativo medido por gasto mensal. Status agora é assinatura paga ou não.</li>
+                    <li>Reset mensal de tudo no dia 1º. Sem reset.</li>
+                    <li>Compressão da rede após 6 meses inativo. A rede não muda mais por inatividade.</li>
+                    <li>Fast-Track 30%/20% nos primeiros 60 dias.</li>
+                    <li>Comissão Perpétua diferenciada por nível do indicado.</li>
+                    <li>Bônus 1, 2 e 3 (R$ 250 / R$ 1.500 / R$ 8.000).</li>
+                    <li>Leadership Bônus (3% / 4% sobre a rede).</li>
+                    <li>Royalty (3% quando uma Head forma outra Head).</li>
+                    <li>Saque via RPA com limite de R$ 1.000/mês para CPF.</li>
+                    <li>"House Account" — cadastro sem link agora é bloqueado.</li>
+                </ul>
+            </div>
+
+            <div class="column blue">
+                <h4>🔄 Continua, mas com regra nova</h4>
+                <ul class="bullet">
+                    <li><strong>Cadastro:</strong> agora é obrigatório ter link ou código de indicação. Sem isso, não pode se cadastrar.</li>
+                    <li><strong>Status do membro:</strong> ativo = assinatura paga (via Guru). Inativo = ainda não pagou ou cancelou.</li>
+                    <li><strong>Visão da rede:</strong> simplificada. Só sponsor + indicados diretos.</li>
+                    <li><strong>Código de indicação:</strong> mantém o formato BH00001 e adiciona possibilidade de digitar código manualmente no cadastro.</li>
+                    <li><strong>Sincronização Shopify:</strong> tags + Locksmith continuam liberando preço de clube.</li>
+                    <li><strong>Pagamento:</strong> Cashin (provável) ou crédito em loja. CPF e CNPJ podem receber.</li>
+                    <li><strong>Cupom de creatina:</strong> mantém, mas vira sistema de campanhas (a Biohelp escolhe quando e pra quem disparar).</li>
+                </ul>
+            </div>
+
+            <div class="column green">
+                <h4>➕ Entra novo no programa</h4>
+                <ul class="bullet">
+                    <li><strong>Integração com Guru:</strong> assinatura paga no Guru se reflete automaticamente no app.</li>
+                    <li><strong>Comissão direta de 50%</strong> sobre a assinatura do convidado.</li>
+                    <li><strong>Saldo do membro</strong> com conversão simples em crédito Shopify (1:1, sem prazo após resgate).</li>
+                    <li><strong>Promoção a Founder</strong> ao atingir 5 ativos no clube.</li>
+                    <li><strong>Saque cash via Cashin</strong> + NF de serviço (Founder com CNPJ).</li>
+                    <li><strong>Ranking público de Founders</strong> baseado em algum critério (a definir).</li>
+                    <li><strong>Área de conteúdo</strong> com textos, vídeos, PDFs (CMS interno).</li>
+                    <li><strong>Link de grupo de WhatsApp</strong> que o Founder pode disponibilizar pro clube dele.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Antes e depois — exemplos práticos</h3>
+
+        <div class="scenario-card">
+            <div class="scenario-title">📌 Cenário 1 — Maria indica a Joana (assinatura R$ 200)</div>
+            <div class="scenario-step"><strong>Antes (V1):</strong> Joana precisa gastar R$ 200 em CV no mês para Maria receber 30% do CV via Fast-Track. Cálculo complexo, depende do nível da Maria, dos demais membros da rede, etc.</div>
+            <div class="scenario-step"><strong>Depois (V2):</strong> Joana paga R$ 200 de assinatura. Maria recebe automaticamente <strong>R$ 100 menos impostos</strong> no saldo dela. Pronto.</div>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-title">📌 Cenário 2 — Maria atinge 5 pessoas ativas no clube</div>
+            <div class="scenario-step"><strong>Antes (V1):</strong> não existia esse conceito. Maria subiria de nível conforme regras complexas (CV da rede, número de Parceiras Ativas em N1, etc.)</div>
+            <div class="scenario-step"><strong>Depois (V2):</strong> Maria automaticamente vira <strong>Founder</strong>. No painel dela aparece um selo "Founder", e ela passa a ter direito a sacar em dinheiro (precisa de CNPJ + NF de serviço, ou via Cashin como CPF).</div>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-title">📌 Cenário 3 — Maria ainda não é Founder e quer aproveitar o saldo</div>
+            <div class="scenario-step"><strong>Antes (V1):</strong> Maria abriria solicitação de saque via RPA, com limite de R$ 1.000/mês.</div>
+            <div class="scenario-step"><strong>Depois (V2):</strong> Maria <strong>converte o saldo em crédito Shopify</strong> (1 real = 1 real). Usa esse crédito pra comprar produtos na própria loja. Sem limite mensal, sem RPA, sem burocracia fiscal.</div>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-title">📌 Cenário 4 — Maria abre o painel "Minha Rede"</div>
+            <div class="scenario-step"><strong>Antes (V1):</strong> Maria via uma árvore com várias camadas — quem ela trouxe, quem essas pessoas trouxeram, e assim por diante. Estatísticas de N1, N2, N3, etc.</div>
+            <div class="scenario-step"><strong>Depois (V2):</strong> Maria vê apenas <strong>quem a trouxe (sponsor)</strong> e <strong>quem ela trouxe diretamente</strong>. Cada pessoa indicada por ela aparece numa tabela simples: nome, código, status (Ativa/Inativa), data de cadastro. <em>Já implementado em 29/04 (F-V11).</em></div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 04 · O QUE JÁ ENTREGAMOS DO V2                                  -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="entregue-v2">04 · O que já entregamos do novo modelo</h1>
+
+        <p>
+            Em <strong>2 dias</strong> (28-29/04) já fizemos uma boa parte da preparação técnica. Não são funcionalidades visíveis ao usuário final ainda (o novo modelo está com a chave desligada), mas são <strong>fundação obrigatória</strong> para construir tudo o que vem.
+        </p>
+
+        <h3>✅ Documentação completa do novo modelo</h3>
+        <ul class="checklist">
+            <li class="done"><strong>Documento canônico do pivô (PIVOT-V2.md)</strong> — fonte única da verdade. Lista o que sai, o que fica, o que entra. Toda mudança a partir de agora referencia esse documento.</li>
+            <li class="done"><strong>Manual de trabalho da equipe (PLAYBOOK.md)</strong> — descreve como cada nova funcionalidade é construída, validada e entregue. Garante que ninguém improvisa.</li>
+            <li class="done"><strong>Lista das 18 perguntas pra Biohelp (QUESTIONARIO-CLIENTE-V2.md)</strong> — formatada pra WhatsApp, pra agilizar respostas.</li>
+            <li class="done"><strong>Resumo executivo pra cliente (este documento)</strong> — atualizado a cada nova rodada.</li>
+            <li class="done"><strong>Insumos da Biohelp arquivados no projeto</strong> — fluxograma novo, regras condensadas e escopo com comentários ficam preservados pra referência permanente.</li>
+        </ul>
+
+        <h3>✅ Fundação técnica do V2</h3>
+        <ul class="checklist">
+            <li class="done"><strong>"Chave de ligamento" do novo modelo</strong> — o sistema agora tem um interruptor interno que liga ou desliga o modelo V2 sem precisar mudar o código. Hoje está <strong>desligado</strong> em produção.</li>
+            <li class="done"><strong>Estrutura de pastas dos novos módulos criada</strong> — assinatura (Guru), comissão V2 (50%), saldo e créditos, Founder e ranking, área de conteúdo. Cada uma é um "compartimento" pronto pra receber a lógica.</li>
+            <li class="done"><strong>Sinalização do código antigo como "em descontinuação"</strong> — sem remover nada. O código V1 continua rodando 100%, mas qualquer desenvolvedor que olhar agora sabe que aquela parte vai sair.</li>
+        </ul>
+
+        <h3>✅ Primeira funcionalidade visível do V2 já entregue: visão restrita da rede</h3>
+
+        <div class="callout green">
+            <span class="callout-icon">🎯</span>
+            <div class="callout-content">
+                <strong>F-V11 — Visão restrita da rede pro membro</strong> <span class="tag green">Concluída em 29/04/2026</span>
+                <p style="margin-top: 8px;">Quando vocês ligarem o V2 (na data de ativação), o membro vai ver no painel "Minha Rede" um layout completamente novo: um card mostrando quem o trouxe pro clube, e logo abaixo uma tabela limpa com os indicados diretos dele. Sem árvore, sem N1/N2, sem CV. Só o essencial.</p>
+                <p style="margin-top: 8px;">Como o V2 ainda está com a chave desligada, o membro continua vendo a árvore antiga hoje. No dia 11/05, quando ligarmos a chave, ele vê o novo formato. Se algo der errado, basta desligar a chave e volta ao formato antigo em menos de 1 minuto.</p>
+            </div>
+        </div>
+
+        <h3>✅ Adequação completa da documentação interna</h3>
+        <ul class="checklist">
+            <li class="done">Todos os documentos antigos receberam um <strong>aviso visível no topo</strong> indicando que se referem ao modelo descontinuado</li>
+            <li class="done">Todos os arquivos de código que serão removidos no futuro receberam uma <strong>marcação técnica</strong> (<code>@deprecated</code>) que faz a IDE riscar automaticamente o uso desses arquivos no editor — funciona como um lembrete pra qualquer desenvolvedor que mexer no código</li>
+            <li class="done">O <strong>índice da documentação</strong> foi reorganizado pra mostrar primeiro o que vale agora (V2) e depois o que é histórico (V1)</li>
+            <li class="done">O <strong>histórico de versões</strong> registrou o pivô como versão 5.0 e as decisões de hoje como versão 5.1</li>
+        </ul>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 05 · CRONOGRAMA                                                 -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="cronograma">05 · Cronograma detalhado até 11/05</h1>
+
+        <div class="callout yellow">
+            <span class="callout-icon">⏰</span>
+            <div class="callout-content">
+                <strong>Prazo apertado mas viável.</strong>
+                <p style="margin-top: 6px;">São <strong>13 dias corridos</strong> (29/04 até 11/05), que dão <strong>8 dias úteis</strong> reais de trabalho — descontando o feriado de 1º de maio e os 4 fins de semana. Pra fechar tudo, dependemos de duas coisas:</p>
+                <ol class="numbered" style="margin-top: 8px;">
+                    <li>Vocês responderem as <strong>12 perguntas pendentes</strong> até <strong>02/05</strong> (quinta de manhã)</li>
+                    <li>O parceiro técnico (Wink) confirmar a abordagem da integração com Guru até <strong>02/05</strong></li>
+                </ol>
+                <p style="margin-top: 8px;">Se essas duas coisas atrasarem, parte das funcionalidades fica fora da janela de 11/05 e entra numa segunda entrega (provavelmente entre 18-25/05). Marcamos com asterisco (*) na tabela abaixo as funcionalidades que dependem dessas decisões.</p>
+            </div>
+        </div>
+
+        <table class="timeline-table">
+            <thead>
+                <tr>
+                    <th>Dia</th>
+                    <th>Atividade</th>
+                    <th>Funcionalidades</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
             <tbody>
-                <tr><td>Identidade/Acesso</td><td>3</td><td>3</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Cadastro/Indicação</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Rede/Visualização</td><td>4</td><td>4</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>CV/Status</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Níveis</td><td>3</td><td>3</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Comissões</td><td>7</td><td>7</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr><td>Saques</td><td>6</td><td>5</td><td>1</td><td>0</td><td>92%</td></tr>
-                <tr><td>Admin</td><td>5</td><td>5</td><td>0</td><td>0</td><td>100%</td></tr>
-                <tr style="font-weight: 600; background: var(--green-bg);"><td>TOTAL</td><td>38</td><td>37</td><td>1</td><td>0</td><td>98%</td></tr>
+                <tr>
+                    <td class="day done">Qua 29/04 (hoje)</td>
+                    <td class="done">
+                        <strong>Pivô declarado e documentado.</strong> Documentos canônicos criados. Chave de ligamento V2 instalada (desligada). Primeira funcionalidade do V2 (Visão restrita da rede) implementada. Adequação completa de todos os documentos. Decisões da Biohelp recebidas em primeira rodada (11 de 18) processadas.
+                    </td>
+                    <td class="done"><span class="tag green">F-V11 entregue</span></td>
+                    <td class="done"><span class="tag green">✅ Concluído</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Qui 30/04</td>
+                    <td>
+                        <strong>Início da F-V01 — cadastro com link/código obrigatório.</strong>
+                        Reescreve a tela e a lógica de cadastro pra exigir indicação. Sem link ou código válido, o cadastro é bloqueado. Em paralelo, escrevemos a especificação técnica da F-V02 (integração Guru) pra a equipe do Wink validar a abordagem.
+                    </td>
+                    <td><span class="tag blue">F-V01</span></td>
+                    <td><span class="tag blue">Planejado</span></td>
+                </tr>
+                <tr>
+                    <td class="day holiday">Sex 01/05</td>
+                    <td class="holiday">🇧🇷 Feriado nacional — Dia do Trabalhador</td>
+                    <td class="holiday">—</td>
+                    <td class="holiday">—</td>
+                </tr>
+                <tr>
+                    <td class="day weekend">Sáb-Dom 02-03/05</td>
+                    <td class="weekend">
+                        <strong>Janela crítica do cliente.</strong> Esperamos que a Biohelp responda as 12 perguntas em aberto e o Wink confirme a abordagem da integração Guru. Sem isso, parte do cronograma a partir de 06/05 fica em risco.
+                    </td>
+                    <td class="weekend">—</td>
+                    <td class="weekend"><span class="tag yellow">Aguardando Biohelp</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Seg 04/05</td>
+                    <td>
+                        <strong>Conclusão da F-V01.</strong> Testes e merge. <strong>Início da F-V02 — integração Guru via Shopify.</strong> Quando o Guru cria um pedido na Shopify (forma confirmada de integração), o app captura via webhook que já temos rodando.
+                    </td>
+                    <td><span class="tag blue">F-V01 ✅<br>F-V02</span></td>
+                    <td><span class="tag blue">Planejado</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Ter 05/05</td>
+                    <td>
+                        <strong>Conclusão da F-V02.</strong> <strong>Início da F-V03 — status ativo via assinatura paga.</strong> Daqui pra frente, "membro ativo" significa "tem assinatura paga". <strong>Em paralelo, início da F-V05 — saldo + créditos Shopify.</strong>
+                    </td>
+                    <td><span class="tag blue">F-V02 ✅<br>F-V03 + F-V05</span></td>
+                    <td><span class="tag blue">Planejado</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Qua 06/05</td>
+                    <td>
+                        <strong>Conclusão da F-V03 e F-V05.</strong> <strong>Início da F-V06 — promoção automática a Founder ao atingir 5 ativos no clube.</strong> <strong>Início da F-V04 — comissão direta de 50%</strong> (somente se as perguntas 1 e 2 já foram respondidas pela Biohelp).
+                    </td>
+                    <td><span class="tag blue">F-V03 ✅<br>F-V05 ✅<br>F-V06 + F-V04*</span></td>
+                    <td><span class="tag yellow">Depende decisão</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Qui 07/05</td>
+                    <td>
+                        <strong>Conclusão da F-V04 (comissão) e F-V06 (Founder).</strong> <strong>Início da F-V07 — fluxo de saque via Cashin + NF de serviço.</strong> A tela de cadastro de dados bancários é nova; a validação automática da NF (formato/dados) é nova; o workflow de aprovação é parecido com o que já existe.
+                    </td>
+                    <td><span class="tag blue">F-V04* ✅<br>F-V06 ✅<br>F-V07</span></td>
+                    <td><span class="tag yellow">Depende decisão</span></td>
+                </tr>
+                <tr>
+                    <td class="day">Sex 08/05</td>
+                    <td>
+                        <strong>Conclusão da F-V07.</strong> Início simultâneo (apenas se as perguntas correspondentes já vieram) das F-V08 (ranking de Founders), F-V09 (área de conteúdo), F-V10 (link WhatsApp por Founder), F-V13 (campanhas de cupom de creatina). <strong>Testes integrados de ponta a ponta no ambiente de teste.</strong>
+                    </td>
+                    <td><span class="tag blue">F-V07 ✅<br>F-V08/V09/V10/V13*</span></td>
+                    <td><span class="tag yellow">Depende decisão</span></td>
+                </tr>
+                <tr>
+                    <td class="day weekend">Sáb-Dom 09-10/05</td>
+                    <td class="weekend">
+                        <strong>Buffer de correções.</strong> Se algum bug aparecer nos testes integrados, é corrigido aqui. <strong>Validação manual da Biohelp</strong> no ambiente de teste — alguém de vocês passa pelos cenários principais (cadastro com ref, virar Founder, sacar, converter saldo em crédito) e dá o OK final.
+                    </td>
+                    <td class="weekend">—</td>
+                    <td class="weekend"><span class="tag gray">Buffer + validação</span></td>
+                </tr>
+                <tr>
+                    <td class="day deadline">Seg 11/05</td>
+                    <td class="deadline">
+                        <strong>🎯 DIA DA MIGRAÇÃO.</strong> Publicação no ambiente de produção. Smoke tests (testes rápidos pra confirmar que tudo carrega). Ativação da chave do V2 em horário combinado (sugestão: fora do horário comercial, pra reduzir risco). Início da janela de monitoramento de 48h.
+                    </td>
+                    <td class="deadline"><span class="tag purple">V2 ao vivo</span></td>
+                    <td class="deadline"><span class="tag purple">Migração</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+            (*) Funcionalidades dependentes de decisões da Biohelp. Se as perguntas correspondentes não chegarem até 02/05, essas itens entram numa segunda janela de entrega após 11/05.
+        </p>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 06 · AS 13 NOVAS FUNCIONALIDADES                                -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="features-v2">06 · As 13 funcionalidades do V2 explicadas</h1>
+
+        <p>
+            Cada caixa abaixo é uma das 13 funcionalidades novas (ou alteradas significativamente) do modelo V2. Os ícones indicam o estado atual:
+            <span class="tag green">✅ pronta</span>
+            <span class="tag blue">🚀 destravada (vamos começar)</span>
+            <span class="tag yellow">🟡 parcial (espera 1 decisão)</span>
+            <span class="tag red">🚫 bloqueada (espera decisão crítica)</span>
+        </p>
+
+        <div class="feature-grid">
+            <div class="feature-card done">
+                <div class="id">F-V11</div>
+                <div class="name">Visão restrita da rede</div>
+                <div class="description">Membro vê apenas quem o indicou e quem ele indicou diretamente. Acabou a árvore N1/N2/N3.</div>
+                <div class="meta">✅ <strong>Concluída</strong> em 29/04/2026</div>
+            </div>
+
+            <div class="feature-card ready">
+                <div class="id">F-V01</div>
+                <div class="name">Cadastro com link/código obrigatório</div>
+                <div class="description">Sem link de indicação ou código manual válido, o cadastro é bloqueado. House Account vai embora.</div>
+                <div class="meta">🚀 Pronta pra começar — <strong>Quinta 30/04</strong></div>
+            </div>
+
+            <div class="feature-card ready">
+                <div class="id">F-V02</div>
+                <div class="name">Integração com Guru via Shopify</div>
+                <div class="description">Quando alguém paga assinatura no Guru, o app é avisado automaticamente via webhook Shopify. Confirmação técnica do Wink em curso.</div>
+                <div class="meta">🚀 Pronta — <strong>Segunda 04/05</strong></div>
+            </div>
+
+            <div class="feature-card ready">
+                <div class="id">F-V03</div>
+                <div class="name">Status ativo = assinatura paga</div>
+                <div class="description">Substitui a regra antiga de "ativo = 200 CV no mês". Agora é simples: tem assinatura paga = ativo. Sem assinatura = inativo.</div>
+                <div class="meta">🚀 Pronta — <strong>Terça 05/05</strong></div>
+            </div>
+
+            <div class="feature-card blocked">
+                <div class="id">F-V04</div>
+                <div class="name">Comissão de 50% direta</div>
+                <div class="description">Maria indica Joana, Joana paga assinatura, Maria recebe 50% (menos impostos) no saldo. Substitui Fast-Track, Perpétua, Bônus, Leadership e Royalty.</div>
+                <div class="meta">🚫 Aguarda Biohelp — <strong>perguntas 1 e 2</strong></div>
+            </div>
+
+            <div class="feature-card ready">
+                <div class="id">F-V05</div>
+                <div class="name">Saldo + créditos na loja</div>
+                <div class="description">O saldo do membro pode ser convertido em crédito na Shopify (1 real = 1 real, sem prazo de uso após resgate).</div>
+                <div class="meta">🚀 Pronta — <strong>Terça-Quarta 05-06/05</strong></div>
+            </div>
+
+            <div class="feature-card partial">
+                <div class="id">F-V06</div>
+                <div class="name">Promoção automática a Founder</div>
+                <div class="description">Quando o membro chega a 5 ativos no clube, vira Founder automaticamente. Aparece um selo no painel e desbloqueia saque cash.</div>
+                <div class="meta">🟡 Pode começar com hipótese padrão ("status definitivo")</div>
+            </div>
+
+            <div class="feature-card partial">
+                <div class="id">F-V07</div>
+                <div class="name">Saque Founder via Cashin + NF</div>
+                <div class="description">Founder com CNPJ sobe NF de serviço, sistema valida automaticamente, admin aprova, transfere via Cashin. CPF saca direto via Cashin (sem NF) ou converte em crédito.</div>
+                <div class="meta">🟡 Tela e validação podem começar; cálculo do valor depende da F-V04</div>
+            </div>
+
+            <div class="feature-card blocked">
+                <div class="id">F-V08</div>
+                <div class="name">Ranking de Founders</div>
+                <div class="description">Lista pública dos Founders com mais... (a definir o critério: tamanho do clube? faturamento? média mensal de itens por cliente?)</div>
+                <div class="meta">🚫 Aguarda Biohelp — <strong>pergunta 11</strong></div>
+            </div>
+
+            <div class="feature-card blocked">
+                <div class="id">F-V09</div>
+                <div class="name">Área de conteúdo</div>
+                <div class="description">Página com textos, vídeos, imagens e PDFs disponíveis pros membros. Pode ser global (admin posta tudo) ou por Founder (cada um tem mural próprio).</div>
+                <div class="meta">🚫 Aguarda Biohelp — <strong>pergunta 15</strong></div>
+            </div>
+
+            <div class="feature-card blocked">
+                <div class="id">F-V10</div>
+                <div class="name">Link de WhatsApp por Founder</div>
+                <div class="description">Founder pode disponibilizar um link de grupo de WhatsApp pro clube dele. Pode ter validação do admin antes de publicar (a decidir).</div>
+                <div class="meta">🚫 Aguarda Biohelp — <strong>pergunta 16</strong></div>
+            </div>
+
+            <div class="feature-card blocked">
+                <div class="id">F-V12</div>
+                <div class="name">Limpeza do código antigo</div>
+                <div class="description">Remoção definitiva de tudo que sai (CV, níveis, bônus, RPA). Só acontece depois do V2 estar estável em produção por ~4 semanas.</div>
+                <div class="meta">⏳ Programada pra ~junho/2026</div>
+            </div>
+
+            <div class="feature-card blocked">
+                <div class="id">F-V13</div>
+                <div class="name">Cupom de creatina como campanha</div>
+                <div class="description">Substitui o cron mensal automático. Admin cria campanhas ("clientes novos em maio ganham cupom") em vez de gerar pra todo mundo todo mês.</div>
+                <div class="meta">🚫 Aguarda Biohelp — <strong>pergunta 22</strong></div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 07 · DECISÕES JÁ REGISTRADAS                                    -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="decisoes">07 · Decisões da Biohelp já registradas</h1>
+
+        <p>
+            Em <strong>29/04/2026</strong> recebemos via WhatsApp as primeiras respostas. <strong>11 das 18 perguntas</strong> foram respondidas, o que <strong>destrava 4 funcionalidades</strong> e parcialmente outras 2. Abaixo, cada decisão na ordem das perguntas, em linguagem simples:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">Pergunta</th>
+                    <th>Tema</th>
+                    <th>O que vocês decidiram</th>
+                    <th>Impacto</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td>Como pagar o membro?</td>
+                    <td>Provavelmente <strong>Cashin</strong> ou PIX manual. Asaas <strong>descartado</strong>.</td>
+                    <td>Vamos construir a integração com Cashin. Caso vocês mudem de fornecedor depois, a estrutura permite trocar fácil.</td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td>Aprovação de saque é manual ou automática?</td>
+                    <td>Aprovação <strong>manual</strong> do admin. Mas a NF é <strong>validada automaticamente</strong> no upload — se estiver fora do padrão, retorna erro pro membro na hora.</td>
+                    <td>O membro descobre o problema antes de mandar. O admin só vê NFs válidas na fila.</td>
+                </tr>
+                <tr>
+                    <td><strong>5</strong></td>
+                    <td>Quem pode receber: só CNPJ ou CPF também?</td>
+                    <td>CPF <strong>NÃO</strong> está fora — pode receber via Cashin ou converter em crédito. CNPJ é obrigatório <strong>só</strong> pra emitir NF de serviço (caminho do saque cash com NF).</td>
+                    <td>Membros pessoa física continuam podendo monetizar o saldo, sem precisar abrir empresa.</td>
+                </tr>
+                <tr>
+                    <td><strong>6</strong></td>
+                    <td>Integramos com o ERP da Biohelp?</td>
+                    <td><strong>Não</strong>, nessa fase.</td>
+                    <td>Tira do escopo a integração ERP. Fluxo de produto fica manual no lado da Biohelp.</td>
+                </tr>
+                <tr>
+                    <td><strong>7</strong></td>
+                    <td>O Guru avisa o app direto ou pela Shopify?</td>
+                    <td>Guru cria pedido na Shopify; <strong>nós lemos pela Shopify</strong>. (Wink valida abordagem técnica.)</td>
+                    <td>Reusa toda a integração que já temos com Shopify. Não precisa criar conexão nova com Guru.</td>
+                </tr>
+                <tr>
+                    <td><strong>10</strong></td>
+                    <td>"House Account" continua existindo?</td>
+                    <td><strong>Descontinua.</strong> Cadastro sem ref bloqueia.</td>
+                    <td>F-V01 fica mais simples. Quem tenta se cadastrar sem link/código recebe mensagem de erro clara.</td>
+                </tr>
+                <tr>
+                    <td><strong>13</strong></td>
+                    <td>Saldo do membro tem prazo pra usar?</td>
+                    <td>Membro <strong>ATIVO</strong>: sem prazo. Membro <strong>INATIVO</strong>: a definir (vira pergunta 21).</td>
+                    <td>Construímos o sistema sem prazo pra ativos. Quando vocês decidirem o prazo do inativo, é só configurar.</td>
+                </tr>
+                <tr>
+                    <td><strong>14</strong></td>
+                    <td>Conversão de saldo em crédito Shopify</td>
+                    <td><strong>1:1</strong>, sem prazo após resgate.</td>
+                    <td>Regra simples e clara. R$ 100 de saldo viram R$ 100 de crédito. Crédito não expira.</td>
+                </tr>
+                <tr>
+                    <td><strong>17</strong></td>
+                    <td>Cupom mensal de creatina continua?</td>
+                    <td><strong>Mantém com escopo alterado.</strong> Vira sistema de <strong>campanhas configuráveis</strong> ("entre pro clube e ganhe creatina grátis", por exemplo). Não mais cron mensal automático pra todo ativo.</td>
+                    <td>Cria F-V13 (nova). Cron mensal será desligado quando F-V13 estiver pronta.</td>
+                </tr>
+                <tr>
+                    <td><strong>18</strong></td>
+                    <td>Saque RPA/CPF com limite R$ 1.000 continua?</td>
+                    <td><strong>Descontinua.</strong></td>
+                    <td>UI escondida quando V2 entrar. Remoção física do código no fim da migração (~junho/2026).</td>
+                </tr>
             </tbody>
         </table>
 
         <hr>
 
-        <!-- Sprint 7 Highlight -->
-        <section id="sprint7">
-            <h1>🎁 Sprint 7 — Creatina + Decisões Fev/2026 ✅</h1>
-            <p><strong>Data de conclusão:</strong> 11/02/2026 + Segurança 18/02/2026 | <strong>Status:</strong> CONCLUÍDO (100%)</p>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 08 · PERGUNTAS PENDENTES                                        -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="perguntas">08 · Perguntas pendentes — precisamos das respostas</h1>
 
-            <div class="callout green">
-                <span class="callout-icon">✅</span>
-                <div class="callout-content">
-                    <strong>6 Decisões resolvidas e implementadas + Segurança Anti-Fraude</strong>
-                    <p style="margin-top: 8px;">TBD-001, TBD-003, TBD-006, TBD-007, TBD-014, TBD-019</p>
-                </div>
-            </div>
+        <p>
+            Restam <strong>12 perguntas em aberto</strong> (8 do questionário original + 4 novas que surgiram a partir das respostas). Estão organizadas por <strong>urgência</strong>: as P0 são as que mais bloqueiam o cronograma.
+        </p>
 
-            <h3>O que foi entregue</h3>
-            <table>
-                <thead><tr><th>#</th><th>Funcionalidade</th><th>TBD/FR</th><th>Status</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>1</td><td>House Account</td><td>TBD-001</td><td><span class="tag green">✅</span></td><td>Cadastro sem link → sponsor = empresa</td></tr>
-                    <tr><td>2</td><td>Tag de nível</td><td>TBD-003</td><td><span class="tag green">✅</span></td><td>Tag <code>nivel:&lt;nivel&gt;</code> no Shopify</td></tr>
-                    <tr><td>3</td><td>ref_code sequencial</td><td>TBD-006</td><td><span class="tag green">✅</span></td><td>Formato BH00001 + customização admin</td></tr>
-                    <tr><td>4</td><td>Landing page</td><td>TBD-007</td><td><span class="tag green">✅</span></td><td>Redirect para /login</td></tr>
-                    <tr><td>5</td><td>CV sem fallback</td><td>TBD-014</td><td><span class="tag green">✅</span></td><td>CV=0 se metafield ausente</td></tr>
-                    <tr><td>6</td><td>Cupom creatina</td><td>TBD-019</td><td><span class="tag green">✅</span></td><td>Cupom individual mensal via Shopify API</td></tr>
-                    <tr><td>7</td><td>Segurança anti-fraude</td><td>-</td><td><span class="tag green">✅</span></td><td>7 camadas de proteção no cupom</td></tr>
-                </tbody>
-            </table>
+        <h2>🚨 P0 — críticas (precisamos até 02/05)</h2>
+        <p>Sem essas 4 respostas, as funcionalidades F-V04 (comissão) e F-V07 (saque) não saem na janela de 11/05.</p>
 
-            <h2>TBD-019 — Cupom Individual Mensal de Creatina</h2>
-            
-            <p><strong>Regra:</strong> Membro Ativo (CV >= 200) recebe cupom exclusivo para 1 creatina grátis/mês.</p>
-            
-            <p><strong>Formato do cupom:</strong> <code>CREATINA-&lt;NOME&gt;-&lt;HASH&gt;-&lt;MÊSANO&gt;</code></p>
-            <ul class="bullet">
-                <li>Exemplo: <code>CREATINA-MARIA-X7K9-FEV2026</code></li>
-                <li>O <strong>hash aleatório</strong> (X7K9) torna o código único e não adivinhável</li>
-            </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">#</th>
+                    <th>Pergunta</th>
+                    <th>Por que precisamos saber</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td>A comissão é <strong>sempre 50%</strong> ou existem casos diferentes?<br><em>Exemplos: produto vs assinatura, primeira compra vs renovação, primeiro mês vs demais meses.</em></td>
+                    <td>Sem isso, não sabemos quanto pagar em cada situação. A regra fica em aberto.</td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td>"Menos impostos e taxas" — <strong>quem desconta</strong>?<br><em>Opção A: O LRP retém ISS/IR antes de pagar pro membro.<br>Opção B: Repassa o valor bruto e o membro se vira na NF dele.</em></td>
+                    <td>Define o cálculo final. Se for Opção A, o sistema desconta automaticamente. Se for Opção B, paga bruto.</td>
+                </tr>
+                <tr>
+                    <td><strong>19</strong></td>
+                    <td><strong>Cashin é o fornecedor confirmado?</strong><br><em>(A resposta da pergunta 3 disse "provavelmente Cashin" — precisamos da confirmação final pra liberarmos a integração.)</em></td>
+                    <td>Sem confirmação, F-V07 (saque) fica sem rail real. Construímos a estrutura pronta, falta apertar o botão.</td>
+                </tr>
+                <tr>
+                    <td><strong>20</strong></td>
+                    <td>Founder com CPF pode usar Cashin pra sacar cash, ou <strong>só CNPJ pode ser Founder</strong>?<br><em>(A pergunta 5 disse que CPF pode receber via Cashin/crédito, mas não ficou claro se Founder exige CNPJ ou não.)</em></td>
+                    <td>Define quem pode virar Founder e como o saque funciona pra cada perfil.</td>
+                </tr>
+            </tbody>
+        </table>
 
-            <details open>
-                <summary>📋 Fluxo da Creatina Grátis</summary>
-                <div class="content">
-                    <div class="diagram">
-<pre>┌─────────────────────────────────────────────────────────────────────────────┐
-│                    FLUXO DA CREATINA GRÁTIS (Sprint 7)                      │
-└─────────────────────────────────────────────────────────────────────────────┘
+        <h2>⚠️ P1 — importantes (até 06/05)</h2>
+        <p>Sem essas, as funcionalidades F-V08, F-V09, F-V10 e F-V13 ficam fora da janela de 11/05 e entram numa segunda entrega.</p>
 
-1️⃣ SISTEMA GERA CUPONS (dia 2 de cada mês, automático)
-   │
-   │  Cron job: /api/cron/generate-creatine-coupons
-   │  Para cada membro ativo:
-   │  ├── Cria Price Rule na Shopify (100% OFF, 1 uso)
-   │  ├── Restringe ao customer_id do membro (segurança)
-   │  └── Gera Discount Code: CREATINA-MARIA-X7K9-FEV2026
-   │
-   ▼
-2️⃣ MEMBRO ACESSA DASHBOARD
-   │
-   │  Card "Creatina Grátis do Mês"
-   │  Mostra: "Seu cupom está pronto!"
-   │  Exibe código: CREATINA-MARIA-X7K9-FEV2026
-   │  Botão de copiar 📋
-   │
-   ▼
-3️⃣ MEMBRO USA NA LOJA
-   │
-   │  Adiciona creatina ao carrinho
-   │  No checkout, cola o cupom
-   │  ⚠️ Se outra pessoa tentar usar → Shopify rejeita (restrito ao dono)
-   │  Desconto de 100% aplicado automaticamente
-   │
-   ▼
-4️⃣ WEBHOOK DETECTA USO + VALIDA SEGURANÇA
-   │
-   │  Webhook orders/paid detecta cupom CREATINA-*
-   │  ✅ Se dono correto → Atualiza status = 'claimed'
-   │  ⚠️ Se fraude → Registra em fraud_details
-   │
-   ▼
-5️⃣ DASHBOARD ATUALIZA
-   │
-   │  Card mostra: "Já utilizado este mês ✅"
-   │  Próximo cupom: mês seguinte
-   │
-   └── FIM DO FLUXO</pre>
-                    </div>
-                </div>
-            </details>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">#</th>
+                    <th>Pergunta</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>11</strong></td>
+                    <td><strong>Critério do ranking de Founder.</strong> Tamanho do clube? Faturamento total da rede? Média mensal de itens por cliente? Combinação dos três (com pesos)?</td>
+                </tr>
+                <tr>
+                    <td><strong>15</strong></td>
+                    <td><strong>Área de conteúdo.</strong> Só o admin posta global pra todos, ou cada Founder tem o mural próprio dele? Ou os dois?</td>
+                </tr>
+                <tr>
+                    <td><strong>16</strong></td>
+                    <td><strong>Link do WhatsApp por Founder.</strong> Admin valida antes de publicar, ou o Founder publica direto?</td>
+                </tr>
+                <tr>
+                    <td><strong>22</strong></td>
+                    <td><strong>UX da gestão de campanhas de cupom.</strong> Admin define períodos/segmentos via uma tela nova, ou cada disparo é manual? Quais critérios podem ser usados (cliente novo, valor mínimo de pedido, primeira compra, etc.)?</td>
+                </tr>
+            </tbody>
+        </table>
 
-            <h3>Estados do Card no Dashboard</h3>
-            <table>
-                <thead><tr><th>Estado</th><th>Cor</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td>Cupom pronto</td><td><span class="tag green">🟢 Verde</span></td><td>Exibe código + botão copiar</td></tr>
-                    <tr><td>Já utilizado</td><td><span class="tag yellow">🟡 Amarelo</span></td><td>Membro usou este mês</td></tr>
-                    <tr><td>Indisponível</td><td><span class="tag gray">⚪ Cinza</span></td><td>Membro não atingiu 200 CV</td></tr>
-                    <tr><td>Gerando...</td><td><span class="tag blue">⏳ Azul</span></td><td>Cupom sendo gerado</td></tr>
-                </tbody>
-            </table>
+        <h2>💡 P2 — secundárias (podem vir depois de 11/05)</h2>
+        <p>Não bloqueiam a entrega — temos hipóteses padrão documentadas pra todas. Vocês podem ajustar depois sem refazer trabalho.</p>
 
-            <h2>🔒 Segurança Anti-Fraude do Cupom (18/02/2026)</h2>
-            
-            <div class="security-box">
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 1: Código Não Adivinhável</strong><br>Hash aleatório de 4 caracteres (ex: X7K9). Impossível "chutar" o código de outro membro.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 2: Restrição por Customer (Shopify)</strong><br>Cupom vinculado ao shopify_customer_id do membro. Shopify rejeita se outra pessoa tentar usar.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 3: Limite de 1 Uso Global</strong><br>usage_limit: 1 → Uma vez usado, cupom inválido. once_per_customer: true → Extra segurança.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 4: Validade Temporal</strong><br>Cupom expira no último dia do mês. Não pode ser guardado para usar depois.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 5: Unicidade no Banco</strong><br>UNIQUE INDEX em coupon_code. Impossível gerar código duplicado.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 6: Validação no Webhook</strong><br>Webhook verifica se quem usou é o dono. Fraude detectada → Registra em fraud_details.</div>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">🔒</span>
-                    <div><strong>CAMADA 7: Auditoria Admin</strong><br>View v_creatine_fraud_attempts. Admin pode ver todas as tentativas suspeitas.</div>
-                </div>
-            </div>
-
-            <h3>O que acontece em cada cenário</h3>
-            <table>
-                <thead><tr><th>Cenário</th><th>Resultado</th></tr></thead>
-                <tbody>
-                    <tr><td>Membro usa seu próprio cupom</td><td><span class="tag green">✅ Funciona normalmente</span></td></tr>
-                    <tr><td>Alguém tenta usar cupom de outro</td><td><span class="tag red">❌ Shopify rejeita (customer_selection)</span></td></tr>
-                    <tr><td>Alguém "chuta" um código</td><td><span class="tag red">❌ Hash torna impossível adivinhar</span></td></tr>
-                    <tr><td>Membro tenta usar 2x no mês</td><td><span class="tag red">❌ usage_limit: 1 já foi usado</span></td></tr>
-                    <tr><td>Membro guarda para mês seguinte</td><td><span class="tag red">❌ ends_at expira fim do mês</span></td></tr>
-                    <tr><td>Fraude passa (edge case)</td><td><span class="tag yellow">⚠️ Webhook registra fraud_details</span></td></tr>
-                </tbody>
-            </table>
-
-            <h3>APIs e Banco de Dados (Sprint 7)</h3>
-            <table>
-                <thead><tr><th>Item</th><th>Descrição</th></tr></thead>
-                <tbody>
-                    <tr><td><code>GET /api/members/me/free-creatine</code></td><td>Elegibilidade + gera cupom</td></tr>
-                    <tr><td><code>PATCH /api/admin/members/[id]</code></td><td>Customizar ref_code</td></tr>
-                    <tr><td><code>GET /api/cron/generate-creatine-coupons</code></td><td>Cron mensal (dia 2, 05:00 UTC)</td></tr>
-                    <tr><td><code>free_creatine_claims.coupon_code</code></td><td>Código do cupom gerado</td></tr>
-                    <tr><td><code>free_creatine_claims.fraud_details</code></td><td>JSON com detalhes de fraude</td></tr>
-                    <tr><td><code>v_creatine_fraud_attempts</code></td><td>View para auditoria de fraudes</td></tr>
-                    <tr><td>UNIQUE(coupon_code)</td><td>Garante código único (segurança)</td></tr>
-                </tbody>
-            </table>
-        </section>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">#</th>
+                    <th>Pergunta</th>
+                    <th>Hipótese padrão (se não vier resposta)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>8</strong></td>
+                    <td>Membro inativo: link/código continua válido pra trazer cadastros?</td>
+                    <td>Bloqueia novos cadastros enquanto inativo</td>
+                </tr>
+                <tr>
+                    <td><strong>9</strong></td>
+                    <td>Código manual: imutável ou pode regerar/expirar?</td>
+                    <td>Imutável (igual ao link)</td>
+                </tr>
+                <tr>
+                    <td><strong>12</strong></td>
+                    <td>Founder pode "desfounderar" se cair abaixo de 5 ativos?</td>
+                    <td>Status definitivo (uma vez Founder, sempre Founder)</td>
+                </tr>
+                <tr>
+                    <td><strong>21</strong></td>
+                    <td>Prazo de saldo pra membro INATIVO</td>
+                    <td>90 dias após inativação</td>
+                </tr>
+            </tbody>
+        </table>
 
         <hr>
 
-        <!-- Status Atual -->
-        <section>
-            <h1>🎉 Status Atual</h1>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 09 · O QUE PRECISAMOS DE VOCÊS                                  -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="cliente">09 · O que precisamos da Biohelp</h1>
 
-            <div class="callout green">
-                <span class="callout-icon">✅</span>
-                <div class="callout-content">
-                    <strong>Todos os Sprints (1-7) — CONCLUÍDOS!</strong>
-                    <p style="margin-top: 8px;"><strong>Data de conclusão Sprint 7:</strong> 11/02/2026</p>
-                    <p><strong>Segurança anti-fraude:</strong> 18/02/2026</p>
-                    <p><strong>Testes de integração:</strong> ✅ APROVADOS (04/02/2026)</p>
-                    <p><strong>Cobertura de FRs:</strong> 98% (37/38 implementados)</p>
-                    <p><strong>TBDs resolvidos:</strong> 21/22 (1 pendente: TBD-004 — URLs oficiais)</p>
-                </div>
-            </div>
-
-            <h3>O que foi feito em 11/02/2026</h3>
-            <p><strong>Reunião de alinhamento → 6 decisões resolvidas e implementadas:</strong></p>
+        <div class="key-box">
+            <h3>Pra fechar 11/05 sem atraso, precisamos:</h3>
             <ol class="numbered">
-                <li>✅ TBD-001 — Cadastro sem link → House Account</li>
-                <li>✅ TBD-003 — Tag de nível <code>nivel:&lt;nivel&gt;</code> no Shopify</li>
-                <li>✅ TBD-006 — ref_code sequencial BH00001 + customização admin</li>
-                <li>✅ TBD-007 — Landing page mantém redirect para /login</li>
-                <li>✅ TBD-014 — CV=0 se metafield ausente (sem fallback preço)</li>
-                <li>✅ TBD-019 — Cupom Individual Mensal para creatina grátis</li>
+                <li><strong>Respostas das 12 perguntas pendentes até <span style="color: var(--red);">sexta 02/05</span>.</strong> Os 4 itens P0 (perguntas 1, 2, 19, 20) são os mais urgentes — sem eles, comissão e saque cash não saem.</li>
+                <li><strong>Confirmação técnica do Wink</strong> sobre a integração Guru → Shopify (até 02/05). Se a abordagem for outra, recalculamos o cronograma da F-V02.</li>
+                <li><strong>Acesso ao Cashin</strong> — credenciais de teste e produção (chave de API, conta, etc.) pra integração da F-V07. Pode chegar até 06/05; o código é construído de forma que aceita qualquer fornecedor.</li>
+                <li><strong>Validação manual</strong> entre 09-10/05 — alguém da Biohelp testa no ambiente de teste os principais cenários (cadastro com ref, virar Founder, sacar, converter saldo em crédito) e dá o OK final.</li>
+                <li><strong>Janela de ativação combinada</strong> pra 11/05 — idealmente fora do horário comercial, pra reduzir risco. A migração é reversível em ~1 minuto se algo der errado.</li>
             </ol>
-
-            <h3>O que foi feito em 18/02/2026</h3>
-            <p><strong>Segurança anti-fraude do cupom de creatina:</strong></p>
-            <ul class="bullet">
-                <li>Hash aleatório no código (não adivinhável)</li>
-                <li>Cupom restrito ao shopify_customer_id do membro</li>
-                <li>Validação no webhook detecta fraude</li>
-                <li>Campo fraud_details para registro</li>
-                <li>View v_creatine_fraud_attempts para auditoria</li>
-            </ul>
-
-            <h3>Próximos Passos</h3>
-            <ul class="bullet">
-                <li>⏳ Integração Asaas automática (aguardando credenciais)</li>
-                <li>⏳ Definir URLs oficiais staging/prod (TBD-004)</li>
-                <li>⏳ Remover senha da loja para produção</li>
-                <li>⏳ Testar fluxo completo de indicação (comissões em produção)</li>
-            </ul>
-        </section>
+        </div>
 
         <hr>
 
-        <!-- Checklist de Aceite -->
-        <section>
-            <h1>✅ Checklist de Aceite — Sprint 7</h1>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 10 · COMO GARANTIMOS QUE NADA QUEBRA                            -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="seguranca">10 · Como garantimos que nada quebra</h1>
 
-            <ul class="checklist">
-                <li>House Account implementado (TBD-001)</li>
-                <li>Tag de nível <code>nivel:&lt;nivel&gt;</code> (TBD-003)</li>
-                <li>ref_code sequencial BH00001 (TBD-006)</li>
-                <li>CV=0 se metafield ausente (TBD-014)</li>
-                <li>Cupom individual mensal creatina (TBD-019)</li>
-                <li>Frontend exibe cupom no dashboard</li>
-                <li>Cron mensal gera cupons (dia 2/mês)</li>
-                <li>Webhook detecta uso de cupom CREATINA-*</li>
-                <li>Admin pode customizar ref_code</li>
-                <li>level/status passados no sync Shopify</li>
-                <li>UNIQUE constraint em free_creatine_claims</li>
-                <li>Segurança anti-fraude com 7 camadas</li>
-                <li>View de auditoria para admin</li>
-            </ul>
-        </section>
+        <p>
+            O programa <strong>já está em produção</strong> com clientes reais cadastrados, comissões pagas e saques realizados. Toda mudança precisa ser feita com cuidado pra preservar tudo o que já existe. A estratégia é:
+        </p>
+
+        <h3>1. Chave de ligamento (feature flag)</h3>
+        <p>
+            O sistema agora tem uma <strong>chave interna</strong> (<code>LRP_V2</code>) que liga ou desliga o novo modelo sem precisar mexer no código. Hoje a chave está <strong>desligada</strong>. No dia 11/05, ligamos. Se algo der errado, basta desligar — leva menos de 1 minuto e o programa volta ao funcionamento atual.
+        </p>
+
+        <h3>2. Coexistência V1 + V2</h3>
+        <p>
+            O código V1 (modelo antigo) <strong>continua funcional</strong> e em uso até quando vocês decidirem. Não estamos apagando nada. Se a chave estiver desligada, o membro vê V1; se estiver ligada, vê V2. Os dois caminhos convivem em harmonia até a Onda 6 (limpeza, ~junho/2026).
+        </p>
+
+        <h3>3. Sem migração forçada de dados</h3>
+        <p>
+            Os <strong>dados dos membros existentes não são alterados</strong>. As tabelas continuam as mesmas. O que muda é o que o app exibe e calcula. Quando o V2 ligar, todo membro continua com seu sponsor, seus indicados, seu histórico. Só não vê mais a árvore inteira no painel.
+        </p>
+
+        <h3>4. Tudo testado antes de ir ao ar</h3>
+        <p>
+            Cada nova funcionalidade passa por:
+        </p>
+        <ul class="bullet">
+            <li><strong>Verificação automática</strong> de tipos e qualidade do código (typecheck + lint) — feito a cada commit</li>
+            <li><strong>Testes manuais</strong> simulando os principais cenários (membro feliz, sem rede, com erro de NF, etc.)</li>
+            <li><strong>Modo "Validation Mode"</strong> — antes de aprovar qualquer funcionalidade, o desenvolvedor tenta deliberadamente <strong>quebrar</strong> a feature (input vazio, valores inválidos, dois cliques rápidos, etc.). Se conseguir quebrar, conserta antes de mergear.</li>
+            <li><strong>Validação no ambiente de teste</strong> antes de publicar em produção</li>
+            <li><strong>Validação manual da Biohelp</strong> antes do go-live</li>
+        </ul>
+
+        <h3>5. Riscos e mitigação</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Risco</th>
+                    <th>O que fazemos pra mitigar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Biohelp não responder os 12 itens até 02/05</td>
+                    <td>Hipóteses padrão documentadas pros 4 P2 · Entrega parcial em 11/05 com features bloqueadas indo pra segunda janela</td>
+                </tr>
+                <tr>
+                    <td>Wink não validar a abordagem Guru→Shopify a tempo</td>
+                    <td>Especificação enviada com antecedência · Plano B é webhook direto do Guru com 1 dia adicional</td>
+                </tr>
+                <tr>
+                    <td>Cashin demorar pra liberar credenciais</td>
+                    <td>Estrutura agnóstica de provider — qualquer rail pode ser conectado depois sem refazer · PIX manual fica como fallback temporário</td>
+                </tr>
+                <tr>
+                    <td>Bug em produção após go-live</td>
+                    <td>Chave permite rollback em 1 minuto · Janela de ativação fora do horário comercial · Monitoramento 48h pós-deploy</td>
+                </tr>
+                <tr>
+                    <td>Cliente final usar funcionalidade descontinuada</td>
+                    <td>Telas das funções que saem (RPA/CPF, árvore N1/N2/N3) ficam escondidas quando V2 ativa · Membro vê só o novo</td>
+                </tr>
+            </tbody>
+        </table>
 
         <hr>
 
-        <!-- TBDs -->
-        <section id="tbd">
-            <h1>📋 Decisões (TBD)</h1>
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 11 · PRÓXIMOS PASSOS                                            -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="proximos">11 · Próximos passos imediatos</h1>
 
-            <h3>Pendentes (1 restante)</h3>
-            <table>
-                <thead><tr><th>TBD</th><th>Descrição</th><th>Sprint</th><th>Impacto</th></tr></thead>
-                <tbody>
-                    <tr><td>TBD-004</td><td>URLs oficiais (staging/prod)</td><td>1</td><td>Redirects e webhooks</td></tr>
-                </tbody>
-            </table>
+        <ol class="numbered">
+            <li><strong>Hoje (29/04):</strong> Biohelp recebe este resumo + lista das 12 perguntas restantes. Wink recebe especificação técnica da F-V02 pra validação.</li>
+            <li><strong>30/04:</strong> Equipe técnica inicia F-V01 (cadastro com ref obrigatório).</li>
+            <li><strong>02/05 (sex):</strong> Idealmente todas as 12 respostas chegaram + Wink confirmou abordagem.</li>
+            <li><strong>04-05/05:</strong> F-V01 conclui, F-V02 e F-V03 entram em construção.</li>
+            <li><strong>06-08/05:</strong> Comissão (F-V04), saldo+créditos (F-V05), Founder (F-V06), saque (F-V07), e demais features destravadas.</li>
+            <li><strong>09-10/05:</strong> Buffer + validação manual pela Biohelp no ambiente de teste.</li>
+            <li><strong>11/05:</strong> Deploy em produção + ativação da chave V2 em janela combinada.</li>
+            <li><strong>12-25/05:</strong> Janela de monitoramento + features que ficaram fora da entrega 11/05.</li>
+            <li><strong>~Junho/2026:</strong> Limpeza definitiva do código V1 (Onda 6), depois do V2 estar estável por ~4 semanas em produção.</li>
+        </ol>
 
-            <h3>Resolvidos ✅ (21 decisões)</h3>
-            <table>
-                <thead><tr><th>TBD</th><th>Descrição</th><th>Decisão</th><th>Data</th></tr></thead>
-                <tbody>
-                    <tr><td>TBD-001</td><td>Cadastro sem link</td><td>House Account</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-002</td><td>Preço de membro Shopify</td><td>Cliente configura na loja</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-003</td><td>Tags/metacampos</td><td>Tags atuais + <code>nivel:&lt;nivel&gt;</code></td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-006</td><td>Formato ref_code</td><td>Sequencial BH00001 + customização</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-014</td><td>Metafield CV</td><td><code>custom.cv</code>, CV=0 se ausente</td><td>11/02/2026</td></tr>
-                    <tr><td>TBD-019</td><td>Creatina grátis</td><td>Cupom Individual Mensal + Segurança</td><td>18/02/2026</td></tr>
-                </tbody>
-            </table>
-        </section>
+        <div class="callout blue">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+                <strong>Importante saber.</strong>
+                <p style="margin-top: 6px;">A migração foi desenhada de forma <strong>reversível e gradual</strong>. Se algo der errado em produção, voltar pro V1 é uma mudança de uma única configuração — leva menos de 1 minuto. Os dados dos membros existentes não são alterados. As funcionalidades V1 que continuam fazendo sentido (cupom de creatina como campanha, base de membros, integração Shopify, etc.) seguem intactas.</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 12 · HISTÓRICO V1                                               -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="historico">12 · Histórico — o que foi entregue antes do pivô</h1>
+
+        <p>
+            Antes da decisão de pivô em 28/04/2026, o projeto entregou <strong>37 das 38 funcionalidades originais</strong> em 7 etapas (sprints). Esse trabalho continua funcionando 100% em produção. Será removido fisicamente apenas na Onda 6 (~junho/2026), <strong>depois</strong> do V2 estar estável.
+        </p>
+
+        <details>
+            <summary>📦 Detalhe das 7 etapas entregues (Sprints 1-7)</summary>
+            <div class="content">
+
+                <h3>Sprint 1 — MVP Operacional (concluído 100%)</h3>
+                <p>Base do app: cadastro, login, integração Shopify, geração de link único, persistência da rede.</p>
+                <ul class="checklist">
+                    <li class="done">Autenticação de membro e admin (Supabase Auth)</li>
+                    <li class="done">Controle de permissões (RBAC)</li>
+                    <li class="done">Cadastro de novo membro</li>
+                    <li class="done">Captura de link de indicação</li>
+                    <li class="done">Geração de link único</li>
+                    <li class="done">Ativação automática de preço de membro via tags Shopify</li>
+                    <li class="done">Persistência da rede (relação sponsor)</li>
+                </ul>
+
+                <h3>Sprint 2 — CV + Status (concluído 100%)</h3>
+                <p>Sistema de cálculo de CV e status mensal Ativo/Inativo. <em>Será descontinuado no V2.</em></p>
+                <ul class="checklist">
+                    <li class="done">Webhooks de pedidos (paid/refunded/cancelled)</li>
+                    <li class="done">Cálculo automático de CV por pedido (via metafield Shopify)</li>
+                    <li class="done">Status Ativo/Inativo mensal (≥ 200 CV)</li>
+                    <li class="done">Reset mensal automático no dia 1º</li>
+                </ul>
+
+                <h3>Sprint 3 — Rede Visual + Níveis (concluído 100%)</h3>
+                <p>Visualização da rede pro membro e sistema de níveis (Parceira → Head). <em>Visualização foi substituída pela F-V11; níveis serão descontinuados.</em></p>
+                <ul class="checklist">
+                    <li class="done">Painel "Minha Rede" com árvore</li>
+                    <li class="done">Cálculo automático de nível de cada membro</li>
+                    <li class="done">Status "Líder em Formação" (janela de 90 dias)</li>
+                    <li class="done">Rebaixamento automático quando deixa de cumprir requisitos</li>
+                </ul>
+
+                <h3>Sprint 4 — Comissões (concluído 100%)</h3>
+                <p>Motor completo de cálculo de comissões. <em>Será substituído pela F-V04 — comissão direta de 50%.</em></p>
+                <ul class="checklist">
+                    <li class="done">Ledger auditável de comissões</li>
+                    <li class="done">Fast-Track (30%/20% nos primeiros 60 dias)</li>
+                    <li class="done">Comissão Perpétua diferenciada por tipo de N1</li>
+                    <li class="done">Bônus 1 (R$ 250) / Bônus 2 (R$ 1.500) / Bônus 3 (R$ 8.000)</li>
+                    <li class="done">Leadership Bônus (3% Diretora / 4% Head)</li>
+                    <li class="done">Royalty (3% quando Head forma Head)</li>
+                </ul>
+
+                <h3>Sprint 5 — Saques (concluído 92%)</h3>
+                <p>Solicitação de saque com upload de documento fiscal. <em>Será substituído pela F-V07 — saque via Cashin + NF.</em></p>
+                <ul class="checklist">
+                    <li class="done">Tabela de saques com workflow de aprovação</li>
+                    <li class="done">Upload e validação de NF-e</li>
+                    <li class="done">Trava Net-15 (15 dias após virada do mês)</li>
+                    <li class="done">Limite R$ 1.000/mês para CPF via RPA</li>
+                    <li class="todo">Integração com fintech (estava aguardando credenciais — agora será Cashin no V2)</li>
+                </ul>
+
+                <h3>Sprint 6 — Admin Avançado (concluído 100%)</h3>
+                <p>Painel administrativo completo com gestão de membros, tags e estatísticas globais.</p>
+                <ul class="checklist">
+                    <li class="done">Compressão de rede após 6 meses inativo (<em>será descontinuada</em>)</li>
+                    <li class="done">Dashboard global com KPIs</li>
+                    <li class="done">Filtros por modo de comissionamento</li>
+                    <li class="done">Gestão completa de membro (editar, ajustar nível, bloquear)</li>
+                    <li class="done">CRUD de tags Shopify</li>
+                </ul>
+
+                <h3>Sprint 7 — Decisões + Cupom Creatina (concluído 100%)</h3>
+                <p>6 decisões pendentes do escopo original implementadas + cupom mensal de creatina com 7 camadas de segurança.</p>
+                <ul class="checklist">
+                    <li class="done">House Account pra cadastro sem link (<em>descontinuada no V2</em>)</li>
+                    <li class="done">Tag de nível no Shopify (<em>descontinuada no V2</em>)</li>
+                    <li class="done">ref_code sequencial BH00001 + customização admin (<em>mantém</em>)</li>
+                    <li class="done">Landing page → redirect /login (<em>mantém</em>)</li>
+                    <li class="done">CV sem fallback (CV=0 se metafield ausente, <em>descontinuado no V2</em>)</li>
+                    <li class="done">Cupom mensal de creatina com cron automático (<em>vira sistema de campanhas no V2 — F-V13</em>)</li>
+                    <li class="done">7 camadas de segurança anti-fraude no cupom</li>
+                </ul>
+
+                <h3>Cobertura geral V1</h3>
+                <table>
+                    <thead><tr><th>Categoria</th><th>Total</th><th>✅ Concluído</th><th>⚠️ Parcial</th><th>%</th></tr></thead>
+                    <tbody>
+                        <tr><td>Identidade/Acesso</td><td>3</td><td>3</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Cadastro/Indicação</td><td>5</td><td>5</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Rede/Visualização</td><td>4</td><td>4</td><td>0</td><td>100%</td></tr>
+                        <tr><td>CV/Status</td><td>5</td><td>5</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Níveis</td><td>3</td><td>3</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Comissões</td><td>7</td><td>7</td><td>0</td><td>100%</td></tr>
+                        <tr><td>Saques</td><td>6</td><td>5</td><td>1</td><td>92%</td></tr>
+                        <tr><td>Admin</td><td>5</td><td>5</td><td>0</td><td>100%</td></tr>
+                        <tr style="font-weight: 600; background: var(--green-bg);"><td>TOTAL</td><td>38</td><td>37</td><td>1</td><td>98%</td></tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </details>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- 13 · GLOSSÁRIO                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <h1 id="glossario">13 · Glossário rápido</h1>
+
+        <table>
+            <thead>
+                <tr><th>Termo</th><th>Tradução / Significado</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>V1 (modelo antigo)</strong></td><td>O programa atual — MLM com vários níveis, CV mensal, status por gasto, bônus em cascata.</td></tr>
+                <tr><td><strong>V2 (modelo novo)</strong></td><td>O programa que entra em 11/05 — afiliação 1 nível, comissão 50%, Founder@5.</td></tr>
+                <tr><td><strong>Pivô</strong></td><td>A virada de modelo decidida pela direção em 28/04/2026.</td></tr>
+                <tr><td><strong>Onda</strong></td><td>Etapa do processo de migração. São 6 ondas (0 a 6).</td></tr>
+                <tr><td><strong>Founder</strong></td><td>Membro promovido após atingir 5 ativos no clube. Ganha direito a saque cash.</td></tr>
+                <tr><td><strong>Sponsor</strong></td><td>Membro que indicou alguém pro programa.</td></tr>
+                <tr><td><strong>Indicado direto / N1</strong></td><td>Pessoa que entrou pelo link/código de outro membro. É o único nível visível pro membro no V2.</td></tr>
+                <tr><td><strong>Clube</strong></td><td>Conjunto dos indicados diretos de um membro.</td></tr>
+                <tr><td><strong>Cashin</strong></td><td>Fintech provável fornecedora do rail de pagamento (a confirmar).</td></tr>
+                <tr><td><strong>Guru</strong></td><td>Plataforma de checkout/assinatura usada pela Biohelp. Cria pedidos na Shopify.</td></tr>
+                <tr><td><strong>Locksmith</strong></td><td>App da Shopify que libera preços de clube por tag de cliente. Continua sendo usado.</td></tr>
+                <tr><td><strong>Webhook</strong></td><td>Notificação automática que um sistema envia ao outro quando um evento acontece (ex: pedido pago).</td></tr>
+                <tr><td><strong>Chave de ligamento / Feature flag</strong></td><td>Configuração que liga ou desliga uma funcionalidade sem mexer no código.</td></tr>
+                <tr><td><strong>Ambiente de teste / Staging</strong></td><td>Cópia do app rodando num servidor separado, usado pra testes antes de publicar em produção.</td></tr>
+                <tr><td><strong>Smoke test</strong></td><td>Bateria rápida de testes pra confirmar que o básico funciona depois de uma publicação.</td></tr>
+                <tr><td><strong>Rollback</strong></td><td>Voltar atrás. No nosso caso: desligar a chave V2 = volta ao modelo V1.</td></tr>
+                <tr><td><strong>NF de serviço</strong></td><td>Nota fiscal emitida por CNPJ pra prestação de serviço (necessária pro saque cash do Founder).</td></tr>
+                <tr><td><strong>RPA</strong></td><td>Recibo de Pagamento de Autônomo. Era usado no Sprint 5 pra saque CPF — descontinuado no V2.</td></tr>
+                <tr><td><strong>Hipótese padrão</strong></td><td>Decisão temporária que assumimos quando uma resposta da Biohelp não chegou. Sempre pode ser ajustada depois.</td></tr>
+            </tbody>
+        </table>
+
+        <hr>
 
         <!-- Footer -->
         <footer class="page-footer">
-            <p>Biohelp LRP — Resumo Executivo</p>
-            <p>Última atualização: 18/02/2026</p>
+            Biohelp LRP · Pivô V2 · Atualizado em 29/04/2026 · Deadline da migração: <strong>11/05/2026</strong><br>
+            Documentação técnica completa: <code>docs/sdd/PIVOT-V2.md</code> · Workflow da equipe: <code>docs/sdd/PLAYBOOK.md</code><br>
+            Em caso de dúvidas, falar diretamente com a equipe técnica responsável pela migração.
         </footer>
     </div>
 </body>

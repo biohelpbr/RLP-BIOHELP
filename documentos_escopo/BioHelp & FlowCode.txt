@@ -1,0 +1,210 @@
+# BioHelp & FlowCode
+
+  Meeting started: 29/04/2026, 11:36:01
+  Duration: 36 minutes
+  Participants: Eduardo Sousa, Leonardo Wagner, Logistica Biohelp, Matheus Wink
+
+  [View original transcript](https://app.tactiq.io/api/2/u/m/r/lG6pkLveFK4vwqMIdppv?o=txt)
+
+    
+
+  
+
+  
+    ## Highlights
+
+    > 02:46 Eduardo Sousa: Eu posso te guiar aí tem uma forma de subir no github.
+> 30:31 Leonardo Wagner: gente conseguir. Por exemplo, cara, projeto Executor deu tudo certo, quando eu trabalhava no grupo da ndre, não sei se não é da queda ticket da da repom é
+
+  ## Transcript
+
+  00:00 Logistica Biohelp: Oi não tô te ouvindo.
+00:10 Eduardo Sousa: E agora?
+00:11 Logistica Biohelp: sim
+00:12 Eduardo Sousa: Dia tudo bom Gabriel.
+00:14 Logistica Biohelp: tudo
+00:16 Eduardo Sousa: Beleza vai o pessoal tá entrando aí. Mateus Bom dia
+00:25 Matheus Wink: E aí beleza?
+00:27 Eduardo Sousa: Leonardo Bom dia tudo bom?
+00:28 Matheus Wink: Agora tô aí não pude participar da outra agora.
+00:29 Leonardo Wagner: Bom dia
+00:31 Eduardo Sousa: Oi Ah beleza, tranquilo, beleza, vamos lá não a outra a gente tratou de alguns pontos ali em relação a
+00:42 Eduardo Sousa: Olá, estou transcrevendo esta chamada com minha extensão Tactiq AI. https://tactiq.io/r/transcribing
+00:44 Eduardo Sousa: Esclarecer algumas dúvidas né que eu tinha ali em relação a as mudanças do escopo anterior é para esse novo escopo o Léo também me explicou sobre as features novas ali, principalmente a parte de Academy, né? A gente conversou um pouco ali sobre a estrutura de Frontier ali que ele tá montando o modelo para poder incorporar que no projeto e essa semana que eu construí foi a parte de documentação do banco de dados tá? Então já organizei no projeto toda a estrutura de banco de dados e links ali com Shop. Fire para poder.
+01:26 Eduardo Sousa: Representar essa essa nova estrutura e Criei um cronograma também tá para para poder apresentar para vocês. É claro que os cronograma vai ser enriquecido então por exemplo no cronograma. Ainda não coloquei a parte do integração ali com o front-end eu precisava receber primeiro para eu olhar em quanto tempo eu consigo acoplar, né? Fazer essa junção. Mas eu acredito que coisa rápida, tá? Eu só não coloquei.
+01:57 Leonardo Wagner: Eu até o Eduardo a gente desenhou que todos os temas já tanto o painel que seria do usuário quanto painel admin eu mostrei para o 20 agora um pouquinho antes da nossa agenda. Eu fiz eu fiz uma do Diniz dele, né de peguei a transcrição do projeto. Botei para outra e a para ver tipo, eu não faltou nada, não esquecemos nada foi feito. E aí hoje de tarde a gente tem uma agenda com a turma aqui para bater esse dado bater esse painel e dizer meu é isso.
+02:29 Leonardo Wagner: Aí, fechou cara. Bateu o martelo aqui vai para desenvolvimento, né? E aí eu consigo te mandar. Eu só não sei eu posso abrir aqui rapidinho para gente dar uma olhada. Eu só não sei depois como é que a gente manda isso tá porque ele tá no órgão. Aí a gente vai ter que ver como que a gente vai organizar para mandar.
+02:46 Eduardo Sousa: Eu posso te guiar aí tem uma forma de subir no github.
+02:52 Matheus Wink: Tem acesso ao nosso Love Ball é pelo aquele login que a gente criou uma época
+02:53 Eduardo Sousa: Oi
+02:57 Matheus Wink: se lembra?
+02:59 Eduardo Sousa: É o mesmo.
+02:59 Leonardo Wagner: talvez
+02:59 Matheus Wink: Que a Charlie é mais fácil tu entrar e fazer o esquema.
+03:02 Eduardo Sousa: Ah tá não tá excelente pode eu pego o acesso ali eu mesmo baixo pego Fica tranquilo.
+03:09 Leonardo Wagner: Isso assim ó aqui tá como parceiro e admin tá depois talvez a gente tem que
+03:10 Eduardo Sousa: Tá vamos dar uma olhada, vamos dar uma olhada.
+03:13 Matheus Wink: De baixo ficou top. É tudo dados Bocados, né? Dados Bocados, né?
+03:19 Eduardo Sousa: Sim, sim, é só estrutura ali das funcionalidades onde vai ficar cada coisa, né? O que qual página que vai ter?
+03:33 Leonardo Wagner: fazer um vídeo separado. Eu não sei aqui daí Eduardo Gabi, se a gente tem como conectar na Shop. Fire. Por exemplo, você é uma pessoa fez o login, por exemplo aqui na loja, ela vem aqui em fazer login se ela faz login aqui e clica para ir para a área se ele já consegue não precisar fazer login de novo.
+03:56 Eduardo Sousa: Eu vou precisar ver a peido chopp Fire, mas eu acho que é possível sim.
+04:00 Logistica Biohelp: Não eu não sei dizer isso daí é com Eduardo daí.
+04:04 Matheus Wink: memorizado login no acho do navegador É isso. Mas aí o nosso painel.
+04:12 Leonardo Wagner: Não não eu digo para não.
+04:18 Eduardo Sousa: Travou ali pode repetir.
+04:22 Leonardo Wagner: O que eu ia comentar é para não vir para tela de login, né? Se ela se ela fizer o login no site e clicar ele tipo já cai direto aqui, entendeu? Tipo no painel dela não não necessariamente exato, mas assim isso aí.
+04:32 Matheus Wink: Não tem que fazer duplo login.
+04:40 Eduardo Sousa: Eu vou olhar eu acho que é possível sim.
+04:45 Matheus Wink: O que que eu fiz um esquema muito semelhante, é que se nosso portal essa dashboard vai ser apartada do Shoptime não tem nada a ver uma coisa de login, tem um negócio que eu fiz pode criar um botão Mágico. Vamos supor na shopfi que puxa um dado do usuário que clica e ele já cai logado, aí eu fiz isso no negócio puxando de striper.
+05:14 Eduardo Sousa: método de pagamento
+05:17 Matheus Wink: o Cláudio
+05:19 Eduardo Sousa: Sim sim, eu vou olhar documentação para ver como fazer vou colocar aqui.
+05:26 Leonardo Wagner: Aqui é um painel geral que a pessoa tipo o Brasil aqui, eu tô no na visão do usuário, né? Então tipo. Quantas pessoas ela entrou já indicou para comunidade dela é quantos produtos essas pessoas já consumiram no mês, lembra que toda a indicação tem aqueles 50% que eu vi que tu mandou ali a dúvida, né? Então quanto que isso gerou de comissionamento para ela no mês, o que que é o acumulado que aí é uma conta, né aqui ranking da comunidade, a gente vai ter que ver como que a gente vai fazer porque a princípio A ideia é calcular pelo número de pessoas. Então quem tiver mais número de pessoas tá no ranking que tiver né? E assim excessivamente tá então fazer uma regrinha simples, né? Para evento a gente vai ter que pensar como que a gente vai
+06:13 Eduardo Sousa: beleza
+06:17 Leonardo Wagner: calcular isso aqui tá? Isso aqui é onde hoje de tarde, eu vou ver com o time como que É as práticas que a galera tipo fase e tal para poder porque isso aqui é tipo bônus ativações para pessoa tipo poder participar dos eventos, entendeu? Aí aqui tipo, vem aqui ele vai para comunidade e tal, né? Que é tipo um dobro do evento, né? Então quando que é o próximo evento.
+06:47 Leonardo Wagner: Então aqui é um painelzinho bem em geral aqui os produtos mais consumidos da da rede da pessoa. Não sei se tem como fazer depois tu vai dizer não, o que que dá para fazer o que que não dá né aqui?
+06:59 Eduardo Sousa: Não dá daqui pelo id dela ali para ver o que ela mais vende e puxar para classificar ali no Deadpool.
+07:08 Leonardo Wagner: No acesso a loja eu nem pensei em replicar a loja para cá para você deixar o link, tipo, clica aqui, volta lá para loja lá logada no clube e aqui é os atalhos. E tipo não quero ver rotina. Quero ver rotina performance. Beleza já vai para os combins que isso bota link de destino é tranquilo, né? A parte do Academy aqui daí é um ponto que a gente precisa ver tá? Que que acontece o que que eu fiz aqui, ó, pá, consumo e rotina aí tu acessa trilha aparece aqui os vídeos para a gente fazer tá aqui eu botei por exemplo assim ó bloqueado. Ah desenvolver essa comunidade profissional quero desenvolver quero seguir um caminho de desenvolver minha comunidade. Aí vem só uma mensagem aquela fricçãozinha positiva ativa. A trilha tá liberado para ela, então é mais uma fricção positiva aqui todas as telas elas são iguais né, mas cada uma tem uma um ambiente diferente.
+08:11 Leonardo Wagner: Aqui nós vendas, cara, eu pensei em fazer tipo um sisteminha de gestão que ela tipo assim, ó, quero registrar potencial cliente então ela pode pá, eu quero vender para Eduardo. Acho que o Eduardo tem potencial para comprar algum produto meu então eu posso botar aqui os dados que eu tenho dele e aqui as vendas que eu já fiz então a beleza o Eduardo agora comprou então vou registrar essa venda. Porque como a venda é unipessoal, né? Eu vou ir a mercado eu vou vender aqui é uma forma de não, se tu quiser fazer algum tipo de gestão tá aqui o painel aí tu vai ter que preencher na mão o nome do cliente, qual o produto que ele comprou quantos produtos qual que foi o valor cartão para votar e só a venda?
+08:52 Eduardo Sousa: Essa aí não tem como rastrear, né? Porque é uma venda que ele vai comprar o produto e ele mesmo vai vai vender ali.
+08:57 Leonardo Wagner: Ele exatamente então aqui é o painel que ele vai ter que preencher então
+09:02 Eduardo Sousa: sim
+09:03 Leonardo Wagner: quantos clientes ativos quantos produtos vendidos no mês a receita gerada é tudo com base no que ele preencher não tem nada de automação aqui, entendeu? A automação vai derivada esses dois botões basicamente aqui tá daí aqui a gente tem por exemplo um indicativo que eu acho que aqui é tranquilo que é o preço de custo e o preço sugerido de venda que daí lá no painel de mim. A gente eu botei um campo para a gente preencher ele puxar aqui.
+09:29 Leonardo Wagner: Aqui são as pessoas que ela botou lá, por exemplo. Ah quem eu tô falando pai tá tal tal os clientes que ela já comprou. Aí eu até fiz uma ativaçãozinha tipo. Ah, quanto que ela comprou resuminho registrar uma nova venda já facilitar o máximo, né? E aqui é um tipo assim uma oportunidade nova venda então pô, faz 30 dias aí que a pessoa comprou cara, pode voltar a falar com ela de novo, entendeu? Então mais um sisteminha assim que mas isso tudo é cara. Ela tem que preencher na mão isso aqui para poder ter algum dado aqui, senão vai vir tudo em branco tudo zerado.
+10:07 Eduardo Sousa: sim
+10:09 Leonardo Wagner: Aqui a comunidade que é o link dela que é tá guiado pelo link, né? Quando as pessoas entraram automaticamente como a planta anual todas que entraram vão estar ativa e o crescimento que isso gera, entendeu? Então é bem bem simples assim e aí a parte de resultado e Resgate que a parte financeira de quem ela indicou quem entrou pelo link dela, então o que a gente pensou em fazer tá? Por exemplo tem aqui 2.800 para resgatar.
+10:40 Leonardo Wagner: Tu pode resgatar isso viapix ou tu pode usar como cashback? Tem uma opção? Não sei se tu conhece a kexim.
+10:47 Eduardo Sousa: Eu não usei mas eu já eu sei como funciona. Acho que sim, eu vou pesquisar a
+10:50 Leonardo Wagner: Tu já usou o serviço dos caras? Sabe? Como é que funciona? Então acho que é de boa para a gente usar aqui.
+11:05 Eduardo Sousa: documentação deles tudo depende documentação, né? Se eles têm documentação boa de Epi é simples de implementar. Ah então.
+11:12 Leonardo Wagner: Aberta, tá?
+11:16 Eduardo Sousa: Tranquilo, agora se não tem aí que é mais complicado que você tem que entrar
+11:18 Leonardo Wagner: Sim, não mas é a Penha aberta e eu tenho contatos o que que eu desenvolvi
+11:19 Eduardo Sousa: em contato com o suporte, tem que entender dos caras, entendeu? então
+11:27 Leonardo Wagner: aqui, tá Pô, eu quero resgatar via pics, daí tu bota ali o valor, né cobrado as taxas e tudo mais tem aqui todas as informações onde a pessoa coloca a nota anexa nota e solicita, que aí é onde cai por e-mail. Lembra que a gente conversou só que a gente pensou em vez de fazer isso a gente coloca tipo assim não resgatar pela E aí eu posso tanto pessoa jurídica, quanto pessoa física resgatar o valor?
+11:57 Eduardo Sousa: Entendi, porque antes estava travado com uma pessoa jurídica.
+12:00 Leonardo Wagner: Isso porque daí a gente paga para cashin como bônus vinculado ao telefone ao e-mail da pessoa e a questão lá na pessoa. Bota lá o e-mail dela faz a conta e tem esse valor lá na conta dela. Que aí ela pode sacar que ela pode usar pode pagar boleto pode fazer tudo pela conta da questão, mas daí tu desvincula da conta da biorrepe, tá é uma alternativa que a gente meio que achou para
+12:22 Eduardo Sousa: Tá não tá ótimo eu vou dar uma olhada na documentação deles e dou um
+12:25 Leonardo Wagner: desviar isso aqui.
+12:32 Eduardo Sousa: veredito assim sobre a viabilidade.
+12:35 Leonardo Wagner: Tá porque assim, se for cara é só PJ tem que anexar nota fiscal ou a pessoa daí pode resgatar como cashback, eu acho que essa aqui é uma opção que igual vai ter ou não aqui assim é tipo, não quero resgatar o que aquilo que é. E
+12:46 Eduardo Sousa: sim
+12:49 Leonardo Wagner: aí o Gabi eu tenho que fazer a mágica de ativar. Perfil usuário é isso não vai ter grandes alterações.
+13:01 Eduardo Sousa: Aí ele só na parte ali do cashback, né? Só para não ficar aberto aqui para mim quando ele gerar o cashback ali a lógica que a gente vai fazer gerar o cupom para ele usar lá dentro vinculada.
+13:17 Logistica Biohelp: Então, eu tava pensando isso, eu quero confirmar ainda com o pessoal, mas eu tava pensando em adicionar crédito mesmo, porque agora a gente usa as contas
+13:27 Matheus Wink: Sim, é melhor.
+13:27 Logistica Biohelp: novas da shopfai igual e aí dá para adicionar crédito para pessoa. Eu acho que é melhor do que ficar gerando cupom aí a pessoa tem que tipo
+13:35 Leonardo Wagner: Que é melhor?
+13:39 Logistica Biohelp: procurar algo bom e daí tipo ela vai comprar o valor que é um pouco abaixo daí tipo. Ah, tô perdendo dinheiro ali que não tá sendo usado e sabe. Acho que põe o crédito a pessoa chegar lá no check out tem a opção de pagar
+13:49 Eduardo Sousa: É tipo iFood ali.
+13:53 Logistica Biohelp: com crédito e é isso sabe?
+13:54 Matheus Wink: O cliente depois que tiver crédito ele chega no shopping vai aparecer usar
+13:57 Logistica Biohelp: É a validade no crédito. Se tu largar o crédito lá, eu acho que tem opção de tipo deixar ele limitado ou com qualidade, mas acho que tipo depois que a
+14:05 Leonardo Wagner: Não, mas a gente.
+14:06 Logistica Biohelp: pessoa resgatou ela tem lá salvo, entendeu?
+14:14 Matheus Wink: créditos outro crédito você disponível 10 mil reais de crédito aproveitar.
+14:21 Logistica Biohelp: Eu não tu vai tipo pagar com o crédito, entendeu?
+14:26 Leonardo Wagner: O crédito é uma forma de pagamento, né?
+14:30 Logistica Biohelp: É que nem a pagar por pics. Tu tem a opção pagar com crédito daí tem quanto de crédito? Tu tem e tipo tudo de crédito, ele vai usar máximo de crédito
+14:35 Leonardo Wagner: vai ter que
+14:40 Logistica Biohelp: que ele conseguir, entendeu?
+14:41 Eduardo Sousa: Entendi.
+14:42 Matheus Wink: Ah não tem como escolher usar menos.
+14:44 Logistica Biohelp: Não mas quem que vai escolher os a menos?
+14:48 Leonardo Wagner: Eu não faço sentido nenhum.
+14:49 Logistica Biohelp: Ah não, eu quero pagar só 80% da minha compra com crédito o resto eu quero pagar ano pics porque Ah não porque eu quero sofrer, entendeu? Eu quero ter que botar meu Pixel ali.
+15:01 Matheus Wink: Uma coisa usar a palavra cashback não foi abominada.
+15:07 Logistica Biohelp: Ah eu acho que pode botar daí como Crédito. Depois que é o que tava, entendeu? Sim, sim.
+15:13 Eduardo Sousa: Eu acho que o Mateus pensou Ali era por exemplo a pessoa tem sei lá 200 reais de crédito e ela vai comprar um produto que custa r$ 500 aí tem a opção dela bater esses 200 que ela tem de crédito e pagar o presente, por exemplo, aí vai
+15:25 Logistica Biohelp: É sim, ela consegue sim, mas se ela for Tipo se ela tem 10 mil de crédito ela
+15:28 Leonardo Wagner: Isso não.
+15:31 Logistica Biohelp: não tem como usar só 200, ela vai gastar os 500, entendeu?
+15:32 Eduardo Sousa: ser só no prédio.
+15:35 Matheus Wink: Entendi, entendi.
+15:35 Eduardo Sousa: sim
+15:38 Logistica Biohelp: Não dá essa opção. É sim, sim, é dá para fazer pelo pela IPI também que eu saiba porque é mais
+15:49 Leonardo Wagner: é
+15:51 Logistica Biohelp: ou menos que nem criar o cupom, entendeu? Só que daí tipo, tu gera tem um Eu tenho um expoente que é para tu uma chamada que é para tu adicionar crédito na conta do cliente porque eu já vi isso pela pelo.
+16:03 Matheus Wink: O o pessoal Normalmente quando quando o banco Inter tem pontos a e quando tu quando ele converte isso para para algo interno, ele dá bônus, tipo assim, né? Mas vantajoso para nós dar 110% do valor em créditos da loja para evitar
+16:21 Leonardo Wagner: Não.
+16:22 Matheus Wink: o cara que fazer o pics que nos gera taxa.
+16:25 Logistica Biohelp: Não, mas daí quando é isso que a gente tem que eu queria falar quando se a pessoa resgatar por exemplo Casting provavelmente a gente consegue dar os 50% inteiro, né? Se a pessoa for resgatar por pics, a gente tem que cobrar ali uns impostos umas taxas. E aí a gente tem que ver qual que é a porcentagem de imposto para tipo deduzir, mas daí tipo cada opção que a pessoa seleciona aparece um imposto deduzido ali, eu só não sei qual que é a porcentagem para cada opção.
+17:00 Leonardo Wagner: Quero sacar todo o valor tá? Então olha só o bruto é tanto o valor taco de
+17:07 Logistica Biohelp: Sim recebida tanto.
+17:09 Leonardo Wagner: resgate, posto é tanto valor a receber tanto aí tem botado nota fiscal. Tem
+17:10 Logistica Biohelp: é
+17:13 Leonardo Wagner: que ser do valor a receber entendeu? Tipo que tem que fazer essa essa ponta
+17:16 Logistica Biohelp: sim
+17:20 Leonardo Wagner: aqui, mas é que tá o cashback, ele seria uma alternativa para quem é a pessoa física, né agora com a questão. Daí pode pode deixar as três opções, né? Ou tira essa opção e que é que a tinta entendeu? Porque porque quem quem compra para revender o crédito na loja é bom porque daí tu não movimento o valor na conta, né? Fica usando comprando sem sem movimento na tua conta bancária. Tranquilo aqui alguma dúvida.
+17:55 Eduardo Sousa: É um show de bola excelente.
+17:58 Leonardo Wagner: Boa e aí aqui cara é meio que um depara só que aí um pouco mais a visão global de tudo, né? Então é o Global novos membros do mês é quando você entrarem independente do link que entraram o que que gerou de receita para Bio. Que que foi consumido é produto total aí é conta né? Ou por membro aqui é um crescimento de tipo um gráficozinho de base em entrava. Não sei se isso aqui não é complexo, né?
+18:30 Eduardo Sousa: Não não é não é completo.
+18:37 Leonardo Wagner: É isso aí tem a questão da comunidade que é meio que a visão geral só que separado, né? Então o que que a gente tem de líderes, né Líder? É o que cara. Tem cinco pessoas no seu Clube a gente considera Líder, que que é influenciador tem pessoas com 40 pessoas é influenciadora, então tu nome é automático, não precisa dizer não esse link é de influenciador, tipo, esse eu não sei quem.
+19:00 Eduardo Sousa: Já criar regra para quando ele bater cinco, ele já ganha uma tag de líder quando bater.
+19:07 Leonardo Wagner: Porque daí vai ficar mais fácil um pouco a nossa vida depois lá a gente pode aperfeiçoar isso, mas eu acho que para o início agora a gente não viu é tem cinco pessoas líder tem 40 já influenciador tem poder de influenciar as pessoas e aqui é um gráfico um tabelinha que é cara a Marina. Quem indicou a Marina? Aqui tá o mesmo nome né? Mas aqui ó. A Júlia foi a Fernanda que é
+19:33 Eduardo Sousa: beleza
+19:37 Leonardo Wagner: tipo a Júlia pertence abaixo da Fernanda naquela que é uma estrutura abaixo. Aí quantas pessoas A Júlia tem ela indicou duas quando os produtos no mês ela comprou seis que gerou de receita de produto e aí tem um campo ali onde a gente vai poder preencher todas as informações e o que gerou de receita do clube e daí você entra que tem um painelzinho que é um resuminho também. Aí cara, depois a gente faz um ver o que que é ruim que não dá para a gente gerar.
+20:08 Leonardo Wagner: Aí que questão de comunidade que também é tudo deriva um pouco da Visão geral, só que separadinho, né? Gráficos questão de consumo daí agora é voltada a produto. Mesma coisa que aqui é basicamente eu separei o que tá na visão geral. E aqui produto é onde a gente preenche as informações então ele replica aqui só os números do consumo. E aí eu tenho aqui por exemplo. Ah, eu tenho aqui Whey, quanto eu tenho estoque. Qual que é o preço do site? Qual que é o preço sugerido qualquer contribuição daí é que eu consigo botar as informações, principalmente do preço de venda do site aqui tá errado é o preço de preço sugerido e o preço de venda da Pessoa 64 e o preço sugerido era 164 de venda que é o que vai aparecer lá para naquele painel de mim, sabe.
+21:06 Leonardo Wagner: E aqui a contribuição líquida ó que daí só o admin não aparece para lá
+21:09 Eduardo Sousa: sim
+21:11 Leonardo Wagner: esse produto aqui é meu real que a gente ganha r$ 50 então para poder calcular ali. Calcular ali por indicadores ficarem corretos para ele não puxar isso da shopfly, eu prefiro onde a gente preenche Manual tem lá 30 40 produtos que a gente cadastra preenche e o que que puxa é só o estoque mesmo, né? A gente
+21:35 Eduardo Sousa: Tá ótimo.
+21:35 Leonardo Wagner: pode pode preencher na mão, depois a gente aperfeição a isso tá aí evento aqui também. A ideia é tipo aquele O painel de gestão onde a gente preenche né? Porque o evento tu não tem como saber né? Então o que que é um evento Pô, qual é o nome? Qual é o dia é online presencial? Qual que é o link de adesão daí? Sim a gente vai botar um link lá todo mundo vindo do evento vai vir por esse link, né? Daí consegue letar quantas pessoas compraram por esse link, mas o ponto é tá funil, quantas pessoas estavam no topo de funil, quantas pessoas vieram do orgânico? Quantas pessoas entraram no WhatsApp com as pessoas compareceram no evento e o convertido aqui daí foi quantas pessoas compraram pelo link, aí a gente é gerado custa a gente.
+22:21 Leonardo Wagner: Né aqui a gente pode adicionar, né? O que que a gente vai vender lá no evento e vai criar um evento entendeu? A gente tem ali um indicativo de não dentro de cada evento, quanto que custou quanto que a gente converteu. Qual foi o retorno mais para ter né? Mas a ideia é meio que preencher e pegar as informações do kit. Tá parte financeira é meio que um geral né também de quantos ativos tem. E aí evolução de assinante é uma projeção tipo cara com base no crescimento que quer a projeção futuro é base estatística, a gente pode usar uma Projeção de contribuição de produto que daí é com base no bom se na média cada um compra tanto e tantas unidade total que que a gente pode projetar aqui crescimento com base.
+23:13 Leonardo Wagner: De novos assinantes eu sei que isso aqui pode dar mais uma projeção. Aqui o resgate que é uma forma geral de não quem pediu o saque quem não pediu. Parte da Academy que daí é onde a gente também vai ter que preencher as trilhas, né? Novas aulas novas trilhas aí aqui eu deixei como YouTube, né? Fazer um upload do link do YouTube fechado aí ou aberta que é para bloquear.
+23:40 Matheus Wink: É como se fosse um cms, né? Nosso gerenciador.
+23:44 Eduardo Sousa: Vocês conseguem editar ali colocar 24?
+23:49 Leonardo Wagner: E aqui eu resolvi indicar quantas pessoas assistiram quando iniciaram a gente entender o que que a galera tá olhando e aqui Alerta, depois a gente pode ver como que a gente vai fazer nem mexer muito nessa parte de alertas aqui seria cara, seria isso aí basicamente isso aqui também.
+24:08 Eduardo Sousa: Então não vai em configurações, por favor. Tem configurações também vai ter essa lógica aí de gestão de administradores como cms também, né? Eu consegui tirar.
+24:23 Leonardo Wagner: Quais são os e-mails que podem acessar que o painel de menina?
+24:28 Logistica Biohelp: Ali ativação tem que não é sim.
+24:31 Leonardo Wagner: Mexer nessa parte aqui tá essa parte aqui tá correndo essa aqui o alerta e configuração eu não mexi. Então tá na lógica ainda do lnp antigo, né?
+24:42 Eduardo Sousa: beleza
+24:45 Logistica Biohelp: Só para não dar confusão.
+24:47 Leonardo Wagner: Assim vamos lá tá Eduardo o evento cara, ele vai acontecer no mês 6, tá
+24:51 Eduardo Sousa: Eu vejo um pouco aconteceu enorme ficou muito bom, vai algumas regrinhas ali, a gente vai ter que detalhar, mas assim eu vou trabalhando atuando e por exemplo aquelas regrinhas estatísticas ou você vai lidar com vocês, eu falei olha aqui a projeção a gente pode pegar a taxa de crescimento dos meses anteriores jogar dessa forma. Então eu vou sempre tô lidando ali eu gosto de validar rápido e aí eu implemento tá? Mas ficou excelente cara. A gente pode fazer assim, eu pego o acesso do lobo e quando você me der ok eu baixo e já começo a fazer eu montei um cronograma, mas acho que vale a pena eu arredondar esse cronograma depois que eu tiver acesso a essa versão do Love para ficar mais realista assim o prazo que eu vou conseguir entregar vocês tinha comentado comigo pretende assim respeitar que vocês ia ficar pronto até dia 10 e 15 do mês que vem, né?
+25:53 Leonardo Wagner: então p*** cara, não deu para 10 15 ali precisou esticar mais 10 15 dias não tem problema, né? Que seria para início do mês 6 ali, eu acho que a ideia
+25:59 Eduardo Sousa: beleza
+26:02 Leonardo Wagner: aqui é realmente a gente fazer um negócio bem feito bem estruturado, porque precisa baixar um pouco ritmo e fazer um pouquinho melhor ou independente falou Pô tem uns detalhezinho ali que a gente precisa validar assim, não não tem problema dar uma esticada, né? A ideia é só pagar é porque sem o sistema que não consegue lançar nada, né chegar para todo dia, meu ó, estoque tá resolvido sistema tá resolvido agora vocês fazem um evento e traga a galera para dentro.
+26:29 Eduardo Sousa: Sprints até essa data né? Aí se precisar chegou até tal da tal Sprint ele ficou pronto, né? Aí a gente conversa. Vou precisar de mais uma semana aqui para concluir esse outros print que ficou faltando.
+26:46 Leonardo Wagner: Não e até assim, né? Ali claro ali a gente fez eu fiz pensando assim não o que que seria vamos lá o mínimo ideal para a gente poder iniciar o projeto ali de ter número tem informação depois claro painel de gestão de mim. A gente
+27:00 Eduardo Sousa: Vou fazer isso a matriz de força Impacto. E aí eu vou verificar com vocês.
+27:04 Leonardo Wagner: quer entrar bem mais a fundo e trazer bem mais eu entendo que não. Uma outra parte a um outro momento é um outro desenvolvimento, mas se tu ver ele Putz, cara, isso aqui vai apertar não vai dar para fazer daí a gente sente e reajusta ali, o que que for, talvez tem coisa até que não vale, pô, aquela parte de milhas de evento. Eh ali a ideia que a turma deu, mas cara tem que ver tem que a gente tem que montar o que que seria essas milhas de evento de ativação. Então talvez isso ali no início a gente tira fora.
+27:41 Eduardo Sousa: Fala Léo isso aqui cara, eu consigo Entregar até essa data esse vai falar o Eduardo isso aqui, por exemplo essa funcionalidade de alertas, eu não preciso dela até o lançamento. Então cara vou deixar por último porque eu preciso ter o lançamento é esse aqui, eu vou mergulhar nessas entendeu?
+28:00 Leonardo Wagner: Não fechou e o que que eu queria comentar a turma comentou de fazer um negócio depois aqui é mais uma dúvida se a gente consegue fazer tá então assim ah
+28:15 Eduardo Sousa: Você fala assim, ela coloca uma foto da comida e os dados do treino dela.
+28:16 Leonardo Wagner: uma questão de saúde de a pessoa ir lá registrar o treino ou então botar uma foto e calcular. Quantas calorias tem isso a gente consegue desenvolver depois isso depois tá Não agora para A ideia é tornar é porque assim pensa que a questão do clube toda é ela envolve um quesito de comunidade comunidade de saúde bem-estar então é trazer algumas features ali para o ponto de não, olha só trazer alguns treinos que a pessoa pode fazer ter algumas sei lá algumas coisas de nutrição, daí a pessoa lá calcula, quantas calorias sabe aquelas coisas que prende a galera no
+29:01 Eduardo Sousa: Sim, não dá para fazer aí vai ter uma integração com o modelo de a né com
+29:02 Leonardo Wagner: uso do app assim.
+29:11 Eduardo Sousa: ele, ele cria um agente ali que vai interagir com pessoa e ajudar ela a montar o próprio treino avaliar se a meta de alimentação dela é suficiente porque ela quer alcançar, né? Então por exemplo uma coisa que eu participei de um projeto há três meses numa empresa da França, eles criaram um aplicativo lá que era isso tirava foto ali da refeição. E aí o elenco conseguia calcular a caloria de calorias de proteína etc e ajudar ela a fazer o déficit calórico
+29:46 Leonardo Wagner: sim
+29:46 Eduardo Sousa: projetava que ela Tem de Déficit calórico no mês, então dá para fazer é claro que eu acho que esse perfil de comunidade. Seria algo mais simples, né?
+29:56 Matheus Wink: Dá para fazer o conexão se mulher tiver Apple com Apple watch sono
+30:03 Eduardo Sousa: Ao que normalmente a galera que treina usa bastante então isso tudo vira
+30:05 Matheus Wink: monitoramento do sono com ora o aplicativo abre várias portas para engajamento inclusive.
+30:12 Leonardo Wagner: É não é esse é o ponto e assim ó o supra-sumo depois né? Trazendo é a
+30:22 Eduardo Sousa: ferramenta de interação da comunidade ali.
+30:31 Leonardo Wagner: gente conseguir. Por exemplo, cara, projeto Executor deu tudo certo, quando eu trabalhava no grupo da ndre, não sei se não é da queda ticket da da repom é
+30:43 Leonardo Wagner: uma multidão francesa voltado para parte de combustível. Eles têm a Shelton
+30:43 Eduardo Sousa: Não conheço.
+30:49 Leonardo Wagner: tem parte lá também, o que que eles faziam tá? Eles faziam uma vez por ano um movimento de 30 60 dias não lembro agora o período que é o seguinte não olha só o Eduardo nós vamos fazer um movimento de saúde e as top cinco equipes Mundial vão para uma viagem. Sei lá para Disney. Qualquer ponto ligada a parte
+31:09 Eduardo Sousa: sim
+31:10 Leonardo Wagner: de exercício, então, eles tinham app da deles que é tipo assim não eu rolava cadastrar minha equipe. Tá ligado exercício corrida natação pedal e musculação cada atividade gerava ponto tu tinha lá 60 dias com a tua equipe. A equipe que mais ranqueava ganhava um prêmio, tá ligado? Era porque não era uma viagem assim não, tipo meu é tu e mais cinco que é tipo a tua equipe inteira aqui que a galera que trabalhava junto ali no escritório. Imaginei todo mundo para Disney, neguinho saia correndo do outro direito, entendeu isso depois porque tudo isso envolve essa questão de conexão dos apps e envolve comunidade, né? Então eu acho que o ponto depois que a gente tem que tentar levar um pouco é esses incentivos ao esporte incentivos a união de comunidade e prática de exercício e bem-estar saúde e tudo mais então assim futuras, mas que é mais ou menos onde a gente quer levar e daqui a pouco até transformar tudo isso aqui no aplicativo depois né?
+32:15 Eduardo Sousa: Nós é possível, cara assim essa essa ideia Inicial aí de ter essas duas ferramentas ou ferramenta com ponto com muita comunidade é excelente cara, seu domingo fez isso, né? Estava fez isso vários fizeram isso e funciona bastante dá para fazer hoje com essa integração com os elementos é o modelo de react, então a gente que ele reage raciocínio executa e usa. Deu para isso, cara, é possível você fazer quase tudo então a gente tem a gente tem bastante experiência tem atuado muito nesse tipo de projeto aqui, então conta com a gente para ajudar nesse processo de discovery que é descobrir exatamente o que a gente vai fazer consolidar e depois executar.
+33:00 Leonardo Wagner: Inicial mas depois Cara isso aqui realmente a gente transformar o movimento como um todo no movimento de saúde, né? Porque eu quero não tudo isso tá ligado a prática de consumo, né? Então o que a gente quer na prática é o cliente consumindo e consumindo todos os meses então tudo que tu envolve comunidade incentivo. Esporte isso aqui pessoal, não vou fazer tá então diretamente volta no quesito de consumo, né?
+33:33 Eduardo Sousa: Sim, faz total sentido eu tive em Brasília final de semana passado, ela tava tendo Iron Man, cara, você vê a Volvo lá patrocinando com garrafinha barraquinha e tal tudo da Volvo e fazer tentando fazer um link de tipo cuidar da saúde também cuidar do ambiente. Eles trouxeram os carros elétricos e tal de Exposição de carro elétrico então no fim eles querem consumo, né, mas eles trazem isso para uma conscientização então.
+34:08 Leonardo Wagner: Não e aí depois que esses eventos tu pode vincular brindes, né? Então tipo. Ah, tu tá aqui praticando Esporte não sei o quê conecta tudo libera bem aí, tu vai gameficando o troço de uma forma. Que que fica interessante e vai gerando o consumo vai gerando interesse de consumo.
+34:25 Eduardo Sousa: Show show de bola então eu vou vou fazer isso. Vou aguardar vocês me mandaram e tal essa essa o quê questão do eu vou ver aqui se eu tenho os acessos gravados, se não tiver eu peço aí para o Gabriel. E aí eu baixo o ovo monto esse documento cronograma, vocês reviews foi Eduardo. OK? Aí eu ponho a mão e começo a desenvolver.
+34:51 Leonardo Wagner: Eu vi no grupo, tu perguntou sobre o negócio da creatina, eu vi que o galo respondeu mas não não cheguei a ver o que que o Gabi respondeu, mas talvez assim, né para os fundadores aqui pelo menos do primeiro evento a gente vai vai fornecer creatina e aí o que talvez a gente pode tentar ver pelo link, né? Então tipo nesse dia ou nesse período aqui por esse link aqui todo mundo ganha uma tag lá que ganhou a creatina, entendeu? Pensar como que a gente faz isso, né?
+35:23 Eduardo Sousa: beleza Beleza vou registrar aqui no escopo.
+35:29 Leonardo Wagner: Cara eu acho que eu queria passar era isso, não sei o que mais.
+35:34 Eduardo Sousa: Não acho que era isso. Eu montei o cronograma aqui, né, mas acho que faz sentido apresentar para vocês, depois que eu fiz essa essa revisão, né? Então vou acoplar essa estrutura aí do Novo Bock no cronograma e dividir em sprints, né por semana ali o que que eu vou conseguir entregar em cada semana cada dia, né? Vem um cronograma bem detalhado depois para vocês.
+36:00 Leonardo Wagner: Boa cara, fechou porque assim o lobo ele meio que tá Resumindo, que que é o
+36:01 Eduardo Sousa: tá
+36:05 Leonardo Wagner: Projeto agora fechado, a gente apresentou para Adriana apresentou para o
+36:06 Eduardo Sousa: sim
+36:09 Leonardo Wagner: Rodrigão, comparam. Então fechou o seu projeto agora realmente assim não tem mais derivações mudança de modelo não tem mais nada agora tanto que agora a gente já vai desenvolver tudo e aí com isso. A gente já fecha. A gente não sabe que a gente precisa realmente é isso aqui tá aqui é isso. Vamos desenvolver, né?
+36:28 Eduardo Sousa: Beleza, show de bola fechado Mateus.
+36:35 Logistica Biohelp: É isso aí
+36:37 Eduardo Sousa: Então tá bom, obrigado pessoal a gente se fala então de novo em breve.
+  

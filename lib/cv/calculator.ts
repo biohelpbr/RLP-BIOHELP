@@ -1,4 +1,17 @@
 /**
+ * @deprecated V1 LEGACY — descontinuado em 28/04/2026 pelo Pivô V2.
+ *
+ * Esta lógica pertence ao modelo MLM/CV original. Mantida apenas até a onda 6
+ * (F-V12 — cleanup). NÃO usar em código novo.
+ * Quando flag LRP_V2=true em produção, NÃO chamar funções deste módulo.
+ *
+ * Modelo v2 (afiliação 1-nível + Founder@5) está em lib/subscriptions/,
+ * lib/commissions-v2/, lib/credits/, lib/founder/.
+ *
+ * Ver: docs/sdd/PIVOT-V2.md
+ */
+
+/**
  * Calculador de CV (Commission Volume)
  * SPEC: Seção 1.2, 3.3 - CV por item/pedido
  * 

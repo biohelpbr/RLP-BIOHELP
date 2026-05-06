@@ -816,3 +816,49 @@ export const COMMISSION_PERCENTAGES = {
  *   - 10% CV de líderes N1
  *   - 15% CV da rede inteira (fallback)
  */
+
+// =====================================================
+// PIVÔ V2 — Visão restrita da rede (F-V11)
+// =====================================================
+
+/**
+ * Info do sponsor exibida pro membro no painel restrito do v2.
+ * Sponsor é quem trouxe o membro pro programa (1 nível pra cima).
+ * Pode ser null se o membro foi cadastrado direto pela admin / topo da árvore.
+ */
+export interface SponsorInfo {
+  id: string
+  name: string
+  ref_code: string
+  status: MemberStatus
+  is_house_account: boolean
+}
+
+/**
+ * Indicado direto (N1) na visão v2. Sem CV nem nível — esses conceitos
+ * foram removidos no pivô. Apenas o essencial pra UX do membro.
+ */
+export interface DirectReport {
+  id: string
+  name: string
+  ref_code: string
+  status: MemberStatus
+  created_at: string
+}
+
+/**
+ * Resposta v2 de GET /api/members/me/network.
+ * Substitui MemberNetworkResponse quando a flag LRP_V2 está ON.
+ * Discriminator `version: 'v2'` permite type guard no front.
+ */
+export interface MemberNetworkResponseV2 {
+  version: 'v2'
+  member: {
+    id: string
+    name: string
+    ref_code: string
+    status: MemberStatus
+  }
+  sponsor: SponsorInfo | null
+  direct_reports: DirectReport[]
+}

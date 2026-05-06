@@ -1,6 +1,14 @@
+> ⚠️ **TEMPLATE V1 — pode estar SUPERSEDED para features V2**
+>
+> Para features do **Pivô V2** (F-VNN), use a SPEC da feature em `docs/sdd/features/F-VNN-<slug>/SPEC.md` como contrato — esta SPEC já tem CAs, arquivos permitidos, plano e matriz de validação.
+> Para features V1 ainda em manutenção, este template continua válido.
+> Ver: [docs/sdd/PIVOT-V2.md](docs/sdd/PIVOT-V2.md) e [docs/sdd/PLAYBOOK.md](docs/sdd/PLAYBOOK.md).
+
+---
+
 # PR — Biohelp LRP (SDD)
 
-> **Regra:** Este PR deve estar 100% alinhado ao SDD. Se algo não estiver no SPEC, é mudança de escopo.
+> **Regra:** Este PR deve estar 100% alinhado ao SDD. Se algo não estiver no SPEC (v1) ou na SPEC da feature v2, é mudança de escopo.
 
 ## 1) Contexto
 **Task ID:** (ex.: S1-004)  

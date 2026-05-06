@@ -1,4 +1,16 @@
 /**
+ * @deprecated V1 LEGACY — descontinuado em 28/04/2026 pelo Pivô V2.
+ *
+ * Fast-Track, Comissão Perpétua diferenciada por nível, percentuais por
+ * Parceira/Líder/Diretora/Head: TUDO REMOVIDO no v2. No v2 a comissão é
+ * 50% direto sobre a assinatura do convidado (1 nível só).
+ * Mantida apenas até a onda 6 (F-V12 — cleanup). NÃO usar em código novo.
+ *
+ * Substituto: lib/commissions-v2/ (aguarda TBD-1 e TBD-2).
+ * Ver: docs/sdd/PIVOT-V2.md
+ */
+
+/**
  * Motor de Cálculo de Comissões
  * Sprint 4 - Biohelp LRP
  * 

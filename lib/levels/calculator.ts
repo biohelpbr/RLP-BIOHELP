@@ -1,4 +1,14 @@
 /**
+ * @deprecated V1 LEGACY — descontinuado em 28/04/2026 pelo Pivô V2.
+ *
+ * Os níveis Parceira/Líder em Formação/Líder/Diretora/Head foram REMOVIDOS
+ * do modelo. No v2 só existe Membro e Founder (≥5 ativos no clube).
+ * Mantida apenas até a onda 6 (F-V12 — cleanup). NÃO usar em código novo.
+ *
+ * Ver: docs/sdd/PIVOT-V2.md e lib/founder/
+ */
+
+/**
  * Calculadora de Níveis - Sprint 3
  * 
  * Implementa as regras de progressão de nível conforme TBD-011

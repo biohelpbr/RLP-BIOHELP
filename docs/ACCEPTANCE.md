@@ -1,3 +1,10 @@
+> ⚠️ **DOCUMENTO V1 — SUPERSEDED PELO PIVÔ V2 (28/04/2026)**
+>
+> Os CAs abaixo são do modelo MLM/CV descontinuado.
+> Para CAs vigentes, ver as SPECs por feature em [sdd/features/F-VNN-<slug>/SPEC.md](sdd/features/) e a fonte de verdade em [sdd/PIVOT-V2.md](sdd/PIVOT-V2.md).
+
+---
+
 # ACCEPTANCE — Critérios de Aceite e Testes (Biohelp LRP)
 
 Este documento reúne **checklists de validação** por sprint, **mapeamento de FRs** e **roteiros de teste** para homologação com o cliente.
