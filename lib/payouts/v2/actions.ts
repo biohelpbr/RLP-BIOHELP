@@ -96,11 +96,14 @@ export async function requestPayout(
   return { ok: true, data: { id: data.id as string } }
 }
 
-export const PAYOUT_FEES = {
+// PAYOUT_FEES — referência interna. Em "use server" não pode export const.
+// Se precisar consumir em UI, mover pra `lib/payouts/v2/schema.ts`.
+const _PAYOUT_FEES = {
   pix: { fixed: PIX_FIXED_FEE, rate: 0 },
   cashback_cashin: { fixed: 0, rate: 0 },
   shopify_credit: { fixed: 0, rate: 0 },
 } as const
+void _PAYOUT_FEES
 
 /**
  * F-V07c: decodifica data URL (`data:application/pdf;base64,...`) ou base64 puro

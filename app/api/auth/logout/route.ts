@@ -4,14 +4,14 @@
  * Sprint: 1
  */
 
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 // Força rota dinâmica (usa cookies)
 export const dynamic = 'force-dynamic'
 
-export async function POST() {
+async function handleLogout(req: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
     await supabase.auth.signOut()
@@ -19,16 +19,11 @@ export async function POST() {
     // Limpar cookies de autenticação
     const cookieStore = await cookies()
     const allCookies = cookieStore.getAll()
-    
-    const response = NextResponse.json(
-      {
-        ok: true,
-        redirect: '/login',
-      },
-      { status: 200 }
-    )
 
-    // Remover todos os cookies relacionados ao Supabase
+    // 303 See Other: força navegador a fazer GET no /login após POST
+    const loginUrl = new URL('/login', req.url)
+    const response = NextResponse.redirect(loginUrl, { status: 303 })
+
     allCookies.forEach((cookie) => {
       if (cookie.name.includes('supabase') || cookie.name.includes('sb-')) {
         response.cookies.delete(cookie.name)
@@ -39,13 +34,12 @@ export async function POST() {
   } catch (error) {
     console.error('[logout] Error:', error)
     return NextResponse.json(
-      {
-        ok: false,
-        error: 'INTERNAL_ERROR',
-        message: 'Erro ao fazer logout.',
-      },
+      { ok: false, error: 'INTERNAL_ERROR', message: 'Erro ao fazer logout.' },
       { status: 500 }
     )
   }
 }
+
+export const POST = handleLogout
+export const GET = handleLogout
 
