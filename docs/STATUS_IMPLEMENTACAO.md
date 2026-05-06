@@ -1,7 +1,7 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** 28/04/2026 (PIVÔ V2 declarado)
-**Sprint Atual:** ⏸️ Sprints v1 (1-7) CONGELADOS | 🚧 Pivô V2 em planejamento
-**Status Geral:** ✅ V1 entregue (37/38 FRs) | ⚠️ V1 sendo descontinuado | 📋 18 TBDs aguardando cliente
+**Data:** 05/05/2026 (snapshot pós-reunião 29/04 PM com cliente)
+**Sprint Atual:** ⏸️ Sprints v1 (1-7) CONGELADOS | 🚧 Pivô V2 em execução — S1 (06–12/05) inicia
+**Status Geral:** ✅ V1 entregue (37/38 FRs) | ⚠️ V1 sendo descontinuado | 📋 14/22 TBDs respondidos | 🎨 Front Loveable absorvido como referência
 
 ---
 
@@ -11,7 +11,9 @@
 
 📄 **Documento canônico do pivot:** [docs/sdd/PIVOT-V2.md](sdd/PIVOT-V2.md)
 📄 **Workflow operacional pós-pivot:** [docs/sdd/PLAYBOOK.md](sdd/PLAYBOOK.md)
-📥 **Insumos do cliente:** `documentos_escopo/Biohelp _ Loyalty Reward Program.docx` (escopo v1 com comentários do cliente), `documentos_escopo/Fluxograma.jpg.jpeg` (fluxograma novo, 28/04), `Fluxo.txt` (regras condensadas).
+📄 **Migração do front Loveable:** [docs/sdd/LOVEABLE-IMPORT.md](sdd/LOVEABLE-IMPORT.md)
+📅 **Cronograma sprints:** [docs/sdd/CRONOGRAMA-V2.md](sdd/CRONOGRAMA-V2.md) — 5 sprints + buffer até **11/06/2026** (versão compactada — 27 dias úteis)
+📥 **Insumos do cliente:** `documentos_escopo/Biohelp _ Loyalty Reward Program.docx` (escopo v1 com comentários), `documentos_escopo/Fluxograma.jpg.jpeg` (fluxograma novo, 28/04), `documentos_escopo/Fluxo.txt` (regras condensadas), `documentos_escopo/BioHelp & FlowCode.txt` (transcript reunião 29/04 PM), `_loveable_import/` (front Loveable — gitignored, referência visual).
 
 ### Resumo do que muda
 - ❌ **REMOVIDO:** CV, níveis (Parceira/Líder/Diretora/Head), Fast-Track, Bônus 1/2/3, Leadership Bônus, Royalty, RPA/CPF, reset mensal de CV, compressão após 6 meses inativo, ledger CV-based.
@@ -19,55 +21,72 @@
 - ➕ **NOVO:** integração Guru, comissão 50% direta, saldo + créditos Shopify, Founder@5, ranking de Founders, área de conteúdo, link WhatsApp por Founder.
 - ⏸️ **PAUSADOS:** crons `close-monthly-cv` e `network-compression` (desligar via env quando flag v2 ON).
 
-### Backlog v2 — 12 features (detalhe em PIVOT-V2.md §2)
+### Backlog v2 — 17 features (detalhe em PIVOT-V2.md §2)
 | Onda | Features | Status |
 |---|---|---|
-| 0 (docs) | PIVOT-V2.md, PLAYBOOK.md, este update | ✅ Concluído (28/04/2026) |
-| 1 (TBDs) | 18 TBDs com cliente | ⏳ Aguardando |
-| 2 (foundation) | F-V01, F-V02, F-V03 | ⏸️ Bloqueado por TBDs |
-| 3 (commissão) | F-V04, F-V05, F-V07 | ⏸️ Bloqueado |
-| 4 (Founder) | F-V06, F-V08, F-V11 | ⏸️ Bloqueado |
-| 5 (conteúdo) | F-V09, F-V10 | ⏸️ Bloqueado |
-| 6 (cleanup) | F-V12 (remover v1 morto) | depende |
+| 0 (docs) | PIVOT-V2.md, PLAYBOOK.md, LOVEABLE-IMPORT.md, CRONOGRAMA-V2.md, SPECs F-V14..F-V18 | ✅ Concluído (05/05/2026) |
+| 1 (TBDs) | 22 TBDs com cliente (14 respondidos) | 🟡 Em andamento — 8 abertos |
+| 2 (foundation) | F-V01, F-V02, F-V03 | ✅ Destravadas |
+| 3 (commissão) | F-V04, F-V05, F-V07 | F-V05 ✅ destravada · F-V04 🚫 · F-V07 🟡 |
+| 4 (Founder) | F-V06, F-V08, F-V11, F-V18 | F-V11 ✅ feita · F-V08 ✅ destravada · F-V18 ✅ destravada |
+| 5 (conteúdo) | F-V09, F-V10, F-V13 | F-V09 🟡 · F-V10 🚫 · F-V13 🚫 (pode ser absorvida por F-V15) |
+| 6 (cleanup) | F-V12 (remover v1 morto) | depende v2 estável |
+| **7 (front)** | **F-V14, F-V15, F-V16, F-V17, F-V18** + portar todas as outras features migradas | 🚧 **Em execução** — S1 inicia 06/05 |
 
-### Bloqueios atuais
-- **12 TBDs** aguardando decisão do cliente (`PIVOT-V2.md` §4.1). 11/18 respondidos em 29/04/2026; 4 novos derivados (TBD-19/20/21/22) gerados pelas respostas.
-- F-V04, F-V07 (parte cálculo), F-V08, F-V09, F-V10, F-V13 ainda bloqueadas.
-- F-V01, F-V02, F-V03, F-V05 ✅ **destravadas em 29/04/2026** — prontas pra começar.
-- Confirmação técnica pendente: **Wink** (abordagem Guru → Shopify), **fornecedor de pagamento** (Cashin? — TBD-19).
-- ✅ Sprint 7 — House Account descontinuada (TBD-10); creatina mantida com escopo alterado (TBD-17 → F-V13).
-- ✅ Sprint 5 — RPA/CPF descontinuado (TBD-18). UI escondida atrás do flag v2; remoção física em F-V12.
+### Bloqueios atuais (snapshot 05/05/2026)
+- **8 TBDs originais ainda abertos** (`PIVOT-V2.md` §4.1) + 4 derivados (TBD-23/24/25/26 da reunião 29/04 PM). Total: 12 abertos de 26 catalogados (14 respondidos).
+- **Resolvidos na reunião 29/04 PM:** TBD-11 (ranking por nº pessoas), TBD-19 (Cashin confirmado), TBD-14 refino (crédito Shopify via API `customer.credit`).
+- F-V04, F-V07 (parte cálculo) ainda bloqueadas por TBD-1, TBD-2.
+- F-V09 🟡 com hipótese padrão (global), F-V10 🚫 (TBD-16), F-V13 🚫 (pode ser absorvida por F-V15).
+- F-V01, F-V02, F-V03, F-V05, F-V08, F-V14, F-V15, F-V16, F-V18 ✅ **destravadas**.
+- F-V17 (SSO Shopify) 🟡 — exige PoC técnica com Multipass/App Proxy antes.
+- ✅ Sprint 7 v1 — House Account descontinuada; creatina vira campanhas (F-V13/F-V15).
+- ✅ Sprint 5 v1 — RPA/CPF descontinuado.
 
 ### Trabalho em andamento (sem bloqueio de TBD)
 - ✅ **Frente 1** (feature flag `LRP_V2`) concluída em 28/04/2026 — `lib/utils/featureFlags.ts`, `LRP_V2` e `CRON_DISABLED_V2` em `.env.example` e `.env.local`.
 - ✅ **Frente 3** (shells dos módulos novos) concluída em 28/04/2026 — `lib/subscriptions/`, `lib/commissions-v2/`, `lib/credits/`, `lib/founder/`, `lib/content/`.
-- ✅ **F-V11** (visão restrita da rede) — implementação concluída em 29/04/2026 na branch `feat/F-V11-visao-restrita-rede`. Build/typecheck limpos. Validação manual pendente (dev server + flag `LRP_V2=true`). Detalhe em `docs/sdd/features/F-V11-visao-restrita-rede/SPEC.md` (matriz preenchida).
-- ✅ **Adequação documental V2** concluída em 29/04/2026 — banner DEPRECATED nos 5 docs v1 (`SPEC_Biohelp_LRP.md`, `ACCEPTANCE.md`, `DECISOES_TBD.md`, `WORKFLOW.md`, `PR_TEMPLATE.md`); comentário `@deprecated` em 6 arquivos de código v1 (`lib/cv/`, `lib/levels/`, `lib/commissions/{calculator,bonus3,royalty}.ts`, `lib/network/compression.ts`); entrada v5.0 no `docs/CHANGELOG.md`; insumos do cliente persistidos em `documentos_escopo/Fluxo.txt`; índice `docs/README.md` reorganizado priorizando v2.
+- ✅ **F-V11** (visão restrita da rede) — implementação concluída em 29/04/2026, mergeada em `main`. Branch `feat/F-V11-visao-restrita-rede` ainda existe localmente. Build/typecheck limpos. Validação manual pendente.
+- ✅ **Adequação documental V2** concluída em 29/04/2026 — banner DEPRECATED nos 5 docs v1, comentário `@deprecated` em 6 arquivos de código v1, entrada v5.0 no CHANGELOG.
+- ✅ **Reunião 29/04 PM com cliente** — Léo apresentou layout completo (partner + admin) feito em Loveable. 5 features novas catalogadas (F-V14..F-V18). Cronograma esticado pra 01–15/06.
+- ✅ **Documentação base da migração concluída em 05/05/2026:**
+  - `docs/sdd/LOVEABLE-IMPORT.md` — inventário 33 páginas + design tokens + mapeamento Loveable→Next + Anti-SPEC do import (tipos v1 hybrid).
+  - `docs/sdd/CRONOGRAMA-V2.md` — 5 sprints + buffer.
+  - SPECs skeleton: `docs/sdd/features/F-V14-vendas-manuais-membro/SPEC.md`, `F-V15-eventos-admin/`, `F-V16-painel-admin-completo/`, `F-V17-sso-shopify/`, `F-V18-tags-automaticas/`.
+  - `PIVOT-V2.md` atualizado com Anti-SPEC §12-13, novos TBDs, F-V14..F-V18, Onda 7.
+- ✅ **`_loveable_import/`** — ZIP do Loveable extraído na raiz do projeto. Gitignored. Fonte de design, não de código.
 
-### Próximo passo
-1. **F-V01** (cadastro com ref obrigatório) — destravada em 29/04/2026. Porta de entrada do v2.
-2. **F-V02** (integração Guru via webhook Shopify) — destravada. Confirmar abordagem técnica com Wink antes de mergear.
-3. **F-V03** (status ativo = subscription_paid) — destravada, depende de F-V02.
-4. **F-V05** (saldo + créditos 1:1) — destravada.
-5. Cliente responder os **12 TBDs ainda abertos** (8 originais + 4 derivados). Sem isso F-V04, F-V07 (cálculo), F-V08, F-V09, F-V10, F-V13 ficam bloqueadas.
-6. Confirmação do fornecedor de pagamento (TBD-19 — Cashin?).
+### Próximo passo (snapshot 05/05/2026)
+1. **S1 — Fundação do front** (06–12/05/2026): Tailwind + shadcn + design tokens + shells de layout. Detalhe em `CRONOGRAMA-V2.md`.
+2. **F-V01** (cadastro com ref obrigatório) — pode rodar em paralelo a S1 se decidir começar backend antes do front.
+3. Cliente responder os **12 TBDs ainda abertos** (8 originais + 4 da reunião 29/04 PM). Cobrar nas demos quartas-feiras.
+4. **Validação técnica antes de S5:**
+   - Wink confirma Guru → Shopify webhook (F-V02).
+   - Multipass / App Proxy da Shopify pra F-V17 (PoC).
+   - Documentação Cashin (F-V07).
+   - API `customer.credit` da Shopify (F-V05).
 
-### Status de cada feature v2 (atualizar conforme avanço)
+### Status de cada feature v2 (atualizar conforme avanço — 05/05/2026)
 | ID | Feature | Classe | Onda | Status |
 |---|---|---|---|---|
 | F-V01 | Cadastro com ref obrigatório | C | 2 | ✅ Destravada (TBD-10 resolvido) — pronta pra iniciar |
-| F-V02 | Integração Guru via webhook Shopify | D | 2 | ✅ Destravada (TBD-7 resolvido — Shopify-first) |
+| F-V02 | Integração Guru via webhook Shopify | D | 2 | ✅ Destravada (TBD-7 resolvido) |
 | F-V03 | Status ativo = subscription_paid | C | 2 | ✅ Destravada (depende F-V02) |
 | F-V04 | Comissão 50% por assinatura | D | 3 | 🚫 Bloqueada (TBD-1, TBD-2) |
-| F-V05 | Saldo + créditos Shopify 1:1 | C | 3 | ✅ Destravada (TBD-14 resolvido) |
+| F-V05 | Saldo + créditos Shopify 1:1 | C | 3 | ✅ Destravada (TBD-14 refinado: API `customer.credit`) |
 | F-V06 | Promoção a Founder ≥5 ativos | B | 4 | 🟡 Parcial (TBD-12 hipótese padrão: definitivo) |
-| F-V07 | Saque Founder via Cashin + NF | D | 3 | 🟡 Parcial — fluxo OK, valor depende F-V04. UI/upload pode iniciar |
-| F-V08 | Ranking de Founders | B | 4 | 🚫 Bloqueada (TBD-11) |
-| F-V09 | Área de conteúdo | B | 5 | 🚫 Bloqueada (TBD-15) |
+| F-V07 | Saque Founder via Cashin + NF + triple resgate | D | 3 | 🟡 Parcial — Cashin confirmado (TBD-19), valor depende F-V04. UI/upload pode iniciar |
+| F-V08 | Ranking de Founders | B | 4 | ✅ Destravada (TBD-11 resolvido — nº pessoas como critério inicial) |
+| F-V09 | Área de conteúdo (Academy CMS) | B | 5 | 🟡 Parcial (TBD-15 hipótese padrão: global gerenciado pelo admin) |
 | F-V10 | Link WhatsApp Founder | A | 5 | 🚫 Bloqueada (TBD-16) |
-| F-V11 | Visão restrita da rede | B | 4 (antecipada) | ✅ Implementada 29/04/2026 — pendente validação manual em dev |
+| F-V11 | Visão restrita da rede | B | 4 (antecipada) | ✅ Implementada 29/04/2026 — pendente validação manual |
 | F-V12 | Cleanup v1 (remover CV, níveis, RPA, etc.) | D | 6 | depende v2 estável |
-| F-V13 | Cupom de creatina como campanha configurável | C | 5 | 🚫 Bloqueada (TBD-22) — substitui cron mensal automático |
+| F-V13 | Cupom de creatina como campanha configurável | C | 5 | 🚫 Bloqueada (TBD-22) — pode ser absorvida por F-V15 |
+| **F-V14** | **Vendas manuais do membro (CRM leve)** | **C** | **7 (S2)** | ✅ **Destravada (nova — 29/04 PM)** |
+| **F-V15** | **Eventos admin (criação + funil + link/tag)** | **C** | **7 (S4)** | ✅ **Destravada (nova — 29/04 PM)** |
+| **F-V16** | **Painel admin completo (9 áreas)** | **B** | **7 (S3-S4)** | ✅ **Destravada (nova — 29/04 PM)** |
+| **F-V17** | **SSO Shopify → Painel** | **D** | **7 (S5)** | 🟡 **Parcial — exige PoC Multipass/App Proxy** |
+| **F-V18** | **Tags automáticas Líder/Influenciador** | **B** | **7 (S3)** | ✅ **Destravada (nova — 29/04 PM)** |
 
 ---
 

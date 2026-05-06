@@ -12,10 +12,12 @@ Você está continuando o trabalho no projeto **Biohelp LRP** (Loyalty Reward Pr
 
 ### Passo zero — leia, em ordem, antes de qualquer ação:
 
-1. `docs/sdd/PIVOT-V2.md` — fonte única de verdade do pivô. Delta v1→v2, backlog F-V01..F-V12 classificado A/B/C/D, Anti-SPEC v2, 18 TBDs, plano em 6 ondas.
-2. `docs/sdd/PLAYBOOK.md` — workflow operacional (loop por feature, classes, estados CONTINUE/PAUSE/BLOQUEADO, template de SPEC, CI mínimo).
-3. `docs/STATUS_IMPLEMENTACAO.md` — só a seção "PIVÔ V2" no topo. Estado atual e backlog. Tudo abaixo dessa seção é histórico do v1 (NÃO use como verdade).
-4. `docs/sdd/QUESTIONARIO-CLIENTE-V2.md` — texto que foi enviado ao cliente via WhatsApp pedindo decisão dos 18 TBDs.
+1. `docs/sdd/PIVOT-V2.md` — fonte única de verdade do pivô. Delta v1→v2, backlog F-V01..F-V18 classificado A/B/C/D, Anti-SPEC v2 (§1-13), 26 TBDs (14 respondidos), plano em 7 ondas.
+2. `docs/sdd/CRONOGRAMA-V2.md` — 5 sprints semanais + 2 dias buffer (06/05–11/06/2026) pra absorção do front Loveable + features novas.
+3. `docs/sdd/LOVEABLE-IMPORT.md` — inventário do front Loveable, design tokens, mapeamento Loveable→Next, Anti-SPEC do import (tipos v1 hybrid).
+4. `docs/sdd/PLAYBOOK.md` — workflow operacional (loop por feature, classes, estados CONTINUE/PAUSE/BLOQUEADO, template de SPEC, CI mínimo).
+5. `docs/STATUS_IMPLEMENTACAO.md` — só a seção "PIVÔ V2" no topo. Estado atual e backlog. Tudo abaixo dessa seção é histórico do v1 (NÃO use como verdade).
+6. `docs/sdd/QUESTIONARIO-CLIENTE-V2.md` — texto enviado ao cliente via WhatsApp pedindo decisão dos TBDs (versão original).
 
 ### Regras críticas (não-negociáveis)
 
@@ -25,50 +27,54 @@ Você está continuando o trabalho no projeto **Biohelp LRP** (Loyalty Reward Pr
   - RLS policies existentes
   - Migrations já aplicadas (sempre criar nova migration, nunca reverter)
   - ref_codes de membros existentes (formato `BH00001` mantém)
-  - House Account (TBD-16) e cupom de creatina (TBD-17) — sem decisão do cliente
   - Código RPA/CPF (deprecated, mas remoção física só na onda 6 — F-V12)
+  - **§12: tipos e mocks v1 do Loveable** (`_loveable_import/src/types/`, `lib/fake-api.ts`) — NUNCA importar pro código de produção.
+  - **§13: pasta `_loveable_import/`** — gitignored, referência visual apenas. Nenhum import direto desse path em código de produção.
 - **NÃO implementar nada de v1**: CV, níveis (Parceira/Líder/Diretora/Head), Fast-Track, Bônus 1/2/3, Leadership Bônus, Royalty, RPA/CPF, reset mensal, compressão de 6 meses inativo. Esse código vive em `lib/cv/`, `lib/levels/`, `lib/commissions/` mas está congelado.
-- **Cadastro v2 exige ref obrigatório** (link OU código manual). Não cair em House Account em fluxo v2 sem confirmação do TBD-16.
+- **Cadastro v2 exige ref obrigatório** (link OU código manual). House Account descontinuada (TBD-10).
 - **Toda feature v2 atrás de feature flag `LRP_V2`** (default `false`). Helper em `lib/utils/featureFlags.ts` (`isV2Enabled()`).
 - **Sem evidência objetiva no QA → nunca aprovado.** Matriz de Validação obrigatória pra B/C/D (CA → teste → tipo → status → evidência). Teste fake (`expect(true).toBe(true)`) não conta.
-- **Em conflito de docs:** `PIVOT-V2.md` > `PLAYBOOK.md` > `SPEC_Biohelp_LRP.md` (legado v1) > `WORKFLOW.md` (legado v1) > `documentos_projeto_iniciais_MD/*`.
+- **Em conflito de docs:** `PIVOT-V2.md` > `LOVEABLE-IMPORT.md` > `CRONOGRAMA-V2.md` > `PLAYBOOK.md` > SPECs específicas > `SPEC_Biohelp_LRP.md` (legado v1) > `WORKFLOW.md` (legado v1) > `documentos_projeto_iniciais_MD/*`.
 
-### Estado atual (snapshot — confira no STATUS_IMPLEMENTACAO.md se vier outra sessão depois)
+### Estado atual (snapshot 05/05/2026 — confira no STATUS_IMPLEMENTACAO.md se vier outra sessão depois)
 
-**Concluído (sessões 28-29/04/2026):**
-- Onda 0 (documentação): `PIVOT-V2.md`, `PLAYBOOK.md`, `STATUS_IMPLEMENTACAO.md` atualizado, `QUESTIONARIO-CLIENTE-V2.md`, este `PROMPT-NOVA-SESSAO.md`.
+**Concluído (sessões 28-29/04/2026 + 05/05/2026):**
+- Onda 0 (documentação): `PIVOT-V2.md`, `PLAYBOOK.md`, `STATUS_IMPLEMENTACAO.md`, `QUESTIONARIO-CLIENTE-V2.md`, `PROMPT-NOVA-SESSAO.md`.
 - Frente 1 (preparação de infra): `lib/utils/featureFlags.ts` criado. Vars `LRP_V2` e `CRON_DISABLED_V2` em `.env.example` e `.env.local` (default `false`).
-- Frente 3 (shells dos módulos novos): criados — `lib/subscriptions/`, `lib/commissions-v2/`, `lib/credits/`, `lib/founder/`, `lib/content/`. Cada um com types stub + TODO marcando o TBD que destrava.
-- F-V11 SPEC criada: `docs/sdd/features/F-V11-visao-restrita-rede/SPEC.md` (status: Approved).
-- **Adequação documental V2 (29/04/2026):** banner DEPRECATED nos 5 docs v1 (`SPEC_Biohelp_LRP.md`, `ACCEPTANCE.md`, `DECISOES_TBD.md`, `WORKFLOW.md`, `PR_TEMPLATE.md`); comentário `@deprecated` em 6 arquivos de código v1 (`lib/cv/calculator.ts`, `lib/levels/calculator.ts`, `lib/commissions/{calculator,bonus3,royalty}.ts`, `lib/network/compression.ts`); entrada v5.0 no `docs/CHANGELOG.md`; insumos do cliente persistidos (`documentos_escopo/Fluxo.txt`); índice `docs/README.md` reorganizado priorizando v2. **Importante:** todo o código v1 continua funcional (flag `LRP_V2=false` por default) — adequação foi sinalização, não remoção.
+- Frente 3 (shells dos módulos novos): `lib/subscriptions/`, `lib/commissions-v2/`, `lib/credits/`, `lib/founder/`, `lib/content/`.
+- **F-V11** ✅ implementada e mergeada em `main` (29/04/2026). Branch `feat/F-V11-visao-restrita-rede` ainda existe localmente.
+- Adequação documental V2 (29/04): banner DEPRECATED em 5 docs v1, `@deprecated` em 6 arquivos de código v1, CHANGELOG v5.0.
+- **Reunião 29/04 PM com cliente** — Léo apresentou layout completo (partner + admin) feito em Loveable. 5 features novas catalogadas (F-V14..F-V18). Cronograma esticado pra início/meados de junho.
+- **Documentação base da migração (05/05/2026):**
+  - `docs/sdd/LOVEABLE-IMPORT.md` — inventário 33 páginas + design tokens + mapeamento + Anti-SPEC do import.
+  - `docs/sdd/CRONOGRAMA-V2.md` — 5 sprints (06/05–09/06) + 2 dias buffer (10–11/06). Entrega final 11/06/2026.
+  - 5 SPECs skeleton: `F-V14-vendas-manuais-membro/`, `F-V15-eventos-admin/`, `F-V16-painel-admin-completo/`, `F-V17-sso-shopify/`, `F-V18-tags-automaticas/`.
+  - PIVOT-V2.md atualizado (Anti-SPEC §12-13, TBDs novos, Onda 7).
+- **`_loveable_import/`** — ZIP do Loveable extraído na raiz (gitignored). URL: `https://lovable.dev/projects/c6cd387c-c9cf-4b03-a139-4b90f6e4e3f7`.
 
-**Próxima ação imediata (29/04/2026 — pós-respostas):**
-- **F-V11** já entregue ✅.
-- **F-V01, F-V02, F-V03, F-V05** ✅ destravadas — qualquer uma pode começar. Recomendação: F-V01 primeiro (porta de entrada).
-- **F-V06, F-V07** 🟡 parciais (podem começar com hipóteses padrão / partes não bloqueadas).
+**Próxima ação imediata (05/05/2026):**
+- **S1 do CRONOGRAMA-V2** (06–12/05/2026): fundação do front — Tailwind + shadcn + design tokens + shells. Branch `feat/S1-fundacao-loveable`.
+- **F-V01** pode rodar paralelo a S1 se quiser começar backend antes do front.
 
-**Ainda bloqueado por TBDs abertos** (12 em `PIVOT-V2.md` §4.1): F-V04, F-V08, F-V09, F-V10, F-V13.
-
-**TBDs respondidos em 29/04/2026** (11/18) — `PIVOT-V2.md` §4.2:
-- **3** Cashin/PIX (Asaas descartado) · **4** aprovação manual + validação NF automática · **5** CPF via Cashin/crédito · **6** sem ERP · **7** Guru → Shopify webhook · **10** House Account descontinua · **13** ativo sem prazo (inativo TBD-21) · **14** saldo→crédito 1:1 sem prazo · **17** creatina vira campanhas (F-V13 nova) · **18** RPA/CPF descontinua.
-
-**TBDs derivados (novos)**: 19 (Cashin confirmado?), 20 (Founder CPF?), 21 (prazo saldo inativo), 22 (UX campanhas creatina).
+**TBDs respondidos em 29/04 PM** (3 a mais → total 14/26): TBD-11 (ranking nº pessoas), TBD-19 (Cashin confirmado), TBD-14 refinado (`customer.credit` da Shopify).
+**TBDs derivados na 29/04 PM:** TBD-23 (validade crédito Shopify), TBD-24 (eventos com entry-fee?), TBD-25 (preço sugerido manual?), TBD-26 (critério final ranking).
+**Ainda bloqueado por TBDs:** F-V04 (TBD-1, 2), F-V07 (parte fiscal — TBD-1, 2), F-V10 (TBD-16), F-V13 (TBD-22 — pode ser absorvida por F-V15).
 
 ### O que fazer nesta sessão
 
-Antes de qualquer código, pergunte ao usuário:
-1. **Implementar F-V01** (cadastro com ref obrigatório)? Recomendação primária — porta de entrada do v2. TBD-10 resolvido (House Account descontinua). Hipóteses padrão documentadas pra TBD-8 (link de inativo bloqueia novos cadastros) e TBD-9 (código manual imutável).
-2. **Implementar F-V02** (integração Guru via webhook Shopify)? Classe D — antes de mergear, **confirmar com Wink** se a abordagem Shopify-first cobre todos os eventos do Guru ou se precisa webhook direto do Guru também.
-3. **Implementar F-V03** (status ativo = subscription_paid)? Depende de F-V02 estar em curso.
-4. **Implementar F-V05** (saldo + créditos Shopify 1:1)? Pode rolar paralela — sem bloqueios pra a parte ativa; prazo do inativo (TBD-21) tem hipótese padrão (90 dias).
-5. **Outra coisa?** Qualquer feature nova → criar SPEC em `docs/sdd/features/F-VNN-<slug>/SPEC.md` seguindo o template em `PLAYBOOK.md` antes de codar.
+Antes de qualquer código, confirmar com o usuário qual frente atacar:
+1. **S1 do CRONOGRAMA-V2** (06–12/05) — fundação do front (Tailwind + shadcn + tokens + shells). Recomendação primária pós-05/05. Branch `feat/S1-fundacao-loveable`.
+2. **F-V01** (cadastro com ref obrigatório) em paralelo a S1 — backend independente.
+3. **F-V14, F-V15, F-V16, F-V17, F-V18** — SPECs skeleton já existem; refinar CAs antes de codar.
+4. **Outra coisa?** Qualquer feature nova → criar SPEC em `docs/sdd/features/F-VNN-<slug>/SPEC.md` seguindo o template em `PLAYBOOK.md` antes de codar.
 
 Para cada feature destravada que iniciar:
-- Branch `feat/F-VNN-<slug>` a partir de `main` (ou da última branch mergeada).
+- Branch `feat/F-VNN-<slug>` a partir de `main` (ou `feat/Sn-<foco>` durante a sprint corrente).
 - SPEC em `docs/sdd/features/F-VNN-<slug>/SPEC.md` com classe, DoR, RFs, CAs, arquivos permitidos, plano e matriz vazia.
 - Toda lógica v2 atrás do flag `LRP_V2` (default OFF). Helper em `lib/utils/featureFlags.ts`.
+- **Imports proibidos:** nada de `_loveable_import/*` no código de produção (Anti-SPEC §13). Use só como referência visual.
 - QA em Validation Mode (PLAYBOOK §11-A) com matriz preenchida.
-- Atualizar `STATUS_IMPLEMENTACAO.md` + `PIVOT-V2.md §2` quando concluir.
+- Atualizar `STATUS_IMPLEMENTACAO.md` + `PIVOT-V2.md §2` + `CRONOGRAMA-V2.md` (sprint atual) quando concluir.
 
 ### Comportamento esperado
 
@@ -111,4 +117,4 @@ Comece lendo os 4 arquivos da seção "Passo zero". Quando terminar, faça um re
 
 ---
 
-*Última atualização: 2026-04-29 segunda sessão — TBDs respondidos pelo cliente (11/18). F-V01, F-V02, F-V03, F-V05 destravadas. 4 TBDs derivados criados (19/20/21/22). F-V13 nova feature (cupom de creatina como campanha configurável). Anti-SPEC §8/9/10 atualizadas, novo §11 (provider de pagamento). CHANGELOG v5.1.*
+*Última atualização: 2026-05-05 — Reunião 29/04 PM com cliente: 5 features novas (F-V14..F-V18), 3 TBDs resolvidos (11/14/19), 4 derivados (23/24/25/26). Loveable absorvido como referência. Documentação base da migração concluída: LOVEABLE-IMPORT.md, CRONOGRAMA-V2.md (compactado), 5 SPECs skeleton. Anti-SPEC §12-13 (Loveable). Onda 7 (front) com S1–S5+buffer = entrega 11/06/2026.*

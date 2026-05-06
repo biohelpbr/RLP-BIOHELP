@@ -34,3 +34,8 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 
+# Loveable import (artefato de origem do front — referência, não vai pro repo)
+# Ver docs/sdd/LOVEABLE-IMPORT.md
+_loveable_import/
+docs/docs para cliente/biohelp-project.zip
+

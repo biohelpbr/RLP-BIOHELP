@@ -3,9 +3,14 @@
 > Documento canônico do pivot do projeto. Fonte única de verdade para toda mudança a partir de 28/abr/2026.
 > Quando houver conflito entre este doc e qualquer artefato anterior (SPEC_Biohelp_LRP.md, STATUS_IMPLEMENTACAO.md, documentos_projeto_iniciais_MD/*), **este doc prevalece** para tudo que diz respeito ao modelo v2.
 
-**Data:** 2026-04-28 (atualizado 29/04/2026)
-**Status:** Onda 0 concluída · F-V11 entregue · 11/18 TBDs respondidos · Ondas 2-3 parcialmente desbloqueadas
-**Insumos do cliente:** `documentos_escopo/Biohelp _ Loyalty Reward Program.docx` (escopo v1 com comentários), `documentos_escopo/Fluxograma.jpg.jpeg` (fluxograma novo), `documentos_escopo/Fluxo.txt` (regras condensadas).
+**Data:** 2026-04-28 (atualizado 05/05/2026)
+**Status:** Onda 0 concluída · F-V11 entregue · 14/26 TBDs respondidos · Front Loveable absorvido como referência · Migração em 5 sprints + buffer (06/05–11/06/2026)
+**Insumos do cliente:**
+- `documentos_escopo/Biohelp _ Loyalty Reward Program.docx` (escopo v1 com comentários)
+- `documentos_escopo/Fluxograma.jpg.jpeg` (fluxograma novo, 28/04)
+- `documentos_escopo/Fluxo.txt` (regras condensadas)
+- `documentos_escopo/BioHelp & FlowCode.txt` (transcript da reunião 29/04 PM)
+- `_loveable_import/` (front Loveable — fonte de design, não de código; ver `LOVEABLE-IMPORT.md`)
 
 ---
 
@@ -52,6 +57,19 @@
 - **F-V11:** Refactor da visão de rede: membro vê só sponsor + indicados diretos. ✅ **Implementada 29/04/2026.**
 - **F-V12:** Migration / arquivamento do modelo v1 atrás de feature flag (`LRP_V2`). Inclui cleanup do RPA/CPF (TBD-18 resolvido — descontinua).
 - **F-V13:** Cupom de creatina como campanha configurável pelo admin (substitui cron mensal automático). Depende de TBD-22.
+- **F-V14** *(nova — reunião 29/04 PM):* Vendas manuais do membro (CRM leve). Membro registra leads (potenciais clientes) e vendas concretizadas fora do canal Shopify. Métricas derivam só do que o membro preenche. Sem rastreio automático.
+- **F-V15** *(nova — reunião 29/04 PM):* Eventos admin. Admin cria evento (nome, data, presencial/online, link de adesão), métricas de funil (topo, WhatsApp, presentes, convertidos), bônus de ativação por participação. Link gera tag específica em quem comprar pelo período/link. Substitui o conceito legado de "cupom de creatina mensal".
+- **F-V16** *(nova — reunião 29/04 PM):* Painel admin completo. 9 áreas: Visão Geral, Comunidade (com tags Líder/Influenciador), Crescimento, Consumo, Produtos, Eventos, Financeiro, Resgates, Academy. Alertas e Configurações ficam pós-MVP.
+- **F-V17** *(nova — reunião 29/04 PM):* SSO Shopify → Painel. Cliente entra logada na Shopify, clica no atalho do clube e cai direto no `/dashboard` sem novo login. Análoga ao "magic button" que Wink fez puxando dado de Stripe.
+- **F-V18** *(nova — reunião 29/04 PM):* Tags automáticas Líder (≥5 afiliados ativos) e Influenciador (≥40 afiliados ativos). Auto-aplicadas pelo sistema. Conviver com tag `FOUNDER` da F-V06.
+- **Triple resgate** *(refina F-V07 — reunião 29/04 PM):* além de Cashin (cash) + Crédito Shopify, também PIX direto com taxa/imposto deduzido na UI. Três opções no resgate.
+- **Crédito Shopify direto** *(refina F-V05/TBD-14 — reunião 29/04 PM):* via API `customer.credit` da Shopify, não cupom. Validade do crédito → TBD-23 *(novo)*.
+
+### Pós-MVP (acordado fora do escopo de junho/2026)
+- Foto-comida → calorias (modelo ReAct).
+- Registro de treino + integração Apple Watch/Google Fit.
+- Gamificação tipo "Iron Man" — equipes competindo por viagem.
+- `admin/Alerts` e `admin/Settings` (gestão de admins via UI) — após MVP.
 
 ---
 
@@ -71,7 +89,12 @@
 | F-V10 | Link WhatsApp por Founder | A | P2 | 🚫 Bloqueada — TBD-16 (admin valida?) aberto. |
 | F-V11 | Visão restrita da rede pro membro | B | P1 | ✅ **Implementada 29/04/2026** |
 | F-V12 | Deprecation v1 (CV, níveis, bônus, royalty, RPA/CPF) | D | depende | Aguarda v2 estável em produção. TBD-18 confirma cortar RPA/CPF. |
-| F-V13 | Cupom de creatina como campanha configurável | C | P2 | 🚫 Bloqueada — TBD-22 (UX da gestão) aberto. |
+| F-V13 | Cupom de creatina como campanha configurável | C | P2 | 🚫 Bloqueada — TBD-22 (UX da gestão) aberto. Pode ficar coberta por F-V15 (eventos com link/tag). |
+| F-V14 | Vendas manuais do membro (CRM leve) | C | P1 | ✅ Destravada — sem TBD pendente. |
+| F-V15 | Eventos admin (criação + funil + link/tag) | C | P1 | ✅ Destravada — TBD-24 (entry-fee?) e TBD-25 (bônus de ativação?) não bloqueiam início. |
+| F-V16 | Painel admin completo (9 áreas) | B | P1 | ✅ Destravada — depende de F-V04, F-V05 pra dados reais; UI/shells podem começar. |
+| F-V17 | SSO Shopify → Painel (sem duplo login) | D | P1 | 🟡 Parcial — depende de validação técnica da API Shopify (multipass, customer accounts). Pode iniciar prova de conceito. |
+| F-V18 | Tags automáticas Líder (≥5) / Influenciador (≥40) | B | P2 | ✅ Destravada — regra simples, depende de F-V06 ter contagem de "ativos no clube". |
 
 **Legenda:** P0 = bloqueia o novo fluxo. P1 = essencial pro MVP v2. P2 = pós-MVP v2. ✅ = destravada / 🟡 = parcial / 🚫 = bloqueada.
 
@@ -91,13 +114,15 @@ NÃO mexer sem autorização explícita do humano:
 8. House Account (Sprint 7 / TBD-001) — **descontinuada no v2** (TBD-10 resolvido 29/04/2026). Código permanece até onda 6 / F-V12 cleanup. Quando flag `LRP_V2=true`, cadastro sem ref bloqueia (não cai mais em House Account).
 9. Cupom mensal de creatina (Sprint 7 / TBD-019) — **escopo alterado no v2** (TBD-17 resolvido 29/04/2026). Vira sistema de campanhas configuráveis pelo admin (cliente/período/segmento), não mais cron mensal automático. Detalhes em F-V13 + TBD-22.
 10. RPA / CPF / limite R$1.000 — **descontinuado no v2** (TBD-18 resolvido 29/04/2026). Código existe mas **não deve ser exposto na UI v2**. Removido fisicamente em F-V12.
-11. Provider de pagamento — Cashin/PIX manual é a direção atual (TBD-3 resolvido com ressalva — TBD-19 pra confirmação). Construir `lib/payouts/v2/` com interface agnóstica de provider pra permitir troca sem mexer em cima.
+11. Provider de pagamento — Cashin/PIX manual é a direção atual (TBD-3 resolvido com ressalva — TBD-19 confirmado em 29/04 PM). Construir `lib/payouts/v2/` com interface agnóstica de provider pra permitir troca sem mexer em cima.
+12. **Tipos e mocks v1 do Loveable** (`_loveable_import/src/types/`, `_loveable_import/src/lib/fake-api.ts`) — nunca importar pro código de produção. O front Loveable foi gerado misturando v1 (CV, ranks PARTNER/LEADER/DIRECTOR/HEAD, Fast-Track, Triple3, Leadership) com v2 (Club, Events, OrdersAnalytics, Growth). **Apenas layout, design tokens e shells visuais** podem ser portados. Modelo de dados é refeito do zero alinhado a este doc. Ver `LOVEABLE-IMPORT.md` §4.
+13. **Pasta `_loveable_import/`** — gitignored. Está local apenas como referência visual durante a migração. Nenhum import direto desse path é permitido em código de `app/`, `lib/`, `supabase/`. A pasta pode ser apagada a qualquer momento.
 
 ---
 
 ## 4. TBDs ao cliente — decisões pendentes
 
-### 4.1 TBDs em aberto (12 — ainda bloqueando features)
+### 4.1 TBDs em aberto (10 — ainda bloqueando features ou aguardando confirmação)
 
 | ID | Pergunta | Bloqueia |
 |---|---|---|
@@ -105,14 +130,16 @@ NÃO mexer sem autorização explícita do humano:
 | TBD-2 | "Menos impostos e taxas" — quem desconta? LRP retém ISS/IR antes do payout, ou repassa bruto e o membro se vira na NF? | F-V04, F-V07 |
 | TBD-8 | Inativo: link/código de afiliação dele continua válido pra trazer novos cadastros, ou bloqueia? | F-V01 (não-bloqueante — hipótese padrão: bloqueia novos cadastros enquanto inativo) |
 | TBD-9 | Validade do código manual: imutável ou expira? Pode ser reusado se membro inativar e reativar? | F-V01 (não-bloqueante — hipótese padrão: imutável, igual ao link) |
-| TBD-11 | Critério do ranking de Founder: tamanho do clube? faturamento? média mensal de itens por cliente? combinação? | F-V08 |
 | TBD-12 | Founder pode "desfounderar" se cair abaixo de 5 ativos, ou status é definitivo uma vez atingido? | F-V06 (não-bloqueante — hipótese padrão: status definitivo) |
-| TBD-15 | Conteúdo (F-V09): admin posta global, ou cada Founder tem seu próprio mural pro clube dele? | F-V09 |
+| TBD-15 | Conteúdo (F-V09): admin posta global, ou cada Founder tem seu próprio mural pro clube dele? | F-V09 (29/04 PM: hipótese padrão **global**, gerenciado pelo admin via Academy CMS) |
 | TBD-16 | WhatsApp link por Founder: admin valida antes de publicar, ou o Founder publica direto? | F-V10 |
-| **TBD-19** *(novo)* | **Cashin** é o fornecedor confirmado pra pagamentos? Resposta TBD-3 disse "provavelmente" — precisa confirmação final. Em paralelo: o `lib/payouts/v2/` é construído com interface de provider agnóstica. | F-V07 |
-| **TBD-20** *(novo)* | Founder com CPF pode usar Cashin (sem NF), ou só Founder com CNPJ pode sacar cash? Em outras palavras, ser Founder é independente de CPF/CNPJ ou exige CNPJ? | F-V06, F-V07 |
-| **TBD-21** *(novo)* | Membro inativo: prazo X pra converter saldo em crédito antes de "expirar"? Qual X? Resposta TBD-13 deixou em aberto pra inativos. | F-V05 (não-bloqueante — hipótese padrão: 90 dias após inativação) |
-| **TBD-22** *(novo)* | Cupom de creatina (campanhas): admin define períodos/segmentos via UI nova, ou disparo é manual? Quais critérios de elegibilidade (cliente novo, valor mínimo de pedido, etc.)? | F-V13 |
+| TBD-20 | Founder com CPF pode usar Cashin (sem NF), ou só Founder com CNPJ pode sacar cash? | F-V06, F-V07 |
+| TBD-21 | Membro inativo: prazo X pra converter saldo em crédito antes de "expirar"? Qual X? | F-V05 (não-bloqueante — hipótese padrão: 90 dias após inativação) |
+| TBD-22 | Cupom de creatina (campanhas): admin define períodos/segmentos via UI nova, ou disparo é manual? Quais critérios de elegibilidade? | F-V13 (pode ser absorvida por F-V15 — confirmar com cliente) |
+| **TBD-23** *(novo, 29/04 PM)* | Crédito Shopify gerado por resgate — tem validade ou é eterno até consumo? Cliente disse "depois que resgatou tem salvo lá". Confirmação técnica + validação. | F-V05 (não-bloqueante — hipótese padrão: sem validade após geração; admin pode forçar expiração no painel) |
+| **TBD-24** *(novo, 29/04 PM)* | Eventos têm entry-fee (ingresso pago) ou são gratuitos com bônus de ativação? Como o "bônus de ativação" é creditado (saldo? badge? cashback Cashin)? | F-V15 (não-bloqueante — hipótese padrão: gratuito + tag em quem comprar pelo link/período) |
+| **TBD-25** *(novo, 29/04 PM)* | "Preço sugerido" pro membro vender (vendas manuais F-V14) — é fixado pelo admin por produto, ou margem em cima do "preço de custo"? Custo é exibido pra todo membro ou só pra Founders? | F-V14 (não-bloqueante — hipótese padrão: admin define preço sugerido manual por produto; preço de custo só visível admin) |
+| **TBD-26** *(novo, 29/04 PM)* | TBD-11 foi substituído por hipótese padrão (ranking por nº de pessoas no clube) — confirmar critério final. Pode ser combinação (pessoas + receita + retenção)? | F-V08 (não-bloqueante — começa com nº de pessoas) |
 
 ### 4.2 TBDs resolvidos (11 — registrados em 29/04/2026)
 
@@ -129,6 +156,14 @@ NÃO mexer sem autorização explícita do humano:
 | TBD-17 | Cupom de creatina **mantém**, mas com escopo alterado: vira **sistema de campanhas configuráveis pelo admin** (cliente/período/segmento). Não mais cron mensal automático. | Anti-SPEC §9 atualizado. **F-V13 criada** pra cobrir o escopo novo. **TBD-22 derivado** pra UX. Cron `generate-creatine-coupons` será desligado quando F-V13 substituir. |
 | TBD-18 | **Saque RPA/CPF descontinua**. Não foi confirmado quantos membros usam. | Anti-SPEC §10 atualizado. UI escondida atrás do flag v2. Remoção física na onda 6 / F-V12. |
 | TBD-001 (legado v1) | House Account — descontinua no v2 (sobreposto pelo TBD-10). | Sem ação adicional. |
+
+### 4.3 TBDs resolvidos na reunião 29/04 PM (3 — registrados em 05/05/2026)
+
+| ID | Decisão | Impacto |
+|---|---|---|
+| TBD-11 | Ranking de Founder começa **por nº de pessoas no clube** (decisão inicial). Iteração futura pode incluir receita/retenção. | F-V08 destravada com hipótese padrão. **TBD-26 derivado** pra confirmar critério final. |
+| TBD-19 | **Cashin confirmado** como provider. API aberta, contato direto pelo Léo. Construir `lib/payouts/v2/cashin.ts` com interface agnóstica mantida. | F-V07 destravada na parte do provider. |
+| TBD-14 (refino) | Crédito Shopify via **API `customer.credit`** (não cupom). Mateus confirmou existir endpoint. **TBD-23 derivado** pra prazo de validade do crédito. | F-V05 com regra mais clara. Cupom Shopify continua disponível via `lib/shopify/coupon.ts` mas não é o caminho default. |
 
 ---
 
@@ -184,6 +219,16 @@ NÃO mexer sem autorização explícita do humano:
 - [ ] **F-V12** — remover fisicamente código v1 (jobs CV, bônus, royalty, rebaixamento, RPA/CPF, telas de níveis, House Account, cron de cupom mensal).
 - [ ] Só após v2 validado em produção e flag `LRP_V2=true` por X semanas (sugestão: 4 semanas com 0 incidentes).
 
+### ONDA 7 — Front-end (absorção do Loveable, paralela às ondas 2-5)
+> Cronograma detalhado em `docs/sdd/CRONOGRAMA-V2.md` (versão compactada — 27 dias úteis, entrega 11/06/2026). Decisões de migração em `docs/sdd/LOVEABLE-IMPORT.md`.
+
+- [ ] **S1 — Fundação + Membro core start** (06–12/05): Tailwind + shadcn + tokens + shells + 3 telas membro (Dashboard, Club, Profile).
+- [ ] **S2 — Membro finish + Login** (13–19/05): Store, Orders (F-V14), Finance (F-V05+F-V07 triple), Login refator.
+- [ ] **S3 — Admin core** (20–26/05): Overview, Community (F-V18), Growth, Consumption, Products.
+- [ ] **S4 — Eventos+Academy+Finance/Payouts admin** (27/05–02/06): F-V15, F-V09, Finance, Payouts admin, OrdersAnalytics.
+- [ ] **S5 — Integrações finais + QA** (03–09/06): F-V17 (SSO Shopify), Cashin live, validações NF, matriz de validação por feature.
+- [ ] **Buffer** (10–11/06): polimento + retrabalho de feedback. **Entrega final: 11/06/2026 (qui).**
+
 ---
 
 ## 6. Mapeamento código → status pós-pivot
@@ -219,15 +264,31 @@ NÃO mexer sem autorização explícita do humano:
 
 ---
 
-## 7. Próximos passos imediatos
+## 7. Próximos passos imediatos (snapshot 05/05/2026)
 
-1. **Iniciar F-V01** (cadastro com ref obrigatório) — porta de entrada do v2. TBD-10 resolvido. Hipóteses padrão pra TBD-8/9 documentadas no SPEC quando criar.
-2. **Iniciar F-V02** (integração Guru via Shopify) — em paralelo a F-V01. Confirmar com Wink a abordagem antes de mergear.
-3. **Iniciar F-V05** (saldo + créditos Shopify 1:1) — depende de F-V03/F-V04 estarem em curso? Não — saldo pode existir antes da comissão entrar; vira valor 0 até F-V04 alimentar.
-4. **Cliente responder os 12 TBDs ainda abertos** (8 originais + 4 derivados). Sem isso, F-V04, F-V07, F-V08, F-V09, F-V10, F-V13 ficam bloqueadas.
-5. **Confirmação técnica do Wink** sobre Guru → Shopify webhook.
-6. **Confirmação do fornecedor de pagamento** (Cashin vs alternativas — TBD-19).
+1. **S1 do CRONOGRAMA-V2** (06–12/05) — fundação do front: Tailwind + shadcn + design tokens + shells. Documentação base já feita (LOVEABLE-IMPORT.md, SPECs F-V14..F-V18 skeleton).
+2. **F-V01** ainda destravada — porta de entrada do v2. Pode rodar paralelo a S1 se decidir começar backend antes do front.
+3. **Cliente responder TBDs ainda abertos** (10 + 4 novos da reunião 29/04 PM). Sem isso, F-V04 e a parte fiscal de F-V07 seguem bloqueadas.
+4. **Validação técnica:**
+   - Wink confirma Guru → Shopify webhook (F-V02).
+   - Multipass / Customer Account API da Shopify pra F-V17 (SSO).
+   - Documentação Cashin (F-V07).
+   - API `customer.credit` da Shopify (F-V05).
 
 ---
 
-*Última atualização: 2026-04-29 (11/18 TBDs respondidos; F-V01, F-V02, F-V03, F-V05 destravadas; 4 TBDs derivados criados; F-V13 nova feature).*
+## 8. Onde encontrar cada coisa
+
+| Procura | Onde |
+|---|---|
+| Estrutura de telas/rotas + design tokens + mapeamento Loveable→Next | `docs/sdd/LOVEABLE-IMPORT.md` |
+| Cronograma sprint a sprint até 15/06/2026 | `docs/sdd/CRONOGRAMA-V2.md` |
+| SPEC de cada feature v2 | `docs/sdd/features/F-VNN-<slug>/SPEC.md` |
+| Workflow de execução (loop por feature, classes, estados) | `docs/sdd/PLAYBOOK.md` |
+| Texto enviado ao cliente pedindo decisão dos TBDs | `docs/sdd/QUESTIONARIO-CLIENTE-V2.md` |
+| Prompt self-contained pra abrir nova sessão CLI | `docs/sdd/PROMPT-NOVA-SESSAO.md` |
+| Status de cada feature + o que está em produção | `docs/STATUS_IMPLEMENTACAO.md` (seção PIVÔ V2 no topo) |
+
+---
+
+*Última atualização: 2026-05-05 (reunião 29/04 PM com cliente; 14/26 TBDs respondidos — TBD-11/19/14 resolvidos; TBD-23/24/25/26 derivados; 5 features novas F-V14..F-V18; absorção do Loveable como referência; Anti-SPEC §12-13; cronograma compactado de 5 sprints + 2 dias buffer = entrega 11/06/2026).*
