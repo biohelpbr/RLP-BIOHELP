@@ -48,7 +48,10 @@ export async function listCommunity(filters: CommunityFilters = {}): Promise<Com
   }
 
   if (filters.tag) {
-    query = query.contains("tags", [filters.tag])
+    // tags é jsonb — precisa serializar como JSON array, não Postgres array.
+    // .contains() envia formato `cs.{...}` (incompatível com jsonb); usamos
+    // .filter("cs", JSON.stringify([tag])) que envia `cs.["..."]`.
+    query = query.filter("tags", "cs", JSON.stringify([filters.tag]))
   }
 
   const { data, error, count } = await query

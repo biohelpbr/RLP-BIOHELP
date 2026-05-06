@@ -27,6 +27,14 @@ export function createServiceClient() {
     auth: {
       autoRefreshToken: false,
       persistSession: false
+    },
+    // Next 14 dedupa fetch dentro do mesmo render lifecycle, o que cacheia
+    // leituras de service_role e quebra recompute / agregações server-side
+    // quando os dados mudam entre chamadas no mesmo request. service_role
+    // é sempre dynamic — força no-store.
+    global: {
+      fetch: (input, init) =>
+        fetch(input as RequestInfo, { ...init, cache: 'no-store' })
     }
   })
 }
