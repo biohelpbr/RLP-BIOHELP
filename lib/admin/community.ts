@@ -1,0 +1,168 @@
+import { createServiceClient } from "@/lib/supabase/server"
+
+export type CommunityMember = {
+  id: string
+  name: string
+  email: string
+  ref_code: string
+  status: string
+  created_at: string
+  sponsor_id: string | null
+  tags: string[]
+  active_count: number
+}
+
+export type CommunityFilters = {
+  status?: "active" | "pending" | "inactive" | "all"
+  tag?: string
+  page?: number
+  pageSize?: number
+}
+
+export type CommunityList = {
+  rows: CommunityMember[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+const DEFAULT_PAGE_SIZE = 50
+
+export async function listCommunity(filters: CommunityFilters = {}): Promise<CommunityList> {
+  const supabase = createServiceClient()
+  const page = Math.max(1, filters.page ?? 1)
+  const pageSize = Math.min(200, Math.max(10, filters.pageSize ?? DEFAULT_PAGE_SIZE))
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  let query = supabase
+    .from("members")
+    .select("id, name, email, ref_code, status, created_at, sponsor_id, tags", {
+      count: "exact",
+    })
+    .order("created_at", { ascending: false })
+    .range(from, to)
+
+  if (filters.status && filters.status !== "all") {
+    query = query.eq("status", filters.status)
+  }
+
+  if (filters.tag) {
+    // tags é jsonb — precisa serializar como JSON array, não Postgres array.
+    // .contains() envia formato `cs.{...}` (incompatível com jsonb); usamos
+    // .filter("cs", JSON.stringify([tag])) que envia `cs.["..."]`.
+    query = query.filter("tags", "cs", JSON.stringify([filters.tag]))
+  }
+
+  const { data, error, count } = await query
+  if (error) {
+    console.error("[community.listCommunity]", error)
+    return { rows: [], total: 0, page, pageSize }
+  }
+
+  const ids = (data ?? []).map((r) => r.id as string)
+  const counts = await loadActiveCounts(ids)
+
+  const rows: CommunityMember[] = (data ?? []).map((r) => ({
+    id: r.id as string,
+    name: (r.name as string) ?? "",
+    email: (r.email as string) ?? "",
+    ref_code: (r.ref_code as string) ?? "",
+    status: (r.status as string) ?? "",
+    created_at: (r.created_at as string) ?? "",
+    sponsor_id: (r.sponsor_id as string | null) ?? null,
+    tags: Array.isArray(r.tags) ? (r.tags as string[]) : [],
+    active_count: counts.get(r.id as string) ?? 0,
+  }))
+
+  return { rows, total: count ?? 0, page, pageSize }
+}
+
+async function loadActiveCounts(memberIds: string[]): Promise<Map<string, number>> {
+  if (memberIds.length === 0) return new Map()
+  const supabase = createServiceClient()
+  const { data, error } = await supabase
+    .from("member_active_affiliate_count")
+    .select("member_id, active_count")
+    .in("member_id", memberIds)
+  if (error) {
+    console.error("[community.loadActiveCounts]", error)
+    return new Map()
+  }
+  const map = new Map<string, number>()
+  for (const row of data ?? []) {
+    map.set(row.member_id as string, Number(row.active_count ?? 0))
+  }
+  return map
+}
+
+export async function getCommunityMember(id: string) {
+  const supabase = createServiceClient()
+  const { data: member } = await supabase
+    .from("members")
+    .select("id, name, email, ref_code, status, created_at, sponsor_id, tags, phone, level")
+    .eq("id", id)
+    .single()
+  if (!member) return null
+
+  const [sponsorRes, countsRes, payoutsRes, leadsRes, salesRes] = await Promise.all([
+    member.sponsor_id
+      ? supabase
+          .from("members")
+          .select("id, name, ref_code")
+          .eq("id", member.sponsor_id)
+          .single()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("member_active_affiliate_count")
+      .select("active_count")
+      .eq("member_id", id)
+      .single(),
+    supabase
+      .from("payout_requests")
+      .select("id, amount, status, payout_method, created_at")
+      .eq("member_id", id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("member_leads")
+      .select("*", { count: "exact", head: true })
+      .eq("member_id", id),
+    supabase
+      .from("member_sales")
+      .select("*", { count: "exact", head: true })
+      .eq("member_id", id),
+  ])
+
+  const sponsor = sponsorRes.data
+  const counts = countsRes.data
+  const payouts = payoutsRes.data
+  const leadsCount = leadsRes.count ?? 0
+  const salesCount = salesRes.count ?? 0
+
+  return {
+    member: {
+      id: member.id as string,
+      name: (member.name as string) ?? "",
+      email: (member.email as string) ?? "",
+      ref_code: (member.ref_code as string) ?? "",
+      status: (member.status as string) ?? "",
+      created_at: (member.created_at as string) ?? "",
+      sponsor_id: (member.sponsor_id as string | null) ?? null,
+      tags: Array.isArray(member.tags) ? (member.tags as string[]) : [],
+      phone: (member.phone as string | null) ?? null,
+      level: (member.level as string | null) ?? null,
+    },
+    sponsor: sponsor as { id: string; name: string; ref_code: string } | null,
+    activeCount: Number(counts?.active_count ?? 0),
+    payouts: (payouts ?? []) as Array<{
+      id: string
+      amount: number
+      status: string
+      payout_method: string | null
+      created_at: string
+    }>,
+    leadsCount,
+    salesCount,
+  }
+}

@@ -11,17 +11,17 @@
 Reunião 29/04 PM: cliente apresentou layout admin completo com 9 áreas ativas. Esta SPEC é **agregadora** — cada área tem sub-SPEC ou é coberta por feature específica. Define a estrutura comum, navegação, e qual área puxa de qual lib.
 
 ## Áreas e dependências
-| Área | Rota | Feature subjacente | Sub-SPEC |
-|---|---|---|---|
-| Visão Geral | `/admin` | F-V16 (esta) | — |
-| Comunidade | `/admin/community` | F-V16 + F-V18 (tags auto) | F-V18 SPEC |
-| Crescimento | `/admin/growth` | F-V16 (gráficos + projeção) | — |
-| Consumo | `/admin/consumption` | F-V16 (Shopify reads + admin manual) | — |
-| Produtos | `/admin/products` | F-V16 (já existe; refator layout + preço sugerido + custo) | — |
-| Eventos | `/admin/events` | F-V15 | F-V15 SPEC |
-| Financeiro | `/admin/finance` | F-V04 (comissões) + F-V05 (saldo) + F-V16 | F-V04 SPEC + F-V05 SPEC |
-| Resgates | `/admin/payouts` | F-V07 | F-V07 SPEC |
-| Academy | `/admin/academy` | F-V09 | F-V09 SPEC |
+| Área | Rota | Feature subjacente | Sub-SPEC | Status |
+|---|---|---|---|---|
+| Visão Geral | `/admin` | F-V16 (esta) | — | ✅ S3 (06/05/2026) |
+| Comunidade | `/admin/community` | F-V16 + F-V18 (tags auto) | F-V18 SPEC | ✅ S3 (06/05/2026) |
+| Crescimento | `/admin/growth` | F-V16 (gráficos + projeção) | — | ✅ S3 (06/05/2026) |
+| Consumo | `/admin/consumption` | F-V16 (Shopify reads + admin manual) | — | ✅ S3 (06/05/2026) |
+| Produtos | `/admin/products` | F-V16 (já existe; refator layout + preço sugerido + custo) | — | ✅ S3 (06/05/2026) |
+| Eventos | `/admin/events` | F-V15 | F-V15 SPEC | ⏳ S4 |
+| Financeiro | `/admin/finance` | F-V04 (comissões) + F-V05 (saldo) + F-V16 | F-V04 SPEC + F-V05 SPEC | ⏳ S4 |
+| Resgates | `/admin/payouts` | F-V07 | F-V07 SPEC | ⏳ S4 |
+| Academy | `/admin/academy` | F-V09 | F-V09 SPEC | ⏳ S4 |
 
 ## Definition of Ready
 - [x] RFs definidos

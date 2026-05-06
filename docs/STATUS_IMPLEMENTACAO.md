@@ -102,9 +102,30 @@
 - ⏳ **TBD-27 *(novo, S2)*:** dados Biohelp NF (CNPJ, razão social, endereço) hardcoded em `WithdrawDialog`. Confirmar dados reais com cliente em demo de 13/05 e mover pra env ou `system_config` table em S5.
 - ⏳ **Pendente humano (não-bloqueante):** Playwright UI screenshot smoke (Plug-in MCP desconectou na primeira tentativa); RLS test end-to-end com 2 tokens (precisa setup de 2 contas test).
 
-### Próximo passo (snapshot 06/05/2026 pós-S2-validado)
-1. Humano revisa PR #3 e mergeia (Playwright UI screenshot opcional pra demo 13/05).
-2. **S3 — Admin core** (20–26/05/2026): Overview, Community+F-V18, Growth, Consumption, Products. Detalhe em `CRONOGRAMA-V2.md`.
+### S3 entregue (06/05/2026) — branch `feat/S3-admin-core` ✅ migrations aplicadas + smoke ON+OFF + F-V18 end-to-end
+- ✅ **Migration aplicada** via Supabase MCP no projeto `rlp-biohelp`: `f_v18_tags_and_affiliate_count` — `members.tags jsonb DEFAULT '[]'` + index GIN + view `member_active_affiliate_count` (proxy `status='active'` até F-V03 entrar). Idempotente, rollback comentado.
+- ✅ **F-V18 implementada e validada end-to-end** (8/8 CAs ✅):
+  - `lib/tags/auto-classifier.ts` — `recompute(memberId?)` lê view, aplica regra (≥40 → lider+influenciador; ≥5 → lider; else → []), preserva `manual:*` por prefix. Idempotente.
+  - `app/api/cron/auto-tags/route.ts` — GET endpoint protegido por `Bearer CRON_SECRET`. Retorna `{ok, scanned, updated, unchanged}`.
+  - `vercel.json` — schedule diário 03:00 UTC.
+  - `lib/tags/hook-on-status-change.ts` — stub documentado (wire em S5+ quando F-V03 entrar).
+  - Smoke: seed 5/40/4 affiliates → tags corretas. `manual:vip` preservada. 2x recompute = idempotente. Auth 401 sem Bearer.
+- ✅ **5 áreas admin v2** atrás de `LRP_V2`:
+  - `/admin` (switch RSC) — V2Admin com 4 cards + breakdown por status (substitui `breakdownByRank` v1) + 3 stats de tags F-V18.
+  - `/admin/community` + `/admin/community/[id]` — lista com filtros status+tag, paginação, badges Líder/Influenciador/FOUNDER. Detalhe com sponsor + payouts.
+  - `/admin/growth` — RSC + `GrowthCharts` client (Recharts). 6m histórico + 3m projeção (média móvel). Bar (membros) + Line (receita vs resgates) com `ReferenceLine`.
+  - `/admin/consumption` — agregação `member_sales` (F-V14) por produto. Ranking receita+qty+ticket+clientes únicos.
+  - `/admin/products` (switch RSC) — V2 mostra mais vendidos via F-V14. Cadastro completo (preço sugerido + custo) em S4.
+- ✅ **2 bugs reais detectados e corrigidos no smoke:**
+  - Cache de `fetch` Next 14 cacheava leituras service_role e quebrava `recompute()` entre chamadas. Fix em `createServiceClient` global com `cache:'no-store'`.
+  - `.contains("tags", [...])` envia formato Postgres array incompatível com jsonb. Fix em `lib/admin/community.ts` usando `.filter("cs", JSON.stringify([...]))`.
+- ✅ **Build/typecheck/lint exit 0.**
+- ✅ **Smoke ON via HTTP+SQL** (admin@biohelp.test logado): 6 rotas v2 retornaram 200 com markers v2 corretos (Visão Geral, Distribuição por status, Tags automáticas F-V18, Filtros community, etc).
+- ✅ **Smoke OFF**: 4 rotas v1 (200) + 3 rotas v2 redirect → /admin (community/growth/consumption) + login V1 visível.
+
+### Próximo passo (snapshot 06/05/2026 pós-S3-validado)
+1. Humano revisa PR #4 (S3) e mergeia.
+2. **S4 — Eventos + Academy + Finance/Payouts admin** (27/05–02/06/2026): F-V15 (eventos), F-V09 (Academy CMS), Finance/Payouts admin refator, OrdersAnalytics. Detalhe em `CRONOGRAMA-V2.md`.
 2. **F-V01** (cadastro com ref obrigatório) — pode rodar em paralelo a S1 se decidir começar backend antes do front.
 3. Cliente responder os **12 TBDs ainda abertos** (8 originais + 4 da reunião 29/04 PM). Cobrar nas demos quartas-feiras.
 4. **Validação técnica antes de S5:**
@@ -133,7 +154,7 @@
 | **F-V15** | **Eventos admin (criação + funil + link/tag)** | **C** | **7 (S4)** | ✅ **Destravada (nova — 29/04 PM)** |
 | **F-V16** | **Painel admin completo (9 áreas)** | **B** | **7 (S3-S4)** | ✅ **Destravada (nova — 29/04 PM)** |
 | **F-V17** | **SSO Shopify → Painel** | **D** | **7 (S5)** | 🟡 **Parcial — exige PoC Multipass/App Proxy** |
-| **F-V18** | **Tags automáticas Líder/Influenciador** | **B** | **7 (S3)** | ✅ **Destravada (nova — 29/04 PM)** |
+| **F-V18** | **Tags automáticas Líder/Influenciador** | **B** | **7 (S3)** | ✅ **Entregue em S3 (06/05) — Status:Done escopo S3 (proxy `status='active'`). Migration aplicada + cron diário + 8/8 CAs validados** |
 
 ---
 
