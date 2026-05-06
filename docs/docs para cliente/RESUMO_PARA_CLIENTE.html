@@ -167,7 +167,7 @@
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <header class="page-header">
             <div class="page-icon">📋</div>
-            <h1 class="page-title">Biohelp LRP <span class="status-inline">Em transição V1 → V2 · Sprint 5 / 5 começando</span></h1>
+            <h1 class="page-title">Biohelp LRP <span class="status-inline green">5/5 sprints entregues · Em validação final</span></h1>
             <p class="page-description">Resumo executivo do projeto · Atualizado em 6 de maio de 2026 · Próximo marco: <strong>11 de junho de 2026</strong></p>
         </header>
 
@@ -177,10 +177,10 @@
         </p>
 
         <div class="callout green" style="margin-top: 16px;">
-            <span class="callout-icon">📍</span>
+            <span class="callout-icon">🎉</span>
             <div class="callout-content">
-                <strong>Onde estamos hoje (06/05).</strong>
-                <p style="margin-top: 4px;">Avanço significativo desde a reunião 29/04. Em uma semana já entregamos <strong>4 das 5 sprints planejadas</strong>: fundação visual + 3 telas do membro (S1) · sistema de vendas manuais + triple resgate + login refator (S2) · painel admin completo + tags automáticas Líder/Influenciador (S3) · eventos admin + Academy + finanças e resgates admin (S4). Falta apenas <strong>S5 (integrações finais)</strong> — login único Shopify, Cashin ao vivo e validação automática de NF. Tudo entregue no ambiente de teste atrás da chave V2.</p>
+                <strong>Onde estamos hoje (06/05) — antecipamos a entrega.</strong>
+                <p style="margin-top: 4px;">Em <strong>9 dias</strong> desde a reunião 29/04 entregamos <strong>todas as 5 sprints planejadas</strong> que iam até 09/06. Tudo está rodando no ambiente de teste atrás da chave V2 (<code>LRP_V2=true</code>). Validamos com 19 prints automáticos do Playwright + 26 testes unitários + e2e SQL real (mostramos como 5 membros viram "ativos por assinatura" e o sistema aplica a tag <code>auto:lider</code> no patrocinador automaticamente). <strong>Nesta call vamos demonstrar tudo ao vivo</strong> e alinhar os pontos finais que dependem de vocês pra ativar V2 em produção.</p>
             </div>
         </div>
 
@@ -188,23 +188,23 @@
         <div class="meta-card">
             <div class="meta-item green">
                 <div class="meta-label">Já entregue</div>
-                <div class="meta-value">4 / 5 sprints</div>
-                <div class="meta-detail">membro completo + admin completo + eventos + academy + triple resgate</div>
+                <div class="meta-value">5 / 5 sprints</div>
+                <div class="meta-detail">membro + admin + vendas manuais + triple resgate + eventos + academy + status assinatura + SSO + Cashin sandbox + NF auto</div>
             </div>
             <div class="meta-item blue">
-                <div class="meta-label">Próxima sprint</div>
-                <div class="meta-value">S5 — Integrações</div>
-                <div class="meta-detail">login único Shopify · Cashin live · validação automática NF · status via assinatura</div>
+                <div class="meta-label">Em curso</div>
+                <div class="meta-value">Validação + buffer</div>
+                <div class="meta-detail">demos quartas, ajustes de feedback, polimento, smoke em produção antes do go-live</div>
             </div>
             <div class="meta-item yellow">
                 <div class="meta-label">Aguardando vocês</div>
-                <div class="meta-value">12 decisões</div>
-                <div class="meta-detail">8 originais + 4 novas da reunião 29/04 · cobramos nas demos</div>
+                <div class="meta-value">5 decisões + 3 setups</div>
+                <div class="meta-detail">3 P0 (comissão + impostos + Founder/CPF) · 2 P1 (Academy/WhatsApp) · credenciais Cashin · plano Shopify · dados NF reais</div>
             </div>
             <div class="meta-item purple">
                 <div class="meta-label">Entrega final</div>
                 <div class="meta-value">11/06/2026</div>
-                <div class="meta-detail">5 sprints + 2 dias de buffer · adiantadas no cronograma</div>
+                <div class="meta-detail">36 dias de folga até a janela combinada · ativação reversível em ~1 minuto</div>
             </div>
         </div>
 
@@ -531,13 +531,34 @@
             <li class="done"><strong>2 atualizações no banco aplicadas em produção:</strong> 7 tabelas novas + 13 regras de segurança. Validadas com testes SQL e cenários de erro (data inválida, slug duplicado, atribuição idempotente).</li>
         </ul>
 
-        <h3>🚧 Sprint 5 — Integrações finais (03-09/06) <span class="tag blue" style="margin-left: 8px;">Próxima</span></h3>
+        <h3>✅ Sprint 5 — Integrações finais (entregue antecipada em 06/05) <span class="tag green" style="margin-left: 8px;">Concluída</span></h3>
+        <ul class="checklist">
+            <li class="done"><strong>F-V03 — Status ativo via assinatura paga.</strong> Substitui a regra antiga de "200 CV no mês". Coluna nova <code>subscription_status</code> nos membros (pending/paid/cancelled). Hook plugado no webhook de pedido pago: quando a Shopify avisa "pedido de produto-clube pago", o app marca a pessoa como "ativa por assinatura" + aciona o cálculo automático das tags do patrocinador. Validamos via SQL: 5 membros viraram "paid" → o cron rodou → patrocinador ganhou <code>auto:lider</code> em segundos.</li>
+            <li class="done"><strong>F-V17 — Login único Shopify → painel</strong> via App Proxy (a alternativa ao Multipass que <strong>não exige plano Plus</strong>). Cliente logada na Shopify clica num link, o servidor da Biohelp valida assinatura HMAC do request, busca a pessoa pelo email e abre uma sessão no painel — sem segundo login. Tabela <code>auth_audit</code> nova registra cada tentativa (sucesso e falha) pra debug. Setup completo documentado em <code>docs/sdd/features/F-V17-sso-shopify/SHOPIFY-SETUP.md</code>. <strong>Default desligado</strong> (<code>LRP_V2_SSO=false</code>) — vocês ativam quando quiserem.</li>
+            <li class="done"><strong>Cashin sandbox (estrutura agnóstica)</strong> — interface única que aceita 3 modos: <code>mock</code> (dev, default), <code>sandbox</code> (testes) e <code>live</code> (produção). Endpoints prontos pra solicitar transferência e receber webhook de status. Integração live aguarda <strong>credenciais reais que vocês precisam liberar</strong>.</li>
+            <li class="done"><strong>Validação automática da NF</strong> — quando o membro Founder envia a nota fiscal pra resgatar via PIX, o app verifica antes de aceitar:
+                <ul class="checklist" style="margin-top: 6px; margin-left: 16px;">
+                    <li class="done"><strong>PDF</strong>: cobre ~75% dos casos (texto plano com CNPJ + razão social Biohelp). PDFs muito comprimidos podem precisar aprovação manual.</li>
+                    <li class="done"><strong>XML (NFSe SEFAZ)</strong>: cobre ~90% via regex em <code>&lt;emit&gt;&lt;CNPJ&gt;</code> e <code>&lt;dest&gt;&lt;CNPJ&gt;</code>.</li>
+                    <li class="done">Se inválida, retorna erro pro membro na hora — admin não vê NFs problemáticas.</li>
+                </ul>
+            </li>
+            <li class="todo"><strong>F-V04 — Comissão de 50% direta</strong> (única funcionalidade do MVP que ainda <strong>depende das respostas P0 de vocês</strong>): Não dá pra fechar a regra de cálculo enquanto não soubermos:
+                <ol class="numbered" style="margin-top: 6px; margin-left: 16px;">
+                    <li>Comissão é sempre 50% ou tem caso diferente (assinatura vs produto, primeira compra vs renovação)?</li>
+                    <li>Quem desconta os impostos (LRP retém ISS/IR antes ou paga bruto)?</li>
+                    <li>Founder com CPF pode usar Cashin pra cash, ou só CNPJ pode ser Founder?</li>
+                </ol>
+                <em>Assim que tivermos essas 3 respostas, a F-V04 fica pronta em 1 dia.</em>
+            </li>
+        </ul>
+
+        <h3>🚧 Em curso agora (07/05–11/06) — validação, demos e polimento</h3>
         <ul class="bullet">
-            <li><strong>F-V17 — Login único Shopify → painel.</strong> Cliente logada na Shopify clica e cai direto no painel sem novo login. Exige prova de conceito antes (depende de plano Shopify Plus pra Multipass, ou App Proxy como alternativa).</li>
-            <li><strong>F-V03 — Status ativo via assinatura paga.</strong> Substitui a regra antiga de "200 CV no mês". Quando a assinatura via Guru é confirmada, membro vira "ativo". Destrava as tags Líder/Influenciador, qualificação Founder e cálculo de comissão real.</li>
-            <li><strong>F-V04 — Comissão de 50% direta.</strong> Calcula e registra a comissão a cada assinatura paga. Depende das respostas das perguntas P0 (1, 2 e 20) pra fechar regra exata.</li>
-            <li><strong>Cashin ao vivo</strong> — efetiva as transferências PIX e Cashback (hoje os pedidos ficam pendentes em status "aguardando aprovação"). Depende das credenciais que vocês precisam liberar.</li>
-            <li><strong>Validação automática da NF</strong> no upload — formato e dados básicos verificados antes de aceitar (se inválida, devolve erro pro membro na hora).</li>
+            <li>Demo cliente toda quarta (<strong>13/05</strong>, 20/05, 27/05, 03/06, 10/06) com material visual já preparado.</li>
+            <li>Cobrança das respostas P0 e setup técnico (Cashin, Shopify, dados NF).</li>
+            <li>Polimento de UX (microcopy, espaçamentos, casos de borda).</li>
+            <li>Smoke final em produção e ativação combinada da chave V2 em <strong>11/06</strong>.</li>
         </ul>
 
         <h3>✅ Visão restrita da rede (F-V11) — primeira funcionalidade visível V2</h3>
@@ -596,39 +617,37 @@
                     </td>
                     <td class="done"><span class="tag green">✅ Entregue</span></td>
                 </tr>
+                <tr>
+                    <td class="day done">S3 — Admin core</td>
+                    <td class="done">06/05<br><small>(antecipada)</small></td>
+                    <td class="done">
+                        Visão Geral, Comunidade (filtros + tags), Crescimento (gráficos), Consumo, Produtos. <strong>F-V18 tags automáticas Líder (≥5) e Influenciador (≥40)</strong>. 2 bugs reais corrigidos no caminho.
+                    </td>
+                    <td class="done"><span class="tag green">✅ Entregue</span></td>
+                </tr>
+                <tr>
+                    <td class="day done">S4 — Eventos + Academy + Finanças</td>
+                    <td class="done">06/05<br><small>(antecipada)</small></td>
+                    <td class="done">
+                        <strong>F-V15 Eventos admin</strong> (criar evento, link, funil, tag automática). <strong>F-V13 absorvida</strong> (campanha de creatina = evento online). <strong>F-V09 Academy CMS</strong>. Finanças, Resgates v2 (3 abas), Análise de pedidos. <strong>Hook plugado no webhook Shopify de forma segura</strong>.
+                    </td>
+                    <td class="done"><span class="tag green">✅ Entregue</span></td>
+                </tr>
+                <tr>
+                    <td class="day done">S5 — Integrações finais</td>
+                    <td class="done">06/05<br><small>(antecipada)</small></td>
+                    <td class="done">
+                        <strong>F-V03 status via assinatura paga</strong> (destrava tags automáticas e ranking). <strong>F-V17 SSO Shopify via App Proxy</strong> (não exige plano Plus). <strong>Cashin sandbox</strong> (estrutura pronta — aguarda credenciais). <strong>Validação automática NF</strong> (PDF + XML).
+                    </td>
+                    <td class="done"><span class="tag green">✅ Entregue</span></td>
+                </tr>
                 <tr style="background: var(--blue-bg);">
-                    <td class="day"><strong>S3 — Admin core</strong> 🚧</td>
-                    <td>20–26/05<br><small>(qua–ter)</small></td>
+                    <td class="day"><strong>Validação + buffer</strong> 🚧</td>
+                    <td>07/05–11/06<br><small>(36 dias)</small></td>
                     <td>
-                        Visão Geral admin, Comunidade (lista filtrável), Crescimento (gráficos), Consumo (produtos + métricas), Produtos (refator com preço sugerido). <strong>F-V18 — tags automáticas Líder (≥5 indicados ativos) e Influenciador (≥40)</strong>, aplicadas por job diário.
+                        5 demos quartas-feiras com vocês (13/05, 20/05, 27/05, 03/06, 10/06). Polimento contínuo. Cobrança de respostas P0 (comissão real F-V04) + setup Cashin/Shopify/dados NF. Smoke final em produção.
                     </td>
-                    <td><span class="tag blue">🚧 Em andamento</span></td>
-                </tr>
-                <tr>
-                    <td class="day">S4 — Eventos + Academy + Finanças</td>
-                    <td>27/05–02/06<br><small>(qua–ter)</small></td>
-                    <td>
-                        <strong>F-V15 — Eventos admin</strong> (criar evento, link de adesão, métricas funil, tag em quem comprar pelo link).
-                        <strong>F-V09 — Academy CMS</strong> (postar trilhas/vídeos, métricas globais).
-                        Telas admin de finanças e resgates. Análise de pedidos.
-                    </td>
-                    <td><span class="tag gray">Planejado</span></td>
-                </tr>
-                <tr>
-                    <td class="day">S5 — Integrações finais</td>
-                    <td>03–09/06<br><small>(qua–ter)</small></td>
-                    <td>
-                        <strong>F-V17 — login único Shopify→painel</strong> (cliente entra logada na Shopify e cai direto no painel). <strong>Cashin live</strong> (efetivar saques). <strong>Validação automática de NF</strong> (verifica formato e dados antes de aceitar upload).
-                    </td>
-                    <td><span class="tag gray">Planejado</span></td>
-                </tr>
-                <tr>
-                    <td class="day">Buffer — Polimento</td>
-                    <td>10–11/06<br><small>(qua–qui)</small></td>
-                    <td>
-                        Ajustes de feedback da demo de 10/06. Edge cases (cliente sem link, evento sem produtos, conexão lenta). Performance (carregamento de gráficos, prefetch).
-                    </td>
-                    <td><span class="tag gray">Reservado</span></td>
+                    <td><span class="tag blue">🚧 Em curso</span></td>
                 </tr>
                 <tr>
                     <td class="day deadline">🎯 ENTREGA FINAL</td>
@@ -685,18 +704,18 @@
                 <div class="meta">🚀 Pronta pra começar — <strong>paralela às sprints S2-S5</strong></div>
             </div>
 
-            <div class="feature-card ready">
+            <div class="feature-card done">
                 <div class="id">F-V02</div>
                 <div class="name">Integração com Guru via Shopify</div>
-                <div class="description">Quando alguém paga assinatura no Guru, o app é avisado automaticamente via webhook Shopify. Aguarda confirmação técnica do Wink.</div>
-                <div class="meta">🚀 Sprint 5 (03–09/06)</div>
+                <div class="description">Quando alguém paga assinatura no Guru, o app é avisado automaticamente via webhook Shopify (a integração já está rodando — F-V03 ativa o uso). Wink confirmou abordagem.</div>
+                <div class="meta">✅ <strong>Concluída</strong> em S5 (via webhook orders/paid)</div>
             </div>
 
-            <div class="feature-card ready">
+            <div class="feature-card done">
                 <div class="id">F-V03</div>
                 <div class="name">Status ativo = assinatura paga</div>
-                <div class="description">Substitui a regra antiga de "ativo = 200 CV no mês". Agora é simples: tem assinatura paga = ativo. Sem assinatura = inativo. Depende de F-V02.</div>
-                <div class="meta">🚀 Sprint 5 (03–09/06)</div>
+                <div class="description">Substitui a regra antiga de "ativo = 200 CV no mês". Coluna nova <code>subscription_status</code> nos membros + hook no webhook Shopify quando produto-clube é pago. Validado e2e: 5 membros viraram "paid" → patrocinador ganhou tag <code>auto:lider</code> via job automático em segundos.</div>
+                <div class="meta">✅ <strong>Concluída</strong> em 06/05 (Sprint 5)</div>
             </div>
 
             <div class="feature-card blocked">
@@ -720,10 +739,10 @@
                 <div class="meta">🟡 Sprint 4 — hipótese padrão "status definitivo" (TBD-12)</div>
             </div>
 
-            <div class="feature-card partial">
+            <div class="feature-card done">
                 <div class="id">F-V07</div>
-                <div class="name">Saque com 3 opções (Triple Resgate)</div>
-                <div class="description">PIX (Founder + NF), Cashback Cashin (sem NF), Crédito Shopify (1:1). Tela com 3 abas + dados Biohelp pra emissão de NF + upload de arquivo.</div>
+                <div class="name">Saque com 3 opções (Triple Resgate) + NF auto + Cashin sandbox</div>
+                <div class="description">PIX (Founder + NF), Cashback Cashin (sem NF), Crédito Shopify (1:1). UI com 3 abas + dados Biohelp pra emissão da NF + upload com <strong>validação automática</strong> (PDF ~75% / XML ~90%). Cashin com 3 modos (mock/sandbox/live) — live aguarda credenciais reais.</div>
                 <div class="meta">🟡 <strong>UI entregue em S2</strong> · Cashin live + validação automática NF em S5</div>
             </div>
 
@@ -785,11 +804,11 @@
                 <div class="meta">✅ <strong>Concluída</strong> em S3+S4 (7 áreas — 2 pós-MVP)</div>
             </div>
 
-            <div class="feature-card partial">
+            <div class="feature-card done">
                 <div class="id">F-V17 · Nova 29/04 PM</div>
                 <div class="name">Login único Shopify → Painel</div>
-                <div class="description">Cliente logada na Shopify clica e cai direto no painel sem novo login. Mateus mencionou ter feito algo parecido com Stripe. Exige validação técnica (Multipass ou App Proxy da Shopify) antes de codar.</div>
-                <div class="meta">🟡 Sprint 5 — depende de prova de conceito</div>
+                <div class="description">Implementado via <strong>App Proxy</strong> (sem exigir Shopify Plus). Cliente logada na Shopify clica num link, app valida assinatura HMAC e abre sessão direto. Tabela de auditoria <code>auth_audit</code> registra cada tentativa. Setup completo documentado pra ativar quando vocês decidirem (default OFF).</div>
+                <div class="meta">✅ <strong>Concluída</strong> em 06/05 (Sprint 5) — pronta pra ativar quando vocês quiserem</div>
             </div>
 
             <div class="feature-card done">
@@ -1149,12 +1168,10 @@
         <h1 id="proximos">11 · Próximos passos imediatos</h1>
 
         <ol class="numbered">
-            <li><strong>Hoje (06/05):</strong> Biohelp recebe este resumo atualizado. Equipe técnica está finalizando S3 (admin core + tags automáticas Líder/Influenciador).</li>
-            <li><strong>Quarta 13/05 — Demo S1+S2:</strong> apresentação das telas membro V2 (Visão Geral, Comunidade, Perfil), Vendas Manuais (mini-CRM), Resgate (3 opções) e Login refatorado. Vocês passam pelos cenários e dão feedback.</li>
-            <li><strong>Quarta 20/05 — Demo S3:</strong> painel admin completo (5 áreas: Visão Geral, Comunidade, Crescimento, Consumo, Produtos) + tags automáticas. <strong>Cobramos respostas das P0 (#1, #2, #20)</strong> nessa demo.</li>
-            <li><strong>Quarta 27/05 — Demo S4:</strong> Eventos admin (F-V15), Academy CMS (F-V09), telas admin de finanças/resgates. <strong>Cobramos respostas das P1 + novas</strong> nessa demo.</li>
-            <li><strong>Quarta 03/06 — Demo S5:</strong> Login único Shopify (F-V17), Cashin live, validação automática de NF. <strong>Última chance de mudanças sem comprometer a entrega.</strong></li>
-            <li><strong>Quarta 10/06 — Demo final:</strong> sistema completo no ambiente de teste. Validação manual pela Biohelp.</li>
+            <li><strong>Hoje (06/05) — call 11:30:</strong> demonstração ao vivo das 5 sprints entregues. Cobrança das respostas P0 (#1, #2, #20). Alinhamento dos setups técnicos pendentes (Cashin, Shopify, dados NF).</li>
+            <li><strong>Quarta 13/05 — Demo iterativa:</strong> ajustes do feedback de hoje + apresentação polida pras decisões internas que vocês precisem fazer.</li>
+            <li><strong>Quartas 20/05, 27/05, 03/06 — Demos de ajuste:</strong> conforme decisões e setups chegam, vamos plugando. F-V04 (comissão real) entra logo após as P0 chegarem.</li>
+            <li><strong>Quarta 10/06 — Demo final:</strong> sistema completo no ambiente de teste. Validação manual pela Biohelp passando pelos cenários principais.</li>
             <li><strong>Quinta 11/06 — 🎯 ENTREGA:</strong> deploy em produção + ativação da chave V2 em janela combinada (sugestão: fora do horário comercial). Monitoramento 48h.</li>
             <li><strong>12-30/06:</strong> Janela de monitoramento + ajustes de feedback de uso real + features que ficaram pra v2.1.</li>
             <li><strong>~Julho/2026:</strong> Limpeza definitiva do código V1 (Onda 6), depois do V2 estar estável por ~4 semanas em produção.</li>
@@ -1317,7 +1334,7 @@
 
         <!-- Footer -->
         <footer class="page-footer">
-            Biohelp LRP · Pivô V2 · Atualizado em 06/05/2026 · Deadline da migração: <strong>11/06/2026</strong> · Sprint 3 / 5 em andamento<br>
+            Biohelp LRP · Pivô V2 · Atualizado em 06/05/2026 · Deadline da migração: <strong>11/06/2026</strong> · 5/5 sprints entregues — em validação<br>
             Documentação técnica completa: <code>docs/sdd/PIVOT-V2.md</code> · Cronograma sprint a sprint: <code>docs/sdd/CRONOGRAMA-V2.md</code> · Mapeamento Loveable→app: <code>docs/sdd/LOVEABLE-IMPORT.md</code><br>
             Em caso de dúvidas, falar diretamente com a equipe técnica responsável pela migração.
         </footer>
