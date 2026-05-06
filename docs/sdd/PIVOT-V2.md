@@ -56,7 +56,7 @@
 - **F-V10:** Link de grupo WhatsApp por Founder.
 - **F-V11:** Refactor da visão de rede: membro vê só sponsor + indicados diretos. ✅ **Implementada 29/04/2026.**
 - **F-V12:** Migration / arquivamento do modelo v1 atrás de feature flag (`LRP_V2`). Inclui cleanup do RPA/CPF (TBD-18 resolvido — descontinua).
-- **F-V13:** Cupom de creatina como campanha configurável pelo admin (substitui cron mensal automático). Depende de TBD-22.
+- ~~**F-V13:** Cupom de creatina como campanha configurável pelo admin (substitui cron mensal automático). Depende de TBD-22.~~ **ABSORVIDA POR F-V15 (06/05/2026)** — campanha de creatina vira "evento online com produto elegível = creatina". TBD-22 cai dentro de F-V15.
 - **F-V14** *(nova — reunião 29/04 PM):* Vendas manuais do membro (CRM leve). Membro registra leads (potenciais clientes) e vendas concretizadas fora do canal Shopify. Métricas derivam só do que o membro preenche. Sem rastreio automático.
 - **F-V15** *(nova — reunião 29/04 PM):* Eventos admin. Admin cria evento (nome, data, presencial/online, link de adesão), métricas de funil (topo, WhatsApp, presentes, convertidos), bônus de ativação por participação. Link gera tag específica em quem comprar pelo período/link. Substitui o conceito legado de "cupom de creatina mensal".
 - **F-V16** *(nova — reunião 29/04 PM):* Painel admin completo. 9 áreas: Visão Geral, Comunidade (com tags Líder/Influenciador), Crescimento, Consumo, Produtos, Eventos, Financeiro, Resgates, Academy. Alertas e Configurações ficam pós-MVP.
@@ -89,7 +89,7 @@
 | F-V10 | Link WhatsApp por Founder | A | P2 | 🚫 Bloqueada — TBD-16 (admin valida?) aberto. |
 | F-V11 | Visão restrita da rede pro membro | B | P1 | ✅ **Implementada 29/04/2026** |
 | F-V12 | Deprecation v1 (CV, níveis, bônus, royalty, RPA/CPF) | D | depende | Aguarda v2 estável em produção. TBD-18 confirma cortar RPA/CPF. |
-| F-V13 | Cupom de creatina como campanha configurável | C | P2 | 🚫 Bloqueada — TBD-22 (UX da gestão) aberto. Pode ficar coberta por F-V15 (eventos com link/tag). |
+| F-V13 | ~~Cupom de creatina como campanha configurável~~ | — | — | ✅ **Absorvida por F-V15 em 06/05/2026.** Campanha de creatina = evento online com produto elegível. TBD-22 cai em F-V15. |
 | F-V14 | Vendas manuais do membro (CRM leve) | C | P1 | ✅ Destravada — sem TBD pendente. |
 | F-V15 | Eventos admin (criação + funil + link/tag) | C | P1 | ✅ Destravada — TBD-24 (entry-fee?) e TBD-25 (bônus de ativação?) não bloqueiam início. |
 | F-V16 | Painel admin completo (9 áreas) | B | P1 | ✅ Destravada — depende de F-V04, F-V05 pra dados reais; UI/shells podem começar. |
@@ -135,7 +135,7 @@ NÃO mexer sem autorização explícita do humano:
 | TBD-16 | WhatsApp link por Founder: admin valida antes de publicar, ou o Founder publica direto? | F-V10 |
 | TBD-20 | Founder com CPF pode usar Cashin (sem NF), ou só Founder com CNPJ pode sacar cash? | F-V06, F-V07 |
 | TBD-21 | Membro inativo: prazo X pra converter saldo em crédito antes de "expirar"? Qual X? | F-V05 (não-bloqueante — hipótese padrão: 90 dias após inativação) |
-| TBD-22 | Cupom de creatina (campanhas): admin define períodos/segmentos via UI nova, ou disparo é manual? Quais critérios de elegibilidade? | F-V13 (pode ser absorvida por F-V15 — confirmar com cliente) |
+| ~~TBD-22~~ | ~~Cupom de creatina (campanhas): admin define períodos/segmentos via UI nova, ou disparo é manual?~~ **RESOLVIDO 06/05/2026:** F-V13 absorvida por F-V15. Campanha de creatina = evento `mode=online` com produto elegível = creatina. TBD-22 não bloqueia mais (cai dentro do fluxo F-V15). | — |
 | **TBD-23** *(novo, 29/04 PM)* | Crédito Shopify gerado por resgate — tem validade ou é eterno até consumo? Cliente disse "depois que resgatou tem salvo lá". Confirmação técnica + validação. | F-V05 (não-bloqueante — hipótese padrão: sem validade após geração; admin pode forçar expiração no painel) |
 | **TBD-24** *(novo, 29/04 PM)* | Eventos têm entry-fee (ingresso pago) ou são gratuitos com bônus de ativação? Como o "bônus de ativação" é creditado (saldo? badge? cashback Cashin)? | F-V15 (não-bloqueante — hipótese padrão: gratuito + tag em quem comprar pelo link/período) |
 | **TBD-25** *(novo, 29/04 PM)* | "Preço sugerido" pro membro vender (vendas manuais F-V14) — é fixado pelo admin por produto, ou margem em cima do "preço de custo"? Custo é exibido pra todo membro ou só pra Founders? | F-V14 (não-bloqueante — hipótese padrão: admin define preço sugerido manual por produto; preço de custo só visível admin) |
@@ -212,9 +212,9 @@ NÃO mexer sem autorização explícita do humano:
 - [ ] **F-V08** — ranking. 🚫 Bloqueada (TBD-11).
 
 ### ONDA 5 — Conteúdo e comunidade (P2)
-- [ ] **F-V09** — área de conteúdo. 🚫 Bloqueada (TBD-15).
+- [ ] **F-V09** — área de conteúdo. 🚧 Em S4 (06/05/2026) com hipótese padrão TBD-15 (global).
 - [ ] **F-V10** — link WhatsApp Founder. 🚫 Bloqueada (TBD-16).
-- [ ] **F-V13** — cupom de creatina como campanha configurável. 🚫 Bloqueada (TBD-22).
+- [x] ~~**F-V13** — cupom de creatina como campanha configurável.~~ **Absorvida por F-V15 em S4 (06/05/2026).**
 
 ### ONDA 6 — Cleanup
 - [ ] **F-V12** — remover fisicamente código v1 (jobs CV, bônus, royalty, rebaixamento, RPA/CPF, telas de níveis, House Account, cron de cupom mensal).

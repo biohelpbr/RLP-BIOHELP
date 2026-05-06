@@ -29,7 +29,7 @@
 | 2 (foundation) | F-V01, F-V02, F-V03 | ✅ Destravadas |
 | 3 (commissão) | F-V04, F-V05, F-V07 | F-V05 ✅ destravada · F-V04 🚫 · F-V07 🟡 |
 | 4 (Founder) | F-V06, F-V08, F-V11, F-V18 | F-V11 ✅ feita · F-V08 ✅ destravada · F-V18 ✅ destravada |
-| 5 (conteúdo) | F-V09, F-V10, F-V13 | F-V09 🟡 · F-V10 🚫 · F-V13 🚫 (pode ser absorvida por F-V15) |
+| 5 (conteúdo) | F-V09, F-V10, ~~F-V13~~ | F-V09 🚧 S4 · F-V10 🚫 · ~~F-V13~~ ✅ **absorvida por F-V15 em S4 (06/05/2026)** |
 | 6 (cleanup) | F-V12 (remover v1 morto) | depende v2 estável |
 | **7 (front)** | **F-V14, F-V15, F-V16, F-V17, F-V18** + portar todas as outras features migradas | 🚧 **Em execução** — S1 ✅ entregue (06/05) |
 
