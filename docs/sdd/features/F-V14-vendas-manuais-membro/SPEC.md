@@ -12,10 +12,10 @@ Reunião 29/04 PM: o membro vende fora do canal Shopify (presencial, indicação
 
 ## Definition of Ready
 - [x] RFs definidos
-- [ ] CAs testáveis preenchidos
+- [x] CAs testáveis preenchidos (refinados em S2 — 13/05/2026)
 - [x] Arquivos permitidos listados
 - [x] Anti-SPEC aplicável citada
-- [ ] TBDs bloqueantes resolvidos (TBD-25 não bloqueia início — hipótese padrão documentada)
+- [x] TBDs bloqueantes resolvidos (TBD-25 não bloqueia início — hipótese padrão documentada)
 
 ## Requisitos Funcionais
 - **RF-1:** Membro pode registrar **lead** (potencial cliente): nome, telefone/email, produto-alvo, observação.
@@ -25,13 +25,27 @@ Reunião 29/04 PM: o membro vende fora do canal Shopify (presencial, indicação
 - **RF-5:** Membro vê **preço sugerido** do produto (definido pelo admin em F-V16). Preço de custo é admin-only.
 - **RF-6:** Cada venda registrada vincula-se a um produto cadastrado pelo admin (F-V16 / Products) via FK.
 
-## Critérios de Aceite (esboço — refinar antes de codar)
-- CA-01: criar lead com nome+telefone obrigatórios; preview na lista imediato.
-- CA-02: criar venda exige produto da lista admin; validação Zod.
-- CA-03: cards de métricas atualizam ao criar/deletar venda.
-- CA-04: lead com `last_contact_at` > 30 dias aparece em "Oportunidades".
-- CA-05: RLS — membro só vê os próprios leads/vendas; admin vê todos via view.
-- CA-06: lead/venda visível para o membro independente do flag `LRP_V2` (recurso novo, sem equivalente v1).
+## Critérios de Aceite (refinados S2)
+
+### Leads
+- **CA-01:** form de novo lead em `/dashboard/orders/new?tipo=lead` exige `name` (≥2 chars) e `contact` (≥3 chars). Submit válido → row em `member_leads` com `member_id = auth.uid()`, `last_contact_at = now()`, toast success "Lead registrado". Lista em `/dashboard/orders` mostra o lead imediatamente após `revalidatePath`.
+- **CA-02:** form sem `name` ou `contact` → erro Zod inline, sem submit; nenhuma row criada.
+
+### Vendas
+- **CA-03:** form de nova venda em `/dashboard/orders/new?tipo=venda` exige `customer_name` (≥2), `qty` (≥1), `paid_amount` (>0), `sold_at` (data ≤ hoje), `payment_method` ∈ {pix, cartao, dinheiro, transferencia, outro}. `product_id` é opcional (string livre) — em S2 não exige FK rígida pois F-V16 ainda não normalizou produtos. Submit válido → row em `member_sales`, toast success.
+- **CA-04:** Cards de métricas em `/dashboard/orders` recalculam após criar/deletar venda — exibem: nº de vendas no mês corrente, receita do mês, ticket médio, nº de clientes únicos. Métrica = agregação SQL filtrada por `member_id` e `sold_at >= date_trunc('month', now())`.
+
+### Oportunidades
+- **CA-05:** lead com `last_contact_at < now() - interval '30 days'` aparece numa seção "Oportunidades" (badge âmbar) dentro da lista de leads. Cálculo no Server Component via filtro JS após query.
+
+### Segurança
+- **CA-06:** RLS — usuário autenticado só consegue SELECT/INSERT/UPDATE/DELETE em `member_leads` e `member_sales` onde `member_id = auth.uid()`. Test com 2 tokens distintos: user2 não vê leads de user1; tentativa de UPDATE com outro `member_id` retorna 0 rows afetadas.
+
+### Coexistência v1/v2
+- **CA-07:** rota `/dashboard/orders` é v2-only — flag `LRP_V2=false` redireciona para `/dashboard`. v1 mantém `/dashboard/sales` intacto (página antiga continua funcionando para usuários sem flag).
+
+### Migration
+- **CA-08:** migration aplica idempotente (`IF NOT EXISTS`); rollback comentado no topo executa sem erro.
 
 ## Arquivos PERMITIDOS
 - `app/(member)/dashboard/orders/page.tsx` — lista
@@ -61,14 +75,22 @@ Reunião 29/04 PM: o membro vende fora do canal Shopify (presencial, indicação
 ## Matriz de Validação (preencher no QA)
 | CA | Teste | Tipo | Status | Evidência |
 |---|---|---|---|---|
-| CA-01 | … | manual | ⏳ | … |
-| CA-02 | … | manual+Zod | ⏳ | … |
-| CA-03 | … | manual | ⏳ | … |
-| CA-04 | … | unit (cron-like) | ⏳ | … |
-| CA-05 | … | RLS test (curl com 2 tokens) | ⏳ | … |
-| CA-06 | … | flag toggle | ⏳ | … |
+| CA-01 | Submit lead via UI → row criada | Playwright + SQL count | ⏳ | … |
+| CA-02 | Submit lead sem name → erro Zod | Playwright (assert disabled/error msg) | ⏳ | … |
+| CA-03 | Submit venda via UI → row criada | Playwright + SQL row | ⏳ | … |
+| CA-04 | Cards atualizam após nova venda | Playwright (assert valor card) | ⏳ | … |
+| CA-05 | Lead > 30d aparece em Oportunidades | Playwright + insert manual com data antiga | ⏳ | … |
+| CA-06 | RLS — user2 não vê leads de user1 | curl com 2 tokens / SQL `set role` | ⏳ | … |
+| CA-07 | flag OFF → redirect | Playwright (URL final) | ⏳ | … |
+| CA-08 | Rollback migration | psql exec | ⏳ | … |
 
 ## Loveable — elementos descartados
 - `Order` type com `commissionType`, `commissionPercent`, `cv` — modelo v1.
 - `mockOrders` — dataset v1.
-- Página `partner/Orders.tsx` no Loveable mostra comissão por venda — substituir por **preço sugerido vs preço de venda**.
+- Página `partner/Orders.tsx` no Loveable mostra comissão por venda — substituir por **valor pago manual** (modelo v2 = vendas fora do canal Shopify, sem comissão calculada porque não passa pela loja).
+- `OrderType: LRP|FIRST|NORMAL` — fora do escopo de F-V14 (vai pra OrdersAnalytics admin em F-V16/S4).
+
+## Rollback
+- Revert do PR.
+- Migration reversa: `<data>_f-v14-sales-manual.sql` rollback comentado no topo: `DROP TABLE IF EXISTS member_sales CASCADE; DROP TABLE IF EXISTS member_leads CASCADE;`.
+- Feature flag desligar: `LRP_V2=false` → rota `/dashboard/orders` redireciona, dados ficam preservados em DB.
