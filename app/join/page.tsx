@@ -1,87 +1,61 @@
+"use client"
+
+import * as React from "react"
+import { Suspense, useState } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import Link from "next/link"
+import {
+  AlertTriangle,
+  ArrowRight,
+  Check,
+  Lock,
+  Mail,
+  Phone,
+  Sparkles,
+  Ticket,
+  User,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { BHCard } from "@/components/biohelp"
+
 /**
- * Página de Cadastro
- * SPEC: Seção 6.3 - GET /join
- * Design: Clean, sem emojis, baseado no frontend Biohelp
+ * `/join` v2 — Cadastro com design Biohelp (Loveable absorvido).
+ *
+ * Anti-SPEC §13: NÃO importa de _loveable_import/. Refator visual aplicando
+ * mesmo pattern de V2Login (Tailwind + shadcn + gradients Biohelp).
+ *
+ * Funcional:
+ * - Campo "Código de quem te convidou" SEMPRE visível (não só via ?ref=).
+ * - Pre-popula quando ?ref vier na URL + mostra confirmação verde.
+ * - Telefone opcional (TBD com cliente em 13/05 — pode virar obrigatório).
+ * - Validação: senha mínima 6, senha = confirmação, código obrigatório.
+ * - Lógica POST mantida em /api/members/join.
  */
-
-'use client'
-
-import { useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
-import styles from './page.module.css'
-
-// Ícones SVG
-const Icons = {
-  alertTriangle: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-      <line x1="12" y1="9" x2="12" y2="13"/>
-      <line x1="12" y1="17" x2="12.01" y2="17"/>
-    </svg>
-  ),
-  user: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
-    </svg>
-  ),
-  mail: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-      <polyline points="22,6 12,13 2,6"/>
-    </svg>
-  ),
-  lock: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
-  ),
-  arrowRight: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="5" y1="12" x2="19" y2="12"/>
-      <polyline points="12 5 19 12 12 19"/>
-    </svg>
-  ),
-  alertCircle: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="12"/>
-      <line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-  ),
-  userPlus: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="8.5" cy="7" r="4"/>
-      <line x1="20" y1="8" x2="20" y2="14"/>
-      <line x1="23" y1="11" x2="17" y2="11"/>
-    </svg>
-  ),
-}
 
 function JoinForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const refFromUrl = searchParams.get('ref')
+  const refFromUrl = searchParams.get("ref")
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-    // Código manual de quem te convidou. Pre-populado pelo ?ref= da URL se houver.
-    inviteCode: refFromUrl ?? '',
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    inviteCode: refFromUrl ?? "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }))
     setError(null)
   }
@@ -90,29 +64,25 @@ function JoinForm() {
     e.preventDefault()
     setError(null)
 
-    // Validações básicas
     if (formData.password !== formData.confirmPassword) {
-      setError('As senhas não coincidem')
+      setError("As senhas não coincidem.")
       return
     }
-
     if (formData.password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres')
+      setError("A senha deve ter pelo menos 6 caracteres.")
       return
     }
-
     const inviteCode = formData.inviteCode.trim().toUpperCase()
     if (!inviteCode) {
-      setError('Informe o código ou link de quem te convidou.')
+      setError("Informe o código ou link de quem te convidou.")
       return
     }
 
     setIsLoading(true)
-
     try {
-      const response = await fetch('/api/members/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/members/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -125,20 +95,21 @@ function JoinForm() {
       const data = await response.json()
 
       if (!response.ok) {
-        if (data.code === 'EMAIL_EXISTS') {
-          setError('Este e-mail já está cadastrado')
-        } else if (data.code === 'INVALID_REF') {
-          setError('Código de referência inválido')
+        if (data.code === "EMAIL_EXISTS") {
+          setError("Este e-mail já está cadastrado. Faça login.")
+        } else if (data.code === "INVALID_REF") {
+          setError("Código de convite inválido. Confira com quem te indicou.")
         } else {
-          setError(data.message || 'Erro ao criar conta')
+          setError(data.message || "Erro ao criar conta. Tente novamente.")
         }
         return
       }
 
-      // Sucesso - redireciona para dashboard
-      router.push('/dashboard')
+      router.push("/dashboard")
+      router.refresh()
     } catch (err) {
-      setError('Erro de conexão. Tente novamente.')
+      console.error("[JoinPage] error", err)
+      setError("Erro de conexão. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -152,182 +123,219 @@ function JoinForm() {
     formData.inviteCode.trim()
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        {/* Card principal */}
-        <div className={styles.card}>
-          {/* Header */}
-          <div className={styles.header}>
-            <div className={styles.logo}>B</div>
-            <h1 className={styles.title}>Criar conta</h1>
-            <p className={styles.subtitle}>Preencha seus dados para começar</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-bh-lavender-soft via-background to-bh-blue-soft flex items-center justify-center p-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-bh-lime/20 rounded-full blur-3xl animate-pulse-soft" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-bh-coral/10 rounded-full blur-3xl" />
+      </div>
 
-          {/* Aviso quando não tem ref na URL — pessoa precisa colar o código */}
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-6 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bh-gradient-purple bh-shadow-purple-glow mb-4">
+            <span className="text-primary-foreground font-bold text-3xl">B</span>
+          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Criar conta</h1>
+          <p className="text-muted-foreground">Preencha seus dados para começar.</p>
+        </div>
+
+        <BHCard variant="elevated" className="animate-scale-in">
           {!refFromUrl && (
-            <div className={styles.alert}>
-              <span className={styles.alertIcon}>{Icons.alertTriangle}</span>
-              <div>
-                <strong>Como te convidaram?</strong>
-                <p>Cole o código que a parceira te passou no campo abaixo, ou peça o link de convite e clique nele.</p>
+            <div className="flex items-start gap-3 rounded-xl border border-bh-coral/30 bg-bh-coral-soft/40 p-3 mb-5">
+              <AlertTriangle className="w-5 h-5 text-bh-coral flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-foreground">
+                <strong className="block">Como te convidaram?</strong>
+                <p className="text-muted-foreground">
+                  Cole o código que a parceira te passou no campo abaixo, ou peça
+                  o link de convite e clique nele.
+                </p>
               </div>
             </div>
           )}
 
-          {/* Formulário */}
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Nome completo</label>
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>{Icons.user}</span>
-                <input
-                  type="text"
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-foreground">
+                Nome completo
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="name"
                   name="name"
+                  type="text"
                   placeholder="Como devemos te chamar?"
-                  className={styles.input}
                   value={formData.name}
                   onChange={handleChange}
+                  className="pl-10 h-12 rounded-xl"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>E-mail</label>
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>{Icons.mail}</span>
-                <input
-                  type="email"
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-foreground">
+                E-mail
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="email"
                   name="email"
+                  type="email"
                   placeholder="seu@email.com"
-                  className={styles.input}
                   value={formData.email}
                   onChange={handleChange}
+                  className="pl-10 h-12 rounded-xl"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Telefone <span style={{ opacity: 0.6, fontWeight: 'normal' }}>(opcional)</span></label>
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>{Icons.user}</span>
-                <input
-                  type="tel"
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-foreground flex items-center gap-2">
+                Telefone
+                <span className="text-xs text-muted-foreground font-normal">
+                  (opcional)
+                </span>
+              </Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="phone"
                   name="phone"
+                  type="tel"
                   placeholder="(11) 99999-9999"
-                  className={styles.input}
                   value={formData.phone}
                   onChange={handleChange}
+                  className="pl-10 h-12 rounded-xl"
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Código de quem te convidou <span style={{ color: '#d63b3b' }}>*</span></label>
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>{Icons.userPlus}</span>
-                <input
-                  type="text"
+            <div className="space-y-2">
+              <Label htmlFor="inviteCode" className="text-foreground">
+                Código de quem te convidou{" "}
+                <span className="text-destructive">*</span>
+              </Label>
+              <div className="relative">
+                <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="inviteCode"
                   name="inviteCode"
+                  type="text"
                   placeholder="Ex.: BH00001 ou SPONSOR01"
-                  className={styles.input}
                   value={formData.inviteCode}
                   onChange={handleChange}
+                  className="pl-10 h-12 rounded-xl uppercase"
                   required
+                  disabled={isLoading || !!refFromUrl}
                   autoCapitalize="characters"
-                  style={{ textTransform: 'uppercase' }}
                 />
               </div>
               {refFromUrl && (
-                <p style={{ fontSize: 12, color: '#4caf50', marginTop: 4 }}>
-                  ✓ Código preenchido automaticamente pelo link de convite
+                <p className="flex items-center gap-1 text-xs text-success">
+                  <Check className="w-3.5 h-3.5" />
+                  Código preenchido automaticamente pelo link de convite
                 </p>
               )}
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Senha</label>
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>{Icons.lock}</span>
-                <input
-                  type="password"
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-foreground">
+                Senha
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="password"
                   name="password"
+                  type="password"
                   placeholder="Mínimo 6 caracteres"
-                  className={styles.input}
                   value={formData.password}
                   onChange={handleChange}
+                  className="pl-10 h-12 rounded-xl"
                   required
                   minLength={6}
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Confirmar senha</label>
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputIcon}>{Icons.lock}</span>
-                <input
-                  type="password"
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-foreground">
+                Confirmar senha
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="confirmPassword"
                   name="confirmPassword"
+                  type="password"
                   placeholder="Digite a senha novamente"
-                  className={styles.input}
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  className="pl-10 h-12 rounded-xl"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
-            {error && (
-              <div className={styles.error}>
-                {Icons.alertCircle}
-                <span>{error}</span>
-              </div>
-            )}
-
-            <button
+            <Button
               type="submit"
-              className={styles.btnSubmit}
+              className="w-full h-12 rounded-xl bh-gradient-purple text-primary-foreground font-semibold hover:opacity-90 transition-opacity group"
               disabled={!isFormValid || isLoading}
             >
-              {isLoading ? 'Criando conta...' : 'Criar minha conta'}
-              {!isLoading && <span className={styles.btnIcon}>{Icons.arrowRight}</span>}
-            </button>
+              {isLoading ? "Criando conta…" : "Criar minha conta"}
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
           </form>
 
-          {/* Link de login */}
-          <p className={styles.loginLink}>
-            Já tem uma conta?{' '}
-            <Link href="/login">Fazer login</Link>
-          </p>
-
-          {/* Info do sponsor quando código preenchido */}
           {formData.inviteCode.trim() && (
-            <div className={styles.sponsorInfo}>
-              <span className={styles.sponsorIcon}>{Icons.userPlus}</span>
-              <span>Convidado por: <strong>{formData.inviteCode.trim().toUpperCase()}</strong></span>
+            <div className="mt-6 p-3 rounded-xl bg-bh-lime/20 border border-bh-lime/30 text-sm flex items-center gap-2 text-foreground">
+              <Sparkles className="w-4 h-4 text-accent-foreground" />
+              <span>
+                Convidado por:{" "}
+                <strong>{formData.inviteCode.trim().toUpperCase()}</strong>
+              </span>
             </div>
           )}
-        </div>
+        </BHCard>
 
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          Já tem uma conta?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Fazer login
+          </Link>
+        </p>
+
+        <p className="text-center text-xs text-muted-foreground mt-2">
+          © {new Date().getFullYear()} Biohelp Nutrition. Todos os direitos
+          reservados.
+        </p>
       </div>
     </div>
   )
 }
 
-// Loading fallback para Suspense
 function JoinLoading() {
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <div className={styles.card}>
-          <div className={styles.header}>
-            <div className={styles.logo}>B</div>
-            <h1 className={styles.title}>Criar conta</h1>
-            <p className={styles.subtitle}>Carregando...</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-bh-lavender-soft via-background to-bh-blue-soft flex items-center justify-center p-4">
+      <div className="w-full max-w-md text-center">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bh-gradient-purple mb-4">
+          <span className="text-primary-foreground font-bold text-3xl">B</span>
         </div>
+        <p className="text-muted-foreground">Carregando…</p>
       </div>
     </div>
   )

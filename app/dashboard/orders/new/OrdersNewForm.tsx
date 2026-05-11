@@ -67,13 +67,18 @@ export function OrdersNewForm({ initialTipo }: OrdersNewFormProps) {
   const handleSubmitSale = async (e: React.FormEvent) => {
     e.preventDefault()
     setPending(true)
+    // saleSoldAt vem do <input type="date"> como "YYYY-MM-DD" — se passar
+    // direto pra new Date() vira meia-noite UTC, o que no BRT (UTC-3) vira o
+    // dia anterior. Forçar meio-dia local pra cair no dia certo independente
+    // do timezone do servidor.
+    const soldAtLocalNoon = saleSoldAt ? `${saleSoldAt}T12:00:00` : saleSoldAt
     const res = await createSale({
       customer_name: saleCustomer,
       product_name: saleProduct,
       qty: saleQty,
       paid_amount: saleAmount.replace(",", "."),
       payment_method: salePaymentMethod,
-      sold_at: saleSoldAt,
+      sold_at: soldAtLocalNoon,
       note: saleNote,
     })
     setPending(false)

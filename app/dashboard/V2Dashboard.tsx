@@ -11,9 +11,19 @@ import {
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberNetworkV2 } from "@/lib/network/v2"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
+import { getNextPublishedEvent } from "@/lib/events/queries"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHCard, BHStat, CopyButton } from "@/components/biohelp"
 import { Button } from "@/components/ui/button"
+
+function formatEventWindow(startIso: string, endIso: string): string {
+  const start = new Date(startIso)
+  const end = new Date(endIso)
+  const fmt = (d: Date) =>
+    d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
+  if (start.toDateString() === end.toDateString()) return fmt(start)
+  return `${fmt(start)} → ${fmt(end)}`
+}
 
 function buildInviteUrl(refCode: string): string {
   const base =
@@ -40,7 +50,10 @@ export default async function V2Dashboard() {
     redirect("/login")
   }
 
-  const network = await getMemberNetworkV2(member.id)
+  const [network, nextEvent] = await Promise.all([
+    getMemberNetworkV2(member.id),
+    getNextPublishedEvent(),
+  ])
   const directReportsCount = network?.direct_reports.length ?? 0
   const isActive = member.status === "active"
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL ?? "#"
@@ -118,15 +131,43 @@ export default async function V2Dashboard() {
                 <CalendarHeart className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Próximo evento</h2>
+                <h2 className="text-lg font-semibold">
+                  {nextEvent ? nextEvent.name : "Próximo evento"}
+                </h2>
                 <p className="text-sm text-muted-foreground">
-                  Em breve — eventos serão publicados pela admin (F-V15).
+                  {nextEvent ? (
+                    <>
+                      {formatEventWindow(nextEvent.start_at, nextEvent.end_at)}
+                      {" · "}
+                      {nextEvent.mode === "online"
+                        ? "Online"
+                        : nextEvent.mode === "presencial"
+                        ? "Presencial"
+                        : "Híbrido"}
+                      {nextEvent.location ? ` · ${nextEvent.location}` : ""}
+                    </>
+                  ) : (
+                    "Em breve — eventos serão publicados pela admin."
+                  )}
                 </p>
               </div>
             </div>
-            <Button variant="outline" disabled className="w-full">
-              Aguardando publicação
-            </Button>
+            {nextEvent ? (
+              <Button asChild variant="outline" className="w-full">
+                <a
+                  href={`/r/${nextEvent.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Saber mais
+                  <ExternalLink className="w-4 h-4 ml-2" />
+                </a>
+              </Button>
+            ) : (
+              <Button variant="outline" disabled className="w-full">
+                Aguardando publicação
+              </Button>
+            )}
           </BHCard>
         </div>
 

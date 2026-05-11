@@ -177,6 +177,31 @@ export async function getEventById(id: string): Promise<EventFunnel | null> {
  * Cookie cross-site é frágil em webhook (Shopify → server), então usamos
  * event_visits.member_id como fonte de verdade.
  */
+/**
+ * Pega o próximo evento publicado (em andamento ou futuro mais próximo).
+ * Usado no `/dashboard` do membro pra preencher o card "Próximo evento".
+ * Retorna null se não houver nenhum publicado em andamento ou futuro.
+ */
+export async function getNextPublishedEvent(): Promise<EventRow | null> {
+  const supabase = createServiceClient()
+  const nowIso = new Date().toISOString()
+
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("status", "published")
+    .gte("end_at", nowIso) // exclui eventos já encerrados
+    .order("start_at", { ascending: true })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    console.error("[getNextPublishedEvent]", error)
+    return null
+  }
+  return (data as EventRow) || null
+}
+
 export async function findAttributableEventForOrder(params: {
   memberId: string
   productIds: string[]
