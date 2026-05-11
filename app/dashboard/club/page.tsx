@@ -4,6 +4,7 @@ import { ArrowLeft, Crown, UserPlus, Users } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberNetworkV2 } from "@/lib/network/v2"
+import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHAvatar, BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
@@ -41,7 +42,7 @@ export default async function ClubPage() {
     })
 
   return (
-    <PartnerShell memberName={member.name} isActive={isActive}>
+    <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <div>
           <Link

@@ -45,7 +45,7 @@ interface PartnerSidebarProps {
 
 export function PartnerSidebar({
   memberName,
-  memberSubtitle = "Líder da sua comunidade",
+  memberSubtitle = "Membro do clube",
   isActive = false,
 }: PartnerSidebarProps) {
   const pathname = usePathname()

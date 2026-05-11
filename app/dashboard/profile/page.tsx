@@ -4,6 +4,7 @@ import { ArrowLeft, AtSign, Crown, Hash, Phone, User as UserIcon } from "lucide-
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberNetworkV2 } from "@/lib/network/v2"
+import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHAvatar, BHCard } from "@/components/biohelp"
 
@@ -35,7 +36,7 @@ export default async function ProfilePage() {
     })
 
   return (
-    <PartnerShell memberName={member.name} isActive={isActive}>
+    <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <div>
           <Link
@@ -47,7 +48,7 @@ export default async function ProfilePage() {
           </Link>
           <h1 className="text-3xl font-bold text-foreground">Meu perfil</h1>
           <p className="text-muted-foreground">
-            Seus dados de cadastro. A edição chega na próxima sprint.
+            Seus dados de cadastro. Para alterar, fale com a admin Biohelp.
           </p>
         </div>
 

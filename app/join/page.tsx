@@ -64,13 +64,16 @@ const Icons = {
 function JoinForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const refCode = searchParams.get('ref')
+  const refFromUrl = searchParams.get('ref')
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
+    // Código manual de quem te convidou. Pre-populado pelo ?ref= da URL se houver.
+    inviteCode: refFromUrl ?? '',
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -98,6 +101,12 @@ function JoinForm() {
       return
     }
 
+    const inviteCode = formData.inviteCode.trim().toUpperCase()
+    if (!inviteCode) {
+      setError('Informe o código ou link de quem te convidou.')
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -107,8 +116,9 @@ function JoinForm() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          phone: formData.phone || null,
           password: formData.password,
-          ref: refCode,
+          ref: inviteCode,
         }),
       })
 
@@ -134,11 +144,12 @@ function JoinForm() {
     }
   }
 
-  const isFormValid = 
-    formData.name.trim() && 
-    formData.email.trim() && 
-    formData.password && 
-    formData.confirmPassword
+  const isFormValid =
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.password &&
+    formData.confirmPassword &&
+    formData.inviteCode.trim()
 
   return (
     <div className={styles.container}>
@@ -152,13 +163,13 @@ function JoinForm() {
             <p className={styles.subtitle}>Preencha seus dados para começar</p>
           </div>
 
-          {/* Alerta se não tiver ref */}
-          {!refCode && (
+          {/* Aviso quando não tem ref na URL — pessoa precisa colar o código */}
+          {!refFromUrl && (
             <div className={styles.alert}>
               <span className={styles.alertIcon}>{Icons.alertTriangle}</span>
               <div>
-                <strong>Atenção</strong>
-                <p>Você precisa de um link de convite para se cadastrar.</p>
+                <strong>Como te convidaram?</strong>
+                <p>Cole o código que a parceira te passou no campo abaixo, ou peça o link de convite e clique nele.</p>
               </div>
             </div>
           )}
@@ -195,6 +206,44 @@ function JoinForm() {
                   required
                 />
               </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Telefone <span style={{ opacity: 0.6, fontWeight: 'normal' }}>(opcional)</span></label>
+              <div className={styles.inputWrapper}>
+                <span className={styles.inputIcon}>{Icons.user}</span>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="(11) 99999-9999"
+                  className={styles.input}
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Código de quem te convidou <span style={{ color: '#d63b3b' }}>*</span></label>
+              <div className={styles.inputWrapper}>
+                <span className={styles.inputIcon}>{Icons.userPlus}</span>
+                <input
+                  type="text"
+                  name="inviteCode"
+                  placeholder="Ex.: BH00001 ou SPONSOR01"
+                  className={styles.input}
+                  value={formData.inviteCode}
+                  onChange={handleChange}
+                  required
+                  autoCapitalize="characters"
+                  style={{ textTransform: 'uppercase' }}
+                />
+              </div>
+              {refFromUrl && (
+                <p style={{ fontSize: 12, color: '#4caf50', marginTop: 4 }}>
+                  ✓ Código preenchido automaticamente pelo link de convite
+                </p>
+              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -253,11 +302,11 @@ function JoinForm() {
             <Link href="/login">Fazer login</Link>
           </p>
 
-          {/* Info do sponsor */}
-          {refCode && (
+          {/* Info do sponsor quando código preenchido */}
+          {formData.inviteCode.trim() && (
             <div className={styles.sponsorInfo}>
               <span className={styles.sponsorIcon}>{Icons.userPlus}</span>
-              <span>Convidado por: <strong>{refCode}</strong></span>
+              <span>Convidado por: <strong>{formData.inviteCode.trim().toUpperCase()}</strong></span>
             </div>
           )}
         </div>

@@ -335,9 +335,9 @@ export function WithdrawDialog({
                 onChange={handleFile}
               />
               <p className="text-xs text-muted-foreground mt-2">
-                Validação automática da NF (formato + dados) entra em S5.
-                Em S2 o arquivo é só referência — o pedido fica pendente
-                aguardando aprovação manual do admin.
+                A nota fica registrada com o pedido e passa por validação
+                automática (formato + CNPJ Biohelp). Depois da aprovação
+                do admin, o PIX é processado em dias úteis.
               </p>
             </div>
           </div>
@@ -347,7 +347,7 @@ export function WithdrawDialog({
           {method === "shopify_credit"
             ? "Após aprovação, o crédito é aplicado na sua próxima compra na loja Biohelp."
             : method === "cashback_cashin"
-            ? "Cashback creditado via Cashin após aprovação manual do admin (em S2). Integração live entra em S5."
+            ? "Cashback creditado via Cashin após aprovação manual do admin. Você recebe direto na conta Cashin associada ao seu CPF."
             : "Após aprovação da NF e da solicitação, o pagamento PIX é processado em dias úteis."}
         </p>
 

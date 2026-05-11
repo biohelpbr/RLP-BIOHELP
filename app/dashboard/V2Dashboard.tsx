@@ -2,7 +2,6 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import {
   CalendarHeart,
-  Copy,
   ExternalLink,
   Link2,
   ShoppingCart,
@@ -11,9 +10,20 @@ import {
 } from "lucide-react"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberNetworkV2 } from "@/lib/network/v2"
+import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
-import { BHCard, BHStat } from "@/components/biohelp"
+import { BHCard, BHStat, CopyButton } from "@/components/biohelp"
 import { Button } from "@/components/ui/button"
+
+function buildInviteUrl(refCode: string): string {
+  const base =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    ""
+  // Path-only é suficiente (browser resolve com origem atual no clipboard).
+  // Mas pra compartilhamento WhatsApp, melhor URL absoluta quando temos.
+  return base ? `${base}/join?ref=${refCode}` : `/join?ref=${refCode}`
+}
 
 /**
  * Dashboard do Membro v2 (Pivô — afiliação 1-nível).
@@ -36,7 +46,7 @@ export default async function V2Dashboard() {
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL ?? "#"
 
   return (
-    <PartnerShell memberName={member.name} isActive={isActive}>
+    <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <header className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">
@@ -126,13 +136,25 @@ export default async function V2Dashboard() {
               <h2 className="text-lg font-semibold">Link de convite</h2>
               <p className="text-sm text-muted-foreground">
                 Compartilhe seu código <span className="font-medium">{member.ref_code}</span>{" "}
-                pra trazer novas pessoas.
+                ou o link completo abaixo pra trazer novas pessoas.
               </p>
+              <code className="mt-2 inline-block text-xs bg-background/60 px-2 py-1 rounded border border-border break-all">
+                {buildInviteUrl(member.ref_code)}
+              </code>
             </div>
-            <Button variant="secondary" disabled className="self-start">
-              <Copy className="w-4 h-4 mr-2" />
-              Copiar (em breve)
-            </Button>
+            <div className="flex flex-col gap-2 self-start">
+              <CopyButton
+                value={buildInviteUrl(member.ref_code)}
+                label="Copiar link"
+                copiedLabel="Link copiado!"
+              />
+              <CopyButton
+                value={member.ref_code}
+                label="Copiar código"
+                variant="outline"
+                copiedLabel="Código copiado!"
+              />
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link

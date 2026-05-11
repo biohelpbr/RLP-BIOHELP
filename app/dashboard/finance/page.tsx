@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { CircleDollarSign, Clock, Wallet } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
+import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHCard, BHStat } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
@@ -63,7 +64,7 @@ export default async function FinancePage() {
   ])
 
   return (
-    <PartnerShell memberName={member.name} isActive={member.status === "active"}>
+    <PartnerShell memberName={member.name} isActive={member.status === "active"} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <header className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">Resultado &amp; Resgate</h1>

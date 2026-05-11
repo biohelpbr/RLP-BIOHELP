@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { GraduationCap } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
+import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHCard } from "@/components/biohelp"
 import { listPublishedTrails } from "@/lib/content/queries"
@@ -16,7 +17,7 @@ export default async function AcademyMemberPage() {
   const trails = await listPublishedTrails()
 
   return (
-    <PartnerShell memberName={member.name ?? "Você"} isActive={member.status === "active"}>
+    <PartnerShell memberName={member.name ?? "Você"} isActive={member.status === "active"} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <header>
           <h1 className="text-3xl font-bold text-foreground inline-flex items-center gap-2">
