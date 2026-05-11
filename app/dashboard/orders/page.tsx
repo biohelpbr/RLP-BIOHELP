@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
+import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHCard, BHStat } from "@/components/biohelp"
 import { Button } from "@/components/ui/button"
@@ -50,7 +51,7 @@ export default async function OrdersPage() {
   const isActive = member.status === "active"
 
   return (
-    <PartnerShell memberName={member.name} isActive={isActive}>
+    <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <header className="flex items-end justify-between gap-4 flex-wrap">
           <div className="space-y-1">

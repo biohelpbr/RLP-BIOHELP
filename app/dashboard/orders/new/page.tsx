@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
+import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { OrdersNewForm } from "./OrdersNewForm"
 
@@ -24,7 +25,7 @@ export default async function OrdersNewPage({ searchParams }: OrdersNewPageProps
   const tipo = sp.tipo === "lead" ? "lead" : "venda"
 
   return (
-    <PartnerShell memberName={member.name} isActive={member.status === "active"}>
+    <PartnerShell memberName={member.name} isActive={member.status === "active"} memberSubtitle={getMemberSubtitle(member)}>
       <OrdersNewForm initialTipo={tipo} />
     </PartnerShell>
   )
