@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { CreditCard, FileText, Wallet } from "lucide-react"
 import { redirect } from "next/navigation"
 import { AdminShell } from "@/components/layouts/AdminShell"
@@ -6,6 +5,7 @@ import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getCurrentMember, isCurrentUserAdmin, createServiceClient } from "@/lib/supabase/server"
+import { PayoutActions } from "./PayoutActions"
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
   pending: "secondary",
@@ -62,9 +62,14 @@ function PayoutList({ rows, emptyMsg }: { rows: PayoutRow[]; emptyMsg: string })
       {rows.map((p) => {
         const m = getMember(p)
         return (
-          <li key={p.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
+          <li
+            key={p.id}
+            className="py-3 flex flex-wrap items-center justify-between gap-3"
+          >
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-foreground">{m.name || "(sem nome)"}</p>
+              <p className="font-medium text-foreground">
+                {m.name || "(sem nome)"}
+              </p>
               <p className="text-xs text-muted-foreground truncate">
                 {m.email} · {formatDate(p.created_at)}
               </p>
@@ -80,12 +85,7 @@ function PayoutList({ rows, emptyMsg }: { rows: PayoutRow[]; emptyMsg: string })
             <Badge variant={STATUS_VARIANT[p.status] ?? "outline"}>
               {STATUS_LABEL[p.status] ?? p.status}
             </Badge>
-            <Link
-              href={`/admin/payouts/${p.id}`}
-              className="text-xs text-primary hover:underline"
-            >
-              Detalhes →
-            </Link>
+            <PayoutActions payoutId={p.id} status={p.status} />
           </li>
         )
       })}

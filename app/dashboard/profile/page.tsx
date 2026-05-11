@@ -7,6 +7,7 @@ import { getMemberNetworkV2 } from "@/lib/network/v2"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHAvatar, BHCard } from "@/components/biohelp"
+import { ProfileEditForm } from "./ProfileEditForm"
 
 /**
  * `/dashboard/profile` — Meu Perfil v2 (read-only em S1).
@@ -48,7 +49,7 @@ export default async function ProfilePage() {
           </Link>
           <h1 className="text-3xl font-bold text-foreground">Meu perfil</h1>
           <p className="text-muted-foreground">
-            Seus dados de cadastro. Para alterar, fale com a admin Biohelp.
+            Seus dados de cadastro. Você pode atualizar nome e telefone aqui.
           </p>
         </div>
 
@@ -91,6 +92,11 @@ export default async function ProfilePage() {
               }
             />
           </dl>
+
+          <ProfileEditForm
+            initialName={member.name ?? ""}
+            initialPhone={member.phone ?? ""}
+          />
         </BHCard>
 
         <BHCard variant="default" className="space-y-3">
