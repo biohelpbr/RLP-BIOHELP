@@ -134,9 +134,9 @@ export default async function AdminFinancePage() {
         <BHCard variant="elevated" className="space-y-3">
           <h2 className="text-lg font-semibold">Resgates por método</h2>
           <p className="text-sm text-muted-foreground">
-            F-V07 oferece 3 caminhos: PIX (Founder + NF), Cashback Cashin (CPF/CNPJ direto na conta) e
-            Crédito na loja Shopify (1:1, sem prazo). Comissão real (F-V04) ainda bloqueada por TBD-1/2 —
-            valores presentes são placeholders e demos.
+            F-V07 oferece 3 caminhos: PIX (CNPJ + NF), Cashback Cashin (CPF aceita, direto na conta) e
+            Crédito Shopify (1:1, sem prazo de expiração). Imposto (~15%) sempre deduzido — os valores
+            líquidos abaixo já refletem o desconto.
           </p>
           <div className="grid sm:grid-cols-3 gap-3">
             {(["pix", "cashback_cashin", "shopify_credit"] as const).map((m) => {
@@ -159,9 +159,9 @@ export default async function AdminFinancePage() {
         <BHCard variant="default" className="space-y-2">
           <h2 className="text-lg font-semibold">Comissões (F-V04)</h2>
           <p className="text-sm text-muted-foreground">
-            Aguardando destrava de TBD-1 (sempre 50%?) e TBD-2 (impostos retidos pelo LRP ou pelo
-            membro?). Quando destravar, este painel mostra: agregado mensal, breakdown por status,
-            top 10 sponsors do mês, e comparativo vs mês anterior.
+            Modelo de comissão variável por tier de afiliadas ativas (40%→55%), com imposto fixo de
+            15% deduzido sempre. Refinamento pendente: bônus por consumo médio da rede (regra exata
+            a definir com a Biohelp). Próximo iteração: agregado mensal, top sponsors e comparativo.
           </p>
           <Button asChild variant="ghost" className="self-start">
             <Link href="/admin/commissions" className="inline-flex items-center gap-2">

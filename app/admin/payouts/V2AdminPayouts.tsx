@@ -125,7 +125,7 @@ export default async function V2AdminPayouts() {
         <header>
           <h1 className="text-3xl font-bold text-foreground">Resgates</h1>
           <p className="text-muted-foreground">
-            Triple resgate F-V07: PIX (Founder + NF), Cashback Cashin e Crédito Shopify. Total{" "}
+            Triple resgate F-V07: PIX (CNPJ + NF), Cashback Cashin e Crédito Shopify. Total{" "}
             <strong>{counts.total}</strong> · pendentes <strong>{counts.pending}</strong>.
           </p>
         </header>

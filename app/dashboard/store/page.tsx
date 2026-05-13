@@ -22,7 +22,7 @@ export default async function StorePage() {
   const member = await getCurrentMember()
   if (!member) redirect("/login")
 
-  const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL ?? "https://biohelp-dev.myshopify.com"
+  const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL ?? "https://bio-help.com"
   const isActive = member.status === "active"
 
   // Cada card linka para uma coleção/tag na loja. Os paths seguem o padrão

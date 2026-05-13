@@ -12,6 +12,10 @@ import {
   type PayoutRequestRow,
 } from "@/lib/payouts/v2/queries"
 import { PAYOUT_METHOD_LABELS } from "@/lib/payouts/v2/schema"
+import {
+  getMemberCommissionTier,
+  COMMISSION_TIERS,
+} from "@/lib/commissions-v2/tier"
 import { FinanceClient } from "./FinanceClient"
 
 /**
@@ -58,9 +62,10 @@ export default async function FinancePage() {
   const member = await getCurrentMember()
   if (!member) redirect("/login")
 
-  const [balance, payouts] = await Promise.all([
+  const [balance, payouts, tierInfo] = await Promise.all([
     getMemberBalance(member.id),
     listMemberPayouts(member.id),
+    getMemberCommissionTier(member.id),
   ])
 
   return (
@@ -97,7 +102,72 @@ export default async function FinancePage() {
           />
         </div>
 
-        <FinanceClient available={balance.available_for_withdrawal} />
+        <FinanceClient
+          available={balance.available_for_withdrawal}
+          tier={{
+            label: tierInfo.tier.label,
+            gross_rate: tierInfo.gross_rate,
+            net_rate: tierInfo.net_rate,
+            active_referrals: tierInfo.active_referrals,
+          }}
+        />
+
+        <BHCard variant="default" className="space-y-3">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h2 className="text-lg font-semibold">Sua taxa de comissão</h2>
+              <p className="text-sm text-muted-foreground">
+                Tier <span className="font-medium">{tierInfo.tier.label}</span> ·
+                {" "}
+                {tierInfo.active_referrals}{" "}
+                {tierInfo.active_referrals === 1
+                  ? "afiliada ativa"
+                  : "afiliadas ativas"}
+                {" · "}
+                {(tierInfo.gross_rate * 100).toFixed(0)}% bruto (
+                {(tierInfo.net_rate * 100).toFixed(1)}% líquido)
+              </p>
+            </div>
+            <span className="text-xs text-muted-foreground italic">
+              Modelo em refinamento — bônus por consumo médio em definição
+            </span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            {COMMISSION_TIERS.map((t) => {
+              const isCurrent =
+                tierInfo.active_referrals >= t.min_referrals &&
+                (t.max_referrals === null ||
+                  tierInfo.active_referrals <= t.max_referrals)
+              const range =
+                t.max_referrals === null
+                  ? `${t.min_referrals}+`
+                  : `${t.min_referrals}-${t.max_referrals}`
+              return (
+                <div
+                  key={t.label}
+                  className={
+                    isCurrent
+                      ? "rounded-lg border-2 border-primary bg-primary/10 p-3"
+                      : "rounded-lg border border-border bg-muted/30 p-3"
+                  }
+                >
+                  <p className="text-xs font-semibold text-foreground">
+                    {t.label}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {range} afiliadas
+                  </p>
+                  <p className="text-sm font-bold text-foreground mt-1">
+                    {(t.gross_rate * 100).toFixed(0)}%
+                    <span className="text-xs font-normal text-muted-foreground ml-1">
+                      bruto
+                    </span>
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </BHCard>
 
         <BHCard variant="default" className="space-y-3">
           <div className="flex items-center justify-between">

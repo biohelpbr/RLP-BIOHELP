@@ -4,7 +4,7 @@ export const PAYOUT_METHODS = ["pix", "cashback_cashin", "shopify_credit"] as co
 export type PayoutMethod = (typeof PAYOUT_METHODS)[number]
 
 export const PAYOUT_METHOD_LABELS: Record<PayoutMethod, string> = {
-  pix: "PIX (Founder + NF)",
+  pix: "PIX (CNPJ + NF)",
   cashback_cashin: "Cashback Cashin",
   shopify_credit: "Crédito na loja",
 }

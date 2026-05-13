@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  AlertTriangle,
   Check,
   Copy,
   FileText,
@@ -34,21 +35,31 @@ import {
 } from "@/lib/payouts/v2/schema"
 
 /**
- * F-V07 — Triple resgate: PIX (Founder + NF), Cashback Cashin, Crédito Shopify.
+ * F-V07 — Triple resgate (PIX + NF, Cashback Cashin, Crédito Shopify).
  *
- * Anti-SPEC §13: NÃO importa do _loveable_import/. Reescrito a partir do
- * design Loveable, com modelo v2 (3 métodos vs 2 do mock) + chamada à
- * Server Action `requestPayout`.
+ * Decisões cliente 13/05/2026:
+ * - Imposto sempre aplicado (~15%), independente do método.
+ * - PIX exige CNPJ + NF. Cashin/Crédito aceitam CPF (Founder não é restrito a CNPJ).
+ * - Dados da Biohelp para NF são placeholders até cliente passar os reais
+ *   (badge "a confirmar").
  *
- * S2 só persiste request com status=pending. Cashin live + validação NF
- * ficam pra S5. Não chama API externa nesta sprint.
+ * Anti-SPEC §13: não importa do _loveable_import/.
  */
+
+interface TierInfo {
+  label: string
+  gross_rate: number
+  net_rate: number
+  active_referrals: number
+}
 
 interface WithdrawDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   /** Saldo bruto disponível pra resgate (BRL). */
   available: number
+  /** Tier de comissão atual do membro (opcional — usado pra exibir info). */
+  tier?: TierInfo
 }
 
 const fmtBRL = (n: number) =>
@@ -58,6 +69,7 @@ const fmtBRL = (n: number) =>
   })}`
 
 const PIX_FIXED_FEE = 3.67
+const TAX_RATE = 0.15
 
 const BIOHELP_INVOICE_DATA = {
   razaoSocial: "Biohelp Nutrição e Bem-Estar Ltda.",
@@ -70,18 +82,18 @@ const BIOHELP_INVOICE_DATA = {
 
 const METHOD_LABELS: Record<PayoutMethod, { title: string; subtitle: string; icon: React.ReactNode }> = {
   pix: {
-    title: "PIX (Founder)",
-    subtitle: "Saque em conta. Exige NF de serviço.",
+    title: "PIX (CNPJ + NF)",
+    subtitle: "Saque em conta. Exige CNPJ e NF de serviço.",
     icon: <Wallet className="w-5 h-5 text-primary" />,
   },
   cashback_cashin: {
     title: "Cashback Cashin",
-    subtitle: "Sem NF, sem taxas — recebe via Cashin.",
+    subtitle: "Sem NF. Aceita CPF. Recebe na conta Cashin.",
     icon: <Wallet className="w-5 h-5 text-primary" />,
   },
   shopify_credit: {
     title: "Crédito Shopify",
-    subtitle: "1:1 na loja Biohelp. Sem NF, sem taxas.",
+    subtitle: "1:1 na loja Biohelp. Sem NF. Crédito não expira.",
     icon: <ShoppingBag className="w-5 h-5 text-primary" />,
   },
 }
@@ -90,6 +102,7 @@ export function WithdrawDialog({
   open,
   onOpenChange,
   available,
+  tier,
 }: WithdrawDialogProps) {
   const [method, setMethod] = React.useState<PayoutMethod>("shopify_credit")
   const [amount, setAmount] = React.useState<string>("")
@@ -97,29 +110,26 @@ export function WithdrawDialog({
   const [copied, setCopied] = React.useState<string | null>(null)
   const [pending, setPending] = React.useState(false)
 
-  const fixedFee = method === "pix" ? PIX_FIXED_FEE : 0
-  const netAvailable = Math.max(0, available - fixedFee)
-
   React.useEffect(() => {
     if (open) {
-      setAmount(netAvailable.toFixed(2).replace(".", ","))
+      setAmount(available.toFixed(2).replace(".", ","))
       setMethod("shopify_credit")
       setInvoiceFile(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  React.useEffect(() => {
-    setAmount(netAvailable.toFixed(2).replace(".", ","))
-  }, [method, netAvailable])
-
   const numericAmount =
     Number(amount.replace(/\./g, "").replace(",", ".")) || 0
+  const taxAmount = Number((numericAmount * TAX_RATE).toFixed(2))
+  const pixFee = method === "pix" ? PIX_FIXED_FEE : 0
+  const netReceive = Math.max(0, numericAmount - taxAmount - pixFee)
+
   const requiresInvoice = method === "pix"
   const canSubmit =
     !pending &&
     numericAmount > 0 &&
-    numericAmount <= netAvailable &&
+    numericAmount <= available &&
     (!requiresInvoice || !!invoiceFile)
 
   const handleCopy = (label: string, value: string) => {
@@ -151,7 +161,7 @@ export function WithdrawDialog({
       toast.error("Informe um valor maior que zero.")
       return
     }
-    if (numericAmount > netAvailable) {
+    if (numericAmount > available) {
       toast.error("Valor acima do disponível.")
       return
     }
@@ -196,6 +206,23 @@ export function WithdrawDialog({
           </span>
         </div>
 
+        {tier ? (
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+            <div>
+              <p className="font-semibold text-foreground">
+                Sua taxa atual: {(tier.gross_rate * 100).toFixed(0)}% bruto · {(tier.net_rate * 100).toFixed(1)}% líquido
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Tier <span className="font-medium">{tier.label}</span> · {tier.active_referrals}{" "}
+                {tier.active_referrals === 1 ? "afiliada ativa" : "afiliadas ativas"}
+              </p>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              Imposto 15% deduzido sempre
+            </span>
+          </div>
+        ) : null}
+
         <Tabs
           value={method}
           onValueChange={(v) => setMethod(v as PayoutMethod)}
@@ -228,7 +255,7 @@ export function WithdrawDialog({
 
         <div className="rounded-xl border border-border bg-background p-5 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="amount">Valor desejado</Label>
+            <Label htmlFor="amount">Valor desejado (bruto)</Label>
             <div className="flex">
               <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted/50 text-sm text-muted-foreground">
                 R$
@@ -241,12 +268,37 @@ export function WithdrawDialog({
                 className="rounded-l-none"
               />
             </div>
-            <p className="text-xs text-muted-foreground">
-              Disponível líquido: {fmtBRL(netAvailable)}
-              {fixedFee > 0
-                ? ` (taxa fixa de ${fmtBRL(fixedFee)} já descontada)`
-                : ""}
-            </p>
+          </div>
+
+          <div
+            data-testid="payout-breakdown"
+            className="rounded-lg border border-border bg-muted/20 p-3 text-sm space-y-1"
+          >
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Bruto</span>
+              <span className="font-medium text-foreground">{fmtBRL(numericAmount)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Imposto (15%)</span>
+              <span className="text-destructive font-medium" data-testid="payout-tax">
+                -{fmtBRL(taxAmount)}
+              </span>
+            </div>
+            {pixFee > 0 ? (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Taxa PIX</span>
+                <span className="text-destructive font-medium">-{fmtBRL(pixFee)}</span>
+              </div>
+            ) : null}
+            <div className="flex justify-between pt-1 border-t border-border">
+              <span className="font-semibold text-foreground">Você recebe</span>
+              <span
+                className="font-semibold text-primary"
+                data-testid="payout-net"
+              >
+                {fmtBRL(netReceive)}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -258,19 +310,29 @@ export function WithdrawDialog({
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">
-                  Nota fiscal obrigatória
+                  Nota fiscal obrigatória (CNPJ)
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Pra resgatar via PIX é necessário emitir uma NF de prestação
-                  de serviço pra Biohelp no valor do resultado e anexar abaixo.
+                  de serviço pra Biohelp e anexar abaixo. Se você não tem CNPJ,
+                  escolha Cashin ou Crédito Shopify (sem NF).
                 </p>
               </div>
             </div>
 
             <div className="rounded-lg bg-background border border-border p-3 space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                Dados pra emissão da NF
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Dados pra emissão da NF
+                </p>
+                <span
+                  data-testid="nf-placeholder-badge"
+                  className="inline-flex items-center gap-1 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200 px-2 py-0.5 text-[10px] font-medium"
+                >
+                  <AlertTriangle className="w-3 h-3" />
+                  a confirmar com a Biohelp
+                </span>
+              </div>
               {[
                 { label: "Razão Social", value: BIOHELP_INVOICE_DATA.razaoSocial },
                 { label: "CNPJ", value: BIOHELP_INVOICE_DATA.cnpj },
@@ -345,9 +407,9 @@ export function WithdrawDialog({
 
         <p className="text-xs text-muted-foreground leading-relaxed">
           {method === "shopify_credit"
-            ? "Após aprovação, o crédito é aplicado na sua próxima compra na loja Biohelp."
+            ? "Após aprovação, o crédito é aplicado na próxima compra na loja Biohelp. O crédito não expira."
             : method === "cashback_cashin"
-            ? "Cashback creditado via Cashin após aprovação manual do admin. Você recebe direto na conta Cashin associada ao seu CPF."
+            ? "Cashback creditado via Cashin após aprovação manual do admin. Você recebe direto na conta Cashin associada ao seu CPF — não precisa de CNPJ nem NF."
             : "Após aprovação da NF e da solicitação, o pagamento PIX é processado em dias úteis."}
         </p>
 

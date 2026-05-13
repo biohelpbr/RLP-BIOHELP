@@ -1,15 +1,20 @@
 /**
  * Módulo de Comissões V2 (Pivô V2)
  *
- * Comissão direta de 50% (líquida de impostos/taxas) sobre a assinatura
- * paga do convidado. Apenas 1 nível — substitui Fast-Track, Perpétua,
- * Bônus 1/2/3, Leadership e Royalty do v1.
+ * Comissão variável por tier de afiliadas ativas (40%→55%), com imposto de
+ * 15% deduzido sempre (NF/Cashin/Crédito). Apenas 1 nível — substitui
+ * Fast-Track, Perpétua, Bônus 1/2/3, Leadership e Royalty do v1.
  *
- * Status: SHELL — aguardando TBD-1 (sempre 50%?) e TBD-2 (quem retém impostos?)
+ * Decisões cliente 13/05/2026:
+ * - TBD-1 (sempre 50%?) → resolvido: tier variável por afiliadas ativas.
+ *   Bônus por consumo médio da rede em definição (próxima iteração).
+ * - TBD-2 (impostos retidos?) → resolvido: ~15% sempre deduzido, em todos
+ *   os métodos.
+ *
+ * Tier helper: lib/commissions-v2/tier.ts (canônico). Este arquivo expõe os
+ * shapes para integração com payouts/ledger.
+ *
  * Feature: F-V04 (PIVOT-V2.md §2)
- *
- * NÃO ATIVAR sem flag LRP_V2 ON. Código v1 em lib/commissions/* permanece
- * funcional até onda 6 (cleanup) — ver F-V12.
  */
 
 export type CommissionStatus = 'pending' | 'available' | 'paid' | 'cancelled'

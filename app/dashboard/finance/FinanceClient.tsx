@@ -5,8 +5,16 @@ import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BHCard, WithdrawDialog } from "@/components/biohelp"
 
+interface TierInfo {
+  label: string
+  gross_rate: number
+  net_rate: number
+  active_referrals: number
+}
+
 interface FinanceClientProps {
   available: number
+  tier?: TierInfo
 }
 
 const fmtBRL = (n: number) =>
@@ -16,7 +24,7 @@ const fmtBRL = (n: number) =>
     minimumFractionDigits: 2,
   })
 
-export function FinanceClient({ available }: FinanceClientProps) {
+export function FinanceClient({ available, tier }: FinanceClientProps) {
   const [open, setOpen] = React.useState(false)
   const canWithdraw = available > 0
 
@@ -30,11 +38,18 @@ export function FinanceClient({ available }: FinanceClientProps) {
           <div>
             <h2 className="text-lg font-semibold">Pronto pra resgatar?</h2>
             <p className="text-sm text-muted-foreground">
-              Você pode escolher entre PIX (Founder + NF), Cashback Cashin
-              ou crédito 1:1 na loja Biohelp.
+              Escolha PIX (CNPJ + NF), Cashback Cashin (sem NF) ou crédito 1:1
+              na loja Biohelp.
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Disponível: {fmtBRL(available)}
+              {tier ? (
+                <>
+                  {" · "}
+                  Taxa atual {(tier.gross_rate * 100).toFixed(0)}% bruto (
+                  {(tier.net_rate * 100).toFixed(1)}% líquido após imposto)
+                </>
+              ) : null}
             </p>
           </div>
         </div>
@@ -43,7 +58,12 @@ export function FinanceClient({ available }: FinanceClientProps) {
         </Button>
       </BHCard>
 
-      <WithdrawDialog open={open} onOpenChange={setOpen} available={available} />
+      <WithdrawDialog
+        open={open}
+        onOpenChange={setOpen}
+        available={available}
+        tier={tier}
+      />
     </>
   )
 }

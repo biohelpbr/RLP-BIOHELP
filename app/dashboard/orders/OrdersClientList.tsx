@@ -24,8 +24,11 @@ const fmtBRL = (n: number) =>
   })
 
 const fmtDate = (s: string) => {
-  const d = new Date(s)
-  return d.toLocaleDateString("pt-BR")
+  // Coluna `member_sales.sold_at` é `date` (sem hora). `new Date("YYYY-MM-DD")`
+  // parseia como midnight UTC → -1 dia em BRT. Append T12:00:00 garante local
+  // noon e cai no dia certo independente de fuso.
+  const iso = s.length === 10 ? `${s}T12:00:00` : s
+  return new Date(iso).toLocaleDateString("pt-BR")
 }
 
 export function OrdersClientList({ leads, sales }: OrdersClientListProps) {

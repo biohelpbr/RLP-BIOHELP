@@ -5,6 +5,7 @@ import { createServiceClient, getCurrentMember } from "@/lib/supabase/server"
 import { requestPayoutSchema } from "./schema"
 import { getMemberBalance } from "./queries"
 import { validateInvoice } from "./nfe-validator"
+import { COMMISSION_TAX_RATE } from "@/lib/commissions-v2/tier"
 
 type ActionResult<T = void> =
   | { ok: true; data?: T }
@@ -68,8 +69,13 @@ export async function requestPayout(
   const supabase = createServiceClient()
   const now = new Date().toISOString()
 
-  // gross_amount é NOT NULL legacy (v1 calculava taxa); em v2 sem dedução
-  // o gross é igual ao amount solicitado.
+  // Decisão cliente 13/05/2026: imposto sempre aplicado (~15%), independente
+  // do método (PIX/NF, Cashin, Crédito). PIX ainda tem PIX_FIXED_FEE em cima
+  // do imposto. Cashin/Crédito só imposto.
+  const taxAmount = Number((amount * COMMISSION_TAX_RATE).toFixed(2))
+  const pixFee = payout_method === "pix" ? PIX_FIXED_FEE : 0
+  const netAmount = Number((amount - taxAmount - pixFee).toFixed(2))
+
   // bank_name/agency/account/account_type/cpf_cnpj/holder_name foram
   // relaxados em F-V07b — só PIX exige preenchimento (futura UI S5).
   const { data, error } = await supabase
@@ -78,7 +84,8 @@ export async function requestPayout(
       member_id: member.id,
       amount,
       gross_amount: amount,
-      net_amount: amount,
+      net_amount: netAmount,
+      tax_amount: taxAmount,
       payout_method,
       status: "pending",
       person_type: payout_method === "pix" ? "pj" : "pf",
