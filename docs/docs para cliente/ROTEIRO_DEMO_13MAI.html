@@ -258,13 +258,21 @@
   <div class="num">3</div>
   <h4>Acesso à Loja</h4>
   <div class="url">localhost:3000/dashboard/store</div>
-  <p>Clique no botão grande &ldquo;Ir para a loja Biohelp&rdquo; — abre <code>https://bio-help.com/</code> em nova aba.</p>
-  <ul class="tags">
-    <li><span class="badge real">URL bio-help.com (HTTP 200 testado)</span></li>
-    <li><span class="badge placeholder">Cards de coleção (rotina-manhã etc.) caem em <code>/collections/all</code> como fallback</span></li>
+  <p>Clique no botão grande &ldquo;Ir para a loja Biohelp&rdquo; — abre <code>https://bio-help.com/</code> em nova aba (375 produtos reais, validado em E2E hoje).</p>
+  <p>Mostre os 6 cards de curadoria abaixo. Pode clicar em qualquer um — todos abrem uma coleção real com produtos:</p>
+  <ul style="font-size: 13px; columns: 2;">
+    <li>Rotina manhã → <code>collections/cognicao</code> (16 produtos)</li>
+    <li>Rotina noite → <code>collections/sono</code> (16 produtos)</li>
+    <li>Performance → <code>collections/todos-de-performance</code> (18 produtos)</li>
+    <li>Beleza → <code>collections/todos-em-beleza</code> (13 produtos)</li>
+    <li>Imunidade → <code>collections/imunidade</code> (18 produtos)</li>
+    <li>Todos os produtos → <code>collections/all</code> (32 produtos)</li>
   </ul>
-  <p class="careful">As 6 coleções customizadas (Rotina Manhã, Rotina Noite, Performance, Beleza, Recompra Rápida, Mais Comprados) NÃO existem ainda na loja real — verificado hoje (404). Adicionei um aviso italic acima dos cards: &ldquo;Coleções listadas serão criadas pelo time Biohelp&rdquo;. Os cards apontam pra &ldquo;Todos os produtos&rdquo; pra não 404 na demo. Quando o time Biohelp criar as coleções dedicadas na Shopify, é só trocar 6 strings no código.</p>
-  <p class="say">O botão principal &lsquo;Ir para a loja&rsquo; vai pra <code>bio-help.com</code>. Os cards abaixo são uma sugestão de curadoria por rotina — quando a Biohelp criar essas coleções na Shopify, cada card vai apontar pra coleção específica.</p>
+  <ul class="tags">
+    <li><span class="badge real">7 links validados HTTP 200 + Playwright clicar+abrir</span></li>
+    <li><span class="badge real">target="_blank" + rel noopener noreferrer</span></li>
+  </ul>
+  <p class="say">A parceira tem o catálogo Biohelp filtrado por rotina — clique em Rotina manhã, abre direto a coleção de Cognição, com produtos reais e preço. Botão principal &lsquo;Ir para a loja&rsquo; abre a homepage da Biohelp em aba nova.</p>
 </div>
 
 <div class="step good">
@@ -419,14 +427,14 @@
     <td>Confirmado pelo cliente. <strong>Não é Plus</strong> → usamos <strong>App Proxy</strong> (não Multipass) pra SSO.</td>
   </tr>
   <tr>
-    <td>Coleções customizadas (rotina-manhã etc.)</td>
-    <td><span class="badge pending">PENDENTE BIOHELP</span></td>
-    <td>404 hoje. Cards no /dashboard/store apontam pra <code>/collections/all</code> como fallback. Quando criar, eu troco 6 strings no código (~5 min).</td>
+    <td>Coleções dos 6 cards no /dashboard/store</td>
+    <td><span class="badge real">Apontam pra coleções reais com produtos</span></td>
+    <td>Mapeadas 13/05 pós-auditoria: Rotina manhã→<code>cognicao</code> · Rotina noite→<code>sono</code> · Performance→<code>todos-de-performance</code> · Beleza→<code>todos-em-beleza</code> · Imunidade→<code>imunidade</code> · Todos→<code>all</code>. Todas HTTP 200 com produtos reais (verificado).</td>
   </tr>
   <tr>
     <td>Admin API (sync produtos, customer.credit)</td>
-    <td><span class="badge real">Conectada</span></td>
-    <td>Token <code>shpat_055377...</code> ativo. Webhooks orders/paid configurados.</td>
+    <td><span class="badge real">Conectada (DEV store)</span></td>
+    <td>Token <code>shpat_055377...</code> ativo, retorna produtos do <strong>biohelp-dev.myshopify.com</strong> (loja de desenvolvimento). ⚠️ A loja-cliente real bio-help.com está em outro Shopify (<code>totvs-sc-lojabiohelp-com-bp.myshopify.com</code>). Antes do go-live 11/06 precisa trocar <code>SHOPIFY_STORE_DOMAIN</code> + token pra produção.</td>
   </tr>
   <tr>
     <td>SSO Shopify (App Proxy)</td>
@@ -494,8 +502,8 @@
   </tr>
   <tr>
     <td>Coleções da loja Shopify</td>
-    <td>6 cards apontam pra <code>/collections/all</code></td>
-    <td>Cliente criar handles dedicados → trocar 6 strings em <code>dashboard/store/page.tsx</code>.</td>
+    <td>6 cards apontam pra coleções <strong>reais e com produtos</strong> (cognicao, sono, todos-de-performance, todos-em-beleza, imunidade, all)</td>
+    <td>Resolvido 13/05 (não é mais placeholder). Validado E2E com produtos visíveis.</td>
   </tr>
   <tr>
     <td>Cashin integração</td>
@@ -514,7 +522,9 @@
 <ul style="font-size: 14px;">
   <li>✅ Login parceira + admin (auth Supabase real)</li>
   <li>✅ V2Dashboard com ref code, sponsor, 5 afiliadas</li>
-  <li>✅ Loja URL <code>bio-help.com</code> abre HTTP 200</li>
+  <li>✅ Loja URL <code>bio-help.com</code> abre HTTP 200 (375 produtos reais, título &ldquo;Biohelp Nutrition Club&rdquo;)</li>
+  <li>✅ 6 cards de coleção: clicados via Playwright → abrem coleção real Biohelp em aba nova com produtos visíveis (Beleza: R$ 149 / R$ 129 etc.)</li>
+  <li>✅ Shopify Admin API responde 200 (dev store) — token + integração funcionando</li>
   <li>✅ <code>/dashboard/finance</code>: tier card, breakdown, histórico</li>
   <li>✅ WithdrawDialog: 3 abas, breakdown imposto correto (R$ 290,40 → -R$ 43,56 → R$ 246,84)</li>
   <li>✅ PIX breakdown: -R$ 43,56 imposto + -R$ 3,67 taxa = R$ 243,17 líquido</li>
