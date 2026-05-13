@@ -189,6 +189,12 @@
   passo tem URL exata, o que mostrar, o que dizer e o que evitar clicar.
 </p>
 
+<div style="background:#dcfce7;border:1px solid #16a34a;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:14px;">
+  <strong>🌐 Ambiente: PRODUÇÃO</strong> · URL pública
+  <code>https://rlp-biohelp.vercel.app</code> · Commit <code>5d9aed2</code>
+  · LRP_V2=true · validado E2E hoje (13/05). Localhost permanece no ar como fallback.
+</div>
+
 <!-- LEGENDA -->
 <div class="legend">
   <span class="badge real dot">REAL</span> = funciona de verdade, testado em E2E hoje.
@@ -209,13 +215,13 @@
       <td>Parceira (Sponsor)</td>
       <td><code>sponsor@biohelp.test</code></td>
       <td><code>Demo13Mai!</code></td>
-      <td><code>localhost:3000/login</code></td>
+      <td><code>rlp-biohelp.vercel.app/login</code></td>
     </tr>
     <tr>
       <td>Admin Biohelp</td>
       <td><code>admin@biohelp.test</code></td>
       <td><code>S5Test#2026</code></td>
-      <td><code>localhost:3000/login</code></td>
+      <td><code>rlp-biohelp.vercel.app/login</code></td>
     </tr>
   </table>
   <p style="margin: 8px 0 0; font-size: 12px; color: var(--muted);">
@@ -231,7 +237,7 @@
 <div class="step good">
   <div class="num">1</div>
   <h4>Login Parceira</h4>
-  <div class="url">localhost:3000/login</div>
+  <div class="url">rlp-biohelp.vercel.app/login</div>
   <p>Selecione &ldquo;Sou Parceira&rdquo;, entre com <code>sponsor@biohelp.test</code> / <code>Demo13Mai!</code>.</p>
   <ul class="tags">
     <li><span class="badge real">Auth Supabase real</span></li>
@@ -243,7 +249,7 @@
 <div class="step good">
   <div class="num">2</div>
   <h4>Visão Geral (V2Dashboard)</h4>
-  <div class="url">localhost:3000/dashboard</div>
+  <div class="url">rlp-biohelp.vercel.app/dashboard</div>
   <p>Mostre: nome <em>Sponsor Teste</em>, ref code <code>SPONSOR01</code>, 5 afiliadas diretas, link de convite copiável.</p>
   <ul class="tags">
     <li><span class="badge real">Ref code real</span></li>
@@ -257,7 +263,7 @@
 <div class="step good">
   <div class="num">3</div>
   <h4>Acesso à Loja</h4>
-  <div class="url">localhost:3000/dashboard/store</div>
+  <div class="url">rlp-biohelp.vercel.app/dashboard/store</div>
   <p>Clique no botão grande &ldquo;Ir para a loja Biohelp&rdquo; — abre <code>https://bio-help.com/</code> em nova aba (375 produtos reais, validado em E2E hoje).</p>
   <p>Mostre os 6 cards de curadoria abaixo. Pode clicar em qualquer um — todos abrem uma coleção real com produtos:</p>
   <ul style="font-size: 13px; columns: 2;">
@@ -278,7 +284,7 @@
 <div class="step good">
   <div class="num">4</div>
   <h4>Resultado &amp; Resgate · Tier de comissão</h4>
-  <div class="url">localhost:3000/dashboard/finance</div>
+  <div class="url">rlp-biohelp.vercel.app/dashboard/finance</div>
   <p>Mostre os 3 cards de saldo no topo (Disponível, Pendente Net-15, Recebido total) e o <strong>card &ldquo;Sua taxa de comissão&rdquo;</strong> com a tabela de 4 tiers.</p>
   <ul class="tags">
     <li><span class="badge placeholder">Tabela de tiers (40/45/50/55%) — regra exata a definir com cliente</span></li>
@@ -350,7 +356,7 @@
 <div class="step good">
   <div class="num">9</div>
   <h4>Login Admin → Visão Geral</h4>
-  <div class="url">localhost:3000/login → seleciona &ldquo;Sou Admin Biohelp&rdquo; → /admin</div>
+  <div class="url">rlp-biohelp.vercel.app/login → seleciona &ldquo;Sou Admin Biohelp&rdquo; → /admin</div>
   <p><code>admin@biohelp.test</code> / <code>S5Test#2026</code>. Mostre os 4 KPIs (membros ativos, cadastros do mês, vendas, resgates).</p>
   <ul class="tags">
     <li><span class="badge real">KPIs reais da base</span></li>
