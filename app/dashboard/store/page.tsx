@@ -22,7 +22,9 @@ export default async function StorePage() {
   const member = await getCurrentMember()
   if (!member) redirect("/login")
 
-  const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL ?? "https://bio-help.com"
+  // `||` (não `??`) pra também aplicar fallback quando env vem como string vazia.
+  // Verificado em 13/05/2026: em Vercel a env pode existir mas estar vazia.
+  const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
   const isActive = member.status === "active"
 
   // Cada card linka para uma coleção real da loja Biohelp (verificado em

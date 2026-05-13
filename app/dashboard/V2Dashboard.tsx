@@ -56,7 +56,9 @@ export default async function V2Dashboard() {
   ])
   const directReportsCount = network?.direct_reports.length ?? 0
   const isActive = member.status === "active"
-  const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL ?? "#"
+  // `||` (não `??`) pra também aplicar fallback quando env vem como string vazia.
+  // Verificado em 13/05/2026: em Vercel a env pode existir mas estar vazia.
+  const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
 
   return (
     <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
