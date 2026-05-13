@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Roteiro Demo Biohelp · 13/05/2026</title>
+<style>
+  :root {
+    --bg: #faf7f4;
+    --card: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --primary: #8b6f47;
+    --border: #e5dfd6;
+    --real: #16a34a;
+    --real-bg: #dcfce7;
+    --placeholder: #d97706;
+    --placeholder-bg: #fef3c7;
+    --pending: #dc2626;
+    --pending-bg: #fee2e2;
+    --info: #2563eb;
+    --info-bg: #dbeafe;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 32px 24px 80px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(--primary);
+  }
+  h1 small { font-size: 14px; color: var(--muted); font-weight: 400; }
+  h2 {
+    font-size: 20px;
+    margin: 32px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+  }
+  h3 {
+    font-size: 16px;
+    margin: 20px 0 8px;
+  }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin: 16px 0 24px;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 13px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .badge.real { background: var(--real-bg); color: var(--real); }
+  .badge.placeholder { background: var(--placeholder-bg); color: var(--placeholder); }
+  .badge.pending { background: var(--pending-bg); color: var(--pending); }
+  .badge.info { background: var(--info-bg); color: var(--info); }
+  .badge.dot::before {
+    content: "●";
+    font-size: 8px;
+  }
+  .creds {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 0 0 24px;
+  }
+  .creds table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .creds th, .creds td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .creds th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; }
+  .creds td code {
+    background: #f3efe9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 12px 0;
+    position: relative;
+  }
+  .step.danger { border-left: 4px solid var(--pending); }
+  .step.warning { border-left: 4px solid var(--placeholder); }
+  .step.good { border-left: 4px solid var(--real); }
+  .step .num {
+    position: absolute;
+    top: -10px; left: -10px;
+    width: 28px; height: 28px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .step h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+  }
+  .step .url {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .step p { margin: 6px 0; font-size: 14px; }
+  .step .say {
+    background: #fffaf0;
+    border-left: 3px solid var(--primary);
+    padding: 8px 12px;
+    margin: 8px 0 0;
+    font-style: italic;
+    font-size: 13px;
+    color: #4a3a26;
+  }
+  .step .say::before { content: "💬 "; font-style: normal; }
+  .step .careful {
+    background: var(--pending-bg);
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #7f1d1d;
+  }
+  .step .careful::before { content: "⚠️ "; }
+  ul.tags { padding-left: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  table.status {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  table.status th, table.status td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.status th { background: #f6f1e9; font-weight: 600; }
+  .columns { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 700px) { .columns { grid-template-columns: 1fr; } }
+  .qbox {
+    background: var(--card);
+    border: 1px dashed var(--placeholder);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 8px 0;
+  }
+  .qbox h4 { margin: 0 0 6px; font-size: 14px; color: var(--placeholder); }
+  .qbox p { margin: 4px 0; font-size: 13px; }
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Roteiro · Demo Biohelp LRP <small>· 13/05/2026 (quarta)</small></h1>
+<p style="color: var(--muted); font-size: 14px;">
+  Use este documento aberto numa segunda janela durante a apresentação. Cada
+  passo tem URL exata, o que mostrar, o que dizer e o que evitar clicar.
+</p>
+
+<!-- LEGENDA -->
+<div class="legend">
+  <span class="badge real dot">REAL</span> = funciona de verdade, testado em E2E hoje.
+  &nbsp;·&nbsp;
+  <span class="badge placeholder dot">PLACEHOLDER</span> = valor inventado por mim porque cliente não passou o real ainda.
+  &nbsp;·&nbsp;
+  <span class="badge pending dot">PENDENTE</span> = depende de algo do cliente (decisão, credencial, dado).
+  &nbsp;·&nbsp;
+  <span class="badge info dot">INFO</span> = contexto técnico, não mostrar pra cliente.
+</div>
+
+<!-- CREDENCIAIS -->
+<div class="creds">
+  <h3 style="margin-top: 0;">Credenciais da demo</h3>
+  <table>
+    <tr><th>Perfil</th><th>E-mail</th><th>Senha</th><th>URL</th></tr>
+    <tr>
+      <td>Parceira (Sponsor)</td>
+      <td><code>sponsor@biohelp.test</code></td>
+      <td><code>Demo13Mai!</code></td>
+      <td><code>localhost:3000/login</code></td>
+    </tr>
+    <tr>
+      <td>Admin Biohelp</td>
+      <td><code>admin@biohelp.test</code></td>
+      <td><code>S5Test#2026</code></td>
+      <td><code>localhost:3000/login</code></td>
+    </tr>
+  </table>
+  <p style="margin: 8px 0 0; font-size: 12px; color: var(--muted);">
+    ⚠️ Antes de começar a demo, deslogue qualquer sessão prévia. O botão
+    &ldquo;Sair&rdquo; está no canto inferior esquerdo da sidebar em ambos
+    os painéis.
+  </p>
+</div>
+
+<!-- ============= PARTE 1: PARCEIRA ============= -->
+<h2>🎬 Parte 1 · Jornada da Parceira (~10 min)</h2>
+
+<div class="step good">
+  <div class="num">1</div>
+  <h4>Login Parceira</h4>
+  <div class="url">localhost:3000/login</div>
+  <p>Selecione &ldquo;Sou Parceira&rdquo;, entre com <code>sponsor@biohelp.test</code> / <code>Demo13Mai!</code>.</p>
+  <ul class="tags">
+    <li><span class="badge real">Auth Supabase real</span></li>
+    <li><span class="badge real">RLS ativo</span></li>
+  </ul>
+  <p class="say">Login com Supabase Auth + sessão por cookie. Mesmo módulo que vai pra produção.</p>
+</div>
+
+<div class="step good">
+  <div class="num">2</div>
+  <h4>Visão Geral (V2Dashboard)</h4>
+  <div class="url">localhost:3000/dashboard</div>
+  <p>Mostre: nome <em>Sponsor Teste</em>, ref code <code>SPONSOR01</code>, 5 afiliadas diretas, link de convite copiável.</p>
+  <ul class="tags">
+    <li><span class="badge real">Ref code real</span></li>
+    <li><span class="badge real">Contagem N1 (F-V11)</span></li>
+    <li><span class="badge real">Link copiar/colar</span></li>
+    <li><span class="badge placeholder">Status &ldquo;Inativa&rdquo; (sponsor sem assinatura paga)</span></li>
+  </ul>
+  <p class="say">Aqui a parceira tem o resumo da rede em 1 tela. O link de convite traz quem ela referenciar; quando essa pessoa paga assinatura, vira afiliada ativa dela.</p>
+</div>
+
+<div class="step good">
+  <div class="num">3</div>
+  <h4>Acesso à Loja</h4>
+  <div class="url">localhost:3000/dashboard/store</div>
+  <p>Clique no botão grande &ldquo;Ir para a loja Biohelp&rdquo; — abre <code>https://bio-help.com/</code> em nova aba.</p>
+  <ul class="tags">
+    <li><span class="badge real">URL bio-help.com (HTTP 200 testado)</span></li>
+    <li><span class="badge placeholder">Cards de coleção (rotina-manhã etc.) caem em <code>/collections/all</code> como fallback</span></li>
+  </ul>
+  <p class="careful">As 6 coleções customizadas (Rotina Manhã, Rotina Noite, Performance, Beleza, Recompra Rápida, Mais Comprados) NÃO existem ainda na loja real — verificado hoje (404). Adicionei um aviso italic acima dos cards: &ldquo;Coleções listadas serão criadas pelo time Biohelp&rdquo;. Os cards apontam pra &ldquo;Todos os produtos&rdquo; pra não 404 na demo. Quando o time Biohelp criar as coleções dedicadas na Shopify, é só trocar 6 strings no código.</p>
+  <p class="say">O botão principal &lsquo;Ir para a loja&rsquo; vai pra <code>bio-help.com</code>. Os cards abaixo são uma sugestão de curadoria por rotina — quando a Biohelp criar essas coleções na Shopify, cada card vai apontar pra coleção específica.</p>
+</div>
+
+<div class="step good">
+  <div class="num">4</div>
+  <h4>Resultado &amp; Resgate · Tier de comissão</h4>
+  <div class="url">localhost:3000/dashboard/finance</div>
+  <p>Mostre os 3 cards de saldo no topo (Disponível, Pendente Net-15, Recebido total) e o <strong>card &ldquo;Sua taxa de comissão&rdquo;</strong> com a tabela de 4 tiers.</p>
+  <ul class="tags">
+    <li><span class="badge placeholder">Tabela de tiers (40/45/50/55%) — regra exata a definir com cliente</span></li>
+    <li><span class="badge real">Cálculo de tier por afiliadas ativas (server-side)</span></li>
+    <li><span class="badge real">Imposto 15% deduzido sempre</span></li>
+    <li><span class="badge real">Saldo R$ 290,40 vem do <code>commission_ledger</code> v1</span></li>
+  </ul>
+  <p class="say">Como vocês decidiram que a comissão é variável por nº de afiliadas ativas — coloquei aqui 4 tiers escalonados (40% → 55%) e o sistema já calcula automaticamente em qual a parceira está. <strong>Os percentuais exatos são placeholder até vocês fecharem a regra final</strong>, mas o motor está pronto pra qualquer escala. Imposto 15% já desconta sempre.</p>
+</div>
+
+<div class="step good">
+  <div class="num">5</div>
+  <h4>Solicitar resgate · Triple-resgate</h4>
+  <div class="url">/dashboard/finance → botão &ldquo;Solicitar resgate&rdquo;</div>
+  <p>Abra o dialog. Mostre as <strong>3 abas</strong>: PIX (CNPJ + NF), Cashback Cashin, Crédito Shopify.</p>
+  <p><strong>Em cada aba</strong>, aponte o breakdown:</p>
+  <ul>
+    <li><strong>Bruto</strong> (valor solicitado)</li>
+    <li><strong>Imposto (15%)</strong> — sempre aparece, valor calculado em tempo real</li>
+    <li><strong>Taxa PIX</strong> — só aparece se aba PIX (R$ 3,67 fixos)</li>
+    <li><strong>Você recebe</strong> — líquido final</li>
+  </ul>
+  <p>Em <strong>PIX</strong>: mostre os dados de NF Biohelp com o <span class="badge placeholder">badge &ldquo;a confirmar com a Biohelp&rdquo;</span>.</p>
+  <ul class="tags">
+    <li><span class="badge real">3 métodos com Server Action</span></li>
+    <li><span class="badge real">Breakdown matemático correto em tempo real</span></li>
+    <li><span class="badge placeholder">Razão Social/CNPJ/Endereço/IE — placeholders inventados</span></li>
+    <li><span class="badge pending">Cliente ainda não enviou dados reais da NF</span></li>
+  </ul>
+  <p class="say">Vocês decidiram que vão sempre descontar ~15% de imposto, em qualquer dos 3 métodos. Aqui na UI o membro vê isso explicitamente — &lsquo;bruto X, imposto Y, líquido Z&rsquo;. Sem surpresa pós-aprovação. Os dados de NF (essa caixa amarela ⚠️) estão como placeholder esperando vocês passarem os reais — Razão Social, CNPJ, Endereço e IE — antes do go-live de 11/06.</p>
+</div>
+
+<div class="step good">
+  <div class="num">6</div>
+  <h4>Demonstrar resgate Crédito Shopify (sem NF)</h4>
+  <p>Selecione aba <strong>&ldquo;Crédito Shopify&rdquo;</strong>, troque o valor pra <code>50,00</code>. Mostre o breakdown automático: Bruto R$ 50,00 → Imposto -R$ 7,50 → Líquido R$ 42,50.</p>
+  <p>Clique <strong>&ldquo;Solicitar&rdquo;</strong>. Toast verde &ldquo;Crédito solicitado!&rdquo; aparece. Saldo Disponível desce de R$ 290,40 para R$ 240,40.</p>
+  <ul class="tags">
+    <li><span class="badge real">Grava na tabela payout_requests (status=pending)</span></li>
+    <li><span class="badge real">tax_amount + net_amount gravados</span></li>
+    <li><span class="badge real">Saldo recalculado via RPC get_available_balance</span></li>
+  </ul>
+</div>
+
+<div class="step warning">
+  <div class="num">7</div>
+  <h4>Outras telas da parceira (rápido)</h4>
+  <p style="margin-bottom: 6px;">Passe pela sidebar mostrando que o resto está ok:</p>
+  <table class="status">
+    <tr><th>Rota</th><th>O que mostrar</th><th>Status</th></tr>
+    <tr><td><code>/dashboard/academy</code></td><td>&ldquo;Nenhuma trilha publicada ainda&rdquo;</td><td><span class="badge placeholder">Vazio — admin cria conteúdo</span></td></tr>
+    <tr><td><code>/dashboard/orders</code></td><td>Lista vendas manuais + métricas (vendas mês, ticket médio)</td><td><span class="badge real">Funcional</span></td></tr>
+    <tr><td><code>/dashboard/club</code></td><td>Sponsor (n/a) + 5 afiliadas diretas</td><td><span class="badge real">F-V11 OK</span></td></tr>
+    <tr><td><code>/dashboard/profile</code></td><td>Editar nome + telefone</td><td><span class="badge real">Server Action OK</span></td></tr>
+  </table>
+  <p class="say">A parceira tem CRM leve pra registrar vendas manuais (fora da Shopify), o painel da rede dela, e pode editar próprio cadastro.</p>
+</div>
+
+<div class="step good">
+  <div class="num">8</div>
+  <h4>Logout</h4>
+  <p>Clique &ldquo;Sair&rdquo; no rodapé da sidebar.</p>
+  <p class="say">Deslogou rápido, volta pro /login. (Vai entrar de novo agora como admin.)</p>
+</div>
+
+<!-- ============= PARTE 2: ADMIN ============= -->
+<h2>🛠️ Parte 2 · Painel Admin Biohelp (~10 min)</h2>
+
+<div class="step good">
+  <div class="num">9</div>
+  <h4>Login Admin → Visão Geral</h4>
+  <div class="url">localhost:3000/login → seleciona &ldquo;Sou Admin Biohelp&rdquo; → /admin</div>
+  <p><code>admin@biohelp.test</code> / <code>S5Test#2026</code>. Mostre os 4 KPIs (membros ativos, cadastros do mês, vendas, resgates).</p>
+  <ul class="tags">
+    <li><span class="badge real">KPIs reais da base</span></li>
+    <li><span class="badge placeholder">13 membros teste (não membros reais)</span></li>
+  </ul>
+</div>
+
+<div class="step good">
+  <div class="num">10</div>
+  <h4>Resgates — moderar o pedido da parceira</h4>
+  <div class="url">/admin/payouts</div>
+  <p>Abra a aba <strong>&ldquo;Crédito Shopify&rdquo;</strong>. Você vai ver o pedido R$ 50,00 / Líquido R$ 42,50 da Sponsor Teste em status &ldquo;Pendente&rdquo;.</p>
+  <p>Clique <strong>Aprovar</strong> → status muda pra &ldquo;Aprovado&rdquo;. Botões viram &ldquo;Marcar pago&rdquo; / &ldquo;Rejeitar&rdquo;. Clique <strong>Marcar pago</strong> → status &ldquo;Pago&rdquo;.</p>
+  <ul class="tags">
+    <li><span class="badge real">Server Action approvePayout / markPayoutPaid</span></li>
+    <li><span class="badge real">Estados terminais explícitos (não pode aprovar 2x)</span></li>
+    <li><span class="badge real">Revalida /dashboard/finance + /admin/finance</span></li>
+  </ul>
+  <p class="say">Aqui vocês moderam todos os pedidos — vê quem pediu, quanto bruto, quanto líquido depois do imposto. Aprovar libera, &ldquo;Marcar pago&rdquo; é depois de efetivar o crédito na Shopify / PIX / Cashin. Tudo registrado.</p>
+</div>
+
+<div class="step good">
+  <div class="num">11</div>
+  <h4>Financeiro consolidado</h4>
+  <div class="url">/admin/finance</div>
+  <p>Mostre o card &ldquo;Resgates por método&rdquo; com os 3 cards (PIX, Cashback Cashin, Crédito Shopify) e bruto/líquido/pendente em cada.</p>
+  <p>Mostre o card &ldquo;Comissões (F-V04)&rdquo; — agora mostra que o modelo variável por tier está rodando, com refinamento pendente.</p>
+  <ul class="tags">
+    <li><span class="badge real">Consolidação real dos 3 métodos</span></li>
+    <li><span class="badge real">Bruto vs Líquido (-15% imposto) já calculado</span></li>
+    <li><span class="badge placeholder">Bônus por consumo médio em definição</span></li>
+  </ul>
+</div>
+
+<div class="step good">
+  <div class="num">12</div>
+  <h4>Comunidade — filtros + tags</h4>
+  <div class="url">/admin/community</div>
+  <p>Mostre os filtros (Status: Ativos/Pendentes/Inativos · Tag: auto:lider, auto:influenciador, FOUNDER). Clique numa membra pra abrir detalhe.</p>
+  <ul class="tags">
+    <li><span class="badge real">13 membros, filtros funcionando</span></li>
+    <li><span class="badge real">Tags F-V18 (auto:lider ≥5 ativos, auto:influenciador ≥40)</span></li>
+    <li><span class="badge real">Cron diário recalcula tags automaticamente</span></li>
+  </ul>
+  <p class="say">As tags <code>auto:lider</code> e <code>auto:influenciador</code> são automáticas — o sistema conta quem tem 5+ afiliadas ativas e marca de noite. Vocês também podem aplicar tags manuais.</p>
+</div>
+
+<div class="step warning">
+  <div class="num">13</div>
+  <h4>Eventos · Academy · Vendas manuais (passar rápido)</h4>
+  <p>Mostre a estrutura pronta, mesmo sem conteúdo:</p>
+  <table class="status">
+    <tr><th>Rota</th><th>O que tem</th><th>Status</th></tr>
+    <tr><td><code>/admin/events</code></td><td>Botão &ldquo;Novo evento&rdquo;, tabs Em andamento / Futuros / Passados</td><td><span class="badge real">F-V15 CMS pronto</span></td></tr>
+    <tr><td><code>/admin/academy</code></td><td>Botão &ldquo;Nova trilha&rdquo;</td><td><span class="badge real">F-V09 CMS pronto</span></td></tr>
+    <tr><td><code>/admin/orders</code></td><td>Lista vendas manuais agregada</td><td><span class="badge real">F-V14 OK</span></td></tr>
+    <tr><td><code>/admin/products</code></td><td>Catálogo Shopify (sincronizado)</td><td><span class="badge real">via Shopify Admin API</span></td></tr>
+  </table>
+  <p class="say">CMS pronto pra vocês criarem eventos, trilhas de Academy e gerenciarem produtos sincronizados da Shopify.</p>
+</div>
+
+<!-- ============= STATUS DA INTEGRAÇÃO SHOPIFY ============= -->
+<h2>🛒 Status integração Shopify</h2>
+<table class="status">
+  <tr><th>Item</th><th>Status</th><th>Detalhe</th></tr>
+  <tr>
+    <td>URL pública da loja</td>
+    <td><span class="badge real">OK</span></td>
+    <td><code>https://bio-help.com/</code> — testado hoje, HTTP 200. Aparece em todos os CTAs &ldquo;Ir para a loja&rdquo;.</td>
+  </tr>
+  <tr>
+    <td>Plano Shopify</td>
+    <td><span class="badge info">Grow Anual</span></td>
+    <td>Confirmado pelo cliente. <strong>Não é Plus</strong> → usamos <strong>App Proxy</strong> (não Multipass) pra SSO.</td>
+  </tr>
+  <tr>
+    <td>Coleções customizadas (rotina-manhã etc.)</td>
+    <td><span class="badge pending">PENDENTE BIOHELP</span></td>
+    <td>404 hoje. Cards no /dashboard/store apontam pra <code>/collections/all</code> como fallback. Quando criar, eu troco 6 strings no código (~5 min).</td>
+  </tr>
+  <tr>
+    <td>Admin API (sync produtos, customer.credit)</td>
+    <td><span class="badge real">Conectada</span></td>
+    <td>Token <code>shpat_055377...</code> ativo. Webhooks orders/paid configurados.</td>
+  </tr>
+  <tr>
+    <td>SSO Shopify (App Proxy)</td>
+    <td><span class="badge info">Implementado, OFF por gate</span></td>
+    <td>Código F-V17 pronto. Flag <code>LRP_V2_SSO=false</code> até validação. Acende em flip de variável.</td>
+  </tr>
+  <tr>
+    <td>Webhook orders/paid → assinatura</td>
+    <td><span class="badge real">Funcional</span></td>
+    <td>F-V03 + F-V15: pagamento recorrente vira <code>status=active</code> automaticamente, dispara recompute de tags F-V18.</td>
+  </tr>
+  <tr>
+    <td>Crédito Shopify via <code>customer.credit</code></td>
+    <td><span class="badge real">API integrada</span></td>
+    <td>Endpoint disponível na Admin API. Aplicação manual no admin pós-aprovação (futuro: automação).</td>
+  </tr>
+  <tr>
+    <td>Cashin (cashback)</td>
+    <td><span class="badge pending">credenciais pendentes</span></td>
+    <td>Modo <code>mock</code> hoje. Quando cliente passar tokens sandbox/prod, é trocar 2 env vars.</td>
+  </tr>
+</table>
+
+<!-- ============= O QUE AINDA DEPENDE DELES ============= -->
+<h2>⏳ O que ainda depende da Biohelp</h2>
+
+<div class="columns">
+  <div class="qbox">
+    <h4>🚨 Bloqueia o go-live de 11/06</h4>
+    <ul>
+      <li><strong>Regra exata da comissão variável</strong> — Tier exato e fórmula do bônus por consumo médio. Hoje tem placeholder funcional (40/45/50/55%).</li>
+      <li><strong>Dados NF Biohelp</strong> — Razão Social, CNPJ, Endereço completo, Inscrição Estadual. Sem isso, parceiras com CNPJ não conseguem emitir NF pra resgatar PIX.</li>
+      <li><strong>Credenciais Cashin</strong> — Sandbox + Produção. Sem isso, fluxo Cashback Cashin fica em mock.</li>
+    </ul>
+  </div>
+
+  <div class="qbox">
+    <h4>📦 Operacional (não bloqueia, mas precisa)</h4>
+    <ul>
+      <li><strong>Criar coleções na loja Shopify</strong> — handles sugeridos: <code>rotina-manha</code>, <code>rotina-noite</code>, <code>performance</code>, <code>beleza</code>, <code>mais-vendidos</code>.</li>
+      <li><strong>Janela de go-live 11/06</strong> — confirmar disponibilidade do time pra rolar o flip.</li>
+      <li><strong>Decisão saldo v1</strong> — herda, zera ou híbrido (R$ 290,40 do Sponsor Teste vem do <code>commission_ledger</code> v1). Detalhes no <code>RUNBOOK-GOLIVE-11062026.md</code>.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============= QUE FOI INVENTADO POR MIM ============= -->
+<h2>🧪 Placeholders que <em>inventei</em> (vai trocar quando cliente passar real)</h2>
+<table class="status">
+  <tr><th>Onde</th><th>Valor placeholder</th><th>Quando trocar</th></tr>
+  <tr>
+    <td>Tabela de tiers de comissão</td>
+    <td>0-4=40%, 5-9=45%, 10-19=50%, 20+=55%</td>
+    <td>Quando cliente fechar a fórmula exata (afiliados × consumo médio). Edita só <code>lib/commissions-v2/tier.ts</code>.</td>
+  </tr>
+  <tr>
+    <td>Imposto retido</td>
+    <td>15% sempre</td>
+    <td>Cliente já confirmou &ldquo;±15%&rdquo;. Pode mudar pra valor exato (ex.: 14,5% ou 16%) em <code>COMMISSION_TAX_RATE</code>.</td>
+  </tr>
+  <tr>
+    <td>Dados NF Biohelp</td>
+    <td>Razão Social: <em>Biohelp Nutrição e Bem-Estar Ltda.</em><br>CNPJ: <em>12.345.678/0001-90</em><br>Endereço: <em>Av. Paulista, 1000 SP</em><br>IE: <em>Isento</em></td>
+    <td>Cliente passar os reais por WhatsApp. Edita constante <code>BIOHELP_INVOICE_DATA</code>.</td>
+  </tr>
+  <tr>
+    <td>Coleções da loja Shopify</td>
+    <td>6 cards apontam pra <code>/collections/all</code></td>
+    <td>Cliente criar handles dedicados → trocar 6 strings em <code>dashboard/store/page.tsx</code>.</td>
+  </tr>
+  <tr>
+    <td>Cashin integração</td>
+    <td><code>CASHIN_MODE=mock</code>, retorna sucesso fake</td>
+    <td>Cliente passar token sandbox + URL real. Mudar pra <code>sandbox</code> → testar → <code>live</code>.</td>
+  </tr>
+  <tr>
+    <td>Saldo R$ 290,40 do Sponsor Teste</td>
+    <td>Vem do <code>commission_ledger</code> v1 (histórico legacy)</td>
+    <td>Decisão saldo v1: herda / zera / híbrido (vide runbook).</td>
+  </tr>
+</table>
+
+<!-- ============= O QUE FOI TESTADO E O QUE NÃO ============= -->
+<h2>✅ O que foi testado em E2E hoje (Playwright)</h2>
+<ul style="font-size: 14px;">
+  <li>✅ Login parceira + admin (auth Supabase real)</li>
+  <li>✅ V2Dashboard com ref code, sponsor, 5 afiliadas</li>
+  <li>✅ Loja URL <code>bio-help.com</code> abre HTTP 200</li>
+  <li>✅ <code>/dashboard/finance</code>: tier card, breakdown, histórico</li>
+  <li>✅ WithdrawDialog: 3 abas, breakdown imposto correto (R$ 290,40 → -R$ 43,56 → R$ 246,84)</li>
+  <li>✅ PIX breakdown: -R$ 43,56 imposto + -R$ 3,67 taxa = R$ 243,17 líquido</li>
+  <li>✅ Badge NF placeholder &ldquo;a confirmar com a Biohelp&rdquo;</li>
+  <li>✅ Solicitar Crédito R$ 50 → grava em payout_requests com tax_amount R$ 7,50 + net R$ 42,50</li>
+  <li>✅ Saldo recalcula: R$ 290,40 → R$ 240,40 após pedido</li>
+  <li>✅ Admin Aprovar + Marcar pago — estados terminais funcionam</li>
+  <li>✅ Label histórico &ldquo;PIX (CNPJ + NF)&rdquo; (label antigo &ldquo;Founder&rdquo; corrigido)</li>
+  <li>✅ <code>/admin/finance</code>: consolidação 3 métodos (Crédito Bruto R$ 60 / Líquido R$ 52,50)</li>
+  <li>✅ <code>/admin/community</code> filtros + tags F-V18</li>
+  <li>✅ Nova venda manual com data 13/05/2026 (bug timezone fixado durante o E2E)</li>
+  <li>✅ Editar profile (nome + telefone)</li>
+  <li>✅ Logout 303 funcional</li>
+  <li>✅ TypeCheck zero erros</li>
+</ul>
+
+<h2>⚠️ O que NÃO foi testado (manualmente ou em runtime)</h2>
+<ul style="font-size: 14px;">
+  <li>⚠️ Webhook orders/paid real chegando da Shopify (vai precisar testar live no go-live)</li>
+  <li>⚠️ SSO App Proxy (gate <code>LRP_V2_SSO=false</code>)</li>
+  <li>⚠️ Aplicação efetiva do crédito Shopify via <code>customer.credit</code> API (admin marca pago, mas a API call live não foi triggada)</li>
+  <li>⚠️ Cashin live (apenas mock testado)</li>
+  <li>⚠️ Cron F-V18 recalcular tags em tempo real durante a demo (roda 1x/dia em prod)</li>
+</ul>
+
+<footer>
+  Gerado em 13/05/2026 · Commit base <code>45616b1</code> em main · TypeCheck verde · 17 patterns acumulados em memória.
+</footer>
+
+</div>
+</body>
+</html>

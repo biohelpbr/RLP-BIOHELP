@@ -26,15 +26,19 @@ export default async function StorePage() {
   const isActive = member.status === "active"
 
   // Cada card linka para uma coleção/tag na loja. Os paths seguem o padrão
-  // Shopify `/collections/<handle>`. Coleções a serem criadas no Shopify:
-  // rotina-manha, rotina-noite, performance, beleza, recompra-rapida, mais-vendidos.
+  // Shopify `/collections/<handle>`. Coleções customizadas (rotina-manha,
+  // rotina-noite etc.) AINDA NÃO existem na loja Biohelp prod — verificado
+  // 13/05/2026 (HTTP 404). Como fallback, todos apontam para
+  // `/collections/all` (que existe). Quando o time Biohelp criar as coleções,
+  // trocar os paths abaixo para os handles definitivos.
+  const FALLBACK = "/collections/all"
   const kits = [
-    { title: "Rotina manhã", desc: "Energia e foco para começar bem o dia", path: "/collections/rotina-manha" },
-    { title: "Rotina noite", desc: "Recuperação, sono e bem-estar", path: "/collections/rotina-noite" },
-    { title: "Performance", desc: "Suporte para treinos e disposição", path: "/collections/performance" },
-    { title: "Beleza", desc: "Pele, cabelo e colágeno", path: "/collections/beleza" },
+    { title: "Rotina manhã", desc: "Energia e foco para começar bem o dia", path: FALLBACK },
+    { title: "Rotina noite", desc: "Recuperação, sono e bem-estar", path: FALLBACK },
+    { title: "Performance", desc: "Suporte para treinos e disposição", path: FALLBACK },
+    { title: "Beleza", desc: "Pele, cabelo e colágeno", path: FALLBACK },
     { title: "Recompra rápida", desc: "Seus produtos favoritos em 1 clique", path: "/account/orders" },
-    { title: "Mais comprados", desc: "Os queridinhos do clube esse mês", path: "/collections/mais-vendidos" },
+    { title: "Mais comprados", desc: "Os queridinhos do clube esse mês", path: FALLBACK },
   ]
 
   return (
@@ -71,6 +75,13 @@ export default async function StorePage() {
             </Button>
           </div>
         </BHCard>
+
+        <p className="text-xs text-muted-foreground italic">
+          As coleções abaixo são uma sugestão de curadoria. Atualmente todos os
+          atalhos abrem a loja em &ldquo;Todos os produtos&rdquo; — assim que o
+          time Biohelp criar as coleções dedicadas na Shopify, cada card vai
+          apontar pro seu filtro próprio.
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {kits.map((kit) => (
