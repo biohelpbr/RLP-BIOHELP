@@ -5,6 +5,7 @@
 
 ## 2026-05-19
 
+- [2026-05-19] [VALIDATION] CI N1 local executado pós-reorg: `npm run lint` ✅ (apenas warnings preexistentes de exhaustive-deps / no-img-element — nenhum erro novo), `npx tsc --noEmit` ✅ (0 erros), `npm run build` ✅ (Next 14 build completo, todas as rotas geradas). Nenhuma regressão introduzida pela reorg.
 - [2026-05-19] [REORG] Adotado Harness v3.2 em modo bridge aditivo. Criados AGENTS.md / CLAUDE.md / TODO.md (raiz), docs/product/PRD.md, docs/specs/SPEC.md, docs/contracts/CONTRACTS.md, docs/plans/ (CURRENT_REALITY, DECISIONS_LOG, risk-classification, templates), docs/wiki/ (este arquivo + índice + overview + architecture + modules + runbooks), docs/decisions/adr/, docs/legacy/v1/ (com 5 docs v1 movidos), packages/shared/types/, tests/{unit,integration,contract,e2e}/, .github/workflows/ci.yml. **Zero código de produção tocado.** Branch: `chore/harness-v3.2-reorg`. Referência: `.claude/harness-v3.2-manual.html`. PR pendente de abertura humana.
 
 ## 2026-05-13
