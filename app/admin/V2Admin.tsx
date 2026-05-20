@@ -129,40 +129,33 @@ export default async function V2Admin() {
                 <Award className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold">Tags automáticas (F-V18)</h2>
+                <h2 className="text-lg font-semibold">Status e distinções dos membros</h2>
                 <p className="text-sm text-muted-foreground">
-                  Recalculadas diariamente às 03:00 UTC.
+                  Founder é automático (≥5 ativos). Influenciador é tag manual do admin.
                 </p>
               </div>
             </div>
             <ul className="space-y-2">
               <li className="flex items-center justify-between rounded-lg border border-border p-3">
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary">auto:lider</Badge>
-                  <span className="text-sm text-muted-foreground">
-                    ≥ 5 afiliados ativos
-                  </span>
-                </div>
-                <span className="font-semibold">{overview.tags.autoLider}</span>
-              </li>
-              <li className="flex items-center justify-between rounded-lg border border-border p-3">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">auto:influenciador</Badge>
-                  <span className="text-sm text-muted-foreground">
-                    ≥ 40 afiliados ativos
-                  </span>
-                </div>
-                <span className="font-semibold">{overview.tags.autoInfluenciador}</span>
-              </li>
-              <li className="flex items-center justify-between rounded-lg border border-border p-3">
-                <div className="flex items-center gap-2">
                   <Badge variant="default">
                     <Crown className="w-3 h-3 mr-1" />
                     FOUNDER
                   </Badge>
-                  <span className="text-sm text-muted-foreground">F-V06</span>
+                  <span className="text-sm text-muted-foreground">
+                    ≥ 5 afiliados ativos no clube (F-V06)
+                  </span>
                 </div>
-                <span className="font-semibold">{overview.tags.founder}</span>
+                <span className="font-semibold">{overview.tags.founderEligible}</span>
+              </li>
+              <li className="flex items-center justify-between rounded-lg border border-border p-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">manual:influenciador</Badge>
+                  <span className="text-sm text-muted-foreground">
+                    Atribuído manualmente pelo admin
+                  </span>
+                </div>
+                <span className="font-semibold">{overview.tags.manualInfluenciador}</span>
               </li>
             </ul>
           </BHCard>

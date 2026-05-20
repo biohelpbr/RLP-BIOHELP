@@ -19,9 +19,10 @@ export type AdminOverviewV2 = {
     revenueThisMonth: number
   }
   tags: {
-    autoLider: number
-    autoInfluenciador: number
-    founder: number
+    /** Total de membros que cumprem o critério Founder (≥5 ativos no clube) — F-V06 v2 */
+    founderEligible: number
+    /** Membros com tag `manual:influenciador` atribuída pelo admin — F-V18 v2 */
+    manualInfluenciador: number
   }
 }
 
@@ -36,13 +37,13 @@ const ZERO: AdminOverviewV2 = {
   },
   payouts: { pendingCount: 0, pendingAmount: 0, completedAmount: 0 },
   sales: { salesThisMonth: 0, revenueThisMonth: 0 },
-  tags: { autoLider: 0, autoInfluenciador: 0, founder: 0 },
+  tags: { founderEligible: 0, manualInfluenciador: 0 },
 }
 
 export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
   const supabase = createServiceClient()
 
-  const [membersRes, payoutsRes, salesRes, tagsRes] = await Promise.all([
+  const [membersRes, payoutsRes, salesRes, tagsRes, founderRes] = await Promise.all([
     supabase.from("members").select("status, created_at"),
     supabase
       .from("payout_requests")
@@ -52,14 +53,19 @@ export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
       .select("paid_amount, sold_at")
       .gte("sold_at", monthStartDate()),
     supabase.from("members").select("tags"),
+    supabase
+      .from("member_active_affiliate_count")
+      .select("member_id, active_count")
+      .gte("active_count", 5),
   ])
 
-  if (membersRes.error || payoutsRes.error || salesRes.error || tagsRes.error) {
+  if (membersRes.error || payoutsRes.error || salesRes.error || tagsRes.error || founderRes.error) {
     console.error("[overview-v2]", {
       members: membersRes.error,
       payouts: payoutsRes.error,
       sales: salesRes.error,
       tags: tagsRes.error,
+      founder: founderRes.error,
     })
     return ZERO
   }
@@ -107,15 +113,13 @@ export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
   )
 
   const tagRows = tagsRes.data ?? []
-  let autoLider = 0
-  let autoInfluenciador = 0
-  let founder = 0
+  let manualInfluenciador = 0
   for (const r of tagRows) {
     const tags = Array.isArray(r.tags) ? (r.tags as string[]) : []
-    if (tags.includes("auto:lider")) autoLider++
-    if (tags.includes("auto:influenciador")) autoInfluenciador++
-    if (tags.includes("FOUNDER") || tags.includes("manual:founder")) founder++
+    if (tags.includes("manual:influenciador")) manualInfluenciador++
   }
+
+  const founderEligible = (founderRes.data ?? []).length
 
   return {
     members: {
@@ -131,7 +135,7 @@ export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
     },
     payouts: { pendingCount, pendingAmount, completedAmount },
     sales: { salesThisMonth, revenueThisMonth },
-    tags: { autoLider, autoInfluenciador, founder },
+    tags: { founderEligible, manualInfluenciador },
   }
 }
 

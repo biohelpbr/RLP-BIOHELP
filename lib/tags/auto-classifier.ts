@@ -1,10 +1,29 @@
 import { createServiceClient } from "@/lib/supabase/server"
 
+/**
+ * F-V18 v2 — Reescrito após decisão cliente 20/05/2026.
+ *
+ * **Mudança de spec:**
+ *   - Removida a tag `auto:lider`. Quem atinge ≥5 ativos no clube vira FOUNDER
+ *     (lógica em F-V06), não Líder.
+ *   - Removida a auto-classificação de Influenciador. Influenciador agora é
+ *     uma tag **manual** (`manual:influenciador`), aplicada pelo admin via
+ *     `/admin/community/[id]`. Sem threshold automático.
+ *
+ * **Comportamento atual:**
+ *   - `computeAutoTags()` sempre retorna `[]`. Mantido por contrato pra preservar
+ *     idempotência do cron `auto-tags` (limpa qualquer `auto:*` antigo) e
+ *     compatibilidade com `recompute(memberId)`.
+ *   - `mergeTags()` continua preservando tags `manual:*` e `FOUNDER`. Soft cleanup
+ *     de `auto:lider` / `auto:influenciador` em recompute (chamadas existentes
+ *     limpam o que sobrou).
+ *
+ * @see docs/sdd/features/F-V18-tags-automaticas/SPEC.md (v2 — atualizada 20/05)
+ * @see docs/sdd/features/F-V06-promocao-founder/SPEC.md (Founder ≥5 ativos)
+ */
+
 export type AutoTag = "auto:lider" | "auto:influenciador"
 export const AUTO_TAGS: readonly AutoTag[] = ["auto:lider", "auto:influenciador"] as const
-
-const LIDER_THRESHOLD = 5
-const INFLUENCIADOR_THRESHOLD = 40
 
 type RecomputeResult = {
   scanned: number
@@ -12,23 +31,6 @@ type RecomputeResult = {
   unchanged: number
 }
 
-/**
- * F-V18: recalcula tags `auto:*` em `members.tags` baseado no nº de
- * afiliados N1 ativos (view `member_active_affiliate_count`).
- *
- * Regra:
- *   active_count >= 40 → ['auto:lider', 'auto:influenciador']
- *   active_count >= 5  → ['auto:lider']
- *   else               → []
- *
- * Tags com prefixo diferente de 'auto:' (ex.: 'manual:vip', 'FOUNDER')
- * são preservadas. Idempotente — comparar e gravar só se mudou.
- *
- * Hipótese-1 S3: "ativo" = status='active' (proxy via view). Quando
- * F-V03 entrar (S5+), troca em 1 lugar — a view (vide migration).
- *
- * @param memberId Quando undefined, percorre todos. Quando string, só esse membro.
- */
 export async function recompute(memberId?: string): Promise<RecomputeResult> {
   const supabase = createServiceClient()
 
@@ -64,12 +66,9 @@ export async function recompute(memberId?: string): Promise<RecomputeResult> {
   let updated = 0
   let unchanged = 0
 
-  for (const row of counts ?? []) {
-    const id = row.member_id as string
-    const active = Number(row.active_count ?? 0)
-    const desired = computeAutoTags(active)
+  for (const id of ids) {
+    const desired = computeAutoTags()
     const current = currentTagsById.get(id) ?? []
-
     const next = mergeTags(current, desired)
 
     if (sameTags(current, next)) {
@@ -91,19 +90,19 @@ export async function recompute(memberId?: string): Promise<RecomputeResult> {
   return { scanned: ids.length, updated, unchanged }
 }
 
-export function computeAutoTags(activeCount: number): AutoTag[] {
-  if (activeCount >= INFLUENCIADOR_THRESHOLD) {
-    return ["auto:lider", "auto:influenciador"]
-  }
-  if (activeCount >= LIDER_THRESHOLD) {
-    return ["auto:lider"]
-  }
+/**
+ * F-V18 v2: auto-tagging foi descontinuada.
+ * Founder é tratado em F-V06 (status, não tag automática).
+ * Influenciador virou tag manual (`manual:influenciador`).
+ */
+export function computeAutoTags(_activeCount?: number): AutoTag[] {
   return []
 }
 
 /**
  * Substitui apenas as tags `auto:*` em `current` pelo conjunto `desired`.
  * Demais tags (manual:*, FOUNDER, etc.) preservadas.
+ * Com `desired = []` (default v2), funciona como cleanup soft das auto-tags antigas.
  */
 export function mergeTags(current: string[], desired: AutoTag[]): string[] {
   const preserved = current.filter((t) => !t.startsWith("auto:"))

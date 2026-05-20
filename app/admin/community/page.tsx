@@ -25,9 +25,8 @@ const STATUS_CHOICES = [
 
 const TAG_CHOICES = [
   { value: "", label: "Todas as tags" },
-  { value: "auto:lider", label: "auto:lider (≥5)" },
-  { value: "auto:influenciador", label: "auto:influenciador (≥40)" },
-  { value: "FOUNDER", label: "FOUNDER (F-V06)" },
+  { value: "FOUNDER", label: "FOUNDER (≥5 ativos — F-V06)" },
+  { value: "manual:influenciador", label: "manual:influenciador (admin)" },
 ]
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
@@ -146,19 +145,13 @@ export default async function CommunityPage({ searchParams }: CommunityPageProps
                     <Badge variant={STATUS_VARIANT[m.status] ?? "outline"}>
                       {m.status}
                     </Badge>
-                    {m.tags.includes("auto:lider") && (
-                      <Badge variant="secondary">
-                        <Award className="w-3 h-3 mr-1" />
-                        Líder
-                      </Badge>
-                    )}
-                    {m.tags.includes("auto:influenciador") && (
+                    {m.tags.includes("manual:influenciador") && (
                       <Badge variant="secondary">
                         <Award className="w-3 h-3 mr-1" />
                         Influenciador
                       </Badge>
                     )}
-                    {(m.tags.includes("FOUNDER") || m.tags.includes("manual:founder")) && (
+                    {(m.tags.includes("FOUNDER") || m.tags.includes("manual:founder") || m.active_count >= 5) && (
                       <Badge variant="default">
                         <Crown className="w-3 h-3 mr-1" />
                         FOUNDER
