@@ -40,7 +40,26 @@
 
 ## 2. Em andamento
 
-(vazio por enquanto — preencher ao iniciar próximas features pós-demo).
+### Feedback pós-demo 13/05 (call 20/05 10h-11h) — branch `feat/feedback-pos-demo-20mai`
+
+**Status:** 4 commits entregues (U1, A3, A4, A1). 7 itens C/D documentados em `docs/sdd/PERGUNTAS-CALL-20MAI.md` aguardando decisão da call. Roteiro de apresentação em `docs/sdd/ROTEIRO-DEMO-CALL-20MAI.md`.
+
+#### Entregue nesta branch
+- ✅ **U1** Copiar link membro retorna URL absoluta (fallback `https://rlp-biohelp.vercel.app`) — V2Dashboard
+- ✅ **A4** Nome cliente em /admin/payouts vira link → /admin/community/[id]
+- ✅ **A3** Texto "Fonte de dados" /admin/consumption reescrito (3 parágrafos explicando vendas auto vs Shopify reais)
+- ✅ **A1** Spec change F-V18 v2 + F-V06: tag `auto:lider` removida, Influenciador vira `manual:influenciador`, FOUNDER conta por condição (`member_active_affiliate_count.active_count >= 5`)
+
+#### Aguardando decisão na call de 20/05 (documentadas em `PERGUNTAS-CALL-20MAI.md`)
+- 🟡 **A2** Diferenciar receita produto vs assinatura + valor Biohelp vs comissão (reabre TBD-1, TBD-2)
+- 🟡 **A5+U6** Avisos/Notificações admin+user (1 ou 2 features?)
+- 🟡 **U2** Página do membro em Minha comunidade (read-only, campos a definir)
+- 🟡 **U3** Painel da comunidade do sponsor (visão upward)
+- 🟡 **U4** Refator vendas manuais com `custo` + linhas múltiplas + totais (schema decisão: jsonb vs tabela filha)
+- 🟡 **U5** Posts Founder com aprovação admin (nova tabela `community_posts` + workflow)
+
+#### Liga com integração Guru
+- F-V02 end-to-end com assinatura real — Wink envia credenciais Guru + reservar 1h pra test (decisão na call).
 
 ### Template de item
 
