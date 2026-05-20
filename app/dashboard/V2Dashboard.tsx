@@ -27,12 +27,10 @@ function formatEventWindow(startIso: string, endIso: string): string {
 
 function buildInviteUrl(refCode: string): string {
   const base =
-    process.env.NEXT_PUBLIC_APP_URL ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    ""
-  // Path-only é suficiente (browser resolve com origem atual no clipboard).
-  // Mas pra compartilhamento WhatsApp, melhor URL absoluta quando temos.
-  return base ? `${base}/join?ref=${refCode}` : `/join?ref=${refCode}`
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://rlp-biohelp.vercel.app"
+  return `${base}/join?ref=${refCode}`
 }
 
 /**

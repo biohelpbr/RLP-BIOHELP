@@ -26,10 +26,13 @@ export default async function ConsumptionPage() {
     <AdminShell adminName={member.name ?? "Admin"}>
       <div className="space-y-6">
         <header className="space-y-1">
-          <h1 className="text-3xl font-bold text-foreground">Consumo</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            Consumo <span className="text-base font-normal text-muted-foreground">(vendas declaradas pelos membros)</span>
+          </h1>
           <p className="text-muted-foreground">
             {data.rows.length} {data.rows.length === 1 ? "produto" : "produtos"}{" "}
-            registrados em vendas manuais (F-V14).
+            que membros registraram em <code className="text-xs">Minhas vendas</code>.
+            Para o consumo real da loja Shopify, use <code className="text-xs">/admin/orders</code>.
           </p>
         </header>
 
@@ -92,17 +95,31 @@ export default async function ConsumptionPage() {
 
         <BHCard variant="default" className="flex items-start gap-3">
           <Info className="w-5 h-5 text-primary mt-0.5" />
-          <div className="text-sm text-muted-foreground space-y-1">
+          <div className="text-sm text-muted-foreground space-y-2">
             <p>
-              <span className="font-medium text-foreground">Fonte de dados:</span>{" "}
-              Em S3, este painel agrega apenas vendas manuais (`member_sales` —
-              F-V14). Produtos comprados direto na loja Shopify entram em S4 com
-              <code className="ml-1">/admin/orders</code> (OrdersAnalytics).
+              <span className="font-medium text-foreground">O que este painel mostra:</span>{" "}
+              vendas que cada membro <em>auto-registrou</em> via{" "}
+              <code className="text-xs">Minhas vendas</code> (CRM leve do membro).
+              É a visão declarativa — quem o membro acha que converteu.
+            </p>
+            <p>
+              <span className="font-medium text-foreground">O que NÃO mostra:</span>{" "}
+              pedidos reais da loja Shopify (esses ficam em{" "}
+              <code className="text-xs">/admin/orders</code> via webhook
+              <code className="text-xs ml-1">orders/paid</code>). Quando um produto comprado
+              na Shopify entra via webhook, ele aparece em <code>/admin/orders</code>{" "}
+              — não aqui.
+            </p>
+            <p>
+              <span className="font-medium text-foreground">Por que ambos coexistem:</span>{" "}
+              o registro manual permite que o membro acompanhe vendas presenciais
+              (cliente conhecido, indicação por WhatsApp) <em>antes</em> da Shopify
+              processar — útil pra cross-reference e métricas por membro.
             </p>
             <p>
               <span className="font-medium text-foreground">Preço de custo</span>{" "}
               e <span className="font-medium text-foreground">contribuição líquida</span>{" "}
-              dependem de F-V16 / cadastro admin (`/admin/products`).
+              dependem do cadastro admin em <code className="text-xs">/admin/products</code>.
             </p>
           </div>
         </BHCard>

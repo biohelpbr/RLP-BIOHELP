@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { CreditCard, FileText, Wallet } from "lucide-react"
 import { redirect } from "next/navigation"
 import { AdminShell } from "@/components/layouts/AdminShell"
@@ -29,6 +30,12 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: "Cancelado",
 }
 
+interface PayoutMember {
+  id: string | null
+  name: string | null
+  email: string
+}
+
 interface PayoutRow {
   id: string
   amount: number
@@ -37,12 +44,12 @@ interface PayoutRow {
   payout_method: string
   status: string
   created_at: string
-  members: { name: string | null; email: string } | { name: string | null; email: string }[] | null
+  members: PayoutMember | PayoutMember[] | null
 }
 
-function getMember(row: PayoutRow): { name: string | null; email: string } {
-  if (Array.isArray(row.members)) return row.members[0] || { name: null, email: "—" }
-  return row.members || { name: null, email: "—" }
+function getMember(row: PayoutRow): PayoutMember {
+  if (Array.isArray(row.members)) return row.members[0] || { id: null, name: null, email: "—" }
+  return row.members || { id: null, name: null, email: "—" }
 }
 
 function formatBRL(v: number) {
@@ -67,9 +74,18 @@ function PayoutList({ rows, emptyMsg }: { rows: PayoutRow[]; emptyMsg: string })
             className="py-3 flex flex-wrap items-center justify-between gap-3"
           >
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-foreground">
-                {m.name || "(sem nome)"}
-              </p>
+              {m.id ? (
+                <Link
+                  href={`/admin/community/${m.id}`}
+                  className="font-medium text-foreground hover:text-primary hover:underline"
+                >
+                  {m.name || "(sem nome)"}
+                </Link>
+              ) : (
+                <p className="font-medium text-foreground">
+                  {m.name || "(sem nome)"}
+                </p>
+              )}
               <p className="text-xs text-muted-foreground truncate">
                 {m.email} · {formatDate(p.created_at)}
               </p>
@@ -102,7 +118,7 @@ export default async function V2AdminPayouts() {
   const { data, error } = await supabase
     .from("payout_requests")
     .select(
-      "id, amount, gross_amount, net_amount, payout_method, status, created_at, members!member_id(name, email)",
+      "id, amount, gross_amount, net_amount, payout_method, status, created_at, members!member_id(id, name, email)",
     )
     .order("created_at", { ascending: false })
     .limit(200)
