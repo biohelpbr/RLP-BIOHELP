@@ -42,7 +42,7 @@ function WelcomeInner() {
   const [errorMsg, setErrorMsg] = React.useState<string>("")
 
   React.useEffect(() => {
-    if (!externalId) {
+    if (!externalId && !email) {
       setStatus("error")
       setErrorMsg(
         "A URL não tem o identificador da transação. Procure o suporte com seu comprovante.",
@@ -53,7 +53,7 @@ function WelcomeInner() {
     let cancelled = false
     ;(async () => {
       const result = await claimPreRegistration({
-        external_id: externalId,
+        external_id: externalId ?? null,
         transaction_id: tx ?? null,
         email: email ?? null,
       })

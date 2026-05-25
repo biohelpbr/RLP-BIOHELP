@@ -35,21 +35,23 @@ export type ClaimResult =
   | { ok: false; error: string }
 
 interface ClaimInput {
-  external_id: string
+  external_id?: string | null
   transaction_id?: string | null
   email?: string | null
 }
 
 export async function claimPreRegistration(input: ClaimInput): Promise<ClaimResult> {
-  if (!input.external_id) {
+  if (!input.external_id && !input.email) {
     return { ok: false, error: "Token de transação ausente. Procure o suporte com seu comprovante." }
   }
 
-  // Lookup principal: external_id (utm_term) que enviamos pro Guru.
-  // Fallback: email — Guru webhook sobrescreve members.guru_subscriber_id
-  //   com o subscription_id real, então em races onde o webhook chega
-  //   primeiro o token UUID original não bate mais.
-  let member: MemberRow | null = await getMemberByExternalId(input.external_id)
+  // Lookup: external_id (utm_term) OU email (redirect Guru só envia email).
+  // Guru webhook sobrescreve guru_subscriber_id com subscription_id real,
+  // então em races onde o webhook chega primeiro o token UUID original não bate.
+  let member: MemberRow | null = null
+  if (input.external_id) {
+    member = await getMemberByExternalId(input.external_id)
+  }
   if (!member && input.email) {
     const supabaseLookup = createServiceClient()
     const { data } = await supabaseLookup
