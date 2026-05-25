@@ -136,17 +136,32 @@ export async function createPreRegistration(
     return { ok: false, error: "Este link não está mais ativo." }
   }
 
-  const { data: existing } = await supabase
+  // Idempotência por email+sponsor. Se email já existe com OUTRO sponsor, reusar
+  // (lead pode ter entrado pelo link de outra pessoa antes — vínculo original mantém).
+  const { data: existingAnySponsor } = await supabase
     .from("members")
-    .select("id, guru_subscriber_id")
+    .select("id, sponsor_id, guru_subscriber_id")
     .eq("email", parsed.data.email)
-    .eq("sponsor_id", sponsor.id)
     .maybeSingle()
+
+  const existing = existingAnySponsor?.sponsor_id === sponsor.id ? existingAnySponsor : null
+  const existingOtherSponsor = existingAnySponsor && existingAnySponsor.sponsor_id !== sponsor.id
 
   let memberId: string
   let token: string
 
-  if (existing) {
+  if (existingOtherSponsor) {
+    // Email já cadastrado com outro sponsor — reusar member existente e redirecionar pro Guru.
+    // Não muda sponsor_id (Anti-SPEC §1). Lead segue com vínculo original.
+    memberId = existingAnySponsor.id as string
+    token = (existingAnySponsor.guru_subscriber_id as string | null) ?? randomUUID()
+    if (!existingAnySponsor.guru_subscriber_id) {
+      await supabase
+        .from("members")
+        .update({ guru_subscriber_id: token, pre_registered_at: new Date().toISOString() })
+        .eq("id", memberId)
+    }
+  } else if (existing) {
     memberId = existing.id as string
     token = (existing.guru_subscriber_id as string | null) ?? randomUUID()
     if (!existing.guru_subscriber_id) {
