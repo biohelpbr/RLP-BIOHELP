@@ -3,6 +3,14 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-05-25
+
+- [2026-05-25] [RELEASE] F-V19 implementada — fluxo pré-cadastro Guru → LRP → Shopify completo. 14/16 CAs verdes, 2 parciais (CA-13 static, CA-14 indireto). Branch `feat/F-V19-fluxo-guru-pre-cadastro` com 3 commits de código + 1 commit docs. Pendente: merge em main após review + Guru real live (credenciais recebidas, runbook pronto). Follow-ups: dashboard v2 ler `subscription_status` em vez de `status` legado; CA-13/14 fechar em QA pré-produção.
+
+## 2026-05-22
+
+- [2026-05-22] [SPEC] F-V19 criada — fluxo pré-cadastro Guru → LRP → Shopify; SPEC + plano em docs/sdd/; demo MVP 22/05 15h. Runbook `webhook-guru-debug.md` documenta payload real do Digital Manager Guru (sem HMAC — valida via `api_token` no body; `webhook_type` discriminator; `last_status` para subscription, `status` para transaction) — diverge da SPEC original em 7 pontos; schema Zod CORRIGIDO no runbook pra aplicar manualmente em `lib/subscriptions/providers/guru.ts` na próxima sessão.
+
 ## 2026-05-20
 
 - [2026-05-20 09:55] [INGEST] Feedback cliente pós-demo 13/05 recebido via Google Docs (5 itens admin + 6 itens user). Triagem: 3 fast-fixes (U1, A3, A4) + 1 spec change implementado (A1 — drop auto:lider, manual:influenciador, FOUNDER ≥5 ativos) + 7 itens C/D documentados em `docs/sdd/PERGUNTAS-CALL-20MAI.md` e `docs/sdd/ROTEIRO-DEMO-CALL-20MAI.md` para call de hoje 10h-11h com Léo/Matt/Gabriel/Matheus. WhatsApp: Matt pediu validar ponto-a-ponto + integrar Guru para assinatura real (F-V02 end-to-end). Cashin credenciais sandbox pendentes.

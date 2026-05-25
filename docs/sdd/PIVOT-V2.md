@@ -95,8 +95,9 @@
 | F-V16 | Painel admin completo (9 áreas) | B | P1 | ✅ Destravada — depende de F-V04, F-V05 pra dados reais; UI/shells podem começar. |
 | F-V17 | SSO Shopify → Painel (sem duplo login) | D | P1 | ✅ **Implementada 06/05/2026 (S5) via App Proxy** — Multipass descartado (loja sem Plus). Default OFF via `LRP_V2_SSO=false`. |
 | F-V18 | Tags automáticas Líder (≥5) / Influenciador (≥40) | B | P2 | ✅ Destravada — regra simples, depende de F-V06 ter contagem de "ativos no clube". |
+| **F-V19** | **Fluxo Pré-cadastro → Guru → LRP → Shopify** (Live 01/06) | **D** | **P0** | **✅ MVP completo 25/05/2026 — 14/16 CAs verdes. Branch `feat/F-V19-fluxo-guru-pre-cadastro` pronta pra merge. Pendente: Guru real live (credenciais OK, runbook pronto) + Shopify sync live (Léo cria produto fake).** |
 
-**Legenda:** P0 = bloqueia o novo fluxo. P1 = essencial pro MVP v2. P2 = pós-MVP v2. ✅ = destravada / 🟡 = parcial / 🚫 = bloqueada.
+**Legenda:** P0 = bloqueia o novo fluxo. P1 = essencial pro MVP v2. P2 = pós-MVP v2. ✅ = destravada / 🟡 = parcial / 🚫 = bloqueada / 🚧 = em implementação.
 
 ---
 
@@ -150,7 +151,7 @@ NÃO mexer sem autorização explícita do humano:
 | TBD-4 | **Aprovação manual** do admin antes da transferência. NF é validada **automaticamente** (formato, dados, valor) — se inválida, sistema dá erro pro user no upload, não vai pra fila. | F-V07 com 2 etapas: (1) validação automática síncrona da NF; (2) fila de aprovação pra admin. |
 | TBD-5 | CPF **NÃO** está totalmente fora — pode receber via **Cashin** ou crédito em loja. CNPJ pode emitir NF de serviço pra saque cash. | Atualiza Anti-SPEC §10. **TBD-20 derivado**: Founder pode ser CPF? |
 | TBD-6 | **Não há integração com ERP** nessa fase. Fluxo de produto fica manual no cliente. | Remove ERP do escopo. Não cria features pra ERP. |
-| TBD-7 | Guru cria pedido na Shopify, **lemos via webhook Shopify**. Wink valida abordagem técnica posteriormente. | F-V02 com abordagem Shopify-first. Reuso de webhooks já existentes. |
+| TBD-7 | ~~Guru cria pedido na Shopify, **lemos via webhook Shopify**.~~ **REVISADO 22/05/2026:** Mateus desenhou na call que Guru envia webhook **direto ao LRP** (`/api/webhooks/guru`). LRP é a fonte da assinatura e comanda a Shopify (cria customer + pedido fake com tag). Webhook Shopify orders/paid continua existindo mas perde a responsabilidade de marcar `subscription_paid`. Decisão registrada em F-V19. | F-V19 substitui F-V02 nessa parte. Webhook Shopify continua intocado (Anti-SPEC §4). |
 | TBD-10 | **House Account descontinua** no v2. | Anti-SPEC §8 atualizado. F-V01 bloqueia cadastro sem ref. House Account some na onda 6 / F-V12. |
 | TBD-13 | Saldo do membro **ATIVO**: sem prazo. Membro **INATIVO**: a definir. | F-V05 sem prazo pra ativos. **TBD-21 derivado** pra prazo de inativos. |
 | TBD-14 | Saldo → crédito Shopify: **1:1, sem prazo após resgate**. | F-V05 com regra simples. |
@@ -292,4 +293,6 @@ NÃO mexer sem autorização explícita do humano:
 
 ---
 
-*Última atualização: 2026-05-05 (reunião 29/04 PM com cliente; 14/26 TBDs respondidos — TBD-11/19/14 resolvidos; TBD-23/24/25/26 derivados; 5 features novas F-V14..F-V18; absorção do Loveable como referência; Anti-SPEC §12-13; cronograma compactado de 5 sprints + 2 dias buffer = entrega 11/06/2026).*
+*Última atualização: 2026-05-22 (pré-call 15h — F-V19 criada como fluxo Live 01/06 substituindo abordagem Shopify-first do TBD-7; SPEC + Plano em docs/sdd/; Cashin manual confirmado pelos primeiros 2-3 meses; credenciais Guru recebidas; aguardando GURU_OFFER_ID + Shopify variant id da Léo).*
+
+*Versão anterior: 2026-05-05 (reunião 29/04 PM com cliente; 14/26 TBDs respondidos — TBD-11/19/14 resolvidos; TBD-23/24/25/26 derivados; 5 features novas F-V14..F-V18; absorção do Loveable como referência; Anti-SPEC §12-13; cronograma compactado de 5 sprints + 2 dias buffer = entrega 11/06/2026).*

@@ -4,7 +4,7 @@
 > **Fonte de progresso histórica:** `docs/STATUS_IMPLEMENTACAO.md` (snapshot por sprint).
 > **Tabela de status das features v2:** `docs/sdd/PIVOT-V2.md` §2.
 
-**Última atualização:** 2026-05-19.
+**Última atualização:** 2026-05-22 (pré-call 15h — F-V19 SPEC + plano criados).
 
 ---
 
@@ -30,15 +30,27 @@
 | F-V16 | Painel admin completo (9 áreas) | B | S3-S4 | ✅ Done | — |
 | F-V17 | SSO Shopify → Painel (App Proxy) | D | S5 | ✅ Done (06/05, default OFF) | — |
 | F-V18 | Tags automáticas Líder/Influenciador | B | S3 | ✅ Done (06/05) | — |
+| **F-V19** | **Fluxo Pré-cadastro → Guru → LRP → Shopify** | **D** | **S6 (22-25/05)** | **✅ MVP completo — 14/16 CAs verdes. Pendente: merge main + Guru real live.** | **—** |
 
-**Próximas ações (snapshot 2026-05-19):**
-- Roteiro de demo de 13/05 já apresentado ao cliente — `docs/sdd/features/decisoes-reuniao-fev2026/` registra retornos.
-- Aguardando: respostas aos TBDs ainda abertos (1, 2, 8, 9, 12, 15, 16, 20, 21, 23-27).
-- Próximo trabalho: pontos novos do cliente pós-demo (ver §2).
+**Próximas ações (snapshot 2026-05-25):**
+- **F-V19 merge:** review final dos diffs → merge `feat/F-V19-fluxo-guru-pre-cadastro` em main.
+- **F-V19 produção:** logar no Guru (credenciais recebidas) → configurar webhook → testar 1 transação → ligar `SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true` quando Léo enviar variant id.
+- **Follow-ups F-V19:** dashboard v2 ler `subscription_status` em vez de `status` legado; CA-13/14 fechar em QA pré-produção.
+- Aguardando: respostas aos TBDs ainda abertos (1, 2, 8, 9, 12, 15, 16, 20, 21, 23-27) + items 1.3 (mockup minha comunidade), 1.4 (NF Biohelp), 1.6 (GURU_OFFER_ID), 1.7 (Shopify variant assinatura).
 
 ---
 
 ## 2. Em andamento
+
+### F-V19 — Fluxo pré-cadastro Guru (branch `feat/F-V19-fluxo-guru-pre-cadastro`)
+- **Classe:** D (webhook produção-crítico + sync Shopify + cria customer/order)
+- **SPEC:** [docs/sdd/features/F-V19-fluxo-guru-pre-cadastro/SPEC.md](docs/sdd/features/F-V19-fluxo-guru-pre-cadastro/SPEC.md)
+- **Status:** ✅ MVP completo — 14/16 CAs verdes, 2 parciais (CA-13 static, CA-14 indireto). Branch pronta pra merge.
+- **Branch:** `feat/F-V19-fluxo-guru-pre-cadastro` (3 commits código + 1 docs)
+- **Próximo passo concreto:** merge em main + configurar webhook Guru real + Shopify sync live
+- **DoR:** ✅ completa (ver SPEC)
+- **Feature Contract:** SPEC atua como Feature Contract (Agent §7)
+- **Escopo entregue:** landing + form + webhook Guru receiver (schema real via runbook) + simulate-guru + /welcome auto-login + sininho admin + cron diário. Shopify sync em mock (liga com SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true quando Léo enviar variant id).
 
 ### Feedback pós-demo 13/05 (call 20/05 10h-11h) — branch `feat/feedback-pos-demo-20mai`
 
