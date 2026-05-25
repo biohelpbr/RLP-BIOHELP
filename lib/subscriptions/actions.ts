@@ -207,20 +207,15 @@ export async function createPreRegistration(
     href: `/admin/community/${memberId}`,
   })
 
-  // Digital Manager Guru não tem campo `metadata.external_id` na URL do checkout.
-  // Workaround documentado em docs/wiki/runbooks/webhook-guru-debug.md:
-  // passamos o token como `utm_term`; Guru ecoa em `source.utm_term` no webhook.
-  // TODO 🟡 Léo: confirmar URL base real copiando do painel Guru
-  //   (doc oficial: https://clkdmg.site/subscribe/<offer_uuid>;
-  //    SPEC original assumia https://pay.guru.com.br/<id> — pode ser alias).
-  // TODO 🟡 Léo: confirmar se Guru aceita pré-população via ?email&name&cpf&phone
-  //   (não documentado publicamente — se não funcionar, lead redigita no checkout).
+  // Pré-população confirmada 22/05 logando no painel Guru:
+  //   ?email, ?name, ?doc (CPF = "doc" no Guru, não "cpf"), ?phone_number
+  // utm_term carrega pre_registration_token (Guru ecoa em source.utm_term no webhook).
   const offerId = process.env.GURU_OFFER_ID_CLUBE_MENSAL ?? "PLACEHOLDER"
   const params = new URLSearchParams({
     email: parsed.data.email,
     name: parsed.data.name,
-    cpf: parsed.data.cpf,
-    phone: parsed.data.phone,
+    doc: parsed.data.cpf,
+    phone_number: parsed.data.phone,
     utm_source: "lrp",
     utm_medium: "pre_registration",
     utm_campaign: sponsor.ref_code,

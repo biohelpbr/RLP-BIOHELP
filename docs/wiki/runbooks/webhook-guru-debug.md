@@ -356,15 +356,15 @@ Baseado em https://docs.digitalmanager.guru/configuracoes-gerais/webhook (não p
 - 🟡 **Boleto:** se cliente pagar via boleto, há `billet_printed` antes de `approved` (1-3 dias). NÃO ativar member em `billet_printed`.
 - 🟢 **`X-Request-ID` é por dispatch, não por evento de domínio.** Um mesmo dispatch retransmitido tem o mesmo `X-Request-ID`. Eventos diferentes (started vs active) têm IDs diferentes.
 
-## Gaps a confirmar logando (TODO pós-runbook)
+## Gaps — status após login no painel 25/05/2026
 
-1. 🟡 **URL exata do checkout do clube:** `pay.guru.com.br/X` ou `clkdmg.site/subscribe/X`? Léo deve copiar do painel.
-2. 🟡 **`GURU_OFFER_ID_CLUBE_MENSAL`:** valor real da oferta (UUID).
-3. 🟡 **Pré-população `?email=&name=&cpf=&phone=`:** Guru aceita? Documentação pública omite.
-4. 🟡 **`utm_term` arbitrário:** Guru ecoa o valor de volta no payload em `source.utm_term`? (Provavelmente sim — UTMs são opacos pro Guru.)
-5. 🟡 **Alternativa: campo `metadata` custom:** existe na API admin REST mas não está documentado pra checkout — confirmar.
-6. 🟡 **`api_token`:** é gerado por webhook (1 token = 1 webhook config) ou é o mesmo da API REST? Provavelmente o primeiro.
-7. 🟡 **Sandbox / staging:** Guru tem ambiente sandbox? Ou precisamos fazer 1 transação real R$1 pra testar?
+1. ✅ **URL do checkout:** `https://clkdmg.site/subscribe/membership-biohelp-nutrition-club` (confirmado no painel → Produtos → Biohelp Nutrition Club → Ofertas).
+2. ✅ **`GURU_OFFER_ID_CLUBE_MENSAL`:** slug = `membership-biohelp-nutrition-club`. Produto "Biohelp Nutrition Club" (código 1779129698, Appmax API). ⚠️ Valor = R$1.188 anual (não R$99 mensal como na call — confirmar com Léo).
+3. ✅ **Pré-população funciona:** `?email=` ✅, `?name=` ✅, `?doc=` ✅ (CPF = parâmetro `doc`, NÃO `cpf`). `?phone_number=` não testado mas provavelmente funciona (padrão Guru). Screenshot: `guru-checkout-prepopulated-test.png`.
+4. 🟡 **`utm_term` ecoa no webhook:** não testável — 0 webhooks configurados na conta. Precisa criar webhook + fazer 1 transação teste.
+5. 🟡 **Campo `metadata` custom:** não investigado — workaround `utm_term` é suficiente.
+6. 🟡 **`api_token` escopo:** será verificado ao criar o webhook.
+7. 🟡 **Sandbox:** não achei opção de sandbox no painel. Provavelmente teste real via PIX R$1 (se existir oferta de teste) ou usar a própria oferta e reembolsar.
 
 ## Referências
 
