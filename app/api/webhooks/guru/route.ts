@@ -1,0 +1,301 @@
+/**
+ * F-V19 — Webhook receiver Guru.
+ *
+ * Anti-SPEC §4 pattern (try/catch isolado): falha em 1 evento NÃO derruba 200
+ *   pra evitar retry storm do Guru no resto da fila.
+ *
+ * Status codes (runbook §"Retries / Timeouts"):
+ *   200 → processado OK, member_not_found, ou já processado (idempotência).
+ *         Guru NÃO reenvia.
+ *   401 → api_token inválido. Guru NÃO reenvia (correto — não vai resolver com retry).
+ *   500 → DB indisponível ou erro transitório. Guru reenvia até ~30x.
+ *
+ * Idempotência: `X-Request-ID` header (Guru garante o mesmo ID em retries do
+ *   mesmo dispatch). Fallback UUID em chamadas locais sem header.
+ *
+ * Quirk: o Guru manda DOIS webhooks em ativação (transaction.approved ~5s antes
+ *   de subscription.started). markSubscriptionPaid é idempotente, mas evitamos
+ *   notification duplicada checando se já existe row kind=subscription_paid
+ *   apontando pro href do member.
+ */
+
+import crypto from "node:crypto"
+import { NextRequest, NextResponse } from "next/server"
+
+import { createServiceClient } from "@/lib/supabase/server"
+import {
+  classifyGuruEvent,
+  verifyGuruWebhook,
+  type GuruDomainEvent,
+  type GuruWebhookPayload,
+} from "@/lib/subscriptions/providers/guru"
+import {
+  cancelAutoRenew,
+  cancelSubscription,
+  extendSubscription,
+  markSubscriptionPaid,
+} from "@/lib/subscriptions/actions"
+import { getMemberByExternalId, type MemberRow } from "@/lib/subscriptions/queries"
+
+export const runtime = "nodejs"
+
+/** Pretty-print de event_type pra log/auditoria (não vai pro DB). */
+function describeEvent(payload: GuruWebhookPayload): string {
+  if (payload.webhook_type === "subscription") {
+    return `subscription.${payload.last_status}`
+  }
+  return `transaction.${payload.status}`
+}
+
+/**
+ * Shopify sync (mock-only no MVP).
+ * TODO Onda 2: extrair pra lib/shopify/subscription-sync.ts + draftOrderCreate
+ *   quando Léo enviar SHOPIFY_VAR_ASSINATURA_CLUBE e ligar SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true.
+ */
+function shopifySyncMock(args: {
+  memberId: string
+  memberEmail: string | null
+  transactionId: string
+  action: "activated" | "renewed"
+}): void {
+  if (process.env.SHOPIFY_SUBSCRIPTION_SYNC_LIVE === "true") {
+    console.warn(
+      "[guru-webhook] SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true mas sync real ainda não implementado (Onda 2)",
+    )
+    return
+  }
+  console.info(
+    "[SUBSCRIPTION_SYNC mock]",
+    JSON.stringify({
+      action: args.action,
+      memberId: args.memberId,
+      memberEmail: args.memberEmail,
+      transactionId: args.transactionId,
+      ts: new Date().toISOString(),
+    }),
+  )
+}
+
+async function findMemberByEmail(email: string): Promise<MemberRow | null> {
+  const supabase = createServiceClient()
+  const { data } = await supabase
+    .from("members")
+    .select("*")
+    .eq("email", email.toLowerCase())
+    .maybeSingle()
+  return (data as MemberRow | null) ?? null
+}
+
+async function lookupMember(domain: GuruDomainEvent): Promise<MemberRow | null> {
+  if (domain.kind === "noop") return null
+
+  if (domain.kind === "transaction_refunded") {
+    return await findMemberByEmail(domain.email)
+  }
+
+  // subscription_* — externalId (utm_term) é a chave primária; email é fallback.
+  const subEvent = domain
+  let member: MemberRow | null = null
+  if (subEvent.kind === "subscription_activated" && subEvent.external_id) {
+    member = await getMemberByExternalId(subEvent.external_id)
+  }
+  if (!member) {
+    member = await findMemberByEmail(subEvent.email)
+  }
+  return member
+}
+
+async function notifyAdminPaid(member: MemberRow): Promise<void> {
+  const supabase = createServiceClient()
+  // Skip se já existe notification subscription_paid pro mesmo member
+  // (race transaction.approved vs subscription.started — Guru manda os 2).
+  const href = `/admin/community/${member.id}`
+  const { data: existing } = await supabase
+    .from("notifications")
+    .select("id")
+    .eq("kind", "subscription_paid")
+    .eq("href", href)
+    .limit(1)
+    .maybeSingle()
+
+  if (existing) return
+
+  await supabase.from("notifications").insert({
+    recipient_role: "admin",
+    kind: "subscription_paid",
+    title: `Assinatura confirmada: ${member.name ?? member.email ?? member.id}`,
+    body: "Member ativo, sponsor recebeu +1 na contagem.",
+    href,
+  })
+}
+
+async function notifyAdminRefund(member: MemberRow, transactionId: string): Promise<void> {
+  const supabase = createServiceClient()
+  await supabase.from("notifications").insert({
+    recipient_role: "admin",
+    kind: "subscription_refunded",
+    title: `Reembolso recebido: ${member.name ?? member.email ?? member.id}`,
+    body: `Transação ${transactionId}. Cancelar manualmente no admin se necessário.`,
+    href: `/admin/community/${member.id}`,
+  })
+}
+
+export async function POST(req: NextRequest) {
+  const requestId = req.headers.get("x-request-id") ?? crypto.randomUUID()
+
+  // 1. Parse body
+  let raw: string
+  try {
+    raw = await req.text()
+  } catch {
+    return NextResponse.json({ error: "Body unreadable" }, { status: 400 })
+  }
+
+  let json: unknown
+  try {
+    json = JSON.parse(raw)
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
+  }
+
+  // 2. Valida schema + api_token
+  const payload = verifyGuruWebhook(json)
+  if (!payload) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+  }
+
+  const eventType = describeEvent(payload)
+  const supabase = createServiceClient()
+
+  // 3. Idempotência: insert no audit log com event_id UNIQUE
+  const { error: insertErr } = await supabase
+    .from("guru_webhook_events")
+    .insert({ event_id: requestId, event_type: eventType, payload: payload as never })
+
+  if (insertErr) {
+    // 23505 = unique_violation → já processado (idempotência).
+    if (insertErr.code === "23505") {
+      console.info("[guru-webhook] duplicate request_id, no-op", { requestId, eventType })
+      return NextResponse.json({ success: true, message: "already_processed" })
+    }
+    // Erro de DB → 5xx pro Guru reenviar (transitório).
+    console.error("[guru-webhook] db insert audit row failed", insertErr)
+    return NextResponse.json({ error: "DB unavailable" }, { status: 503 })
+  }
+
+  // 4. Classifica + processa (try/catch isolado).
+  try {
+    const domain = classifyGuruEvent(payload)
+
+    if (domain.kind === "noop") {
+      await supabase
+        .from("guru_webhook_events")
+        .update({ processed_at: new Date().toISOString(), error: "noop_event" })
+        .eq("event_id", requestId)
+      return NextResponse.json({ success: true, kind: "noop" })
+    }
+
+    const member = await lookupMember(domain)
+
+    if (!member) {
+      // member_not_found não é resolvível com retry — retorna 200 + loga error
+      // pra Guru não bombardear a fila.
+      await supabase
+        .from("guru_webhook_events")
+        .update({ processed_at: new Date().toISOString(), error: "member_not_found" })
+        .eq("event_id", requestId)
+      return NextResponse.json({ success: false, reason: "member_not_found" })
+    }
+
+    switch (domain.kind) {
+      case "subscription_activated": {
+        // Idempotência por guru_subscriber_id: Guru manda started + active com
+        // o MESMO subscription_id mas X-Request-IDs diferentes (runbook §Quirks).
+        // Audit log passa por ambos. Aqui paramos a 2ª passagem pra não dobrar
+        // extendSubscription (markSubscriptionPaid já é idempotente).
+        if (
+          member.subscription_status === "paid" &&
+          member.guru_subscriber_id === domain.subscription_id
+        ) {
+          console.warn(
+            "[guru-webhook] duplicate activation dispatch — same subscription_id already paid",
+            { memberId: member.id, subscriptionId: domain.subscription_id },
+          )
+          break
+        }
+
+        const paid = await markSubscriptionPaid(member.id)
+        if (!paid.ok) throw new Error(`markSubscriptionPaid: ${paid.error}`)
+
+        const ext = await extendSubscription(member.id, 1)
+        if (!ext.ok) throw new Error(`extendSubscription: ${"error" in ext ? ext.error : "fail"}`)
+
+        // Persiste guru_subscriber_id (sobrescreve token UUID temporário do pré-cadastro).
+        if (member.guru_subscriber_id !== domain.subscription_id) {
+          await supabase
+            .from("members")
+            .update({ guru_subscriber_id: domain.subscription_id })
+            .eq("id", member.id)
+        }
+
+        await notifyAdminPaid(member)
+        shopifySyncMock({
+          memberId: member.id,
+          memberEmail: member.email,
+          transactionId: domain.subscription_id,
+          action: "activated",
+        })
+        break
+      }
+
+      case "subscription_renewed": {
+        const ext = await extendSubscription(member.id, 1)
+        if (!ext.ok) throw new Error(`extendSubscription: ${"error" in ext ? ext.error : "fail"}`)
+
+        shopifySyncMock({
+          memberId: member.id,
+          memberEmail: member.email,
+          transactionId: domain.subscription_id,
+          action: "renewed",
+        })
+        break
+      }
+
+      case "subscription_canceled": {
+        const c = await cancelAutoRenew(member.id)
+        if (!c.ok) throw new Error(`cancelAutoRenew: ${"error" in c ? c.error : "fail"}`)
+        // NÃO inativa agora. Cron diário faz isso quando expires_at < now().
+        break
+      }
+
+      case "subscription_expired": {
+        const c = await cancelSubscription(member.id)
+        if (!c.ok) throw new Error(`cancelSubscription: ${"error" in c ? c.error : "fail"}`)
+        break
+      }
+
+      case "transaction_refunded": {
+        await notifyAdminRefund(member, domain.transaction_id)
+        // Gabriel 30:55: cancelamento por reembolso é manual no admin.
+        break
+      }
+    }
+
+    await supabase
+      .from("guru_webhook_events")
+      .update({ processed_at: new Date().toISOString() })
+      .eq("event_id", requestId)
+
+    return NextResponse.json({ success: true, kind: domain.kind })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error("[guru-webhook] processing failed", { requestId, eventType, err: msg })
+    await supabase
+      .from("guru_webhook_events")
+      .update({ processed_at: new Date().toISOString(), error: msg })
+      .eq("event_id", requestId)
+    // 5xx → Guru reenvia. Se o erro for permanente, o reprocesso bate em 23505
+    // na próxima tentativa e devolve 200 no-op.
+    return NextResponse.json({ error: "Internal error" }, { status: 500 })
+  }
+}
