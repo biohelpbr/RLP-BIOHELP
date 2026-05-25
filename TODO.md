@@ -4,7 +4,7 @@
 > **Fonte de progresso histórica:** `docs/STATUS_IMPLEMENTACAO.md` (snapshot por sprint).
 > **Tabela de status das features v2:** `docs/sdd/PIVOT-V2.md` §2.
 
-**Última atualização:** 2026-05-19.
+**Última atualização:** 2026-05-22 (pré-call 15h — F-V19 SPEC + plano criados).
 
 ---
 
@@ -30,17 +30,48 @@
 | F-V16 | Painel admin completo (9 áreas) | B | S3-S4 | ✅ Done | — |
 | F-V17 | SSO Shopify → Painel (App Proxy) | D | S5 | ✅ Done (06/05, default OFF) | — |
 | F-V18 | Tags automáticas Líder/Influenciador | B | S3 | ✅ Done (06/05) | — |
+| **F-V19** | **Fluxo Pré-cadastro → Guru → LRP → Shopify** | **D** | **S6 (22-25/05)** | **✅ MVP completo — 14/16 CAs verdes. Pendente: merge main + Guru real live.** | **—** |
 
-**Próximas ações (snapshot 2026-05-19):**
-- Roteiro de demo de 13/05 já apresentado ao cliente — `docs/sdd/features/decisoes-reuniao-fev2026/` registra retornos.
-- Aguardando: respostas aos TBDs ainda abertos (1, 2, 8, 9, 12, 15, 16, 20, 21, 23-27).
-- Próximo trabalho: pontos novos do cliente pós-demo (ver §2).
+**Próximas ações (snapshot 2026-05-25):**
+- **F-V19 merge:** review final dos diffs → merge `feat/F-V19-fluxo-guru-pre-cadastro` em main.
+- **F-V19 produção:** logar no Guru (credenciais recebidas) → configurar webhook → testar 1 transação → ligar `SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true` quando Léo enviar variant id.
+- **Follow-ups F-V19:** dashboard v2 ler `subscription_status` em vez de `status` legado; CA-13/14 fechar em QA pré-produção.
+- Aguardando: respostas aos TBDs ainda abertos (1, 2, 8, 9, 12, 15, 16, 20, 21, 23-27) + items 1.3 (mockup minha comunidade), 1.4 (NF Biohelp), 1.6 (GURU_OFFER_ID), 1.7 (Shopify variant assinatura).
 
 ---
 
 ## 2. Em andamento
 
-(vazio por enquanto — preencher ao iniciar próximas features pós-demo).
+### F-V19 — Fluxo pré-cadastro Guru (branch `feat/F-V19-fluxo-guru-pre-cadastro`)
+- **Classe:** D (webhook produção-crítico + sync Shopify + cria customer/order)
+- **SPEC:** [docs/sdd/features/F-V19-fluxo-guru-pre-cadastro/SPEC.md](docs/sdd/features/F-V19-fluxo-guru-pre-cadastro/SPEC.md)
+- **Status:** ✅ MVP completo — 14/16 CAs verdes, 2 parciais (CA-13 static, CA-14 indireto). Branch pronta pra merge.
+- **Branch:** `feat/F-V19-fluxo-guru-pre-cadastro` (3 commits código + 1 docs)
+- **Próximo passo concreto:** merge em main + configurar webhook Guru real + Shopify sync live
+- **DoR:** ✅ completa (ver SPEC)
+- **Feature Contract:** SPEC atua como Feature Contract (Agent §7)
+- **Escopo entregue:** landing + form + webhook Guru receiver (schema real via runbook) + simulate-guru + /welcome auto-login + sininho admin + cron diário. Shopify sync em mock (liga com SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true quando Léo enviar variant id).
+
+### Feedback pós-demo 13/05 (call 20/05 10h-11h) — branch `feat/feedback-pos-demo-20mai`
+
+**Status:** 4 commits entregues (U1, A3, A4, A1). 7 itens C/D documentados em `docs/sdd/PERGUNTAS-CALL-20MAI.md` aguardando decisão da call. Roteiro de apresentação em `docs/sdd/ROTEIRO-DEMO-CALL-20MAI.md`.
+
+#### Entregue nesta branch
+- ✅ **U1** Copiar link membro retorna URL absoluta (fallback `https://rlp-biohelp.vercel.app`) — V2Dashboard
+- ✅ **A4** Nome cliente em /admin/payouts vira link → /admin/community/[id]
+- ✅ **A3** Texto "Fonte de dados" /admin/consumption reescrito (3 parágrafos explicando vendas auto vs Shopify reais)
+- ✅ **A1** Spec change F-V18 v2 + F-V06: tag `auto:lider` removida, Influenciador vira `manual:influenciador`, FOUNDER conta por condição (`member_active_affiliate_count.active_count >= 5`)
+
+#### Aguardando decisão na call de 20/05 (documentadas em `PERGUNTAS-CALL-20MAI.md`)
+- 🟡 **A2** Diferenciar receita produto vs assinatura + valor Biohelp vs comissão (reabre TBD-1, TBD-2)
+- 🟡 **A5+U6** Avisos/Notificações admin+user (1 ou 2 features?)
+- 🟡 **U2** Página do membro em Minha comunidade (read-only, campos a definir)
+- 🟡 **U3** Painel da comunidade do sponsor (visão upward)
+- 🟡 **U4** Refator vendas manuais com `custo` + linhas múltiplas + totais (schema decisão: jsonb vs tabela filha)
+- 🟡 **U5** Posts Founder com aprovação admin (nova tabela `community_posts` + workflow)
+
+#### Liga com integração Guru
+- F-V02 end-to-end com assinatura real — Wink envia credenciais Guru + reservar 1h pra test (decisão na call).
 
 ### Template de item
 

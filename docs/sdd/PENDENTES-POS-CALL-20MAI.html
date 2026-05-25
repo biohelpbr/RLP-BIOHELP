@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pendências pós-call 20/05 — Biohelp × Flowcode</title>
+<style>
+  :root {
+    --text: #37352f;
+    --text-soft: #787774;
+    --text-muted: #9b9a97;
+    --bg: #ffffff;
+    --border: #e9e9e7;
+    --border-soft: #f1f1ef;
+    --accent: #2eaadc;
+    --highlight-yellow: #fdf2c5;
+    --highlight-yellow-text: #76621d;
+    --highlight-blue: #d3e5ef;
+    --highlight-blue-text: #1f4e6f;
+    --highlight-gray: #ebeced;
+    --highlight-gray-text: #5a5a59;
+    --highlight-green: #dbeddb;
+    --highlight-green-text: #2c5e2e;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, "Apple Color Emoji", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 72px 56px 120px;
+  }
+  h1 {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 40px 0 12px;
+    letter-spacing: -0.2px;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 24px 0 8px;
+  }
+  p { margin: 0 0 10px; }
+  .meta {
+    color: var(--text-soft);
+    font-size: 14px;
+    margin: 0 0 32px;
+  }
+  .meta strong { color: var(--text); font-weight: 600; }
+  .callout {
+    background: #f7f6f3;
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin: 20px 0 32px;
+    font-size: 14.5px;
+    color: var(--text-soft);
+    border: 1px solid var(--border-soft);
+  }
+  .callout strong { color: var(--text); }
+  .callout-update {
+    background: #fef9e7;
+    border: 1px solid #f7e6a3;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin: 20px 0 32px;
+    font-size: 14.5px;
+    color: var(--text);
+  }
+  .callout-update strong { color: var(--text); }
+  .callout-update .badge {
+    display: inline-block;
+    background: var(--highlight-yellow);
+    color: var(--highlight-yellow-text);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .callout-update ul { margin: 8px 0 4px; padding-left: 20px; }
+  .callout-update li { margin-bottom: 6px; }
+  hr {
+    border: 0;
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+  ul { padding-left: 22px; margin: 8px 0 12px; }
+  ul li { margin-bottom: 6px; }
+  ul li::marker { color: var(--text-muted); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-size: 14.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-soft);
+    vertical-align: top;
+  }
+  th {
+    font-weight: 600;
+    color: var(--text-soft);
+    background: #fafaf9;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  td:first-child { width: 24px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .tag-yellow { background: var(--highlight-yellow); color: var(--highlight-yellow-text); }
+  .tag-blue { background: var(--highlight-blue); color: var(--highlight-blue-text); }
+  .tag-gray { background: var(--highlight-gray); color: var(--highlight-gray-text); }
+  .tag-green { background: var(--highlight-green); color: var(--highlight-green-text); }
+  .item-block {
+    margin: 18px 0 24px;
+    padding: 0;
+  }
+  .item-block .title {
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .item-block .closed {
+    color: var(--text-soft);
+    font-size: 14.5px;
+    margin: 4px 0;
+  }
+  .item-block .closed::before {
+    content: "✓ ";
+    color: #4d9b58;
+    font-weight: 600;
+  }
+  .item-block .pending {
+    color: var(--text);
+    font-size: 15px;
+    margin: 6px 0;
+  }
+  .item-block .pending::before {
+    content: "→ ";
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .footer-note {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 60px;
+    font-style: italic;
+  }
+  code {
+    background: #f1f1ef;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13.5px;
+    color: #cb4848;
+  }
+  @media (max-width: 600px) {
+    main { padding: 40px 24px 80px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 20px; }
+    table { font-size: 13.5px; }
+    th, td { padding: 8px 6px; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Pendências pós-call 20/05</h1>
+<p class="meta"><strong>Biohelp × Flowcode</strong> · call de 20/05/2026 (09:33–10:27) · próxima call <strong>sexta 22/05 às 15h</strong></p>
+
+<div class="callout">
+  Léo, esse é o resumo do que sobrou em aberto depois da call de 20/05. Tudo que a gente fechou (A1 Líder/Founder, fluxo Guru→LRP→Shopify, estrutura 100%/50% da comissão) já saiu daqui — ficou só o que <strong>depende de você</strong> ou que <strong>ainda precisa da sua palavra final</strong>. Dá uma revisada antes da call de hoje.
+</div>
+
+<div class="callout-update">
+  <span class="badge">⚡ Atualização 22/05/2026 — pré-call 15h</span>
+  <p style="margin:6px 0 8px"><strong>Fechados nesta janela</strong> (depois dos envios do Léo e Gabriel via WhatsApp 11h–12h):</p>
+  <ul>
+    <li><strong>Cashin integração:</strong> confirmado <strong>manual via planilha</strong> nos primeiros 2-3 meses. Saque PF opta pela Cashin, "desconta a taxa e paga o líquido" (sem NF). API só depois do trial. → <strong>F-V07b (Cashin live) sai do escopo MVP-Live 01/06</strong>.</li>
+    <li><strong>Receita produto × assinatura (A2):</strong> MVP confirmado — "contribuição líquida" cadastrada manualmente no painel admin. Gabriel ainda mandará mockup detalhado, mas a regra-base está fechada.</li>
+    <li><strong>Fluxo end-to-end pré-cadastro → Guru → LRP → Shopify:</strong> SPEC F-V19 escrita; demo MVP cobre landing + form + simulação Guru + ativação + sync mock Shopify. Guru e Shopify reais ficam pós-call.</li>
+    <li><strong>Credenciais Guru:</strong> recebidas (eduardo.sousa@flowcode.cc). Não persistidas em arquivo.</li>
+    <li><strong>TBD-7 revisitado:</strong> integração Guru passa a ser <strong>Guru → LRP direto via webhook próprio</strong>, NÃO mais via Shopify. Anti-SPEC do webhook Shopify <code>orders/paid</code> não muda — continua intocado.</li>
+  </ul>
+  <p style="margin-top:10px;margin-bottom:0">O que continua pendente está nas seções abaixo, com status atualizado coluna a coluna.</p>
+</div>
+
+<hr>
+
+<h2>1. Coisas que você ficou de mandar</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Item</th>
+      <th>Quando</th>
+      <th>Status 22/05</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>Números finais de comissionamento</strong><br><span style="color:var(--text-soft);font-size:14px">Faixas (20 primeiros = 100%, e depois?) + threshold de SKU/pessoa pra cair de 100% pra 50%. Você ia bater com Matt hoje à tarde.</span></td>
+      <td><span class="tag tag-yellow">até sexta 22/05</span></td>
+      <td>📥 Gabriel mandou planilha <em>Ass Líquido</em> 11:11 — Léo ainda fecha com Matt</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>% de impostos e taxas final</strong><br><span style="color:var(--text-soft);font-size:14px">Você falou em ~15%, mas queria confirmar com o escritório.</span></td>
+      <td><span class="tag tag-yellow">até sexta 22/05</span></td>
+      <td>📥 Planilha indica taxas — Léo ainda valida com Bruno</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Print/mockup de "Minha comunidade" refinada</strong><br><span style="color:var(--text-soft);font-size:14px">O que aparece ao clicar num membro; como é o painel da comunidade do sponsor; campo "link do grupo WhatsApp".</span></td>
+      <td><span class="tag tag-yellow">até sexta 22/05</span></td>
+      <td>⏳ Não chegou ainda</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>Dados de NF Biohelp</strong><br><span style="color:var(--text-soft);font-size:14px">CNPJ, razão social, endereço — você ia falar com Bruno (escritório contábil).</span></td>
+      <td><span class="tag tag-gray">sem prazo</span></td>
+      <td>⏳ Aguarda (não bloqueia Live 01/06 — Cashin segue manual)</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>Credenciais Cashin sandbox</strong><br><span style="color:var(--text-soft);font-size:14px">Gabriel comentou que estão atrasadas, ainda não chegaram.</span></td>
+      <td><span class="tag tag-gray">quando chegar</span></td>
+      <td><span class="tag tag-green">✓ desbloqueado</span> Cashin segue manual nos primeiros 2-3 meses (Léo 11:12)</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><strong><code>GURU_OFFER_ID_CLUBE_MENSAL</code></strong><br><span style="color:var(--text-soft);font-size:14px">ID público da oferta de assinatura mensal no Guru pra montar a URL do checkout.</span></td>
+      <td><span class="tag tag-yellow">até a call 15h</span></td>
+      <td>⏳ Léo precisa enviar (não é credencial, é ID público do checkout)</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><strong>Produto "Assinatura Clube" no Shopify Admin + variant id</strong><br><span style="color:var(--text-soft);font-size:14px">Pra sync Shopify criar o pedido fake (R$0, com tag <code>subscriber:&lt;data&gt;</code>) que destrava preço de clube.</span></td>
+      <td><span class="tag tag-yellow">antes da Live 01/06</span></td>
+      <td>⏳ Léo cria no Shopify Admin + envia variant id</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>2. Decisões que ainda precisam da sua palavra</h2>
+
+<div class="item-block">
+  <div class="title">2.1 · Receita de produto × Receita de assinatura <span class="tag tag-blue">A2</span> <span class="tag tag-green">✓ Fechado 22/05</span></div>
+  <p class="closed">Assinatura = R$99/mês, separar de produto no admin, produto não gera comissão.</p>
+  <p class="closed">Decisão MVP: "contribuição líquida" cadastrada <strong>manualmente</strong> no painel admin.</p>
+  <p class="closed">Gabriel ainda mandará mockup detalhado do display admin, mas a regra-base não muda. Quando o mockup chegar, atualizamos a SPEC do painel.</p>
+</div>
+
+<div class="item-block">
+  <div class="title">2.2 · Notificações <span class="tag tag-blue">A5 + U6</span></div>
+  <p class="closed">In-app (sininho no header), prioridade admin, lista persistida.</p>
+  <p class="closed">Gabriel vai listar as notificações mínimas (saque pendente, NF rejeitada, post aguardando aprovação, nova trilha/live, etc).</p>
+  <p class="pending">Quer também email/WhatsApp, ou começamos só com in-app?</p>
+</div>
+
+<div class="item-block">
+  <div class="title">2.3 · Posts do Founder na comunidade <span class="tag tag-blue">U5</span></div>
+  <p class="closed">Workflow de aprovação pelo admin antes de publicar. Link de grupo WhatsApp do Founder entra nessa fila.</p>
+  <p class="pending">Conteúdo permitido: <strong>texto + imagem</strong>? Vídeo? Markdown? Link externo?</p>
+  <p class="pending">Permite <strong>comentário/curtida</strong> dos membros, ou one-way (Founder → comunidade)?</p>
+  <p class="pending">Notifica os membros automaticamente quando o Founder posta algo novo?</p>
+</div>
+
+<div class="item-block">
+  <div class="title">2.4 · Refator "Minhas vendas → Novo registro" <span class="tag tag-blue">U4</span></div>
+  <p class="closed">Esse a gente não chegou a tocar na call — minha hipótese-padrão abaixo, me corrige se quiser outra coisa.</p>
+  <p class="pending">Membro digita <strong>custo livre</strong> por linha (não puxa do cadastro de produto do admin)?</p>
+  <p class="pending">Múltiplas linhas (produto / custo / receita / qty) com botão "+"?</p>
+  <p class="pending">Custo é visível só pro próprio membro + admin (não pra outros membros da rede)?</p>
+</div>
+
+<hr>
+
+<h2>3. TBDs antigos ainda em aberto</h2>
+<p style="color:var(--text-soft);font-size:14.5px;margin-bottom:12px">Nenhum bloqueia o go-live, mas vale uma posição sua. <strong>Se você não responder, eu sigo com a hipótese-padrão</strong> e a gente pode reabrir depois.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>TBD</th>
+      <th>Pergunta</th>
+      <th>Hipótese se ficar em silêncio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>8</td><td>Membro inativo — link/código dele continua válido pra novos cadastros?</td><td>Bloqueia</td></tr>
+    <tr><td>9</td><td>Validade do código manual de afiliação — imutável ou expira?</td><td>Imutável</td></tr>
+    <tr><td>12</td><td>Founder pode "desfounderar" se cair pra menos de 5 ativos?</td><td>Status definitivo</td></tr>
+    <tr><td>15</td><td>Conteúdo Academy — admin posta global, ou cada Founder tem mural próprio?</td><td>Global pelo admin</td></tr>
+    <tr><td>20</td><td>Founder com CPF (sem CNPJ) pode usar Cashin?</td><td>Sim, sem NF</td></tr>
+    <tr><td>21</td><td>Membro inativo — qual prazo pra converter saldo em crédito?</td><td>90 dias</td></tr>
+    <tr><td>23</td><td>Crédito Shopify gerado — tem validade ou é eterno?</td><td>Sem validade</td></tr>
+    <tr><td>24</td><td>Eventos com entry-fee ou gratuitos + bônus de ativação?</td><td>Gratuitos + tag</td></tr>
+    <tr><td>25</td><td>Preço sugerido nas vendas manuais — admin define ou membro digita livre?</td><td>Membro digita livre (liga com 2.4)</td></tr>
+    <tr><td>26</td><td>Critério final do ranking Founder — só nº de pessoas ou combinação?</td><td>Só nº de pessoas</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>4. Próximos passos do meu lado</h2>
+
+<h3>Até a call de hoje (22/05 15h)</h3>
+<ul>
+  <li><strong>SPEC F-V19</strong> escrita (fluxo pré-cadastro Guru → LRP → Shopify).</li>
+  <li>Implementar <strong>MVP demo F-V19</strong> (3h): landing dinâmica com nome do sponsor + form + mock Guru + ativação + sync mock Shopify + sininho de notificação.</li>
+  <li>Demonstrar end-to-end na call das 15h com fluxo navegável + DB enchendo na tela.</li>
+</ul>
+
+<h3>Pós-call de hoje (continuação)</h3>
+<ul>
+  <li><strong>Webhook Guru real:</strong> logar com as credenciais que você mandou, validar payload, configurar webhook produção apontando pra <code>/api/webhooks/guru</code> + setar o token no Vercel.</li>
+  <li><strong>Shopify produto fake:</strong> quando você mandar o variant id (item 1.7), ligar a flag <code>SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true</code>.</li>
+  <li><strong>F-V03 deprecation:</strong> o hook do webhook Shopify <code>orders/paid</code> vira no-op (Guru passa a ser fonte da assinatura, não Shopify). Nada de Anti-SPEC quebrado.</li>
+</ul>
+
+<h3>Depende dos itens acima</h3>
+<ul>
+  <li><strong>F-V04 (comissão real)</strong> — só começa quando os números (item 1.1 e 1.2) fecharem.</li>
+  <li><strong>U2 e U3</strong> — só começam quando o print (item 1.3) chegar.</li>
+  <li><strong>A5 e U6 (notificações finais)</strong> — MVP entrega o sininho admin; lista detalhada espera o Gabriel.</li>
+</ul>
+
+<p class="footer-note">Documento gerado 20/05/2026, após a call. Atualizado 22/05/2026 pré-call 15h. Qualquer ajuste manda no grupo do WhatsApp. — Eduardo / Flowcode</p>
+
+</main>
+</body>
+</html>

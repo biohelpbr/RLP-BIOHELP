@@ -63,9 +63,9 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
             </Badge>
             {member.tags.map((t) => (
               <Badge key={t} variant="secondary">
-                {t === "auto:lider" || t === "auto:influenciador" ? (
+                {t === "manual:influenciador" ? (
                   <Award className="w-3 h-3 mr-1" />
-                ) : t === "FOUNDER" ? (
+                ) : t === "FOUNDER" || t === "manual:founder" ? (
                   <Crown className="w-3 h-3 mr-1" />
                 ) : null}
                 {t}

@@ -3,6 +3,20 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-05-25
+
+- [2026-05-25] [RELEASE] F-V19 implementada — fluxo pré-cadastro Guru → LRP → Shopify completo. 14/16 CAs verdes, 2 parciais (CA-13 static, CA-14 indireto). Branch `feat/F-V19-fluxo-guru-pre-cadastro` com 3 commits de código + 1 commit docs. Pendente: merge em main após review + Guru real live (credenciais recebidas, runbook pronto). Follow-ups: dashboard v2 ler `subscription_status` em vez de `status` legado; CA-13/14 fechar em QA pré-produção.
+
+## 2026-05-22
+
+- [2026-05-22] [SPEC] F-V19 criada — fluxo pré-cadastro Guru → LRP → Shopify; SPEC + plano em docs/sdd/; demo MVP 22/05 15h. Runbook `webhook-guru-debug.md` documenta payload real do Digital Manager Guru (sem HMAC — valida via `api_token` no body; `webhook_type` discriminator; `last_status` para subscription, `status` para transaction) — diverge da SPEC original em 7 pontos; schema Zod CORRIGIDO no runbook pra aplicar manualmente em `lib/subscriptions/providers/guru.ts` na próxima sessão.
+
+## 2026-05-20
+
+- [2026-05-20 09:55] [INGEST] Feedback cliente pós-demo 13/05 recebido via Google Docs (5 itens admin + 6 itens user). Triagem: 3 fast-fixes (U1, A3, A4) + 1 spec change implementado (A1 — drop auto:lider, manual:influenciador, FOUNDER ≥5 ativos) + 7 itens C/D documentados em `docs/sdd/PERGUNTAS-CALL-20MAI.md` e `docs/sdd/ROTEIRO-DEMO-CALL-20MAI.md` para call de hoje 10h-11h com Léo/Matt/Gabriel/Matheus. WhatsApp: Matt pediu validar ponto-a-ponto + integrar Guru para assinatura real (F-V02 end-to-end). Cashin credenciais sandbox pendentes.
+- [2026-05-20] [RELEASE] Branch `feat/feedback-pos-demo-20mai` — 4 commits: U1 copiar link absoluto (V2Dashboard), A4 link nome cliente em /admin/payouts → /admin/community/[id], A3 texto fonte de dados /admin/consumption reescrito sem ambiguidade, **A1 spec change F-V18+F-V06**: tag `auto:lider` removida, `auto:influenciador` removida, Influenciador vira tag manual `manual:influenciador`, FOUNDER passa a contar por condição real (member_active_affiliate_count >= 5) em vez de tag persistida. Anti-SPEC v2 §1-13 preservada. Typecheck ✅.
+- [2026-05-20] [DECISION] A1 cliente autorizou (chat 09:30) mudar regra: ≥5 vira Founder direto (não Líder); Influenciador é tag manual aplicada pelo admin. SPEC F-V18 v2 documentada inline no auto-classifier.ts. **Estado PAUSE técnico**: a mudança altera comportamento de F-V18 (que estava Done) — autorização humana explícita registrada.
+
 ## 2026-05-19
 
 - [2026-05-19] [VALIDATION] CI N1 local executado pós-reorg: `npm run lint` ✅ (apenas warnings preexistentes de exhaustive-deps / no-img-element — nenhum erro novo), `npx tsc --noEmit` ✅ (0 erros), `npm run build` ✅ (Next 14 build completo, todas as rotas geradas). Nenhuma regressão introduzida pela reorg.
