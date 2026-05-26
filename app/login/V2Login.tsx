@@ -3,56 +3,75 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Lock, Mail, Sparkles } from "lucide-react"
+import { ArrowRight, CheckCircle, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { BHCard } from "@/components/biohelp"
 import { cn } from "@/lib/utils"
+import { createClientSupabase } from "@/lib/supabase/client"
 
-/**
- * V2 Login (pivô V2 — visual Loveable absorvido).
- *
- * Anti-SPEC §13: NÃO importa do _loveable_import/. Inspirado em
- * `_loveable_import/src/pages/auth/Login.tsx` mas reescrito.
- *
- * Lógica de auth preservada do V1Login (signInWithPassword via
- * /api/auth/login) — não converti pra magic link porque o backend
- * não foi configurado pra OTP. Tabs Parceira/Admin Biohelp são
- * apenas UX (o redirect pós-login é decidido pelo /api/auth/login
- * baseado em roles).
- */
 export default function V2Login() {
   const router = useRouter()
   const [activeTab, setActiveTab] = React.useState<"partner" | "admin">("partner")
   const [email, setEmail] = React.useState("")
-  const [password, setPassword] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
   const [loading, setLoading] = React.useState(false)
+  const [sent, setSent] = React.useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const supabase = createClientSupabase()
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: email.trim().toLowerCase(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       })
-      const data = await response.json()
-      if (!response.ok || !data.ok) {
-        setError(data.message ?? "Erro ao fazer login")
+      if (otpError) {
+        setError(otpError.message)
         setLoading(false)
         return
       }
-      router.push(data.redirect ?? "/dashboard")
-      router.refresh()
+      setSent(true)
+      setLoading(false)
     } catch (err) {
       console.error("[V2Login] error", err)
       setError("Erro de conexão. Tente novamente.")
       setLoading(false)
     }
+  }
+
+  if (sent) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-bh-lavender-soft via-background to-bh-blue-soft flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <BHCard variant="elevated" className="text-center">
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              Link enviado!
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              Enviamos um link de acesso para <strong>{email}</strong>.
+              Abra seu e-mail e clique no link para entrar.
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Não encontrou? Verifique a pasta de spam ou promoções.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => { setSent(false); setEmail("") }}
+              className="w-full"
+            >
+              Tentar com outro e-mail
+            </Button>
+          </BHCard>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -69,9 +88,9 @@ export default function V2Login() {
             <span className="text-primary-foreground font-bold text-3xl">B</span>
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Entre no Nutrition Club
+            Biohelp LRP
           </h1>
-          <p className="text-muted-foreground">Você no controle do seu ritmo.</p>
+          <p className="text-muted-foreground">Portal de Parceiras</p>
         </div>
 
         <BHCard variant="elevated" className="animate-scale-in">
@@ -124,26 +143,7 @@ export default function V2Login() {
                   className="pl-10 h-12 rounded-xl"
                   required
                   disabled={loading}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">
-                Senha
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-12 rounded-xl"
-                  required
-                  minLength={6}
-                  disabled={loading}
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -151,22 +151,16 @@ export default function V2Login() {
             <Button
               type="submit"
               className="w-full h-12 rounded-xl bh-gradient-purple text-primary-foreground font-semibold hover:opacity-90 transition-opacity group"
-              disabled={loading}
+              disabled={loading || !email.includes("@")}
             >
-              {loading ? "Entrando…" : "Entrar"}
+              {loading ? "Enviando…" : "Entrar na minha conta"}
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </form>
 
-          <div className="mt-6 p-4 rounded-xl bg-bh-lime/20 border border-bh-lime/30">
-            <div className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-accent-foreground flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-muted-foreground">
-                Em breve: login por link mágico (sem senha). Por enquanto,
-                use o e-mail e senha cadastrados.
-              </p>
-            </div>
-          </div>
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Você vai receber um link de acesso no seu e-mail. Sem senha.
+          </p>
         </BHCard>
 
         <p className="text-center text-sm text-muted-foreground mt-6">

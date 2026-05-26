@@ -11,7 +11,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 const protectedRoutes = ['/dashboard', '/admin']
 
 // Rotas públicas (não requerem auth)
-const publicRoutes = ['/', '/login', '/join']
+const publicRoutes = ['/', '/login', '/join', '/auth/callback']
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
