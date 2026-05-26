@@ -48,32 +48,56 @@ function describeEvent(payload: GuruWebhookPayload): string {
 }
 
 /**
- * Shopify sync (mock-only no MVP).
- * TODO Onda 2: extrair pra lib/shopify/subscription-sync.ts + draftOrderCreate
- *   quando Léo enviar SHOPIFY_VAR_ASSINATURA_CLUBE e ligar SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true.
+ * Shopify sync — cria/atualiza customer + aplica tag subscriber.
+ * Usa syncCustomerToShopify (V1, funcional desde jan/2026).
+ * Roda em background (não bloqueia resposta do webhook).
  */
-function shopifySyncMock(args: {
+async function syncToShopify(args: {
   memberId: string
   memberEmail: string | null
   transactionId: string
   action: "activated" | "renewed"
-}): void {
-  if (process.env.SHOPIFY_SUBSCRIPTION_SYNC_LIVE === "true") {
-    console.warn(
-      "[guru-webhook] SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true mas sync real ainda não implementado (Onda 2)",
-    )
-    return
-  }
-  console.info(
-    "[SUBSCRIPTION_SYNC mock]",
-    JSON.stringify({
+}): Promise<void> {
+  if (!args.memberEmail) return
+  try {
+    const supabase = createServiceClient()
+    const { data: member } = await supabase
+      .from("members")
+      .select("ref_code, sponsor_id, name, subscription_expires_at")
+      .eq("id", args.memberId)
+      .single()
+    if (!member) return
+
+    let sponsorRefCode: string | null = null
+    if (member.sponsor_id) {
+      const { data: sponsor } = await supabase
+        .from("members")
+        .select("ref_code")
+        .eq("id", member.sponsor_id)
+        .single()
+      sponsorRefCode = sponsor?.ref_code ?? null
+    }
+
+    const expiresDate = member.subscription_expires_at
+      ? new Date(member.subscription_expires_at).toISOString().slice(0, 10)
+      : ""
+
+    const { syncCustomerToShopify } = await import("@/lib/shopify/customer")
+    const result = await syncCustomerToShopify({
+      email: args.memberEmail,
+      firstName: member.name?.split(" ")[0] ?? "",
+      refCode: member.ref_code ?? "",
+      sponsorRefCode,
+      level: "membro",
+      status: "active",
+    })
+    console.info("[guru-webhook] shopify sync:", result.success ? "ok" : "failed", {
       action: args.action,
-      memberId: args.memberId,
-      memberEmail: args.memberEmail,
-      transactionId: args.transactionId,
-      ts: new Date().toISOString(),
-    }),
-  )
+      shopifyCustomerId: result.shopifyCustomerId,
+    })
+  } catch (err) {
+    console.error("[guru-webhook] shopify sync error (non-fatal)", err)
+  }
 }
 
 async function findMemberByEmail(email: string): Promise<MemberRow | null> {
@@ -255,7 +279,7 @@ export async function POST(req: NextRequest) {
         }
 
         await notifyAdminPaid(member)
-        shopifySyncMock({
+        syncToShopify({
           memberId: member.id,
           memberEmail: member.email,
           transactionId: domain.subscription_id,
@@ -268,7 +292,7 @@ export async function POST(req: NextRequest) {
         const ext = await extendSubscription(member.id, 1)
         if (!ext.ok) throw new Error(`extendSubscription: ${"error" in ext ? ext.error : "fail"}`)
 
-        shopifySyncMock({
+        syncToShopify({
           memberId: member.id,
           memberEmail: member.email,
           transactionId: domain.subscription_id,
