@@ -41,10 +41,12 @@ export async function calculateActivationCommission(
   const { error: insertErr } = await supabase.from("commission_ledger").insert({
     member_id: sponsorId,
     source_member_id: newMemberId,
-    order_id: null,
+    source_order_id: null,
     commission_type: "subscription_activation",
     amount,
-    month_year: referenceMonth,
+    cv_base: 0,
+    percentage: 0,
+    network_level: 1,
     reference_month: referenceMonth,
     description: `Ativação assinatura ${tier === "first_20" ? `(≤${THRESHOLD})` : `(>${THRESHOLD})`} — R$${amount}`,
   })
