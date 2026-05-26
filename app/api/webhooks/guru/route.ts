@@ -230,6 +230,22 @@ export async function POST(req: NextRequest) {
         const ext = await extendSubscription(member.id, 1)
         if (!ext.ok) throw new Error(`extendSubscription: ${"error" in ext ? ext.error : "fail"}`)
 
+        // Comissão fixa por ativação: R$80 (≤20 ativos) ou R$40 (>20).
+        // Só dispara se paid.changed (idempotente — não duplica comissão em replay).
+        if (paid.changed && member.sponsor_id) {
+          const { calculateActivationCommission } = await import("@/lib/commissions-v2/calculate-activation")
+          const commResult = await calculateActivationCommission(
+            member.sponsor_id as string,
+            member.id,
+            domain.subscription_id,
+          )
+          if (commResult.ok) {
+            console.info(`[guru-webhook] commission R$${commResult.amount} (${commResult.tier}) for sponsor`)
+          } else {
+            console.error("[guru-webhook] commission failed (non-fatal)", commResult.error)
+          }
+        }
+
         // Persiste guru_subscriber_id (sobrescreve token UUID temporário do pré-cadastro).
         if (member.guru_subscriber_id !== domain.subscription_id) {
           await supabase
