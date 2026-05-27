@@ -49,10 +49,24 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
+  const hostname = request.headers.get('host') ?? ''
+
+  // Separação de domínios: admin.bio-help.com só serve /admin e /admin-login
+  // painel.bio-help.com serve tudo EXCETO /admin
+  const isAdminDomain = hostname.startsWith('admin.')
+  const isPainelDomain = hostname.startsWith('painel.')
+
+  if (isAdminDomain && !pathname.startsWith('/admin') && pathname !== '/admin-login' && !pathname.startsWith('/auth/')) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
+
+  if (isPainelDomain && pathname.startsWith('/admin') && !pathname.startsWith('/admin-login')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
 
   // Verificar se é rota protegida
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-  
+
   // Se rota protegida e não autenticado, redireciona para login
   if (isProtectedRoute && !user) {
     const loginUrl = new URL('/login', request.url)
@@ -61,15 +75,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Se autenticado e tentando acessar login/join, não interferir
-  // O redirecionamento será feito pelo frontend após o login
-  // Isso permite que o login redirecione corretamente para /admin ou /dashboard
   if (user && pathname === '/login') {
-    // Verificar se há um redirect pendente na query string
     const redirectTo = request.nextUrl.searchParams.get('redirect')
     if (redirectTo && (redirectTo === '/admin' || redirectTo === '/dashboard')) {
       return NextResponse.redirect(new URL(redirectTo, request.url))
     }
-    // Se não há redirect específico, deixar o frontend decidir
+    if (isAdminDomain) {
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
