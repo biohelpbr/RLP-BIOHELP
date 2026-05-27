@@ -183,12 +183,54 @@ export async function POST(req: NextRequest) {
   }
 
   // 2. Valida schema + api_token
-  const payload = verifyGuruWebhook(json)
+  let payload = verifyGuruWebhook(json)
   if (!payload) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+    // Zod rejeitou o payload real do Guru. Em vez de retornar 401 (Guru para retries),
+    // tenta extrair dados mínimos do body raw pra não perder a venda.
+    const raw_obj = json as Record<string, unknown>
+    const token = raw_obj?.api_token as string | undefined
+    const expected = process.env.GURU_WEBHOOK_API_TOKEN
+    if (expected && token !== expected) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+    }
+    // Payload real do Guru não bateu no Zod — processar com fallback
+    console.error("[guru-webhook] Zod parse failed — using raw fallback. Payload keys:", Object.keys(raw_obj))
+    const webhookType = raw_obj?.webhook_type as string ?? "unknown"
+    const subscriber = raw_obj?.subscriber as Record<string, unknown> | undefined
+    const email = (subscriber?.email as string) ?? (raw_obj as any)?.contact?.email ?? null
+    const lastStatus = (raw_obj?.last_status as string) ?? (raw_obj?.status as string) ?? "unknown"
+    const subId = (raw_obj?.id as string) ?? "unknown"
+    const chargedTimes = (raw_obj?.charged_times as number) ?? 1
+    const source = raw_obj?.source as Record<string, unknown> | undefined
+
+    if (webhookType === "subscription" && email) {
+      // Construir payload mínimo compatível com o schema
+      payload = {
+        api_token: token ?? "",
+        webhook_type: "subscription",
+        id: subId,
+        last_status: lastStatus as any,
+        subscriber: { id: subscriber?.id as string ?? "unknown", email, name: subscriber?.name as string },
+        product: { id: "unknown" },
+        charged_times: chargedTimes,
+        source: source as any,
+      } as any
+    } else if (webhookType === "transaction" && email) {
+      payload = {
+        api_token: token ?? "",
+        webhook_type: "transaction",
+        id: subId,
+        status: lastStatus as any,
+        contact: { email },
+        product: { id: "unknown" },
+      } as any
+    } else {
+      console.error("[guru-webhook] Cannot extract minimum fields from raw payload")
+      return NextResponse.json({ error: "Unprocessable payload", webhook_type: webhookType }, { status: 200 })
+    }
   }
 
-  const eventType = describeEvent(payload)
+  const eventType = describeEvent(payload!)
   const supabase = createServiceClient()
 
   // 3. Idempotência: insert no audit log com event_id UNIQUE
@@ -209,7 +251,7 @@ export async function POST(req: NextRequest) {
 
   // 4. Classifica + processa (try/catch isolado).
   try {
-    const domain = classifyGuruEvent(payload)
+    const domain = classifyGuruEvent(payload!)
 
     if (domain.kind === "noop") {
       await supabase
