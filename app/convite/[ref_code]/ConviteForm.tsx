@@ -1,27 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { ArrowRight, Mail, Phone, User } from "lucide-react"
+import { ArrowRight, User, Mail, Phone, CreditCard } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { createPreRegistration } from "@/lib/subscriptions/actions"
 import { CONVITE_COPY } from "@/lib/copy/convite"
 
-/**
- * F-V19 — Formulário inline da landing `/convite/[ref_code]`.
- *
- * Máscaras client-only (cosméticas) — server recebe valores limpos:
- *   • CPF: 11 dígitos numéricos (validados via PreRegistrationSchema no server).
- *   • Telefone: 10-11 dígitos brasileiros (DDD + número).
- *
- * Em sucesso, faz `window.location.href = guru_redirect_url` (redirect externo
- * pro checkout Guru). Em erro, mostra mensagem inline e mantém os campos.
- */
-
 interface ConviteFormProps {
   refCode: string
+  sponsorName?: string
 }
 
 const maskCPF = (raw: string): string => {
@@ -96,118 +83,93 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3">
       {error && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="name" className="text-foreground">
-          Nome completo <span className="text-destructive">*</span>
-        </Label>
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="Como devemos te chamar?"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="pl-10 h-12 rounded-xl"
-            required
-            disabled={submitting}
-            autoComplete="name"
-          />
-        </div>
+      <div className="relative">
+        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
+        <input
+          type="text"
+          placeholder="Nome completo"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
+          required
+          disabled={submitting}
+          autoComplete="name"
+        />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email" className="text-foreground">
-          E-mail <span className="text-destructive">*</span>
-        </Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="seu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="pl-10 h-12 rounded-xl"
-            required
-            disabled={submitting}
-            autoComplete="email"
-          />
-        </div>
+      <div className="relative">
+        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
+        <input
+          type="email"
+          placeholder="E-mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
+          required
+          disabled={submitting}
+          autoComplete="email"
+        />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-foreground">
-            WhatsApp <span className="text-destructive">*</span>
-          </Label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-            <Input
-              id="phone"
-              name="phone"
-              type="tel"
-              inputMode="numeric"
-              placeholder="(11) 99999-9999"
-              value={phoneMasked}
-              onChange={(e) => setPhoneMasked(maskPhone(e.target.value))}
-              className="pl-10 h-12 rounded-xl"
-              required
-              disabled={submitting}
-              autoComplete="tel-national"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="cpf" className="text-foreground">
-            CPF <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="cpf"
-            name="cpf"
-            type="text"
-            inputMode="numeric"
-            placeholder="000.000.000-00"
-            value={cpfMasked}
-            onChange={(e) => setCpfMasked(maskCPF(e.target.value))}
-            className="h-12 rounded-xl"
-            required
-            disabled={submitting}
-            autoComplete="off"
-          />
-        </div>
+      <div className="relative">
+        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
+        <input
+          type="tel"
+          inputMode="numeric"
+          placeholder="WhatsApp"
+          value={phoneMasked}
+          onChange={(e) => setPhoneMasked(maskPhone(e.target.value))}
+          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
+          required
+          disabled={submitting}
+          autoComplete="tel-national"
+        />
       </div>
 
-      <label className="flex items-start gap-3 cursor-pointer pt-1">
+      <div className="relative">
+        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
+        <input
+          type="text"
+          inputMode="numeric"
+          placeholder="CPF"
+          value={cpfMasked}
+          onChange={(e) => setCpfMasked(maskCPF(e.target.value))}
+          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
+          required
+          disabled={submitting}
+          autoComplete="off"
+        />
+      </div>
+
+      <label className="flex items-start gap-3 cursor-pointer pt-2 pb-1">
         <input
           type="checkbox"
           checked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
           disabled={submitting}
-          className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
+          className="mt-0.5 h-5 w-5 rounded border-purple-200 text-purple-600 focus:ring-2 focus:ring-purple-300"
           required
         />
-        <span className="text-sm text-foreground">{CONVITE_COPY.termsLabel}</span>
+        <span className="text-xs text-gray-600 leading-relaxed">
+          Li e aceito os <a href="#" className="text-purple-600 underline">termos de uso</a> e a <a href="#" className="text-purple-600 underline">política de privacidade</a> do Club Biohelp.
+        </span>
       </label>
 
-      <Button
+      <button
         type="submit"
-        className="w-full h-12 rounded-xl bh-gradient-purple text-primary-foreground font-semibold hover:opacity-90 transition-opacity group"
+        className="w-full h-14 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm tracking-wider uppercase transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
         disabled={!isValid || submitting}
       >
         {submitting ? CONVITE_COPY.submittingLabel : CONVITE_COPY.submitLabel}
-        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-      </Button>
+        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+      </button>
     </form>
   )
 }
