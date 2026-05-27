@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
   const isAdminDomain = hostname.startsWith('admin.')
   const isPainelDomain = hostname.startsWith('painel.')
 
-  if (isAdminDomain && !pathname.startsWith('/admin') && pathname !== '/admin-login' && !pathname.startsWith('/auth/')) {
+  if (isAdminDomain && !pathname.startsWith('/admin') && pathname !== '/login' && !pathname.startsWith('/auth/') && pathname !== '/welcome') {
     return NextResponse.redirect(new URL('/admin', request.url))
   }
 
