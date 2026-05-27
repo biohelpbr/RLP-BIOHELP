@@ -94,32 +94,7 @@ export default function V2Login() {
         </div>
 
         <BHCard variant="elevated" className="animate-scale-in">
-          <div className="flex rounded-xl bg-muted p-1 mb-6">
-            <button
-              type="button"
-              onClick={() => setActiveTab("partner")}
-              className={cn(
-                "flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200",
-                activeTab === "partner"
-                  ? "bg-background text-foreground bh-shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Sou Parceira
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("admin")}
-              className={cn(
-                "flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200",
-                activeTab === "admin"
-                  ? "bg-background text-foreground bh-shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Sou Admin Biohelp
-            </button>
-          </div>
+          {/* Tab admin removida — acesso admin via URL oculta /admin-login */}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
