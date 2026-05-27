@@ -279,7 +279,7 @@ export async function POST(req: NextRequest) {
         }
 
         await notifyAdminPaid(member)
-        syncToShopify({
+        await syncToShopify({
           memberId: member.id,
           memberEmail: member.email,
           transactionId: domain.subscription_id,
@@ -292,7 +292,7 @@ export async function POST(req: NextRequest) {
         const ext = await extendSubscription(member.id, 1)
         if (!ext.ok) throw new Error(`extendSubscription: ${"error" in ext ? ext.error : "fail"}`)
 
-        syncToShopify({
+        await syncToShopify({
           memberId: member.id,
           memberEmail: member.email,
           transactionId: domain.subscription_id,
