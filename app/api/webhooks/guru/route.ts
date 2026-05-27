@@ -82,10 +82,15 @@ async function syncToShopify(args: {
       ? new Date(member.subscription_expires_at).toISOString().slice(0, 10)
       : ""
 
+    const nameParts = (member.name ?? "").split(" ")
+    const firstName = nameParts[0] || "Parceira"
+    const lastName = nameParts.slice(1).join(" ") || ""
+
     const { syncCustomerToShopify } = await import("@/lib/shopify/customer")
     const result = await syncCustomerToShopify({
       email: args.memberEmail,
-      firstName: member.name?.split(" ")[0] ?? "",
+      firstName,
+      lastName,
       refCode: member.ref_code ?? "",
       sponsorRefCode,
       level: "membro",
