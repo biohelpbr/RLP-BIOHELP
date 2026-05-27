@@ -182,6 +182,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
+  // Guru envelopa o payload real dentro de { "payload": {...}, "connection": "pubsub", ... }
+  // Desembrulhar se necessário.
+  const envelope = json as Record<string, unknown>
+  if (envelope?.payload && typeof envelope.payload === "object" && (envelope.payload as any)?.api_token) {
+    json = envelope.payload
+  }
+
   // 2. Valida schema + api_token
   let payload = verifyGuruWebhook(json)
   if (!payload) {
