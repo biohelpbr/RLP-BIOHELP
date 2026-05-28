@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowRight, User, Mail, Phone, CreditCard } from "lucide-react"
+import { ArrowRight, User, Mail, Phone } from "lucide-react"
 
 import { createPreRegistration } from "@/lib/subscriptions/actions"
 import { CONVITE_COPY } from "@/lib/copy/convite"
@@ -9,14 +9,6 @@ import { CONVITE_COPY } from "@/lib/copy/convite"
 interface ConviteFormProps {
   refCode: string
   sponsorName?: string
-}
-
-const maskCPF = (raw: string): string => {
-  const digits = raw.replace(/\D/g, "").slice(0, 11)
-  return digits
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
 }
 
 const maskPhone = (raw: string): string => {
@@ -37,19 +29,16 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
   const [name, setName] = React.useState("")
   const [email, setEmail] = React.useState("")
   const [phoneMasked, setPhoneMasked] = React.useState("")
-  const [cpfMasked, setCpfMasked] = React.useState("")
   const [acceptedTerms, setAcceptedTerms] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [submitting, setSubmitting] = React.useState(false)
 
   const phoneDigits = stripDigits(phoneMasked)
-  const cpfDigits = stripDigits(cpfMasked)
 
   const isValid =
     name.trim().length >= 3 &&
     /^\S+@\S+\.\S+$/.test(email) &&
     phoneDigits.length >= 10 &&
-    cpfDigits.length === 11 &&
     acceptedTerms
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,7 +53,6 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
         name: name.trim(),
         email: email.trim().toLowerCase(),
         phone: phoneDigits,
-        cpf: cpfDigits,
         accepted_terms: true,
       })
 
@@ -130,43 +118,23 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="conv-phone" className="block text-sm font-medium text-neutral-800 mb-1.5">
-            WhatsApp <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-neutral-400 pointer-events-none" />
-            <input
-              id="conv-phone"
-              type="tel"
-              inputMode="numeric"
-              placeholder="(11) 99999-9999"
-              value={phoneMasked}
-              onChange={(e) => setPhoneMasked(maskPhone(e.target.value))}
-              className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-              required
-              disabled={submitting}
-              autoComplete="tel-national"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="conv-cpf" className="block text-sm font-medium text-neutral-800 mb-1.5">
-            CPF <span className="text-red-500">*</span>
-          </label>
+      <div>
+        <label htmlFor="conv-phone" className="block text-sm font-medium text-neutral-800 mb-1.5">
+          WhatsApp <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-neutral-400 pointer-events-none" />
           <input
-            id="conv-cpf"
-            type="text"
+            id="conv-phone"
+            type="tel"
             inputMode="numeric"
-            placeholder="000.000.000-00"
-            value={cpfMasked}
-            onChange={(e) => setCpfMasked(maskCPF(e.target.value))}
-            className="w-full h-12 px-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            placeholder="(11) 99999-9999"
+            value={phoneMasked}
+            onChange={(e) => setPhoneMasked(maskPhone(e.target.value))}
+            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
             required
             disabled={submitting}
-            autoComplete="off"
+            autoComplete="tel-national"
           />
         </div>
       </div>

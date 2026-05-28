@@ -9,10 +9,7 @@ export const CONVITE_COPY = {
   headlineLine3pre: "em ",
   headlineLine3accent: "comunidade e crescimento",
   sponsorPrefix: "Seu acesso foi liberado por",
-  formIntroPre: "Preencha seus dados para ",
-  formIntroAccent: "ativar o seu acesso",
-  formIntroPost: " ao Nutrition Club",
-  formTitle: "Preencha seus dados para continuar",
+  formTitle: "Preencha seus dados para ativar o seu acesso ao Nutrition Club",
   formSubtitle:
     "Em seguida você é levado(a) pra um checkout seguro pra concluir a assinatura.",
   termsLabel:
@@ -20,7 +17,7 @@ export const CONVITE_COPY = {
   submitLabel: "Continuar para pagamento",
   submittingLabel: "Redirecionando…",
   securityTitle: "AMBIENTE SEGURO E PROTEGIDO",
-  securitySub:
+  membershipNote:
     "Sua membership pode ser cancelada a qualquer momento pelo painel de membro.",
   bottomHeadline: "Algumas pessoas entram para consumir melhor.",
   bottomHighlight: "Outras transformam isso em renda.",
@@ -30,8 +27,8 @@ export const CONVITE_COPY = {
     { img: "/icone-experiencias.png", title: "Experiências", sub: "CONEXÕES\nQUE TRANSFORMAM\nROTINAS" },
     { img: "/icone-oportunidade.png", title: "Oportunidade", sub: "COMPARTILHE,\nINDIQUE,\nGERE RENDA" },
   ],
-  footerTaglinePre: "MAIS ACESSO, MAIS CONEXÃO, ",
-  footerTaglineAccent: "MAIS POSSIBILIDADES",
+  footerTaglinePre: "COMUNIDADE • PROSPERIDADE • ",
+  footerTaglineAccent: "WELLNESS",
   // Legacy (compat)
   badge: "Você foi convidado(a)",
   headlineTemplate: "Você foi convidado(a) por {sponsorName}",

@@ -223,13 +223,12 @@ export async function createPreRegistration(
   })
 
   // Pré-população confirmada 22/05 logando no painel Guru:
-  //   ?email, ?name, ?doc (CPF = "doc" no Guru, não "cpf"), ?phone_number
+  //   ?email, ?name, ?phone_number. CPF ("doc" no Guru) é coletado no checkout.
   // utm_term carrega pre_registration_token (Guru ecoa em source.utm_term no webhook).
   const offerId = process.env.GURU_OFFER_ID_CLUBE_MENSAL ?? "PLACEHOLDER"
   const params = new URLSearchParams({
     email: parsed.data.email,
     name: parsed.data.name,
-    doc: parsed.data.cpf,
     phone_number: parsed.data.phone,
     utm_source: "lrp",
     utm_medium: "pre_registration",

@@ -79,15 +79,8 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
           </div>
         </section>
 
-        {/* Form intro */}
-        <p className="mt-7 text-base text-neutral-800">
-          {CONVITE_COPY.formIntroPre}
-          <strong className="font-bold">{CONVITE_COPY.formIntroAccent}</strong>
-          {CONVITE_COPY.formIntroPost}
-        </p>
-
         {/* Form card */}
-        <div className="mt-4 rounded-2xl border border-neutral-200 p-6 md:p-8">
+        <div className="mt-10 md:mt-6 rounded-2xl border border-neutral-200 p-6 md:p-8">
           <h2 className="text-xl font-bold text-neutral-900">{CONVITE_COPY.formTitle}</h2>
           <p className="mt-1 text-sm text-blue-500">{CONVITE_COPY.formSubtitle}</p>
           <div className="mt-6">
@@ -100,7 +93,6 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
           <p className="text-xs font-bold tracking-wide text-neutral-900">
             {CONVITE_COPY.securityTitle}
           </p>
-          <p className="text-xs text-neutral-500">{CONVITE_COPY.securitySub}</p>
         </div>
 
         {/* ===== BENEFÍCIOS (gradiente atrás do headline + ícones) ===== */}
@@ -150,7 +142,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         </p>
 
         {/* Footer logo */}
-        <div className="mt-8 flex justify-center pb-12">
+        <div className="mt-8 flex justify-center">
           <Image
             src="/logo-oficial.png"
             alt="Biohelp Nutrition Club"
@@ -159,6 +151,11 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
             className="h-6 w-auto"
           />
         </div>
+
+        {/* Membership cancellation note */}
+        <p className="mt-6 pb-12 text-center text-[11px] leading-relaxed text-neutral-400">
+          {CONVITE_COPY.membershipNote}
+        </p>
       </div>
     </div>
   )

@@ -2,7 +2,7 @@ import { z } from "zod"
 
 /**
  * F-V19: schema de entrada do formulário de pré-cadastro `/convite/[ref_code]`.
- * CPF aceita só dígitos (form aplica máscara, server recebe limpo).
+ * CPF não é coletado aqui — o checkout Guru pede o documento na etapa de pagamento.
  * Reutilizado pela server action `createPreRegistration` e pelo ConviteForm (validação client).
  */
 export const PreRegistrationSchema = z.object({
@@ -10,7 +10,6 @@ export const PreRegistrationSchema = z.object({
   name: z.string().min(3).max(120),
   email: z.string().email().toLowerCase(),
   phone: z.string().min(10).max(20),
-  cpf: z.string().regex(/^\d{11}$/),
   accepted_terms: z.literal(true),
 })
 
