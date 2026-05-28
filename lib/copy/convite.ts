@@ -17,8 +17,6 @@ export const CONVITE_COPY = {
   submitLabel: "Continuar para pagamento",
   submittingLabel: "Redirecionando…",
   securityTitle: "AMBIENTE SEGURO E PROTEGIDO",
-  membershipNote:
-    "Sua membership pode ser cancelada a qualquer momento pelo painel de membro.",
   bottomHeadline: "Algumas pessoas entram para consumir melhor.",
   bottomHighlight: "Outras transformam isso em renda.",
   benefits: [

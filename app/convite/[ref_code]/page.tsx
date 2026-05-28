@@ -142,7 +142,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         </p>
 
         {/* Footer logo */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center pb-12">
           <Image
             src="/logo-oficial.png"
             alt="Biohelp Nutrition Club"
@@ -151,11 +151,6 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
             className="h-6 w-auto"
           />
         </div>
-
-        {/* Membership cancellation note */}
-        <p className="mt-6 pb-12 text-center text-[11px] leading-relaxed text-neutral-400">
-          {CONVITE_COPY.membershipNote}
-        </p>
       </div>
     </div>
   )
