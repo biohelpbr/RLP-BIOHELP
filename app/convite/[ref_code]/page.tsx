@@ -68,7 +68,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
           </h1>
 
           {/* Sponsor badge */}
-          <div className="mt-10 inline-flex items-center gap-3 rounded-full border-[1.5px] border-neutral-900 bg-white/70 py-2.5 pl-2.5 pr-6 backdrop-blur-sm">
+          <div className="mt-8 inline-flex items-center gap-3 rounded-full border-[1.5px] border-neutral-900 bg-white/70 py-2.5 pl-2.5 pr-6 backdrop-blur-sm">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700">
               <User className="h-5 w-5 text-white" />
             </span>
@@ -80,14 +80,14 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         </section>
 
         {/* Form intro */}
-        <p className="mt-12 text-base text-neutral-800">
+        <p className="mt-7 text-base text-neutral-800">
           {CONVITE_COPY.formIntroPre}
           <strong className="font-bold">{CONVITE_COPY.formIntroAccent}</strong>
           {CONVITE_COPY.formIntroPost}
         </p>
 
         {/* Form card */}
-        <div className="mt-5 rounded-2xl border border-neutral-200 p-6 md:p-8">
+        <div className="mt-4 rounded-2xl border border-neutral-200 p-6 md:p-8">
           <h2 className="text-xl font-bold text-neutral-900">{CONVITE_COPY.formTitle}</h2>
           <p className="mt-1 text-sm text-blue-500">{CONVITE_COPY.formSubtitle}</p>
           <div className="mt-6">
