@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import { Award, Users, Star, TrendingUp, User } from "lucide-react"
+import { User } from "lucide-react"
 
 import { createServiceClient } from "@/lib/supabase/server"
 import { CONVITE_COPY } from "@/lib/copy/convite"
@@ -10,13 +10,6 @@ import { ConviteForm } from "./ConviteForm"
 interface ConvitePageProps {
   params: Promise<{ ref_code: string }>
 }
-
-const BENEFIT_ICONS = {
-  award: Award,
-  users: Users,
-  star: Star,
-  trending: TrendingUp,
-} as const
 
 export default async function ConvitePage({ params }: ConvitePageProps) {
   const { ref_code } = await params
@@ -35,8 +28,27 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
   const sponsorName = (sponsor.name as string | null) ?? "alguém especial"
 
   return (
-    <div className="min-h-screen bg-white font-archivo text-neutral-900">
-      <div className="mx-auto w-full max-w-3xl px-6 md:px-10">
+    <div className="relative min-h-screen overflow-hidden bg-white font-archivo text-neutral-900">
+      {/* Backgrounds gradientes decorativos */}
+      <Image
+        src="/bg-1.jpg"
+        alt=""
+        aria-hidden
+        width={900}
+        height={700}
+        priority
+        className="pointer-events-none absolute -top-20 -right-40 w-[min(70vw,640px)] opacity-70 select-none"
+      />
+      <Image
+        src="/bg-2.jpg"
+        alt=""
+        aria-hidden
+        width={900}
+        height={700}
+        className="pointer-events-none absolute top-[55%] -left-48 w-[min(70vw,640px)] opacity-60 select-none"
+      />
+
+      <div className="relative z-10 mx-auto w-full max-w-3xl px-6 md:px-10">
         {/* Header: logo + topbar */}
         <header className="flex items-center justify-between pt-8 pb-2">
           <Image
@@ -108,20 +120,23 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
 
         {/* Benefits grid */}
         <div className="mt-12 grid grid-cols-2 gap-y-10 sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-neutral-200">
-          {CONVITE_COPY.benefits.map((b) => {
-            const Icon = BENEFIT_ICONS[b.icon as keyof typeof BENEFIT_ICONS]
-            return (
-              <div key={b.icon} className="flex flex-col items-center px-4 text-center">
-                <Icon className="h-9 w-9 text-blue-600" strokeWidth={1.75} />
-                <p className="mt-3 whitespace-pre-line text-base font-extrabold leading-tight text-neutral-900">
-                  {b.title}
-                </p>
-                <p className="mt-1.5 whitespace-pre-line text-[10px] font-semibold leading-tight tracking-wide text-neutral-500">
-                  {b.sub}
-                </p>
-              </div>
-            )
-          })}
+          {CONVITE_COPY.benefits.map((b) => (
+            <div key={b.img} className="flex flex-col items-center px-4 text-center">
+              <Image
+                src={b.img}
+                alt={b.title.replace("\n", " ")}
+                width={48}
+                height={48}
+                className="h-10 w-10 object-contain"
+              />
+              <p className="mt-3 whitespace-pre-line text-base font-extrabold leading-tight text-neutral-900">
+                {b.title}
+              </p>
+              <p className="mt-1.5 whitespace-pre-line text-[10px] font-semibold leading-tight tracking-wide text-neutral-500">
+                {b.sub}
+              </p>
+            </div>
+          ))}
         </div>
 
         {/* Tagline */}
