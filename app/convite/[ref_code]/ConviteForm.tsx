@@ -90,85 +90,108 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
         </div>
       )}
 
-      <div className="relative">
-        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
-        <input
-          type="text"
-          placeholder="Nome completo"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
-          required
-          disabled={submitting}
-          autoComplete="name"
-        />
+      <div>
+        <label htmlFor="conv-name" className="block text-sm font-medium text-neutral-800 mb-1.5">
+          Nome completo <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-neutral-400 pointer-events-none" />
+          <input
+            id="conv-name"
+            type="text"
+            placeholder="Como devemos te chamar?"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            required
+            disabled={submitting}
+            autoComplete="name"
+          />
+        </div>
       </div>
 
-      <div className="relative">
-        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
-        <input
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
-          required
-          disabled={submitting}
-          autoComplete="email"
-        />
+      <div>
+        <label htmlFor="conv-email" className="block text-sm font-medium text-neutral-800 mb-1.5">
+          E-mail <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-neutral-400 pointer-events-none" />
+          <input
+            id="conv-email"
+            type="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            required
+            disabled={submitting}
+            autoComplete="email"
+          />
+        </div>
       </div>
 
-      <div className="relative">
-        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
-        <input
-          type="tel"
-          inputMode="numeric"
-          placeholder="WhatsApp"
-          value={phoneMasked}
-          onChange={(e) => setPhoneMasked(maskPhone(e.target.value))}
-          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
-          required
-          disabled={submitting}
-          autoComplete="tel-national"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="conv-phone" className="block text-sm font-medium text-neutral-800 mb-1.5">
+            WhatsApp <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-neutral-400 pointer-events-none" />
+            <input
+              id="conv-phone"
+              type="tel"
+              inputMode="numeric"
+              placeholder="(11) 99999-9999"
+              value={phoneMasked}
+              onChange={(e) => setPhoneMasked(maskPhone(e.target.value))}
+              className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+              required
+              disabled={submitting}
+              autoComplete="tel-national"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="conv-cpf" className="block text-sm font-medium text-neutral-800 mb-1.5">
+            CPF <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="conv-cpf"
+            type="text"
+            inputMode="numeric"
+            placeholder="000.000.000-00"
+            value={cpfMasked}
+            onChange={(e) => setCpfMasked(maskCPF(e.target.value))}
+            className="w-full h-12 px-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            required
+            disabled={submitting}
+            autoComplete="off"
+          />
+        </div>
       </div>
 
-      <div className="relative">
-        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300 pointer-events-none" />
-        <input
-          type="text"
-          inputMode="numeric"
-          placeholder="CPF"
-          value={cpfMasked}
-          onChange={(e) => setCpfMasked(maskCPF(e.target.value))}
-          className="w-full h-14 pl-12 pr-4 rounded-2xl border border-purple-100 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition"
-          required
-          disabled={submitting}
-          autoComplete="off"
-        />
-      </div>
-
-      <label className="flex items-start gap-3 cursor-pointer pt-2 pb-1">
+      <label className="flex items-start gap-2.5 cursor-pointer pt-1">
         <input
           type="checkbox"
           checked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
           disabled={submitting}
-          className="mt-0.5 h-5 w-5 rounded border-purple-200 text-purple-600 focus:ring-2 focus:ring-purple-300"
+          className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-400"
           required
         />
-        <span className="text-xs text-gray-600 leading-relaxed">
-          Li e aceito os <a href="#" className="text-purple-600 underline">termos de uso</a> e a <a href="#" className="text-purple-600 underline">política de privacidade</a> do Club Biohelp.
+        <span className="text-sm text-neutral-700 leading-relaxed">
+          {CONVITE_COPY.termsLabel}
         </span>
       </label>
 
       <button
         type="submit"
-        className="w-full h-14 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm tracking-wider uppercase transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+        className="w-full h-12 rounded-xl bg-violet-400 enabled:hover:bg-violet-500 text-white font-semibold text-sm transition-all duration-200 disabled:opacity-100 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
         disabled={!isValid || submitting}
       >
         {submitting ? CONVITE_COPY.submittingLabel : CONVITE_COPY.submitLabel}
-        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        <ArrowRight className="w-4 h-4 group-enabled:group-hover:translate-x-1 transition-transform" />
       </button>
     </form>
   )
