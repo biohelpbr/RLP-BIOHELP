@@ -9,7 +9,7 @@ export const CONVITE_COPY = {
   headlineLine3pre: "em ",
   headlineLine3accent: "comunidade e crescimento",
   sponsorPrefix: "Seu acesso foi liberado por",
-  formTitle: "Preencha seus dados para ativar o seu acesso ao Nutrition Club",
+  formTitle: "Preencha seus dados para continuar",
   formSubtitle:
     "Em seguida você é levado(a) pra um checkout seguro pra concluir a assinatura.",
   termsLabel:
