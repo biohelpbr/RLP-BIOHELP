@@ -80,7 +80,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         </section>
 
         {/* Form card */}
-        <div className="mt-10 md:mt-6 rounded-2xl border border-neutral-200 p-6 md:p-8">
+        <div className="relative z-10 mt-10 md:mt-6 rounded-2xl border border-neutral-200 bg-white p-6 md:p-8">
           <h2 className="text-xl font-bold text-neutral-900">{CONVITE_COPY.formTitle}</h2>
           <p className="mt-1 text-sm text-blue-500">{CONVITE_COPY.formSubtitle}</p>
           <div className="mt-6">
