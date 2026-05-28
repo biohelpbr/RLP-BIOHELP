@@ -29,7 +29,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white font-archivo text-neutral-900">
-      {/* Backgrounds gradientes decorativos */}
+      {/* Backgrounds gradientes decorativos (mix-blend-multiply remove o branco do JPEG) */}
       <Image
         src="/bg-1.jpg"
         alt=""
@@ -37,7 +37,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         width={900}
         height={700}
         priority
-        className="pointer-events-none absolute -top-20 -right-40 w-[min(70vw,640px)] opacity-70 select-none"
+        className="pointer-events-none absolute -top-32 right-0 w-[min(55vw,560px)] mix-blend-multiply select-none"
       />
       <Image
         src="/bg-2.jpg"
@@ -45,7 +45,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         aria-hidden
         width={900}
         height={700}
-        className="pointer-events-none absolute top-[55%] -left-48 w-[min(70vw,640px)] opacity-60 select-none"
+        className="pointer-events-none absolute bottom-0 left-0 w-[min(55vw,560px)] mix-blend-multiply select-none"
       />
 
       <div className="relative z-10 mx-auto w-full max-w-3xl px-6 md:px-10">
