@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowRight, CheckCircle, Mail } from "lucide-react"
@@ -84,12 +85,14 @@ export default function V2Login() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bh-gradient-purple bh-shadow-purple-glow mb-4">
-            <span className="text-primary-foreground font-bold text-3xl">B</span>
-          </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Biohelp LRP
-          </h1>
+          <Image
+            src="/logo-oficial.png"
+            alt="Biohelp Nutrition Club"
+            width={200}
+            height={56}
+            className="h-12 w-auto mx-auto mb-4"
+            priority
+          />
           <p className="text-muted-foreground">Portal de Parceiras</p>
         </div>
 
