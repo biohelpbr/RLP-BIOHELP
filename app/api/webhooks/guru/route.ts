@@ -384,15 +384,9 @@ export async function POST(req: NextRequest) {
       case "subscription_canceled": {
         const c = await cancelAutoRenew(member.id)
         if (!c.ok) throw new Error(`cancelAutoRenew: ${"error" in c ? c.error : "fail"}`)
-        // NÃO inativa agora no LRP. Cron diário move pra cancelled quando expires_at < now().
-        // B4: remove a tag `subscriber` na Shopify (non-fatal, merge B5 preserva o resto).
-        await syncToShopify({
-          memberId: member.id,
-          memberEmail: member.email,
-          transactionId: domain.subscription_id,
-          action: "deactivated",
-          shopifyStatus: "inactive",
-        })
+        // NÃO inativa agora: membro segue PAGO até expirar, então a tag `subscriber`
+        // (preço de clube/Locksmith) PERMANECE. O cron diário move pra cancelled e a
+        // remoção da tag na Shopify acontece no case "subscription_expired".
         break
       }
 
