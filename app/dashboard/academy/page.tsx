@@ -17,7 +17,7 @@ export default async function AcademyMemberPage() {
   const trails = await listPublishedTrails()
 
   return (
-    <PartnerShell memberName={member.name ?? "Você"} isActive={member.status === "active"} memberSubtitle={getMemberSubtitle(member)}>
+    <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <header>
           <h1 className="text-3xl font-bold text-foreground inline-flex items-center gap-2">

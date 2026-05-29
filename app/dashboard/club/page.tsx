@@ -32,7 +32,10 @@ export default async function ClubPage() {
   const network = await getMemberNetworkV2(member.id)
   const sponsor = network?.sponsor ?? null
   const directReports = network?.direct_reports ?? []
-  const isActive = member.status === "active"
+  // F-V03: "ativo" = assinatura paga (subscription_status), não o status legado.
+  // Os badges de sponsor/indicados abaixo leem `.status`, já derivado de
+  // subscription_status em lib/network/v2.ts.
+  const isActive = member.subscription_status === "paid"
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("pt-BR", {

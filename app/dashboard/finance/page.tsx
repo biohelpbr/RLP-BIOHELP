@@ -69,7 +69,7 @@ export default async function FinancePage() {
   ])
 
   return (
-    <PartnerShell memberName={member.name} isActive={member.status === "active"} memberSubtitle={getMemberSubtitle(member)}>
+    <PartnerShell memberName={member.name} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <header className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">Resultado &amp; Resgate</h1>
