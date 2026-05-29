@@ -85,11 +85,21 @@ export async function sendToAbsolut(input: SendToAbsolutInput): Promise<SendToAb
       codigo_indicacao: input.codigoIndicacao,
     }
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    })
+    // Timeout ~4s: o CRM do Abner é externo; não deixar o webhook/server action
+    // pendurado. Abort dispara AbortError → cai no catch (non-fatal).
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 4000)
+    let res: Response
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      })
+    } finally {
+      clearTimeout(timeout)
+    }
 
     if (!res.ok) {
       console.warn(`[crm-absolut] resposta non-2xx: ${res.status} (non-fatal)`)

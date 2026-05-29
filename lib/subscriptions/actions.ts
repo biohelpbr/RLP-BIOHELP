@@ -10,6 +10,7 @@ import {
 } from "@/lib/subscriptions/schemas"
 import { onMemberStatusChange } from "@/lib/tags/hook-on-status-change"
 import { generateRefCode } from "@/lib/utils/ref-code"
+import { sendToAbsolut } from "@/lib/crm/absolut"
 
 type Result =
   | { ok: true; changed: boolean }
@@ -211,6 +212,16 @@ export async function createPreRegistration(
         kind: "pre_registration",
         sponsor_id: sponsor.id,
       },
+    })
+
+    // F-V20: dispara "lead_novo" pro CRM Absolut SOMENTE pra membro novo.
+    // non-fatal e gated (CRM_ABSOLUT_LIVE) — não derruba o pré-cadastro.
+    await sendToAbsolut({
+      evento: "lead_novo",
+      nome: parsed.data.name,
+      email: parsed.data.email,
+      telefone: parsed.data.phone,
+      codigoIndicacao: (sponsor.ref_code as string | null) ?? null,
     })
   }
 
