@@ -13,7 +13,17 @@
  * - lrp_sponsor:<sponsor_ref_code|none>
  * - lrp_status:pending|active|inactive
  * - nivel:<nivel> (membro/parceiro/lider/diretor/head)
+ * - subscriber (B4: somente quando status === 'active')
+ *
+ * F-V19 (sync REST 2024-10):
+ * - B3: e-mail marketing consent = "subscribed" no create/update (senão o
+ *   comprador entra "não inscrito" e a Shopify não consegue mandar e-mail).
+ * - B4: tag `subscriber` quando ativo (paid); ausente quando inativo.
+ * - B5: tags são MERGEADAS no update, nunca sobrescritas — preserva as tags
+ *   próprias do cliente e só substitui as gerenciadas pelo LRP.
  */
+
+import { getShopifyAccessToken } from './token'
 
 // Versão da API
 const SHOPIFY_API_VERSION = '2024-10'
@@ -60,12 +70,16 @@ interface ShopifyCustomersSearchResponse {
 
 /**
  * Gera as tags do membro conforme SPEC 4.4 + TBD-003
- * Tags: lrp_member, lrp_ref, lrp_sponsor, lrp_status, nivel
+ * Tags: lrp_member, lrp_ref, lrp_sponsor, lrp_status, nivel [, subscriber]
+ *
+ * B4: inclui `subscriber` SOMENTE quando o status é ativo (paid). Quando
+ * inativo, a tag é omitida — e como o sync faz MERGE das tags gerenciadas
+ * (ver mergeShopifyTags), a `subscriber` sai sozinha no próximo sync inativo.
  */
-function generateMemberTags(params: CustomerSyncParams): string {
+export function generateMemberTags(params: CustomerSyncParams): string {
   const status = params.status || 'pending'
   const level = params.level || 'membro'
-  
+
   const tags: string[] = [
     'lrp_member',
     `lrp_ref:${params.refCode}`,
@@ -73,7 +87,66 @@ function generateMemberTags(params: CustomerSyncParams): string {
     `lrp_status:${status}`,
     `nivel:${level}`,  // TBD-003 RESOLVIDO: tag de nível obrigatória
   ]
+
+  // B4: tag `subscriber` apenas quando ativo (assinatura paga).
+  if (status === 'active') {
+    tags.push('subscriber')
+  }
+
   return tags.join(', ')
+}
+
+/**
+ * B5: Tags "gerenciadas pelo LRP" = prefixo `lrp_`, prefixo `nivel:`, e a
+ * tag `subscriber`. Comparação case-insensitive. Tudo o mais é tag do cliente
+ * e deve ser preservado.
+ */
+export function isLrpManagedTag(tag: string): boolean {
+  const t = tag.trim().toLowerCase()
+  if (!t) return false
+  return t.startsWith('lrp_') || t.startsWith('nivel:') || t === 'subscriber'
+}
+
+/**
+ * B5: Faz merge das tags, NUNCA sobrescreve.
+ * Conjunto final = (tags existentes NÃO gerenciadas pelo LRP) ∪ (tags LRP atuais).
+ * Preserva as tags próprias do cliente (~5-10% já são clientes) e só substitui
+ * as nossas. Idempotente e sem duplicatas (dedup case-insensitive, mantendo a
+ * grafia original da primeira ocorrência).
+ */
+export function mergeShopifyTags(existingTagsRaw: string, lrpTags: string): string {
+  const split = (raw: string) => raw.split(',').map((t) => t.trim()).filter(Boolean)
+
+  const preserved = split(existingTagsRaw).filter((t) => !isLrpManagedTag(t))
+  const lrp = split(lrpTags)
+
+  const final: string[] = []
+  const seen = new Set<string>()
+  for (const tag of [...preserved, ...lrp]) {
+    const key = tag.toLowerCase()
+    if (!seen.has(key)) {
+      seen.add(key)
+      final.push(tag)
+    }
+  }
+  return final.join(', ')
+}
+
+/**
+ * B3: shape do consent de e-mail marketing para a REST Admin API 2024-10.
+ * Sem este objeto o customer entra "não inscrito" (not_subscribed) e a Shopify
+ * não envia e-mails de marketing.
+ */
+function buildEmailMarketingConsent(): {
+  state: 'subscribed'
+  opt_in_level: 'single_opt_in'
+  consent_updated_at: string
+} {
+  return {
+    state: 'subscribed',
+    opt_in_level: 'single_opt_in',
+    consent_updated_at: new Date().toISOString(),
+  }
 }
 
 /**
@@ -86,12 +159,12 @@ async function shopifyRest<T>(
   body?: Record<string, unknown>
 ): Promise<{ data: T | null; errors: string[] }> {
   const shopDomain = process.env.SHOPIFY_STORE_DOMAIN
-  const accessToken = process.env.SHOPIFY_ADMIN_API_TOKEN
+  const accessToken = await getShopifyAccessToken()
 
   if (!shopDomain || !accessToken) {
     return {
       data: null,
-      errors: ['Missing Shopify credentials (SHOPIFY_STORE_DOMAIN or SHOPIFY_ADMIN_API_TOKEN)'],
+      errors: ['Missing Shopify credentials (SHOPIFY_STORE_DOMAIN + client credentials ou SHOPIFY_ADMIN_API_TOKEN)'],
     }
   }
 
@@ -169,6 +242,8 @@ async function createCustomer(
         first_name: firstName,
         last_name: lastName || undefined,
         tags: generateMemberTags(params),
+        // B3: marca o comprador como inscrito para marketing por e-mail.
+        email_marketing_consent: buildEmailMarketingConsent(),
         // Não enviar senha - customer pode criar conta depois
         send_email_welcome: false,
       },
@@ -196,6 +271,23 @@ async function createCustomer(
 }
 
 /**
+ * Busca as tags atuais de um customer (para o merge no update — B5).
+ * Em caso de erro retorna '' (degrada para só-tags-LRP, evitando travar o sync).
+ */
+async function fetchCustomerTags(customerId: number): Promise<string> {
+  const result = await shopifyRest<ShopifyCustomerResponse>(
+    `/customers/${customerId}.json`
+  )
+
+  if (result.errors.length > 0) {
+    console.error('[shopify] Error fetching customer tags for merge:', result.errors)
+    return ''
+  }
+
+  return result.data?.customer?.tags ?? ''
+}
+
+/**
  * Atualiza um customer existente usando REST API
  */
 async function updateCustomer(
@@ -206,6 +298,10 @@ async function updateCustomer(
   const firstName = nameParts[0] || params.firstName
   const lastName = nameParts.slice(1).join(' ') || params.lastName || ''
 
+  // B5: busca as tags atuais e faz MERGE — nunca sobrescreve as tags do cliente.
+  const existingTags = await fetchCustomerTags(customerId)
+  const mergedTags = mergeShopifyTags(existingTags, generateMemberTags(params))
+
   const result = await shopifyRest<ShopifyCustomerResponse>(
     `/customers/${customerId}.json`,
     'PUT',
@@ -214,7 +310,9 @@ async function updateCustomer(
         id: customerId,
         first_name: firstName,
         last_name: lastName || undefined,
-        tags: generateMemberTags(params),
+        tags: mergedTags,
+        // B3: garante consent de marketing também no update.
+        email_marketing_consent: buildEmailMarketingConsent(),
       },
     }
   )
@@ -346,7 +444,7 @@ export async function syncCustomerToShopify(
 
     console.info('[shopify] Customer updated successfully:', {
       id: existingCustomerId,
-      tags: generateMemberTags(params),
+      lrpTags: generateMemberTags(params), // tags LRP aplicadas; demais tags do cliente preservadas via merge (B5)
     })
 
     return {

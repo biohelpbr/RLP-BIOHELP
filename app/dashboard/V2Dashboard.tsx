@@ -53,7 +53,8 @@ export default async function V2Dashboard() {
     getNextPublishedEvent(),
   ])
   const directReportsCount = network?.direct_reports.length ?? 0
-  const isActive = member.status === "active"
+  // F-V03: "ativo" = assinatura paga (subscription_status), não o status legado.
+  const isActive = member.subscription_status === "paid"
   // `||` (não `??`) pra também aplicar fallback quando env vem como string vazia.
   // Verificado em 13/05/2026: em Vercel a env pode existir mas estar vazia.
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
@@ -90,7 +91,7 @@ export default async function V2Dashboard() {
             value={
               isActive
                 ? "Ativa"
-                : member.status === "pending"
+                : member.subscription_status === "pending"
                 ? "Pendente"
                 : "Inativa"
             }

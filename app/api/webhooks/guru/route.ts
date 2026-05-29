@@ -36,6 +36,7 @@ import {
   markSubscriptionPaid,
 } from "@/lib/subscriptions/actions"
 import { getMemberByExternalId, type MemberRow } from "@/lib/subscriptions/queries"
+import { sendToAbsolut } from "@/lib/crm/absolut"
 
 export const runtime = "nodejs"
 
@@ -56,7 +57,10 @@ async function syncToShopify(args: {
   memberId: string
   memberEmail: string | null
   transactionId: string
-  action: "activated" | "renewed"
+  action: "activated" | "renewed" | "deactivated"
+  // B4: status Shopify aplicado nas tags. "inactive" remove a tag `subscriber`
+  // (merge B5). Default "active" preserva o comportamento de ativação/renovação.
+  shopifyStatus?: "active" | "inactive"
 }): Promise<void> {
   if (!args.memberEmail) return
   try {
@@ -94,7 +98,7 @@ async function syncToShopify(args: {
       refCode: member.ref_code ?? "",
       sponsorRefCode,
       level: "membro",
-      status: "active",
+      status: args.shopifyStatus ?? "active",
     })
     console.info("[guru-webhook] shopify sync:", result.success ? "ok" : "failed", {
       action: args.action,
@@ -339,6 +343,28 @@ export async function POST(req: NextRequest) {
           transactionId: domain.subscription_id,
           action: "activated",
         })
+
+        // F-V20: "virou_cliente" pro CRM Absolut só na 1ª ativação efetiva
+        // (paid.changed — idempotente, não redispara em replay). non-fatal e
+        // gated. ref_code do sponsor segue o mesmo padrão de query do syncToShopify.
+        if (paid.changed) {
+          let sponsorRefCode: string | null = null
+          if (member.sponsor_id) {
+            const { data: sponsorRow } = await supabase
+              .from("members")
+              .select("ref_code")
+              .eq("id", member.sponsor_id)
+              .single()
+            sponsorRefCode = (sponsorRow?.ref_code as string | null) ?? null
+          }
+          await sendToAbsolut({
+            evento: "virou_cliente",
+            nome: member.name ?? "",
+            email: member.email ?? "",
+            telefone: (member.phone as string | null) ?? "",
+            codigoIndicacao: sponsorRefCode,
+          })
+        }
         break
       }
 
@@ -358,13 +384,23 @@ export async function POST(req: NextRequest) {
       case "subscription_canceled": {
         const c = await cancelAutoRenew(member.id)
         if (!c.ok) throw new Error(`cancelAutoRenew: ${"error" in c ? c.error : "fail"}`)
-        // NÃO inativa agora. Cron diário faz isso quando expires_at < now().
+        // NÃO inativa agora: membro segue PAGO até expirar, então a tag `subscriber`
+        // (preço de clube/Locksmith) PERMANECE. O cron diário move pra cancelled e a
+        // remoção da tag na Shopify acontece no case "subscription_expired".
         break
       }
 
       case "subscription_expired": {
         const c = await cancelSubscription(member.id)
         if (!c.ok) throw new Error(`cancelSubscription: ${"error" in c ? c.error : "fail"}`)
+        // B4: remove a tag `subscriber` na Shopify ao inativar (non-fatal).
+        await syncToShopify({
+          memberId: member.id,
+          memberEmail: member.email,
+          transactionId: domain.subscription_id,
+          action: "deactivated",
+          shopifyStatus: "inactive",
+        })
         break
       }
 

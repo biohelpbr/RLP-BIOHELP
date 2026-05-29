@@ -19,6 +19,8 @@ export default function V2Login() {
   const [error, setError] = React.useState<string | null>(null)
   const [loading, setLoading] = React.useState(false)
   const [sent, setSent] = React.useState(false)
+  const [code, setCode] = React.useState("")
+  const [verifying, setVerifying] = React.useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,6 +48,35 @@ export default function V2Login() {
     }
   }
 
+  // Login por CÓDIGO (OTP) em vez do link clicável: imune a prefetch/scanner
+  // de e-mail (que consumia o token único antes do clique → 403 no /verify) e
+  // a webview de app de e-mail (sem o cookie code_verifier do PKCE).
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setVerifying(true)
+    try {
+      const supabase = createClientSupabase()
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: email.trim().toLowerCase(),
+        token: code.trim(),
+        type: "email",
+      })
+      if (verifyError) {
+        setError("Código inválido ou expirado. Confira ou peça um novo.")
+        setVerifying(false)
+        return
+      }
+      // Sessão gravada em cookie pelo client @supabase/ssr → segue pro dashboard.
+      router.refresh()
+      router.replace("/dashboard")
+    } catch (err) {
+      console.error("[V2Login] verify error", err)
+      setError("Erro de conexão. Tente novamente.")
+      setVerifying(false)
+    }
+  }
+
   if (sent) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-bh-lavender-soft via-background to-bh-blue-soft flex items-center justify-center p-4">
@@ -53,21 +84,58 @@ export default function V2Login() {
           <BHCard variant="elevated" className="text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              Link enviado!
+              Confira seu e-mail
             </h2>
-            <p className="text-muted-foreground mb-4">
-              Enviamos um link de acesso para <strong>{email}</strong>.
-              Abra seu e-mail e clique no link para entrar.
+            <p className="text-muted-foreground mb-1">
+              Enviamos um código de acesso para <strong>{email}</strong>.
             </p>
             <p className="text-sm text-muted-foreground mb-6">
-              Não encontrou? Verifique a pasta de spam ou promoções.
+              Digite o código de 6 dígitos abaixo. Não encontrou? Verifique a
+              pasta de spam ou promoções.
             </p>
+
+            <form onSubmit={handleVerify} className="space-y-4 text-left">
+              {error && (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="code" className="text-foreground">
+                  Código de acesso
+                </Label>
+                <Input
+                  id="code"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="000000"
+                  value={code}
+                  onChange={(e) =>
+                    setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
+                  className="h-12 rounded-xl text-center text-2xl tracking-[0.5em]"
+                  maxLength={6}
+                  required
+                  disabled={verifying}
+                  autoFocus
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-xl bh-gradient-purple text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
+                disabled={verifying || code.length < 6}
+              >
+                {verifying ? "Entrando…" : "Confirmar código"}
+              </Button>
+            </form>
+
             <Button
               variant="outline"
-              onClick={() => { setSent(false); setEmail("") }}
-              className="w-full"
+              onClick={() => { setSent(false); setCode(""); setError(null) }}
+              className="w-full mt-3"
+              disabled={verifying}
             >
-              Tentar com outro e-mail
+              Usar outro e-mail
             </Button>
           </BHCard>
         </div>
@@ -137,7 +205,7 @@ export default function V2Login() {
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Você vai receber um link de acesso no seu e-mail. Sem senha.
+            Você vai receber um código de acesso no seu e-mail. Sem senha.
           </p>
         </BHCard>
 

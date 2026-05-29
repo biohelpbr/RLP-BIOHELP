@@ -7,6 +7,8 @@
  * - read_customers scope
  */
 
+import { getShopifyAccessToken } from './token'
+
 // Versão da API - usar versão estável que suporta customerSet (disponível desde 2022-10)
 const SHOPIFY_API_VERSION = '2024-10'
 
@@ -28,12 +30,12 @@ export async function shopifyGraphQL<T>(
   variables?: Record<string, unknown>
 ): Promise<{ data: T | null; errors: string[] }> {
   const shopDomain = process.env.SHOPIFY_STORE_DOMAIN
-  const accessToken = process.env.SHOPIFY_ADMIN_API_TOKEN
+  const accessToken = await getShopifyAccessToken()
 
   if (!shopDomain || !accessToken) {
     return {
       data: null,
-      errors: ['Missing Shopify credentials (SHOPIFY_STORE_DOMAIN or SHOPIFY_ADMIN_API_TOKEN)'],
+      errors: ['Missing Shopify credentials (SHOPIFY_STORE_DOMAIN + client credentials ou SHOPIFY_ADMIN_API_TOKEN)'],
     }
   }
 
