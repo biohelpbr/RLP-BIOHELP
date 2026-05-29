@@ -1,5 +1,29 @@
 import { createServiceClient } from "@/lib/supabase/server"
 
+// F-V03: a fonte de verdade de "ativo" é members.subscription_status
+// (pending|paid|cancelled), não o campo legado status. As páginas admin
+// (/admin/community e /admin/community/[id]) falam o vocabulário legado
+// (active|pending|inactive) nos filtros e badges, então traduzimos aqui nas
+// duas pontas sem alterar a UI.
+type SubscriptionStatusV2 = "pending" | "paid" | "cancelled"
+type LegacyStatus = "active" | "pending" | "inactive"
+
+const LEGACY_TO_SUB: Record<LegacyStatus, SubscriptionStatusV2> = {
+  active: "paid",
+  pending: "pending",
+  inactive: "cancelled",
+}
+
+const SUB_TO_LEGACY: Record<SubscriptionStatusV2, LegacyStatus> = {
+  paid: "active",
+  pending: "pending",
+  cancelled: "inactive",
+}
+
+function legacyFromSubscription(sub: unknown): LegacyStatus {
+  return SUB_TO_LEGACY[sub as SubscriptionStatusV2] ?? "pending"
+}
+
 export type CommunityMember = {
   id: string
   name: string
@@ -37,14 +61,17 @@ export async function listCommunity(filters: CommunityFilters = {}): Promise<Com
 
   let query = supabase
     .from("members")
-    .select("id, name, email, ref_code, status, created_at, sponsor_id, tags", {
-      count: "exact",
-    })
+    .select(
+      "id, name, email, ref_code, subscription_status, created_at, sponsor_id, tags",
+      {
+        count: "exact",
+      }
+    )
     .order("created_at", { ascending: false })
     .range(from, to)
 
   if (filters.status && filters.status !== "all") {
-    query = query.eq("status", filters.status)
+    query = query.eq("subscription_status", LEGACY_TO_SUB[filters.status])
   }
 
   if (filters.tag) {
@@ -68,7 +95,7 @@ export async function listCommunity(filters: CommunityFilters = {}): Promise<Com
     name: (r.name as string) ?? "",
     email: (r.email as string) ?? "",
     ref_code: (r.ref_code as string) ?? "",
-    status: (r.status as string) ?? "",
+    status: legacyFromSubscription(r.subscription_status),
     created_at: (r.created_at as string) ?? "",
     sponsor_id: (r.sponsor_id as string | null) ?? null,
     tags: Array.isArray(r.tags) ? (r.tags as string[]) : [],
@@ -100,7 +127,7 @@ export async function getCommunityMember(id: string) {
   const supabase = createServiceClient()
   const { data: member } = await supabase
     .from("members")
-    .select("id, name, email, ref_code, status, created_at, sponsor_id, tags, phone, level")
+    .select("id, name, email, ref_code, subscription_status, created_at, sponsor_id, tags, phone, level")
     .eq("id", id)
     .single()
   if (!member) return null
@@ -146,7 +173,7 @@ export async function getCommunityMember(id: string) {
       name: (member.name as string) ?? "",
       email: (member.email as string) ?? "",
       ref_code: (member.ref_code as string) ?? "",
-      status: (member.status as string) ?? "",
+      status: legacyFromSubscription(member.subscription_status),
       created_at: (member.created_at as string) ?? "",
       sponsor_id: (member.sponsor_id as string | null) ?? null,
       tags: Array.isArray(member.tags) ? (member.tags as string[]) : [],

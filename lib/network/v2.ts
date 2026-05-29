@@ -20,11 +20,24 @@ import type {
   MemberNetworkResponseV2,
 } from '@/types/database'
 
+// F-V03: a fonte de verdade de "ativo" é members.subscription_status
+// (pending|paid|cancelled), não o campo legado status. Derivamos o MemberStatus
+// exibido a partir dela — paid=>active, cancelled=>inactive, pending=>pending.
+type SubscriptionStatusV2 = 'pending' | 'paid' | 'cancelled'
+
+function statusFromSubscription(
+  sub: SubscriptionStatusV2 | null | undefined
+): MemberStatus {
+  if (sub === 'paid') return 'active'
+  if (sub === 'cancelled') return 'inactive'
+  return 'pending'
+}
+
 interface MemberCoreRow {
   id: string
   name: string
   ref_code: string
-  status: MemberStatus
+  subscription_status: SubscriptionStatusV2 | null
   sponsor_id: string | null
 }
 
@@ -32,7 +45,7 @@ interface DirectReportRow {
   id: string
   name: string
   ref_code: string
-  status: MemberStatus
+  subscription_status: SubscriptionStatusV2 | null
   created_at: string
 }
 
@@ -44,7 +57,7 @@ export async function getMemberNetworkV2(
   // 1) Carrega o membro logado (filtra por id pra evitar exposição de dados alheios)
   const { data: member, error: memberError } = await supabase
     .from('members')
-    .select('id, name, ref_code, status, sponsor_id')
+    .select('id, name, ref_code, subscription_status, sponsor_id')
     .eq('id', memberId)
     .single<MemberCoreRow>()
 
@@ -58,16 +71,18 @@ export async function getMemberNetworkV2(
   if (member.sponsor_id) {
     const { data: sponsorRow } = await supabase
       .from('members')
-      .select('id, name, ref_code, status')
+      .select('id, name, ref_code, subscription_status')
       .eq('id', member.sponsor_id)
-      .single<Pick<MemberCoreRow, 'id' | 'name' | 'ref_code' | 'status'>>()
+      .single<
+        Pick<MemberCoreRow, 'id' | 'name' | 'ref_code' | 'subscription_status'>
+      >()
 
     if (sponsorRow) {
       sponsor = {
         id: sponsorRow.id,
         name: sponsorRow.name,
         ref_code: sponsorRow.ref_code,
-        status: sponsorRow.status,
+        status: statusFromSubscription(sponsorRow.subscription_status),
         is_house_account: sponsorRow.id === HOUSE_ACCOUNT_ID,
       }
     }
@@ -76,7 +91,7 @@ export async function getMemberNetworkV2(
   // 3) Carrega indicados diretos N1 (sem recursão).
   const { data: directReportsRows } = await supabase
     .from('members')
-    .select('id, name, ref_code, status, created_at')
+    .select('id, name, ref_code, subscription_status, created_at')
     .eq('sponsor_id', member.id)
     .order('created_at', { ascending: false })
     .returns<DirectReportRow[]>()
@@ -85,7 +100,7 @@ export async function getMemberNetworkV2(
     id: r.id,
     name: r.name,
     ref_code: r.ref_code,
-    status: r.status,
+    status: statusFromSubscription(r.subscription_status),
     created_at: r.created_at,
   }))
 
@@ -95,7 +110,7 @@ export async function getMemberNetworkV2(
       id: member.id,
       name: member.name,
       ref_code: member.ref_code,
-      status: member.status,
+      status: statusFromSubscription(member.subscription_status),
     },
     sponsor,
     direct_reports: directReports,
