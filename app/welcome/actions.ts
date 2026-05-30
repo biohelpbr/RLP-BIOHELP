@@ -5,10 +5,7 @@ import {
   createServerSupabaseClient,
   createServiceClient,
 } from "@/lib/supabase/server"
-import {
-  extendSubscription,
-  markSubscriptionPaid,
-} from "@/lib/subscriptions/actions"
+import { markSubscriptionPaid } from "@/lib/subscriptions/actions"
 import {
   getMemberByExternalId,
   type MemberRow,
@@ -17,17 +14,25 @@ import {
 /**
  * F-V19 RF-5 — /welcome claim.
  *
- * Cobre 2 caminhos:
- *   • Webhook Guru já chegou (member.status='paid'): só cria auth.user (se preciso)
- *     + gera magic link.
- *   • Webhook ainda não chegou (member.status='pending'): markSubscriptionPaid +
- *     extendSubscription antes do auth.user + magic link. Race com webhook é OK
- *     porque markSubscriptionPaid é idempotente; a única consequência é que
- *     o sponsor recompute F-V18 pode rodar 2x (idempotente).
+ * Responsabilidade do /welcome: garantir sessão logada na hora (UX pós-checkout).
+ *   1. Localiza o member (por external_id/utm_term ou email).
+ *   2. markSubscriptionPaid (idempotente) — só pra liberar o dashboard na hora.
+ *   3. Cria auth.user (se preciso) + estabelece sessão via verifyOtp.
+ *
+ * O que o /welcome NÃO faz (de propósito): estender a assinatura, pagar comissão
+ * de ativação, sincronizar Shopify e disparar CRM. Tudo isso é responsabilidade
+ * EXCLUSIVA do webhook do Guru (app/api/webhooks/guru/route.ts, case
+ * subscription_activated), keyed no subscription_id REAL do Guru, pra acontecer
+ * exatamente 1x por ativação — mesmo no caminho normal em que o /welcome roda
+ * ANTES do webhook chegar. (Antes, o /welcome estendia a assinatura e o webhook
+ * estendia de novo → dobro; e a comissão, gated em paid.changed, era perdida
+ * porque o /welcome já consumia a transição pending→paid.)
+ *
+ * Estado degradado conhecido: se o webhook nunca chegar, o member fica `paid`
+ * (UX OK) mas SEM extensão/comissão/Shopify/CRM. Não é "broken" — é detectável
+ * pelo log [welcome] abaixo + ausência do evento em guru_webhook_events.
  *
  * Não dispara notification subscription_paid daqui — o webhook é quem faz isso.
- * Se welcome rodar antes do webhook, a notification só aparece quando o webhook
- * chegar (poucos segundos depois).
  */
 
 export type ClaimResult =
@@ -72,18 +77,18 @@ export async function claimPreRegistration(input: ClaimInput): Promise<ClaimResu
     return { ok: false, error: "Member sem email cadastrado. Contate o suporte." }
   }
 
-  // Garante paid + expires (idempotente se o webhook já tiver chegado).
+  // Só marca paid (idempotente) pra liberar o dashboard na hora. Extensão,
+  // comissão, Shopify e CRM são donos EXCLUSIVOS do webhook (ver JSDoc).
   if (member.subscription_status !== "paid") {
     const paid = await markSubscriptionPaid(member.id)
     if (!paid.ok) {
       console.error("[claimPreRegistration] markPaid failed", paid)
       return { ok: false, error: "Erro ao ativar assinatura. Tente recarregar a página." }
     }
-    const ext = await extendSubscription(member.id, 1)
-    if (!ext.ok) {
-      console.error("[claimPreRegistration] extend failed", ext)
-      return { ok: false, error: "Assinatura ativa mas sem data de expiração. Suporte." }
-    }
+    console.info(
+      "[welcome] paid set for UX; extension/commission/sync depend on webhook",
+      { memberId: member.id },
+    )
   }
 
   const admin = createAdminClient()

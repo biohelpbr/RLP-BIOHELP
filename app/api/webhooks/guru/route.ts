@@ -313,8 +313,12 @@ export async function POST(req: NextRequest) {
         if (!ext.ok) throw new Error(`extendSubscription: ${"error" in ext ? ext.error : "fail"}`)
 
         // Comissão fixa por ativação: R$80 (≤20 ativos) ou R$40 (>20).
-        // Só dispara se paid.changed (idempotente — não duplica comissão em replay).
-        if (paid.changed && member.sponsor_id) {
+        // Gated só em member.sponsor_id (NÃO em paid.changed): a proteção contra
+        // duplicata é o dedup no topo do case (guru_subscriber_id === subscription_id).
+        // calculateActivationCommission NÃO tem dedup próprio, então depender de
+        // paid.changed perdia a comissão quando o /welcome marcava paid antes do
+        // webhook chegar (caminho normal). O dedup do topo garante 1x por ativação.
+        if (member.sponsor_id) {
           const { calculateActivationCommission } = await import("@/lib/commissions-v2/calculate-activation")
           const commResult = await calculateActivationCommission(
             member.sponsor_id as string,
@@ -344,10 +348,11 @@ export async function POST(req: NextRequest) {
           action: "activated",
         })
 
-        // F-V20: "virou_cliente" pro CRM Absolut só na 1ª ativação efetiva
-        // (paid.changed — idempotente, não redispara em replay). non-fatal e
-        // gated. ref_code do sponsor segue o mesmo padrão de query do syncToShopify.
-        if (paid.changed) {
+        // F-V20: "virou_cliente" pro CRM Absolut na 1ª ativação efetiva. Mesmo
+        // motivo da comissão: gated pelo dedup do topo do case (não por
+        // paid.changed), pra não ser perdido quando o /welcome marca paid antes
+        // do webhook. non-fatal e gated por CRM_ABSOLUT_LIVE dentro de sendToAbsolut.
+        {
           let sponsorRefCode: string | null = null
           if (member.sponsor_id) {
             const { data: sponsorRow } = await supabase
