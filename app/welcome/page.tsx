@@ -36,7 +36,10 @@ function WelcomeInner() {
   const router = useRouter()
   const externalId = params.get("external_id")
   const tx = params.get("tx")
-  const email = params.get("email")
+  // Guru substitui [contact_email] no redirect SEM URL-encode, então o `+` de
+  // aliases (ex: nome+test@dominio.com) chega como espaço ao parser. Email nunca
+  // tem espaço válido → restaurar `+` evita o lookup falhar por causa do alias.
+  const email = params.get("email")?.replace(/ /g, "+") ?? null
 
   const [status, setStatus] = React.useState<"loading" | "error">("loading")
   const [errorMsg, setErrorMsg] = React.useState<string>("")
