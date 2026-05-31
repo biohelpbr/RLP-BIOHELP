@@ -23,7 +23,7 @@ async function loadFinance() {
 
   const [{ data: payouts }, { data: balances }, salesRes] = await Promise.all([
     supabase.from("payout_requests").select("payout_method, status, gross_amount, net_amount, created_at"),
-    supabase.from("commission_balances").select("balance_total, balance_pending, balance_available"),
+    supabase.from("commission_balances").select("total_earned, pending_balance, available_balance"),
     supabase
       .from("member_sales")
       .select("paid_amount")
@@ -61,11 +61,11 @@ async function loadFinance() {
       0,
     ),
     balanceAvailable: (balances || []).reduce(
-      (s: number, b: { balance_available: number }) => s + (Number(b.balance_available) || 0),
+      (s: number, b: { available_balance: number }) => s + (Number(b.available_balance) || 0),
       0,
     ),
     balanceTotal: (balances || []).reduce(
-      (s: number, b: { balance_total: number }) => s + (Number(b.balance_total) || 0),
+      (s: number, b: { total_earned: number }) => s + (Number(b.total_earned) || 0),
       0,
     ),
     salesMonth: (salesRes.data || []).reduce(

@@ -44,7 +44,11 @@ export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
   const supabase = createServiceClient()
 
   const [membersRes, payoutsRes, salesRes, tagsRes, founderRes] = await Promise.all([
-    supabase.from("members").select("status, created_at"),
+    // F-V03: a fonte de verdade de "ativo" é subscription_status (paid|pending|
+    // cancelled), não o campo legado `status`. Traduzimos pro vocabulário legado
+    // (active|pending|inactive) — mesma regra de lib/admin/community.ts — pra
+    // bater com /admin/community. Antes lia `status` e mostrava "Ativos: 0".
+    supabase.from("members").select("subscription_status, created_at"),
     supabase
       .from("payout_requests")
       .select("status, amount"),
@@ -73,13 +77,21 @@ export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
   const members = membersRes.data ?? []
   const monthStart = monthStartDate()
 
+  // subscription_status (v2) → vocabulário legado exibido na UI (igual community).
+  const SUB_TO_LEGACY: Record<string, string> = {
+    paid: "active",
+    pending: "pending",
+    cancelled: "inactive",
+  }
+
   const breakdown = new Map<string, number>()
   let active = 0
   let pending = 0
   let inactive = 0
   let newThisMonth = 0
   for (const m of members) {
-    const s = (m.status as string | null) ?? "unknown"
+    const sub = (m.subscription_status as string | null) ?? "pending"
+    const s = SUB_TO_LEGACY[sub] ?? "pending"
     breakdown.set(s, (breakdown.get(s) ?? 0) + 1)
     if (s === "active") active++
     else if (s === "pending") pending++

@@ -246,7 +246,10 @@ export async function createPreRegistration(
     utm_campaign: sponsor.ref_code,
     utm_term: token,
   })
-  const guruRedirectUrl = `https://clkdmg.site/subscribe/${offerId}?${params.toString()}`
+  // Domínio custom do checkout Guru (CNAME → clkdmg.site). Configurável via env
+  // pra sobreviver a uma futura troca de domínio do Guru sem deploy de código.
+  const guruCheckoutBase = process.env.GURU_CHECKOUT_BASE_URL ?? "https://checkout.bio-help.com"
+  const guruRedirectUrl = `${guruCheckoutBase}/subscribe/${offerId}?${params.toString()}`
 
   return {
     ok: true,
