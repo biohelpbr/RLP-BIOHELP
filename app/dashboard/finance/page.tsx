@@ -12,18 +12,15 @@ import {
   type PayoutRequestRow,
 } from "@/lib/payouts/v2/queries"
 import { PAYOUT_METHOD_LABELS } from "@/lib/payouts/v2/schema"
-import {
-  getMemberCommissionTier,
-  COMMISSION_TIERS,
-} from "@/lib/commissions-v2/tier"
 import { FinanceClient } from "./FinanceClient"
 
 /**
- * `/dashboard/finance` — F-V05 (saldo + créditos) + F-V07 (triple resgate).
+ * `/dashboard/finance` — F-V05 (saldo + créditos) + F-V07 (triple resgate)
+ *   + F-V20 (alinhado à Política Financeira Nutrition Club + Lovable UI).
  *
- * Server Component. Rota nova v2-only — flag OFF redireciona pro dashboard.
- * Carrega saldo via RPC `get_available_balance` e histórico de payout_requests.
- * Dialog de resgate em client component (FinanceClient).
+ * Server Component. Carrega saldo via RPC `get_available_balance` + histórico
+ * de payout_requests + dados bancários cadastrados em members (autopreenchem
+ * o WithdrawDialog).
  */
 const fmtBRL = (n: number) =>
   n.toLocaleString("pt-BR", {
@@ -33,13 +30,13 @@ const fmtBRL = (n: number) =>
   })
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: "Pendente",
+  pending: "Em análise",
   awaiting_document: "Aguardando documento",
   under_review: "Em análise",
   approved: "Aprovado",
   processing: "Em processamento",
-  completed: "Concluído",
-  rejected: "Rejeitado",
+  completed: "Pago",
+  rejected: "Recusado",
   cancelled: "Cancelado",
 }
 
@@ -62,19 +59,34 @@ export default async function FinancePage() {
   const member = await getCurrentMember()
   if (!member) redirect("/login")
 
-  const [balance, payouts, tierInfo] = await Promise.all([
+  const [balance, payouts] = await Promise.all([
     getMemberBalance(member.id),
     listMemberPayouts(member.id),
-    getMemberCommissionTier(member.id),
   ])
 
+  const bankData = {
+    person_type: (member.person_type ?? null) as "pf" | "pj" | null,
+    holder_name: member.bank_holder_name ?? null,
+    document_number: member.document_number ?? null,
+    bank_name: member.bank_name ?? null,
+    bank_agency: member.bank_agency ?? null,
+    bank_account: member.bank_account ?? null,
+    pix_key: member.bank_pix_key ?? null,
+    contact_phone: member.bank_contact_phone ?? null,
+    bank_data_updated_at: member.bank_data_updated_at ?? null,
+  }
+
   return (
-    <PartnerShell memberName={member.name} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
+    <PartnerShell
+      memberName={member.name}
+      isActive={member.subscription_status === "paid"}
+      memberSubtitle={getMemberSubtitle(member)}
+    >
       <div className="space-y-6">
         <header className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">Resultado &amp; Resgate</h1>
           <p className="text-muted-foreground">
-            Acompanhe seu saldo e converta em crédito ou cash.
+            Seu centro financeiro: resultado do mês, liberações e antecipação.
           </p>
         </header>
 
@@ -82,14 +94,14 @@ export default async function FinancePage() {
           <BHStat
             label="Disponível"
             value={fmtBRL(balance.available_for_withdrawal)}
-            subtitle="Pronto para resgate"
+            subtitle="Liberado para resgate imediato"
             icon={<Wallet className="w-5 h-5" />}
             variant="primary"
           />
           <BHStat
             label="Pendente (Net-15)"
             value={fmtBRL(balance.pending_balance)}
-            subtitle="Aguardando liberação"
+            subtitle="Fechamento dia 1º; liberado até dia 10"
             icon={<Clock className="w-5 h-5" />}
             variant="warning"
           />
@@ -104,70 +116,8 @@ export default async function FinancePage() {
 
         <FinanceClient
           available={balance.available_for_withdrawal}
-          tier={{
-            label: tierInfo.tier.label,
-            gross_rate: tierInfo.gross_rate,
-            net_rate: tierInfo.net_rate,
-            active_referrals: tierInfo.active_referrals,
-          }}
+          bankData={bankData}
         />
-
-        <BHCard variant="default" className="space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <h2 className="text-lg font-semibold">Sua taxa de comissão</h2>
-              <p className="text-sm text-muted-foreground">
-                Tier <span className="font-medium">{tierInfo.tier.label}</span> ·
-                {" "}
-                {tierInfo.active_referrals}{" "}
-                {tierInfo.active_referrals === 1
-                  ? "afiliada ativa"
-                  : "afiliadas ativas"}
-                {" · "}
-                {(tierInfo.gross_rate * 100).toFixed(0)}% bruto (
-                {(tierInfo.net_rate * 100).toFixed(1)}% líquido)
-              </p>
-            </div>
-            <span className="text-xs text-muted-foreground italic">
-              Modelo em refinamento — bônus por consumo médio em definição
-            </span>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-            {COMMISSION_TIERS.map((t) => {
-              const isCurrent =
-                tierInfo.active_referrals >= t.min_referrals &&
-                (t.max_referrals === null ||
-                  tierInfo.active_referrals <= t.max_referrals)
-              const range =
-                t.max_referrals === null
-                  ? `${t.min_referrals}+`
-                  : `${t.min_referrals}-${t.max_referrals}`
-              return (
-                <div
-                  key={t.label}
-                  className={
-                    isCurrent
-                      ? "rounded-lg border-2 border-primary bg-primary/10 p-3"
-                      : "rounded-lg border border-border bg-muted/30 p-3"
-                  }
-                >
-                  <p className="text-xs font-semibold text-foreground">
-                    {t.label}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {range} afiliadas
-                  </p>
-                  <p className="text-sm font-bold text-foreground mt-1">
-                    {(t.gross_rate * 100).toFixed(0)}%
-                    <span className="text-xs font-normal text-muted-foreground ml-1">
-                      bruto
-                    </span>
-                  </p>
-                </div>
-              )
-            })}
-          </div>
-        </BHCard>
 
         <BHCard variant="default" className="space-y-3">
           <div className="flex items-center justify-between">
@@ -176,38 +126,59 @@ export default async function FinancePage() {
               {payouts.length} {payouts.length === 1 ? "pedido" : "pedidos"}
             </span>
           </div>
+
           {payouts.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
               Você ainda não pediu nenhum resgate.
             </p>
           ) : (
-            <ul className="space-y-2">
-              {payouts.map((p: PayoutRequestRow) => (
-                <li
-                  key={p.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-3"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium text-foreground">
-                      {p.payout_method
-                        ? PAYOUT_METHOD_LABELS[p.payout_method]
-                        : "Resgate"}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {fmtDate(p.created_at)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-foreground">
-                      {fmtBRL(Number(p.amount))}
-                    </span>
-                    <Badge variant={STATUS_BADGE[p.status] ?? "outline"}>
-                      {STATUS_LABEL[p.status] ?? p.status}
-                    </Badge>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="text-left py-2 font-semibold">Data</th>
+                    <th className="text-left py-2 font-semibold">Modalidade</th>
+                    <th className="text-right py-2 font-semibold">Bruto</th>
+                    <th className="text-right py-2 font-semibold">Descontos</th>
+                    <th className="text-right py-2 font-semibold">Líquido</th>
+                    <th className="text-right py-2 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payouts.map((p: PayoutRequestRow) => {
+                    const gross = Number(p.gross_amount ?? p.amount)
+                    const net = Number(p.net_amount ?? p.amount)
+                    const discounts = Math.max(0, Number((gross - net).toFixed(2)))
+                    return (
+                      <tr
+                        key={p.id}
+                        className="border-t border-border last:border-b-0"
+                        data-testid="payout-row"
+                      >
+                        <td className="py-2">{fmtDate(p.created_at)}</td>
+                        <td className="py-2 text-foreground">
+                          {p.payout_method
+                            ? PAYOUT_METHOD_LABELS[p.payout_method]
+                            : "Resgate"}
+                        </td>
+                        <td className="py-2 text-right">{fmtBRL(gross)}</td>
+                        <td className="py-2 text-right text-destructive">
+                          {discounts > 0 ? `-${fmtBRL(discounts)}` : "—"}
+                        </td>
+                        <td className="py-2 text-right font-medium">
+                          {fmtBRL(net)}
+                        </td>
+                        <td className="py-2 text-right">
+                          <Badge variant={STATUS_BADGE[p.status] ?? "outline"}>
+                            {STATUS_LABEL[p.status] ?? p.status}
+                          </Badge>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </BHCard>
       </div>

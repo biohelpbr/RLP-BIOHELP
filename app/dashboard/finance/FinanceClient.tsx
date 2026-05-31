@@ -1,20 +1,25 @@
 "use client"
 
 import * as React from "react"
-import { Sparkles } from "lucide-react"
+import { HelpCircle, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { BHCard, WithdrawDialog } from "@/components/biohelp"
+import { BHCard, PayoutRulesDialog, WithdrawDialog } from "@/components/biohelp"
 
-interface TierInfo {
-  label: string
-  gross_rate: number
-  net_rate: number
-  active_referrals: number
+interface MemberBankSnapshot {
+  person_type: "pf" | "pj" | null
+  holder_name: string | null
+  document_number: string | null
+  bank_name: string | null
+  bank_agency: string | null
+  bank_account: string | null
+  pix_key: string | null
+  contact_phone: string | null
+  bank_data_updated_at: string | null
 }
 
 interface FinanceClientProps {
   available: number
-  tier?: TierInfo
+  bankData?: MemberBankSnapshot
 }
 
 const fmtBRL = (n: number) =>
@@ -24,8 +29,9 @@ const fmtBRL = (n: number) =>
     minimumFractionDigits: 2,
   })
 
-export function FinanceClient({ available, tier }: FinanceClientProps) {
+export function FinanceClient({ available, bankData }: FinanceClientProps) {
   const [open, setOpen] = React.useState(false)
+  const [rulesOpen, setRulesOpen] = React.useState(false)
   const canWithdraw = available > 0
 
   return (
@@ -36,34 +42,40 @@ export function FinanceClient({ available, tier }: FinanceClientProps) {
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Pronto pra resgatar?</h2>
+            <h2 className="text-lg font-semibold">Pronto para resgatar?</h2>
             <p className="text-sm text-muted-foreground">
-              Escolha PIX (CNPJ + NF), Cashback Cashin (sem NF) ou crédito 1:1
-              na loja Biohelp.
+              Crédito na loja (recomendado, sem custo) ou saque PF (RPA) / PJ (NF)
+              a partir de {fmtBRL(500)}.
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Disponível: {fmtBRL(available)}
-              {tier ? (
-                <>
-                  {" · "}
-                  Taxa atual {(tier.gross_rate * 100).toFixed(0)}% bruto (
-                  {(tier.net_rate * 100).toFixed(1)}% líquido após imposto)
-                </>
-              ) : null}
             </p>
           </div>
         </div>
-        <Button onClick={() => setOpen(true)} disabled={!canWithdraw}>
-          {canWithdraw ? "Solicitar resgate" : "Sem saldo disponível"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setRulesOpen(true)}
+            className="inline-flex items-center gap-1.5"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            Regras
+          </Button>
+          <Button onClick={() => setOpen(true)} disabled={!canWithdraw}>
+            {canWithdraw ? "Resgatar" : "Sem saldo disponível"}
+          </Button>
+        </div>
       </BHCard>
 
       <WithdrawDialog
         open={open}
         onOpenChange={setOpen}
         available={available}
-        tier={tier}
+        bankData={bankData}
       />
+
+      <PayoutRulesDialog open={rulesOpen} onOpenChange={setRulesOpen} />
     </>
   )
 }

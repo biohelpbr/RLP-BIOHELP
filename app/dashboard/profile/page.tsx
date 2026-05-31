@@ -1,6 +1,14 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, AtSign, Crown, Hash, Phone, User as UserIcon } from "lucide-react"
+import {
+  ArrowLeft,
+  AtSign,
+  CreditCard,
+  Crown,
+  Hash,
+  Phone,
+  User as UserIcon,
+} from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberNetworkV2 } from "@/lib/network/v2"
@@ -8,6 +16,7 @@ import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHAvatar, BHCard } from "@/components/biohelp"
 import { ProfileEditForm } from "./ProfileEditForm"
+import { BankDataForm } from "./BankDataForm"
 
 /**
  * `/dashboard/profile` — Meu Perfil v2 (read-only em S1).
@@ -96,6 +105,36 @@ export default async function ProfilePage() {
           <ProfileEditForm
             initialName={member.name ?? ""}
             initialPhone={member.phone ?? ""}
+          />
+        </BHCard>
+
+        <BHCard
+          variant="default"
+          className="space-y-4"
+          id="dados-bancarios"
+        >
+          <div className="flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Dados Bancários
+            </h2>
+          </div>
+          <p className="text-sm text-muted-foreground -mt-2">
+            Pagamentos são feitos apenas para a conta do próprio titular cadastrado.
+            Necessário para resgates via PF (RPA) ou PJ (NF).
+          </p>
+          <BankDataForm
+            initial={{
+              person_type: (member.person_type ?? null) as "pf" | "pj" | null,
+              holder_name: member.bank_holder_name ?? null,
+              document_number: member.document_number ?? null,
+              bank_name: member.bank_name ?? null,
+              bank_agency: member.bank_agency ?? null,
+              bank_account: member.bank_account ?? null,
+              pix_key: member.bank_pix_key ?? null,
+              contact_phone: member.bank_contact_phone ?? null,
+              bank_data_updated_at: member.bank_data_updated_at ?? null,
+            }}
           />
         </BHCard>
 
