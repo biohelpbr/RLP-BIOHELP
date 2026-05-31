@@ -3,6 +3,10 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-05-31
+
+- [2026-05-31] [RELEASE] F-V20 implementada (Classe D) — refator de Resgate alinhado à Política Financeira Nutrition Club + UI Lovable. Migration `20260531_f-v20-member-bank-data.sql` (10 colunas em members + constraint + índice) aplicada via Supabase MCP idempotente. Modalidades renomeadas (Crédito loja/PF RPA/PJ NF), taxa fixa R$ 7,50, mínimo R$ 500 PF+PJ, INSS+IRRF só PF, modal "Regras do Resgate" novo, dados bancários movidos pro /profile (autopreenche dialog), snapshot bancário em payout_requests, janela 7d após alterar dados bancários. CI N1 verde. Branch `feat/F-V20-politica-financeira-lovable` commit `de7e351`. Pendente: E2E em sessão separada (prompt em SPEC).
+
 ## 2026-05-25
 
 - [2026-05-25] [RELEASE] F-V19 implementada — fluxo pré-cadastro Guru → LRP → Shopify completo. 14/16 CAs verdes, 2 parciais (CA-13 static, CA-14 indireto). Branch `feat/F-V19-fluxo-guru-pre-cadastro` com 3 commits de código + 1 commit docs. Pendente: merge em main após review + Guru real live (credenciais recebidas, runbook pronto). Follow-ups: dashboard v2 ler `subscription_status` em vez de `status` legado; CA-13/14 fechar em QA pré-produção.
