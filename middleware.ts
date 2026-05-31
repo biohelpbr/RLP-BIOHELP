@@ -56,6 +56,14 @@ export async function middleware(request: NextRequest) {
   const isAdminDomain = hostname.startsWith('admin.')
   const isPainelDomain = hostname.startsWith('painel.')
 
+  // Parceira autenticada (não-admin) que o guard de /admin jogou pra /dashboard:
+  // no domínio admin, /dashboard cairia de volta em /admin (regra abaixo), o guard
+  // de novo em /dashboard → loop (ERR_TOO_MANY_REDIRECTS). Manda pro painel (host
+  // absoluto) pra quebrar o ciclo. Só afeta admin.bio-help.com (isAdminDomain).
+  if (isAdminDomain && pathname === '/dashboard' && user) {
+    return NextResponse.redirect(new URL('/dashboard', 'https://painel.bio-help.com'))
+  }
+
   if (isAdminDomain && !pathname.startsWith('/admin') && pathname !== '/login' && !pathname.startsWith('/auth/') && pathname !== '/welcome') {
     return NextResponse.redirect(new URL('/admin', request.url))
   }
