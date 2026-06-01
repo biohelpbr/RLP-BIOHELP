@@ -17,6 +17,9 @@ export default function V2Login() {
   const [activeTab, setActiveTab] = React.useState<"partner" | "admin">("partner")
   const [email, setEmail] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
+  // Quando o gate /api/auth/check-email bloqueia, guardamos a URL do Guru
+  // pra renderizar um CTA "Assinar agora" no lugar do erro genérico.
+  const [subscribeUrl, setSubscribeUrl] = React.useState<string | null>(null)
   const [loading, setLoading] = React.useState(false)
   const [sent, setSent] = React.useState(false)
   const [code, setCode] = React.useState("")
@@ -45,12 +48,36 @@ export default function V2Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setSubscribeUrl(null)
     setLoading(true)
     try {
+      // Gate server-side: só envia OTP se o e-mail pertencer a um member
+      // com subscription_status='paid'. Evita Supabase OTP para emails
+      // não-cadastrados e força fluxo de checkout no Guru.
+      const normalized = email.trim().toLowerCase()
+      const gateRes = await fetch("/api/auth/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalized }),
+      })
+      const gate = await gateRes.json().catch(() => ({}))
+      if (!gateRes.ok || !gate?.ok) {
+        if (gate?.code === "NOT_PAID" && gate?.subscribe_url) {
+          setSubscribeUrl(gate.subscribe_url)
+          setError(
+            "E-mail não encontrado. Você precisa fazer o cadastro e assinar o Nutrition Club para acessar o painel.",
+          )
+        } else {
+          setError(gate?.message || "Não foi possível validar o e-mail.")
+        }
+        setLoading(false)
+        return
+      }
+
       const supabase = createClientSupabase()
       const adminFlow = isAdminLoginPath()
       const { error: otpError } = await supabase.auth.signInWithOtp({
-        email: email.trim().toLowerCase(),
+        email: normalized,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback?next=${
             adminFlow ? "/admin" : "/dashboard"
@@ -195,8 +222,19 @@ export default function V2Login() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive space-y-3">
+                <p>{error}</p>
+                {subscribeUrl && (
+                  <a
+                    href={subscribeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center w-full h-10 rounded-lg bh-gradient-purple text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+                  >
+                    Assinar agora
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </a>
+                )}
               </div>
             )}
 
@@ -211,7 +249,11 @@ export default function V2Login() {
                   type="email"
                   placeholder="seu@email.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (error) setError(null)
+                    if (subscribeUrl) setSubscribeUrl(null)
+                  }}
                   className="pl-10 h-12 rounded-xl"
                   required
                   disabled={loading}
