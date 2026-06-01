@@ -23,12 +23,24 @@ export default function V2Login() {
   const [verifying, setVerifying] = React.useState(false)
 
   // F-V19 follow-up (hotfix 01/06): se o login foi iniciado em /admin-login,
-  // o destino correto é /admin, não /dashboard. Sem isso, admin caía em
-  // /dashboard no admin domain, era redirecionado pra painel.bio-help.com
-  // pelo middleware anti-loop, e enxergava a UI de parceira (member row).
+  // o destino correto é /admin, não /dashboard.
   const isAdminLoginPath = () =>
     typeof window !== "undefined" &&
     window.location.pathname.startsWith("/admin-login")
+
+  // Se o usuário abriu /admin-login no painel.bio-help.com (URL errada),
+  // redireciona pra admin.bio-help.com/admin-login ANTES do login, evitando
+  // que a sessão seja criada no domínio errado. Sem efeito em localhost/preview.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!isAdminLoginPath()) return
+    if (window.location.hostname.startsWith("painel.")) {
+      window.location.replace(
+        `https://admin.bio-help.com${window.location.pathname}${window.location.search}`,
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,11 +90,12 @@ export default function V2Login() {
         setVerifying(false)
         return
       }
-      // Sessão gravada em cookie pelo client @supabase/ssr → segue pro destino
-      // correto conforme origem do login (admin ou parceira).
+      // Sessão gravada em cookie pelo client @supabase/ssr. Usamos full-page
+      // navigation (window.location.assign) em vez de router.replace pra
+      // garantir que o middleware revê com a sessão atualizada e não race com
+      // o cookie ainda não propagado.
       const destination = isAdminLoginPath() ? "/admin" : "/dashboard"
-      router.refresh()
-      router.replace(destination)
+      window.location.assign(destination)
     } catch (err) {
       console.error("[V2Login] verify error", err)
       setError("Erro de conexão. Tente novamente.")
