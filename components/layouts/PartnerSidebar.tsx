@@ -9,7 +9,6 @@ import {
   ExternalLink,
   GraduationCap,
   LayoutDashboard,
-  LogIn,
   LogOut,
   Menu,
   ShoppingBag,
@@ -31,13 +30,9 @@ interface NavItem {
   external?: boolean
 }
 
-const SHOP_LOGIN_URL =
-  process.env.NEXT_PUBLIC_SHOPIFY_ACCOUNT_URL || "https://account.bio-help.com"
-
 const partnerNavItems: NavItem[] = [
   { title: "Visão Geral", href: "/dashboard", icon: LayoutDashboard },
   { title: "Acesso à Loja", href: "/dashboard/store", icon: ShoppingCart, matchStart: true },
-  { title: "Login na Loja", href: SHOP_LOGIN_URL, icon: LogIn, external: true },
   { title: "Academy", href: "/dashboard/academy", icon: GraduationCap, matchStart: true },
   { title: "Minhas Vendas", href: "/dashboard/orders", icon: ShoppingBag, matchStart: true },
   { title: "Minha Comunidade", href: "/dashboard/club", icon: Users, matchStart: true },
