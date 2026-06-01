@@ -122,6 +122,9 @@ export function WithdrawDialog({
   const [rulesOpen, setRulesOpen] = React.useState(false)
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null)
 
+  // Reset só na transição fechado→aberto. Se `available` mudasse junto, o
+  // banner de "Crédito gerado" (state local) seria apagado logo após o
+  // revalidatePath do server action (F-V20 E2E CA-21).
   React.useEffect(() => {
     if (open) {
       setAmount(available.toFixed(2).replace(".", ","))
@@ -129,7 +132,8 @@ export function WithdrawDialog({
       setInvoiceFile(null)
       setSuccessMsg(null)
     }
-  }, [open, available])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   const numericAmount =
     Number(amount.replace(/\./g, "").replace(",", ".")) || 0
