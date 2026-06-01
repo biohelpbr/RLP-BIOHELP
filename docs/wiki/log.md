@@ -3,6 +3,12 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-05-31
+
+- [2026-05-31] [BUGFIX] F-V20 CA-21 — banner `credit-success-msg` somia logo após render. Causa: `useEffect` de reset no `WithdrawDialog` tinha `available` nas deps; `revalidatePath` no server action mudava o saldo, re-disparava o effect e zerava `successMsg`. Fix: remover `available` das deps (reset só na transição fechado→aberto). E2E CLI reportou 21/22 PASS; este fix fecha o 22º. Commit `<after-fix>`.
+- [2026-05-31] [VALIDATION] E2E F-V20 rodado em sessão separada do Claude Code (via `E2E-PROMPT.md`) — 21 PASS / 1 FAIL / 0 SKIPPED. FAIL único era CA-21 (banner crédito, corrigido na mesma data). Resto verde: migration idempotente confirmada, breakdown PF=R$807,50 / PJ=R$992,50 / Crédito=R$50 corretos, persistência banco em members, janela 7d bloqueia saque, CTA bank-setup-prompt funciona. Relatório completo em `docs/sdd/features/F-V20-politica-financeira-lovable/E2E-RESULT.md`.
+- [2026-05-31] [RELEASE] F-V20 implementada (Classe D) — refator de Resgate alinhado à Política Financeira Nutrition Club + UI Lovable. Migration `20260531_f-v20-member-bank-data.sql` (10 colunas em members + constraint + índice) aplicada via Supabase MCP idempotente. Modalidades renomeadas (Crédito loja/PF RPA/PJ NF), taxa fixa R$ 7,50, mínimo R$ 500 PF+PJ, INSS+IRRF só PF, modal "Regras do Resgate" novo, dados bancários movidos pro /profile (autopreenche dialog), snapshot bancário em payout_requests, janela 7d após alterar dados bancários. CI N1 verde. Branch `feat/F-V20-politica-financeira-lovable` commit `de7e351`. Pendente: E2E em sessão separada (prompt em SPEC).
+
 ## 2026-05-25
 
 - [2026-05-25] [RELEASE] F-V19 implementada — fluxo pré-cadastro Guru → LRP → Shopify completo. 14/16 CAs verdes, 2 parciais (CA-13 static, CA-14 indireto). Branch `feat/F-V19-fluxo-guru-pre-cadastro` com 3 commits de código + 1 commit docs. Pendente: merge em main após review + Guru real live (credenciais recebidas, runbook pronto). Follow-ups: dashboard v2 ler `subscription_status` em vez de `status` legado; CA-13/14 fechar em QA pré-produção.

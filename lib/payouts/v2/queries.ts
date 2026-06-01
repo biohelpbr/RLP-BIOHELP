@@ -5,6 +5,9 @@ export type PayoutRequestRow = {
   id: string
   member_id: string
   amount: number
+  gross_amount: number | null
+  net_amount: number | null
+  tax_amount: number | null
   status: string
   payout_method: PayoutMethod | null
   created_at: string
@@ -53,7 +56,9 @@ export async function listMemberPayouts(memberId: string): Promise<PayoutRequest
   const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("payout_requests")
-    .select("id, member_id, amount, status, payout_method, created_at, updated_at")
+    .select(
+      "id, member_id, amount, gross_amount, net_amount, tax_amount, status, payout_method, created_at, updated_at",
+    )
     .eq("member_id", memberId)
     .order("created_at", { ascending: false })
     .limit(50)
@@ -65,5 +70,8 @@ export async function listMemberPayouts(memberId: string): Promise<PayoutRequest
   return (data ?? []).map((r) => ({
     ...r,
     amount: Number(r.amount ?? 0),
+    gross_amount: r.gross_amount == null ? null : Number(r.gross_amount),
+    net_amount: r.net_amount == null ? null : Number(r.net_amount),
+    tax_amount: r.tax_amount == null ? null : Number(r.tax_amount),
   })) as PayoutRequestRow[]
 }
