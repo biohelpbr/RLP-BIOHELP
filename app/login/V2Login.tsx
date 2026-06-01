@@ -22,16 +22,27 @@ export default function V2Login() {
   const [code, setCode] = React.useState("")
   const [verifying, setVerifying] = React.useState(false)
 
+  // F-V19 follow-up (hotfix 01/06): se o login foi iniciado em /admin-login,
+  // o destino correto é /admin, não /dashboard. Sem isso, admin caía em
+  // /dashboard no admin domain, era redirecionado pra painel.bio-help.com
+  // pelo middleware anti-loop, e enxergava a UI de parceira (member row).
+  const isAdminLoginPath = () =>
+    typeof window !== "undefined" &&
+    window.location.pathname.startsWith("/admin-login")
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
       const supabase = createClientSupabase()
+      const adminFlow = isAdminLoginPath()
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: email.trim().toLowerCase(),
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${
+            adminFlow ? "/admin" : "/dashboard"
+          }`,
         },
       })
       if (otpError) {
@@ -67,9 +78,11 @@ export default function V2Login() {
         setVerifying(false)
         return
       }
-      // Sessão gravada em cookie pelo client @supabase/ssr → segue pro dashboard.
+      // Sessão gravada em cookie pelo client @supabase/ssr → segue pro destino
+      // correto conforme origem do login (admin ou parceira).
+      const destination = isAdminLoginPath() ? "/admin" : "/dashboard"
       router.refresh()
-      router.replace("/dashboard")
+      router.replace(destination)
     } catch (err) {
       console.error("[V2Login] verify error", err)
       setError("Erro de conexão. Tente novamente.")
