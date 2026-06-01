@@ -110,20 +110,59 @@ export async function getAuthUser() {
 }
 
 /**
- * Obtém o membro atual baseado no usuário autenticado
- * Retorna null se não autenticado ou membro não encontrado
+ * Obtém o membro atual baseado no usuário autenticado.
+ * Retorna null se não autenticado ou membro não encontrado.
+ *
+ * F-V19 hotfix 01/06: auto-linka por email se member existe mas auth_user_id
+ * está NULL. Cenário comum quando user vai direto pro /login sem passar pelo
+ * /welcome (que normalmente faz o link). Sem isso, /dashboard redireciona
+ * pra /login, /login redireciona pra /dashboard (user logado) → loop infinito
+ * (ERR_TOO_MANY_REDIRECTS).
  */
 export async function getCurrentMember() {
   const user = await getAuthUser()
   if (!user) return null
-  
+
   const supabase = createServiceClient()
-  const { data: member } = await supabase
+  let { data: member } = await supabase
     .from('members')
     .select('*')
     .eq('auth_user_id', user.id)
-    .single()
-  
+    .maybeSingle()
+
+  if (!member && user.email) {
+    const { data: byEmail } = await supabase
+      .from('members')
+      .select('*')
+      .eq('email', user.email.toLowerCase())
+      .maybeSingle()
+
+    if (byEmail && !byEmail.auth_user_id) {
+      const { error: linkErr } = await supabase
+        .from('members')
+        .update({ auth_user_id: user.id })
+        .eq('id', byEmail.id)
+      if (linkErr) {
+        console.error('[getCurrentMember] auto-link failed', linkErr)
+      } else {
+        console.info('[getCurrentMember] auto-linked member.auth_user_id', {
+          memberId: byEmail.id,
+          email: user.email,
+        })
+        byEmail.auth_user_id = user.id
+      }
+      member = byEmail
+    } else if (byEmail) {
+      // Member existe mas auth_user_id aponta pra outro user (incomum).
+      // Não auto-substitui pra evitar tomar conta alheia.
+      console.warn('[getCurrentMember] email match but auth_user_id conflict', {
+        memberId: byEmail.id,
+        expected: user.id,
+        stored: byEmail.auth_user_id,
+      })
+    }
+  }
+
   return member
 }
 
@@ -133,7 +172,7 @@ export async function getCurrentMember() {
 export async function isCurrentUserAdmin() {
   const user = await getAuthUser()
   if (!user) return false
-  
+
   const supabase = createServiceClient()
   const { data: member } = await supabase
     .from('members')
