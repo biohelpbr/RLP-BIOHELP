@@ -27,6 +27,9 @@ export default async function StorePage() {
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
   // F-V17 stub: login direto na conta Shopify do membro até SSO ficar pronto.
   const shopLoginUrl = process.env.NEXT_PUBLIC_SHOPIFY_ACCOUNT_URL || "https://account.bio-help.com"
+  // Página de cadastro Shopify — pra membro liberar o preço de custo nos produtos.
+  const shopRegisterUrl =
+    process.env.NEXT_PUBLIC_SHOPIFY_REGISTER_URL || `${shopUrl}/account/register`
   const isActive = member.status === "active"
 
   // Cada card linka para uma coleção real da loja Biohelp (verificado em
@@ -51,51 +54,43 @@ export default async function StorePage() {
           </p>
         </header>
 
-        <BHCard variant="gradient" className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <BHCard className="relative overflow-hidden border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/20">
+          <div className="absolute top-0 right-0 w-56 h-56 bg-primary/15 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-40 h-40 bg-accent/20 rounded-full translate-y-1/2 -translate-x-1/2" />
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-                <ShoppingCart className="w-6 h-6" />
+              <div className="w-14 h-14 rounded-xl bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 bh-shadow-md">
+                <ShoppingCart className="w-7 h-7" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold mb-1">Sua loja exclusiva</h2>
-                <p className="text-sm text-muted-foreground max-w-lg">
-                  Em breve você poderá comprar produtos com preço de membro,
-                  montar suas rotinas de consumo e fazer recompra rápida
-                  diretamente por aqui (F-V17 — SSO Shopify).
+                <h2 className="text-xl font-bold mb-1 text-foreground">Sua loja exclusiva</h2>
+                <p className="text-sm text-foreground/80 max-w-xl">
+                  Para liberar o <strong>preço de membro</strong> nos produtos da Biohelp,
+                  cadastre-se na loja com o mesmo e-mail do clube. Se já tem conta,
+                  faça login pra ver pedidos, endereços e fazer recompra rápida.
                 </p>
               </div>
             </div>
-            <Button asChild size="lg" className="flex-shrink-0">
-              <a href={shopUrl} target="_blank" rel="noopener noreferrer">
-                Ir para a loja Biohelp
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </a>
-            </Button>
-          </div>
-        </BHCard>
-
-        <BHCard className="relative overflow-hidden">
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent/30 text-accent-foreground flex items-center justify-center flex-shrink-0">
-                <LogIn className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold mb-1">Login na loja</h2>
-                <p className="text-sm text-muted-foreground max-w-lg">
-                  Já tem conta na loja Biohelp? Acesse sua conta para ver pedidos,
-                  endereços e fazer recompra rápida.
-                </p>
-              </div>
+            <div className="flex flex-col gap-2 flex-shrink-0 lg:w-64">
+              <Button asChild size="lg">
+                <a href={shopRegisterUrl} target="_blank" rel="noopener noreferrer">
+                  Cadastrar na loja
+                  <ExternalLink className="w-4 h-4 ml-2" />
+                </a>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <a href={shopLoginUrl} target="_blank" rel="noopener noreferrer">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Fazer login na loja
+                </a>
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <a href={shopUrl} target="_blank" rel="noopener noreferrer">
+                  Ir para a loja Biohelp
+                  <ExternalLink className="w-3.5 h-3.5 ml-2" />
+                </a>
+              </Button>
             </div>
-            <Button asChild size="lg" variant="outline" className="flex-shrink-0">
-              <a href={shopLoginUrl} target="_blank" rel="noopener noreferrer">
-                Fazer login na loja
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </a>
-            </Button>
           </div>
         </BHCard>
 
