@@ -248,7 +248,8 @@ export default function V1Dashboard() {
 
   const getInviteLink = () => {
     if (typeof window === 'undefined' || !member) return ''
-    return `${window.location.origin}/join?ref=${member.ref_code}`
+    // F-V19: usa landing nova /convite/<ref> (Guru redirect). /join é fallback V1.
+    return `${window.location.origin}/convite/${member.ref_code}`
   }
 
   const copyToClipboard = async () => {
@@ -538,7 +539,7 @@ export default function V1Dashboard() {
           
           <div className={styles.inviteLinkWrapper}>
             <div className={styles.inviteLink}>
-              {getInviteLink() || `${typeof window !== 'undefined' ? window.location.origin : ''}/join?ref=${displayMember.ref_code}`}
+              {getInviteLink() || `${typeof window !== 'undefined' ? window.location.origin : ''}/convite/${displayMember.ref_code}`}
             </div>
             <button onClick={copyToClipboard} className={styles.copyBtn}>
               {copied ? Icons.check : Icons.copy}

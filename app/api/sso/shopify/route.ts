@@ -97,8 +97,10 @@ export async function GET(request: NextRequest) {
   if (!result.ok) {
     if (result.reason === "member_not_found") {
       const ref = params.get("ref")
-      const joinUrl = ref ? `/join?ref=${encodeURIComponent(ref)}` : "/join"
-      return NextResponse.redirect(absoluteUrl(joinUrl))
+      // F-V19: SSO sem ref cai no /login (não tem rota /convite sem sponsor).
+      // Com ref, landing nova /convite/<ref> substitui /join V1.
+      const fallbackUrl = ref ? `/convite/${encodeURIComponent(ref)}` : "/login"
+      return NextResponse.redirect(absoluteUrl(fallbackUrl))
     }
     return NextResponse.redirect(
       absoluteUrl(`/login?error=${encodeURIComponent(result.reason)}`)

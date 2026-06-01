@@ -29,8 +29,11 @@ function buildInviteUrl(refCode: string): string {
   const base =
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://rlp-biohelp.vercel.app"
-  return `${base}/join?ref=${refCode}`
+    "https://painel.bio-help.com"
+  // F-V19: landing nova `/convite/<ref>` (com Guru redirect direto) substitui
+  // o `/join?ref=` legado V1 (form com senha). V1 mantido como fallback (/join
+  // ainda existe), mas o link distribuído é sempre o /convite.
+  return `${base}/convite/${refCode}`
 }
 
 /**
