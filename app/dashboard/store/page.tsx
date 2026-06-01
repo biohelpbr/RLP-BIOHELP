@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { ExternalLink, LogIn, ShoppingCart, Sparkles } from "lucide-react"
+import { AlertCircle, ExternalLink, LogIn, ShoppingCart, Sparkles } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
@@ -26,10 +26,10 @@ export default async function StorePage() {
   // Verificado em 13/05/2026: em Vercel a env pode existir mas estar vazia.
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
   // F-V17 stub: login direto na conta Shopify do membro até SSO ficar pronto.
+  // Cadastro na Shopify é AUTOMÁTICO via webhook Guru (syncCustomerToShopify),
+  // então o membro só precisa LOGAR com o mesmo email do clube — não tem CTA
+  // separado de "Cadastrar".
   const shopLoginUrl = process.env.NEXT_PUBLIC_SHOPIFY_ACCOUNT_URL || "https://account.bio-help.com"
-  // Página de cadastro Shopify — pra membro liberar o preço de custo nos produtos.
-  const shopRegisterUrl =
-    process.env.NEXT_PUBLIC_SHOPIFY_REGISTER_URL || `${shopUrl}/account/register`
   const isActive = member.status === "active"
 
   // Cada card linka para uma coleção real da loja Biohelp (verificado em
@@ -57,39 +57,43 @@ export default async function StorePage() {
         <BHCard className="relative overflow-hidden border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/20">
           <div className="absolute top-0 right-0 w-56 h-56 bg-primary/15 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-40 h-40 bg-accent/20 rounded-full translate-y-1/2 -translate-x-1/2" />
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 bh-shadow-md">
-                <ShoppingCart className="w-7 h-7" />
+          <div className="relative z-10 space-y-5">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-xl bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 bh-shadow-md">
+                  <ShoppingCart className="w-7 h-7" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold mb-1 text-foreground">Sua loja exclusiva</h2>
+                  <p className="text-sm text-foreground/80 max-w-xl">
+                    Acesse a loja Biohelp com pedidos, endereços e recompra rápida.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-bold mb-1 text-foreground">Sua loja exclusiva</h2>
-                <p className="text-sm text-foreground/80 max-w-xl">
-                  Para liberar o <strong>preço de membro</strong> nos produtos da Biohelp,
-                  cadastre-se na loja com o mesmo e-mail do clube. Se já tem conta,
-                  faça login pra ver pedidos, endereços e fazer recompra rápida.
-                </p>
+              <div className="flex flex-col gap-2 flex-shrink-0 lg:w-64">
+                <Button asChild size="lg">
+                  <a href={shopLoginUrl} target="_blank" rel="noopener noreferrer">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Fazer login na loja
+                  </a>
+                </Button>
+                <Button asChild size="sm" variant="ghost">
+                  <a href={shopUrl} target="_blank" rel="noopener noreferrer">
+                    Ir para a loja Biohelp
+                    <ExternalLink className="w-3.5 h-3.5 ml-2" />
+                  </a>
+                </Button>
               </div>
             </div>
-            <div className="flex flex-col gap-2 flex-shrink-0 lg:w-64">
-              <Button asChild size="lg">
-                <a href={shopRegisterUrl} target="_blank" rel="noopener noreferrer">
-                  Cadastrar na loja
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </a>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <a href={shopLoginUrl} target="_blank" rel="noopener noreferrer">
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Fazer login na loja
-                </a>
-              </Button>
-              <Button asChild size="sm" variant="ghost">
-                <a href={shopUrl} target="_blank" rel="noopener noreferrer">
-                  Ir para a loja Biohelp
-                  <ExternalLink className="w-3.5 h-3.5 ml-2" />
-                </a>
-              </Button>
+
+            <div className="flex items-start gap-3 rounded-xl border-2 border-bh-coral/50 bg-bh-coral-soft/60 p-4">
+              <AlertCircle className="w-6 h-6 text-bh-coral flex-shrink-0 mt-0.5" />
+              <p className="text-base font-semibold text-foreground leading-snug">
+                <span className="text-bh-coral">Importante:</span> pra ver o{" "}
+                <strong>preço de membro</strong>, é obrigatório fazer login na loja
+                com o <strong>mesmo e-mail que você usou no clube</strong>. Sem
+                isso, a loja mostra o preço cheio.
+              </p>
             </div>
           </div>
         </BHCard>
