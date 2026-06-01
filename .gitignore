@@ -42,4 +42,13 @@ docs/docs para cliente/biohelp-project.zip
 # Claude Code workspace files
 .claude/
 .playwright-mcp/
+.mcp.json
+
+# Test/E2E artefatos avulsos (screenshots, logs, scripts ad-hoc)
+test-f-v20-*
+test-*.mjs.tmp
+f-v20-*.png
+lovable-*.png
+lovable-*.md
+*-e2e.log
 
