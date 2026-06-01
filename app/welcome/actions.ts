@@ -6,10 +6,7 @@ import {
   createServiceClient,
 } from "@/lib/supabase/server"
 import { markSubscriptionPaid } from "@/lib/subscriptions/actions"
-import {
-  getMemberByExternalId,
-  type MemberRow,
-} from "@/lib/subscriptions/queries"
+import { findOrCreateMemberFromCheckout } from "@/lib/subscriptions/auto-create"
 
 /**
  * F-V19 RF-5 — /welcome claim.
@@ -43,6 +40,8 @@ interface ClaimInput {
   external_id?: string | null
   transaction_id?: string | null
   email?: string | null
+  name?: string | null
+  phone?: string | null
 }
 
 export async function claimPreRegistration(input: ClaimInput): Promise<ClaimResult> {
@@ -50,29 +49,24 @@ export async function claimPreRegistration(input: ClaimInput): Promise<ClaimResu
     return { ok: false, error: "Token de transação ausente. Procure o suporte com seu comprovante." }
   }
 
-  // Lookup: external_id (utm_term) OU email (redirect Guru só envia email).
-  // Guru webhook sobrescreve guru_subscriber_id com subscription_id real,
-  // então em races onde o webhook chega primeiro o token UUID original não bate.
-  let member: MemberRow | null = null
-  if (input.external_id) {
-    member = await getMemberByExternalId(input.external_id)
+  // F-V19 hotfix 01/06: findOrCreateMemberFromCheckout cobre os dois caminhos:
+  // /convite → member já existe (lookup), e checkout direto → member criado
+  // com sponsor=HOUSE. Sem isso, /welcome falhava em "Pré-cadastro não encontrado"
+  // pra quem pagasse direto em checkout.bio-help.com/subscribe/<offer>.
+  if (!input.email) {
+    return { ok: false, error: "Email não recebido do checkout. Contate o suporte." }
   }
-  if (!member && input.email) {
-    const supabaseLookup = createServiceClient()
-    const { data } = await supabaseLookup
-      .from("members")
-      .select("*")
-      .eq("email", input.email.toLowerCase())
-      .maybeSingle()
-    member = (data as MemberRow | null) ?? null
+  const resolved = await findOrCreateMemberFromCheckout({
+    email: input.email,
+    name: input.name ?? null,
+    phone: input.phone ?? null,
+    externalId: input.external_id ?? null,
+  })
+  if (!resolved.ok) {
+    console.error("[claimPreRegistration] findOrCreate failed", resolved)
+    return { ok: false, error: "Erro ao localizar/criar membro. Contate o suporte." }
   }
-  if (!member) {
-    return {
-      ok: false,
-      error:
-        "Pré-cadastro não encontrado. Pode ser que o pagamento ainda esteja processando — aguarde 30s e atualize a página.",
-    }
-  }
+  const member = resolved.member
   if (!member.email) {
     return { ok: false, error: "Member sem email cadastrado. Contate o suporte." }
   }

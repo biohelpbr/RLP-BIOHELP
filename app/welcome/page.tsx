@@ -40,6 +40,11 @@ function WelcomeInner() {
   // aliases (ex: nome+test@dominio.com) chega como espaço ao parser. Email nunca
   // tem espaço válido → restaurar `+` evita o lookup falhar por causa do alias.
   const email = params.get("email")?.replace(/ /g, "+") ?? null
+  // F-V19 hotfix 01/06: checkout direto (sem /convite) precisa de name+phone
+  // pra auto-criar member com sponsor=HOUSE. Sem isso, /welcome ficava em loop
+  // de "Pré-cadastro não encontrado".
+  const name = params.get("name")
+  const phone = params.get("phone") ?? params.get("phone_number")
 
   const [status, setStatus] = React.useState<"loading" | "error">("loading")
   const [errorMsg, setErrorMsg] = React.useState<string>("")
@@ -59,6 +64,8 @@ function WelcomeInner() {
         external_id: externalId ?? null,
         transaction_id: tx ?? null,
         email: email ?? null,
+        name: name ?? null,
+        phone: phone ?? null,
       })
       if (cancelled) return
       if (result.ok) {

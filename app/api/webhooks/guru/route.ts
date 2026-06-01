@@ -36,6 +36,7 @@ import {
   markSubscriptionPaid,
 } from "@/lib/subscriptions/actions"
 import { getMemberByExternalId, type MemberRow } from "@/lib/subscriptions/queries"
+import { findOrCreateMemberFromCheckout } from "@/lib/subscriptions/auto-create"
 import { sendToAbsolut } from "@/lib/crm/absolut"
 
 export const runtime = "nodejs"
@@ -119,7 +120,10 @@ async function findMemberByEmail(email: string): Promise<MemberRow | null> {
   return (data as MemberRow | null) ?? null
 }
 
-async function lookupMember(domain: GuruDomainEvent): Promise<MemberRow | null> {
+async function lookupMember(
+  domain: GuruDomainEvent,
+  payload: GuruWebhookPayload,
+): Promise<MemberRow | null> {
   if (domain.kind === "noop") return null
 
   if (domain.kind === "transaction_refunded") {
@@ -134,6 +138,31 @@ async function lookupMember(domain: GuruDomainEvent): Promise<MemberRow | null> 
   }
   if (!member) {
     member = await findMemberByEmail(subEvent.email)
+  }
+
+  // F-V19 hotfix 01/06: ativação de checkout direto (sem /convite) — auto-cria
+  // member com sponsor=HOUSE. Só ativação dispara auto-create; cancelled/expired/
+  // renewed sem member é log e segue, não cria fantasma.
+  if (!member && subEvent.kind === "subscription_activated") {
+    const subscriberName =
+      payload.webhook_type === "subscription" ? payload.subscriber.name ?? null : null
+    const subscriberPhone =
+      payload.webhook_type === "subscription"
+        ? payload.subscriber.phone_number ?? null
+        : null
+    const created = await findOrCreateMemberFromCheckout({
+      email: subEvent.email,
+      name: subscriberName,
+      phone: subscriberPhone,
+      externalId: subEvent.external_id ?? null,
+    })
+    if (created.ok) {
+      member = created.member
+      console.info("[guru-webhook] auto-created member from direct checkout", {
+        memberId: member.id,
+        email: subEvent.email,
+      })
+    }
   }
   return member
 }
@@ -277,7 +306,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, kind: "noop" })
     }
 
-    const member = await lookupMember(domain)
+    const member = await lookupMember(domain, payload!)
 
     if (!member) {
       // member_not_found não é resolvível com retry — retorna 200 + loga error
