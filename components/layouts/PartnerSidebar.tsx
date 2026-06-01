@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -59,18 +60,23 @@ export function PartnerSidebar({
     <div className="flex flex-col h-full">
       <div
         className={cn(
-          "flex items-center gap-3 px-4 py-6 border-b border-sidebar-border",
-          collapsed && !mobile && "justify-center px-2",
+          "flex items-center px-4 py-6 border-b border-sidebar-border",
+          collapsed && !mobile ? "justify-center px-2" : "justify-start",
         )}
       >
-        <div className="w-10 h-10 rounded-xl bh-gradient-purple flex items-center justify-center text-primary-foreground font-bold">
-          B
-        </div>
-        {(!collapsed || mobile) && (
-          <div>
-            <h1 className="font-bold text-foreground">Biohelp</h1>
-            <p className="text-xs text-muted-foreground">Nutrition Club</p>
+        {collapsed && !mobile ? (
+          <div className="w-10 h-10 rounded-xl bh-gradient-purple flex items-center justify-center text-primary-foreground font-bold">
+            B
           </div>
+        ) : (
+          <Image
+            src="/logo-oficial.png"
+            alt="Biohelp Nutrition Club"
+            width={200}
+            height={56}
+            priority
+            className="h-8 w-auto"
+          />
         )}
       </div>
 
@@ -165,12 +171,14 @@ export function PartnerSidebar({
 
       {/* Mobile header */}
       <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bh-gradient-purple flex items-center justify-center text-primary-foreground font-bold text-sm">
-            B
-          </div>
-          <span className="font-semibold text-foreground">Biohelp</span>
-        </div>
+        <Image
+          src="/logo-oficial.png"
+          alt="Biohelp Nutrition Club"
+          width={200}
+          height={56}
+          priority
+          className="h-7 w-auto"
+        />
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="Abrir menu">
