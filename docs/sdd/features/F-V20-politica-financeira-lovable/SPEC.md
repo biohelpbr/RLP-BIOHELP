@@ -4,11 +4,13 @@
 
 - **ID:** F-V20
 - **Classe:** D (migration + dados sensíveis + payout flow)
-- **Status:** MVP em PR — aguarda QA / E2E
+- **Status:** ✅ Done — 2026-06-01 (mergeada em main via squash, commit `6c762bb`)
 - **Onda:** S6 (paralela a F-V19, pre go-live 01/06)
-- **Data:** 2026-05-31
-- **Branch:** `feat/F-V20-politica-financeira-lovable`
-- **Commit:** `de7e351`
+- **Data:** 2026-05-31 → 2026-06-01
+- **Branch:** `feat/F-V20-politica-financeira-lovable` (deletada após merge)
+- **Commits no PR #12:** `de7e351` (impl) → `161f214` (docs) → `25ea18c` (fix CA-21) → `17d9adf` (gitignore) → `321d2c7` (merge main → F-V20)
+- **Commit final em main:** `6c762bb feat(F-V20): resgate alinhado à Política Financeira + UI Lovable (#12)`
+- **Validação:** E2E 22/22 PASS (sessão separada via `E2E-PROMPT.md`) + smoke manual no preview Vercel
 
 ## Contexto
 

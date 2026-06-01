@@ -1,7 +1,18 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** 05/05/2026 (snapshot pós-reunião 29/04 PM com cliente)
-**Sprint Atual:** ⏸️ Sprints v1 (1-7) CONGELADOS | 🚧 Pivô V2 em execução — S1 (06–12/05) inicia
+**Data:** 01/06/2026 (go-live day — F-V20 + admin login fix em main; DB limpo)
+**Sprint Atual:** ⏸️ Sprints v1 (1-7) CONGELADOS | ✅ Pivô V2 em produção
 **Status Geral:** ✅ V1 entregue (37/38 FRs) | ⚠️ V1 sendo descontinuado | 📋 14/22 TBDs respondidos | 🎨 Front Loveable absorvido como referência
+
+---
+
+## 🚀 Go-Live 01/06/2026 — Snapshot do dia
+- ✅ **F-V20** mergeada em main via PR #12 (commit `6c762bb`). Resgate alinhado à Política Financeira + UI Lovable. E2E 22/22 PASS.
+- ✅ **F-V19 admin login series** — 3 commits hotfix em main (`f4c4693` + `f574538` + `b1dd011`) corrigindo regressão onde Gabriel caía em /dashboard partner em vez de /admin. Causa-raiz em 3 camadas (V2Login hardcoded, callback default, **middleware classificando /admin-login como protected via `startsWith('/admin')`**).
+- ✅ **DB limpo:** 20 members + 17 orders + 13 commission_ledger + 5 payouts + 4 vendas + 16 auth.users + 2 cv HOUSE deletados. Mantidos: 4 members reais (ADMIN002/BH00014/BH00021/HOUSE) + 1886 guru_webhook_events (audit log). Member BH00022 re-criado pra smoke F-V20.
+- ✅ **Supabase URL Configuration:** Site URL `painel.bio-help.com` + Redirect URLs allow-list com 3 entries (painel/admin/preview Vercel).
+- ⏳ **Follow-ups pós go-live (radar baixo):** logo `/admin-login` não carrega (reportado por Gabriel + Léo); deploy v1 órfão ainda servindo na Site URL (UI antiga com tabs "Sou Parceira/Sou Admin Biohelp" + botão verde) — investigar e desligar.
+
+---
 
 ---
 

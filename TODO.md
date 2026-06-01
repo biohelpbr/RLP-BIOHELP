@@ -4,7 +4,7 @@
 > **Fonte de progresso histórica:** `docs/STATUS_IMPLEMENTACAO.md` (snapshot por sprint).
 > **Tabela de status das features v2:** `docs/sdd/PIVOT-V2.md` §2.
 
-**Última atualização:** 2026-05-22 (pré-call 15h — F-V19 SPEC + plano criados).
+**Última atualização:** 2026-06-01 (go-live: F-V20 mergeada em main, admin login fix, DB limpo).
 
 ---
 
@@ -31,7 +31,7 @@
 | F-V17 | SSO Shopify → Painel (App Proxy) | D | S5 | ✅ Done (06/05, default OFF) | — |
 | F-V18 | Tags automáticas Líder/Influenciador | B | S3 | ✅ Done (06/05) | — |
 | **F-V19** | **Fluxo Pré-cadastro → Guru → LRP → Shopify** | **D** | **S6 (22-25/05)** | **✅ MVP completo — 14/16 CAs verdes. Pendente: merge main + Guru real live.** | **—** |
-| F-V20 | Resgate alinhado à Política Financeira Nutrition Club + UI Lovable | D | S6 | ✅ MVP completo 31/05 — CI N1 verde. E2E pendente em sessão separada. | — |
+| F-V20 | Resgate alinhado à Política Financeira Nutrition Club + UI Lovable | D | S6 | ✅ **Done 01/06** — PR #12 mergeado em main (`6c762bb`), E2E 22/22 PASS + smoke verde | — |
 | F-V21 | Separar conta admin de identidade member (ADMIN001/ADMIN002/HOUSE têm member row → `ref_code` utilizável como sponsor + aparecem em `/admin/community`) | C | TBD | ⏳ Pendente (não-bloqueador go-live; registrado 31/05) | — |
 
 **Próximas ações (snapshot 2026-05-25):**

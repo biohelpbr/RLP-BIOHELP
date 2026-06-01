@@ -3,6 +3,17 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-06-01
+
+- [2026-06-01] [RELEASE] F-V20 mergeada em `main` via PR #12 squash → commit `6c762bb`. Smoke manual no preview Vercel verde + E2E 22/22 PASS prévio. Branch `feat/F-V20-politica-financeira-lovable` deletada. wiki/features/F-V20.md criada; wiki/modules/payouts.md atualizada com regras Política Financeira (R$ 7,50 / mín R$ 500 / INSS+IRRF só PF / janela 7d). Pronto pra go-live de hoje.
+- [2026-06-01] [BUGFIX] **F-V19 admin login series** (commits `f4c4693` + `f574538` + `b1dd011` em main, hotfix direto). Gabriel reportou que login em `admin.bio-help.com/admin-login` caía em painel de parceira em vez de admin. Causa-raiz em 3 camadas:
+  1. `V2Login.tsx:72` hardcoded `router.replace("/dashboard")` ignorava origem admin-login.
+  2. `app/auth/callback/route.ts` default `/dashboard` quando sem `next`. Emails antigos sem `next=/admin` caíam em painel.
+  3. **`middleware.ts:76`** `protectedRoutes.some(r => pathname.startsWith(r))` com `'/admin'` matching `'/admin-login'`. Middleware redirecionava `/admin-login` pra `/login?redirect=/admin-login` antes do V2Login renderizar. Fix: usar `pathname === route || pathname.startsWith(route + '/')`.
+  Validado E2E via Gabriel (3 screenshots de overview/finance/community do admin) + Eduardo (Playwright direto na prod admin).
+- [2026-06-01] [DECISION] Limpeza de dados de teste pré go-live. Deletados via SQL transacional: 20 members (16 óbvios + 4 ambíguos selecionados pelo cliente: BH00011/BH00012/BH00015/BH00016), 17 orders (9 vinculados + 8 órfãos pós SET NULL), 13 commission_ledger, 5 payout_requests, 4 member_sales, 16 auth.users (15 vinculados + 1 órfão `ldccapital.com.br`), 2 cv_monthly_summary HOUSE. **Mantido:** 4 members reais (ADMIN002 financeiro@bio-help.com / BH00014 leonardo@bio-help.com / BH00021 sturmfeevale@gmail.com / HOUSE sistema), 1886 guru_webhook_events (audit log). Member `BH00022 eduardo.sousa@flowcode.cc` re-criado depois pra smoke F-V20.
+- [2026-06-01] [DECISION] Supabase Auth URL Configuration ajustada via Dashboard. Site URL mantida `https://painel.bio-help.com`. **Redirect URLs allow-list (estava vazia, virou 3):** `https://painel.bio-help.com/**`, `https://admin.bio-help.com/**`, `https://rlp-biohelp-*.vercel.app/**`. Sem allow-list, confirm-links de signups novos caíam no Site URL fallback em vez de irem pro `emailRedirectTo` correto. Bug colateral observado: usuários novos clicavam confirm link e iam parar num deploy v1 antigo (UI com tabs "Sou Parceira/Sou Admin Biohelp" + botão verde). Follow-up: identificar e desligar deploy v1 órfão se ainda servindo na rota raiz da Site URL.
+
 ## 2026-05-31
 
 - [2026-05-31] [BUGFIX] F-V20 CA-21 — banner `credit-success-msg` somia logo após render. Causa: `useEffect` de reset no `WithdrawDialog` tinha `available` nas deps; `revalidatePath` no server action mudava o saldo, re-disparava o effect e zerava `successMsg`. Fix: remover `available` das deps (reset só na transição fechado→aberto). E2E CLI reportou 21/22 PASS; este fix fecha o 22º. Commit `<after-fix>`.
