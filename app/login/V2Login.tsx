@@ -22,16 +22,39 @@ export default function V2Login() {
   const [code, setCode] = React.useState("")
   const [verifying, setVerifying] = React.useState(false)
 
+  // F-V19 follow-up (hotfix 01/06): se o login foi iniciado em /admin-login,
+  // o destino correto é /admin, não /dashboard.
+  const isAdminLoginPath = () =>
+    typeof window !== "undefined" &&
+    window.location.pathname.startsWith("/admin-login")
+
+  // Se o usuário abriu /admin-login no painel.bio-help.com (URL errada),
+  // redireciona pra admin.bio-help.com/admin-login ANTES do login, evitando
+  // que a sessão seja criada no domínio errado. Sem efeito em localhost/preview.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!isAdminLoginPath()) return
+    if (window.location.hostname.startsWith("painel.")) {
+      window.location.replace(
+        `https://admin.bio-help.com${window.location.pathname}${window.location.search}`,
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
       const supabase = createClientSupabase()
+      const adminFlow = isAdminLoginPath()
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: email.trim().toLowerCase(),
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${
+            adminFlow ? "/admin" : "/dashboard"
+          }`,
         },
       })
       if (otpError) {
@@ -67,9 +90,12 @@ export default function V2Login() {
         setVerifying(false)
         return
       }
-      // Sessão gravada em cookie pelo client @supabase/ssr → segue pro dashboard.
-      router.refresh()
-      router.replace("/dashboard")
+      // Sessão gravada em cookie pelo client @supabase/ssr. Usamos full-page
+      // navigation (window.location.assign) em vez de router.replace pra
+      // garantir que o middleware revê com a sessão atualizada e não race com
+      // o cookie ainda não propagado.
+      const destination = isAdminLoginPath() ? "/admin" : "/dashboard"
+      window.location.assign(destination)
     } catch (err) {
       console.error("[V2Login] verify error", err)
       setError("Erro de conexão. Tente novamente.")

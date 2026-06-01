@@ -72,8 +72,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Verificar se é rota protegida
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+  // Verificar se é rota protegida.
+  // F-V19 hotfix 01/06: usar match exato OU prefixo com barra final, pra evitar
+  // que /admin-login (rota pública) seja incorretamente classificado como
+  // protegido porque `/admin-login`.startsWith('/admin') === true.
+  const isProtectedRoute = protectedRoutes.some(
+    route => pathname === route || pathname.startsWith(route + '/')
+  )
 
   // Se rota protegida e não autenticado, redireciona para login
   if (isProtectedRoute && !user) {
