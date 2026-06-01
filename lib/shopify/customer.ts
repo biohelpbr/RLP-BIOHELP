@@ -1,19 +1,22 @@
 /**
  * Operações de Customer na Shopify Admin API (REST)
  * SPEC: Seção 4.4, 8.2 - Customer create/update + tags
- * 
+ *
  * NOTA: Usando REST API ao invés de GraphQL porque:
  * - Planos Basic/Starter da Shopify bloqueiam acesso a PII via GraphQL para custom apps
  * - REST API permite criar/atualizar customers mesmo em planos básicos
  * - Tags são aplicadas corretamente via REST
- * 
- * Tags aplicadas (SPEC 4.4 + TBD-003 RESOLVIDO):
+ *
+ * Tags aplicadas (V2 — Pós PIVOT-V2 §1):
  * - lrp_member
  * - lrp_ref:<ref_code>
  * - lrp_sponsor:<sponsor_ref_code|none>
- * - lrp_status:pending|active|inactive
- * - nivel:<nivel> (membro/parceiro/lider/diretor/head)
- * - subscriber (B4: somente quando status === 'active')
+ * - lrp_subscription:paid|pending|cancelled  (V2 — substitui lrp_status:* V1)
+ * - subscriber (quando subscription paid)
+ *
+ * REMOVIDO no V2 (mantido em isLrpManagedTag pra LIMPAR de customers antigos):
+ * - nivel:<membro/parceiro/lider/diretor/head>  (V1 — pivô removeu níveis)
+ * - lrp_status:active|inactive|pending  (V1 — baseado em CV mensal)
  *
  * F-V19 (sync REST 2024-10):
  * - B3: e-mail marketing consent = "subscribed" no create/update (senão o
@@ -21,6 +24,10 @@
  * - B4: tag `subscriber` quando ativo (paid); ausente quando inativo.
  * - B5: tags são MERGEADAS no update, nunca sobrescritas — preserva as tags
  *   próprias do cliente e só substitui as gerenciadas pelo LRP.
+ *
+ * Compat (01/06/2026): `params.status` aceita tanto V1 ('active'/'inactive'/'pending')
+ * quanto V2 ('paid'/'pending'/'cancelled'). Internamente normaliza pra subscription
+ * V2 antes de emitir `lrp_subscription:`. `params.level` é IGNORADO em V2.
  */
 
 import { getShopifyAccessToken } from './token'
@@ -35,8 +42,13 @@ export interface CustomerSyncParams {
   lastName?: string
   refCode: string
   sponsorRefCode: string | null
-  level?: string        // TBD-003: nível do membro (membro/parceiro/lider/diretor/head)
-  status?: string       // Status atual (pending/active/inactive)
+  /** @deprecated V1 only — V2 ignora; tag `nivel:` foi removida no pivô. */
+  level?: string
+  /**
+   * Status da assinatura. Aceita V1 ('active'/'inactive'/'pending') ou
+   * V2 ('paid'/'pending'/'cancelled'). Normalizado pra V2 antes de virar tag.
+   */
+  status?: string
 }
 
 // Resultado do sync
@@ -69,27 +81,34 @@ interface ShopifyCustomersSearchResponse {
 }
 
 /**
- * Gera as tags do membro conforme SPEC 4.4 + TBD-003
- * Tags: lrp_member, lrp_ref, lrp_sponsor, lrp_status, nivel [, subscriber]
+ * Normaliza status V1 ('active'/'inactive') ou V2 ('paid'/'cancelled') para
+ * a semântica V2 da assinatura. 'pending' é igual nos dois mundos.
+ */
+function normalizeSubscriptionStatus(raw: string | undefined): 'paid' | 'pending' | 'cancelled' {
+  const v = (raw ?? 'pending').toLowerCase()
+  if (v === 'paid' || v === 'active') return 'paid'
+  if (v === 'cancelled' || v === 'inactive') return 'cancelled'
+  return 'pending'
+}
+
+/**
+ * Gera as tags V2 do membro (PIVOT-V2 §1 removeu níveis e status CV-based).
+ * Tags: lrp_member, lrp_ref, lrp_sponsor, lrp_subscription [, subscriber]
  *
- * B4: inclui `subscriber` SOMENTE quando o status é ativo (paid). Quando
- * inativo, a tag é omitida — e como o sync faz MERGE das tags gerenciadas
- * (ver mergeShopifyTags), a `subscriber` sai sozinha no próximo sync inativo.
+ * B4: inclui `subscriber` SOMENTE quando subscription === 'paid'.
+ * `params.level` é IGNORADO (compat — não emite mais `nivel:` no V2).
  */
 export function generateMemberTags(params: CustomerSyncParams): string {
-  const status = params.status || 'pending'
-  const level = params.level || 'membro'
+  const subscription = normalizeSubscriptionStatus(params.status)
 
   const tags: string[] = [
     'lrp_member',
     `lrp_ref:${params.refCode}`,
     `lrp_sponsor:${params.sponsorRefCode ?? 'none'}`,
-    `lrp_status:${status}`,
-    `nivel:${level}`,  // TBD-003 RESOLVIDO: tag de nível obrigatória
+    `lrp_subscription:${subscription}`,
   ]
 
-  // B4: tag `subscriber` apenas quando ativo (assinatura paga).
-  if (status === 'active') {
+  if (subscription === 'paid') {
     tags.push('subscriber')
   }
 
@@ -100,6 +119,10 @@ export function generateMemberTags(params: CustomerSyncParams): string {
  * B5: Tags "gerenciadas pelo LRP" = prefixo `lrp_`, prefixo `nivel:`, e a
  * tag `subscriber`. Comparação case-insensitive. Tudo o mais é tag do cliente
  * e deve ser preservado.
+ *
+ * NOTA: `nivel:` continua aqui mesmo no V2 (que NÃO emite mais essa tag) pra
+ * que o merge LIMPE customers antigos com `nivel:membro` legacy no próximo
+ * sync. Idem `lrp_status:` (sai sozinho do output via prefix `lrp_`).
  */
 export function isLrpManagedTag(tag: string): boolean {
   const t = tag.trim().toLowerCase()
