@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { ExternalLink, ShoppingCart, Sparkles } from "lucide-react"
+import { ExternalLink, LogIn, ShoppingCart, Sparkles } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
@@ -25,6 +25,8 @@ export default async function StorePage() {
   // `||` (não `??`) pra também aplicar fallback quando env vem como string vazia.
   // Verificado em 13/05/2026: em Vercel a env pode existir mas estar vazia.
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
+  // F-V17 stub: login direto na conta Shopify do membro até SSO ficar pronto.
+  const shopLoginUrl = process.env.NEXT_PUBLIC_SHOPIFY_ACCOUNT_URL || "https://account.bio-help.com"
   const isActive = member.status === "active"
 
   // Cada card linka para uma coleção real da loja Biohelp (verificado em
@@ -68,6 +70,29 @@ export default async function StorePage() {
             <Button asChild size="lg" className="flex-shrink-0">
               <a href={shopUrl} target="_blank" rel="noopener noreferrer">
                 Ir para a loja Biohelp
+                <ExternalLink className="w-4 h-4 ml-2" />
+              </a>
+            </Button>
+          </div>
+        </BHCard>
+
+        <BHCard className="relative overflow-hidden">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-accent/30 text-accent-foreground flex items-center justify-center flex-shrink-0">
+                <LogIn className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold mb-1">Login na loja</h2>
+                <p className="text-sm text-muted-foreground max-w-lg">
+                  Já tem conta na loja Biohelp? Acesse sua conta para ver pedidos,
+                  endereços e fazer recompra rápida.
+                </p>
+              </div>
+            </div>
+            <Button asChild size="lg" variant="outline" className="flex-shrink-0">
+              <a href={shopLoginUrl} target="_blank" rel="noopener noreferrer">
+                Fazer login na loja
                 <ExternalLink className="w-4 h-4 ml-2" />
               </a>
             </Button>

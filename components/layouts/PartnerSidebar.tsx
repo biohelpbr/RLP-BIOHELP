@@ -6,8 +6,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   ChevronLeft,
+  ExternalLink,
   GraduationCap,
   LayoutDashboard,
+  LogIn,
   LogOut,
   Menu,
   ShoppingBag,
@@ -26,11 +28,16 @@ interface NavItem {
   href: string
   icon: React.ElementType
   matchStart?: boolean
+  external?: boolean
 }
+
+const SHOP_LOGIN_URL =
+  process.env.NEXT_PUBLIC_SHOPIFY_ACCOUNT_URL || "https://account.bio-help.com"
 
 const partnerNavItems: NavItem[] = [
   { title: "Visão Geral", href: "/dashboard", icon: LayoutDashboard },
   { title: "Acesso à Loja", href: "/dashboard/store", icon: ShoppingCart, matchStart: true },
+  { title: "Login na Loja", href: SHOP_LOGIN_URL, icon: LogIn, external: true },
   { title: "Academy", href: "/dashboard/academy", icon: GraduationCap, matchStart: true },
   { title: "Minhas Vendas", href: "/dashboard/orders", icon: ShoppingBag, matchStart: true },
   { title: "Minha Comunidade", href: "/dashboard/club", icon: Users, matchStart: true },
@@ -84,24 +91,47 @@ export function PartnerSidebar({
         {partnerNavItems.map((item) => {
           const active = isItemActive(item)
           const Icon = item.icon
+          const className = cn(
+            "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
+            active
+              ? "bg-primary text-primary-foreground bh-shadow-md"
+              : "text-sidebar-foreground hover:bg-sidebar-accent",
+            collapsed && !mobile && "justify-center px-2",
+          )
+          const content = (
+            <>
+              <Icon className="w-5 h-5 flex-shrink-0" />
+              {(!collapsed || mobile) && (
+                <span className="font-medium text-sm flex items-center gap-1.5">
+                  {item.title}
+                  {item.external && <ExternalLink className="w-3 h-3" />}
+                </span>
+              )}
+            </>
+          )
+          if (item.external) {
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => mobile && setSidebarOpen(false)}
+                className={className}
+              >
+                {content}
+              </a>
+            )
+          }
           return (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => mobile && setSidebarOpen(false)}
               aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
-                active
-                  ? "bg-primary text-primary-foreground bh-shadow-md"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent",
-                collapsed && !mobile && "justify-center px-2",
-              )}
+              className={className}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              {(!collapsed || mobile) && (
-                <span className="font-medium text-sm">{item.title}</span>
-              )}
+              {content}
             </Link>
           )
         })}
