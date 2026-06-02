@@ -11,16 +11,13 @@ interface ConviteFormProps {
   sponsorName?: string
 }
 
-const maskPhone = (raw: string): string => {
-  const digits = raw.replace(/\D/g, "").slice(0, 11)
-  if (digits.length <= 10) {
-    return digits
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{4})(\d)/, "$1-$2")
-  }
-  return digits
-    .replace(/(\d{2})(\d)/, "($1) $2")
-    .replace(/(\d{5})(\d)/, "$1-$2")
+/**
+ * Aceita BR e internacional. Conta dígitos, espaços, "+", "(" ")", "-". Limita
+ * a 20 chars (= schema). Não aplica máscara fixa pra não cortar números fora
+ * do padrão (11) 9XXXX-XXXX.
+ */
+const sanitizePhone = (raw: string): string => {
+  return raw.replace(/[^\d+()\s-]/g, "").slice(0, 20)
 }
 
 const maskCpf = (raw: string): string => {
@@ -139,14 +136,14 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
           <input
             id="conv-phone"
             type="tel"
-            inputMode="numeric"
-            placeholder="(11) 99999-9999"
+            inputMode="tel"
+            placeholder="(11) 99999-9999 ou +1 555 0100"
             value={phoneMasked}
-            onChange={(e) => setPhoneMasked(maskPhone(e.target.value))}
+            onChange={(e) => setPhoneMasked(sanitizePhone(e.target.value))}
             className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
             required
             disabled={submitting}
-            autoComplete="tel-national"
+            autoComplete="tel"
           />
         </div>
       </div>
