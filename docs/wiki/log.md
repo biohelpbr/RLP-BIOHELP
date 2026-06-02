@@ -5,6 +5,7 @@
 
 ## 2026-06-02
 
+- [2026-06-02] [RELEASE] **F-V22 Avisos no painel** deployado em `main` (PR #22 `39a9b3d` + 3 fixes UX `0a90f3c`). Migration aplicada no Supabase remoto + bucket público `announcements`. Aviso da live "Encontro de Boas-Vindas" (03/06 19h, Zoom) criado e no ar, expira 03/06 22h. Banner ficou **responsivo por aspect-ratio** (aspect-[2/1] mobile → sm:[12/5] → lg:[7/2]) + objectPosition center 58%, ~30% reduzido a pedido, testado em 1280px e 390px. Imagem re-recortada via canvas (removida margem preta da arte 16:9). **Decisões em aberto** (ver `docs/wiki/context/F-V22.md`): travar proporção do banner (recomendado 3:1, 1800×600) p/ uploads previsíveis; e-mail da live (Resend Pro). Docs fechados: TODO/PIVOT/SPEC.
 - [2026-06-02] [MVP] **F-V22 Avisos no painel** (classe C) — código pronto, pendente migration remota + deploy. Pedido Léo+Matt (WhatsApp): aviso da live (03/06 19h) no topo do painel, **announcement bar não popup**. Decisão de produto: CMS admin-configurável (`/admin/announcements`) com mensagem + **imagem (upload)** + link/CTA + cor + janela de datas + on/off, reutilizável a cada evento. Nova tabela `announcements` + bucket público `announcements` (`20260602_f-v22-announcements.sql`). Barra renderizada no topo do `V2Dashboard` via `getActiveAnnouncement()` (só o ativo mais recente na janela). typecheck + lint verdes. SPEC: `docs/sdd/features/F-V22-avisos-painel/`. **Separado deste F:** o "mandar e-mail pra todas" do pedido continua tarefa à parte.
 
 ## 2026-06-01

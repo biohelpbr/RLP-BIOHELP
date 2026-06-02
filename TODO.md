@@ -33,7 +33,7 @@
 | **F-V19** | **Fluxo Pré-cadastro → Guru → LRP → Shopify** | **D** | **S6 (22-25/05)** | **✅ MVP completo — 14/16 CAs verdes. Pendente: merge main + Guru real live.** | **—** |
 | F-V20 | Resgate alinhado à Política Financeira Nutrition Club + UI Lovable | D | S6 | ✅ **Done 01/06** — PR #12 mergeado em main (`6c762bb`), E2E 22/22 PASS + smoke verde | — |
 | F-V21 | Separar conta admin de identidade member (ADMIN001/ADMIN002/HOUSE têm member row → `ref_code` utilizável como sponsor + aparecem em `/admin/community`) | C | TBD | ⏳ Pendente (não-bloqueador go-live; registrado 31/05) | — |
-| F-V22 | Avisos no painel (announcement bar CMS: msg + imagem + link + janela) | C | S6 | 🚧 Código pronto 02/06 (pedido Léo/Matt p/ live 03/06). Pendente: migration remota + deploy | — |
+| F-V22 | Avisos no painel (announcement bar CMS: msg + imagem + link + janela) | C | S6 | ✅ **Done 02/06** — deployado em main, banner da live 03/06 no ar (responsivo, ~30% reduzido). Follow-ups abertos: (a) decidir travar proporção do banner (3:1) p/ uploads previsíveis; (b) e-mail da live (Resend Pro) | — |
 
 **Próximas ações (snapshot 2026-05-25):**
 - **F-V19 merge:** review final dos diffs → merge `feat/F-V19-fluxo-guru-pre-cadastro` em main.

@@ -1,6 +1,8 @@
 # F-V22 — Avisos no painel (announcement bar via CMS)
 
-**Classe:** C · **Status:** ✅ Implementado (código) — pendente migration remota + deploy · **Data:** 2026-06-02
+**Classe:** C · **Status:** ✅ Done (deployado em main 02/06) · **Data:** 2026-06-02
+
+> **Estado/handoff detalhado:** `docs/wiki/context/F-V22.md` (inclui decisões em aberto sobre proporção do banner e follow-up de e-mail).
 
 ## Origem
 Pedido do Léo + Matt (WhatsApp 02/06): colocar um aviso no painel divulgando a live
