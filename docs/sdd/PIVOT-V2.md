@@ -97,6 +97,7 @@
 | F-V18 | Tags automáticas Líder (≥5) / Influenciador (≥40) | B | P2 | ✅ Destravada — regra simples, depende de F-V06 ter contagem de "ativos no clube". |
 | **F-V19** | **Fluxo Pré-cadastro → Guru → LRP → Shopify** (Live 01/06) | **D** | **P0** | **✅ MVP completo 25/05/2026 — 14/16 CAs verdes. Branch `feat/F-V19-fluxo-guru-pre-cadastro` pronta pra merge. Pendente: Guru real live (credenciais OK, runbook pronto) + Shopify sync live (Léo cria produto fake).** |
 | **F-V20** | **Resgate alinhado à Política Financeira Nutrition Club + UI Lovable** | **D** | **P0** | **✅ Done 01/06/2026** — PR #12 mergeado em main (`6c762bb`). E2E 22/22 PASS + smoke verde. Modalidades renomeadas (Crédito loja/PF RPA/PJ NF), R$ 7,50 fixo, mín R$ 500, INSS+IRRF só PF, modal Regras, dados bancários em `members` com janela 7d. Migration `20260531_f-v20-member-bank-data.sql` aplicada. |
+| F-V22 | Avisos no painel (announcement bar via CMS admin: msg + imagem + link + janela) | C | P1 | 🚧 **Código pronto 02/06/2026** — pedido Léo/Matt (barra no topo do dashboard, não popup). Migration `20260602_f-v22-announcements.sql` + bucket `announcements`. Pendente: aplicar migration remota + deploy. SPEC em `docs/sdd/features/F-V22-avisos-painel/`. |
 
 **Legenda:** P0 = bloqueia o novo fluxo. P1 = essencial pro MVP v2. P2 = pós-MVP v2. ✅ = destravada / 🟡 = parcial / 🚫 = bloqueada / 🚧 = em implementação.
 

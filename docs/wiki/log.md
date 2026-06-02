@@ -3,6 +3,10 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-06-02
+
+- [2026-06-02] [MVP] **F-V22 Avisos no painel** (classe C) — código pronto, pendente migration remota + deploy. Pedido Léo+Matt (WhatsApp): aviso da live (03/06 19h) no topo do painel, **announcement bar não popup**. Decisão de produto: CMS admin-configurável (`/admin/announcements`) com mensagem + **imagem (upload)** + link/CTA + cor + janela de datas + on/off, reutilizável a cada evento. Nova tabela `announcements` + bucket público `announcements` (`20260602_f-v22-announcements.sql`). Barra renderizada no topo do `V2Dashboard` via `getActiveAnnouncement()` (só o ativo mais recente na janela). typecheck + lint verdes. SPEC: `docs/sdd/features/F-V22-avisos-painel/`. **Separado deste F:** o "mandar e-mail pra todas" do pedido continua tarefa à parte.
+
 ## 2026-06-01
 
 - [2026-06-01] [RELEASE] F-V20 mergeada em `main` via PR #12 squash → commit `6c762bb`. Smoke manual no preview Vercel verde + E2E 22/22 PASS prévio. Branch `feat/F-V20-politica-financeira-lovable` deletada. wiki/features/F-V20.md criada; wiki/modules/payouts.md atualizada com regras Política Financeira (R$ 7,50 / mín R$ 500 / INSS+IRRF só PF / janela 7d). Pronto pra go-live de hoje.

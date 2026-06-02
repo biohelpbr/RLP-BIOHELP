@@ -6,3 +6,4 @@ export { PeriodFilter, PERIOD_OPTIONS, periodLabel, type PeriodValue } from "./P
 export { WithdrawDialog } from "./WithdrawDialog"
 export { PayoutRulesDialog } from "./PayoutRulesDialog"
 export { CopyButton } from "./CopyButton"
+export { AnnouncementBar } from "./AnnouncementBar"
