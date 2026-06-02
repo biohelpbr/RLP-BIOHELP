@@ -188,7 +188,7 @@ export async function createPreRegistration(
         email: parsed.data.email,
         phone: parsed.data.phone,
         document_number: parsed.data.cpf,
-        person_type: "PF",
+        person_type: "pf",
         auth_user_id: null,
         subscription_status: "pending",
         pre_registered_at: new Date().toISOString(),
