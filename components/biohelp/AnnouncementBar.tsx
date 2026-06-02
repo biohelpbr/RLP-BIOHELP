@@ -37,11 +37,11 @@ export function AnnouncementBar({ announcement }: { announcement: AnnouncementRo
       <img
         src={image_url}
         alt={message}
-        className="mx-auto block max-h-64 w-full object-contain"
+        className="block h-auto w-full"
       />
     )
     return (
-      <div className="overflow-hidden rounded-xl border border-border bg-muted/40 bh-shadow-md">
+      <div className="overflow-hidden rounded-xl border border-border bg-neutral-900 bh-shadow-md">
         {hasCta ? (
           <a href={link_url!} target="_blank" rel="noopener noreferrer" className="block">
             {banner}
