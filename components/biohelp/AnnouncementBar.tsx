@@ -37,7 +37,8 @@ export function AnnouncementBar({ announcement }: { announcement: AnnouncementRo
       <img
         src={image_url}
         alt={message}
-        className="block h-auto w-full"
+        className="block h-40 w-full object-cover sm:h-52 lg:h-[300px]"
+        style={{ objectPosition: "center 62%" }}
       />
     )
     return (
