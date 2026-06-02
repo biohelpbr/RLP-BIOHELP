@@ -43,7 +43,8 @@ export function AnnouncementBar({ announcement }: { announcement: AnnouncementRo
         alt={message}
         width={1770}
         height={967}
-        className="block w-full object-cover object-center aspect-[16/10] sm:aspect-[2/1] lg:aspect-[5/2]"
+        className="block w-full object-cover aspect-[2/1] sm:aspect-[12/5] lg:aspect-[7/2]"
+        style={{ objectPosition: "center 58%" }}
       />
     )
     return (
