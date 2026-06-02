@@ -12,8 +12,9 @@ import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberNetworkV2 } from "@/lib/network/v2"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { getNextPublishedEvent } from "@/lib/events/queries"
+import { getActiveAnnouncement } from "@/lib/announcements/queries"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
-import { BHCard, BHStat, CopyButton } from "@/components/biohelp"
+import { AnnouncementBar, BHCard, BHStat, CopyButton } from "@/components/biohelp"
 import { Button } from "@/components/ui/button"
 
 function formatEventWindow(startIso: string, endIso: string): string {
@@ -51,9 +52,10 @@ export default async function V2Dashboard() {
     redirect("/login")
   }
 
-  const [network, nextEvent] = await Promise.all([
+  const [network, nextEvent, announcement] = await Promise.all([
     getMemberNetworkV2(member.id),
     getNextPublishedEvent(),
+    getActiveAnnouncement(),
   ])
   const directReportsCount = network?.direct_reports.length ?? 0
   // F-V03: "ativo" = assinatura paga (subscription_status), não o status legado.
@@ -65,6 +67,8 @@ export default async function V2Dashboard() {
   return (
     <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
+        {announcement && <AnnouncementBar announcement={announcement} />}
+
         <header className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">
             Oi, {member.name.split(" ")[0]}
