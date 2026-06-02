@@ -178,7 +178,7 @@ export function AdminSidebar({
         </button>
       </aside>
 
-      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
+      <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-background sticky top-0 z-40">
         <div className="flex flex-col gap-0.5">
           <Image
             src="/logo-oficial.png"
