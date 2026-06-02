@@ -22,7 +22,7 @@ export async function AdminShell({ adminName, children }: AdminShellProps) {
   ])
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
       <AdminSidebar adminName={adminName} />
       <div className="flex-1 flex flex-col min-w-0">
         <header className="flex items-center justify-end gap-3 px-4 lg:px-8 py-3 border-b border-border bg-background/80 backdrop-blur sticky top-0 z-30">

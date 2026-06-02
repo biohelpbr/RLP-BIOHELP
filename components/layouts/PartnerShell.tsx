@@ -20,7 +20,7 @@ export function PartnerShell({
   children,
 }: PartnerShellProps) {
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
       <PartnerSidebar
         memberName={memberName}
         isActive={isActive}
