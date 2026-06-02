@@ -15,16 +15,69 @@ const CTA_STYLES: Record<AnnouncementRow["variant"], string> = {
 }
 
 /**
- * F-V22 — Barra de aviso fixa no topo do dashboard do membro.
+ * F-V22 — Aviso fixo no topo do dashboard do membro.
  *
  * Server Component (sem estado, não-fechável por decisão de produto — Matt:
  * "ao invés de popup q a pessoa fecha no instinto"). Conteúdo vem do CMS
- * (/admin/announcements). Imagem, link e CTA são opcionais.
+ * (/admin/announcements).
+ *
+ * Dois modos:
+ *  - COM imagem → banner em destaque (imagem completa, clicável) + faixa de CTA.
+ *  - SEM imagem → barra de texto colorida com ícone + CTA opcional.
  */
 export function AnnouncementBar({ announcement }: { announcement: AnnouncementRow }) {
   const { message, image_url, link_url, cta_label, variant } = announcement
   const hasCta = !!link_url && link_url.trim().length > 0
+  const ctaText = cta_label?.trim() || "Saber mais"
 
+  // --- Modo banner (com imagem) ---
+  if (image_url) {
+    const banner = (
+      // eslint-disable-next-line @next/next/no-img-element -- URL externa (Supabase Storage)
+      <img
+        src={image_url}
+        alt={message}
+        className="mx-auto block max-h-64 w-full object-contain"
+      />
+    )
+    return (
+      <div className="overflow-hidden rounded-xl border border-border bg-muted/40 bh-shadow-md">
+        {hasCta ? (
+          <a href={link_url!} target="_blank" rel="noopener noreferrer" className="block">
+            {banner}
+          </a>
+        ) : (
+          banner
+        )}
+        <div
+          className={cn(
+            "flex flex-wrap items-center justify-between gap-3 px-4 py-3",
+            VARIANT_STYLES[variant],
+          )}
+        >
+          <p className="min-w-0 flex-1 text-sm font-medium leading-snug sm:text-[0.95rem]">
+            {message}
+          </p>
+          {hasCta && (
+            <a
+              href={link_url!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+                CTA_STYLES[variant],
+              )}
+            >
+              {ctaText}
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // --- Modo barra de texto (sem imagem) ---
   return (
     <div
       role="status"
@@ -33,18 +86,9 @@ export function AnnouncementBar({ announcement }: { announcement: AnnouncementRo
         VARIANT_STYLES[variant],
       )}
     >
-      {image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element -- URL externa (Supabase Storage), sem domínio configurado em next/image
-        <img
-          src={image_url}
-          alt=""
-          className="h-12 w-12 flex-shrink-0 rounded-lg object-cover ring-1 ring-white/40"
-        />
-      ) : (
-        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
-          <Megaphone className="h-5 w-5" />
-        </span>
-      )}
+      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
+        <Megaphone className="h-5 w-5" />
+      </span>
 
       <p className="min-w-0 flex-1 text-sm font-medium leading-snug sm:text-[0.95rem]">
         {message}
@@ -60,7 +104,7 @@ export function AnnouncementBar({ announcement }: { announcement: AnnouncementRo
             CTA_STYLES[variant],
           )}
         >
-          {cta_label?.trim() || "Saber mais"}
+          {ctaText}
           <ExternalLink className="h-4 w-4" />
         </a>
       )}
