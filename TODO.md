@@ -4,7 +4,7 @@
 > **Fonte de progresso histórica:** `docs/STATUS_IMPLEMENTACAO.md` (snapshot por sprint).
 > **Tabela de status das features v2:** `docs/sdd/PIVOT-V2.md` §2.
 
-**Última atualização:** 2026-06-01 (go-live: F-V20 mergeada em main, admin login fix, DB limpo).
+**Última atualização:** 2026-06-02 (F-V22 avisos done + deploy; registradas F-V23–F-V28 da call BioHelp&FlowCode).
 
 ---
 
@@ -34,12 +34,50 @@
 | F-V20 | Resgate alinhado à Política Financeira Nutrition Club + UI Lovable | D | S6 | ✅ **Done 01/06** — PR #12 mergeado em main (`6c762bb`), E2E 22/22 PASS + smoke verde | — |
 | F-V21 | Separar conta admin de identidade member (ADMIN001/ADMIN002/HOUSE têm member row → `ref_code` utilizável como sponsor + aparecem em `/admin/community`) | C | TBD | ⏳ Pendente (não-bloqueador go-live; registrado 31/05) | — |
 | F-V22 | Avisos no painel (announcement bar CMS: msg + imagem + link + janela) | C | S6 | ✅ **Done 02/06** — deployado em main, banner da live 03/06 no ar (responsivo, ~30% reduzido). Follow-ups abertos: (a) decidir travar proporção do banner (3:1) p/ uploads previsíveis; (b) e-mail da live (Resend Pro) | — |
+| F-V23 | Disparo de e-mail nativo no admin (Resend Pro) — segmentação + status | C | S7 | ⏳ Pendente (**P0/P1 — mais urgente da call 02/06**). SPEC: `docs/sdd/features/F-V23-email-disparo-admin/`. Resend Pro já contratado | DKIM/DNS no Cloudflare |
+| F-V24 | Cancelamento/estorno (Guru webhook + manual; imediato vs renovação) | D | S7 | ⏳ Pendente (P1). SPEC: `docs/sdd/features/F-V24-cancelamento-estorno/` | Eventos/payload de cancelamento do Guru (TBD) |
+| F-V25 | Busca de cliente no admin (`/admin/community`) | B | S7 | ⏳ Pendente (P1, desafoga atendimento). Contract inline §1.1 | — |
+| F-V26 | Banner de avisos também na Academy (espelha F-V22) | B | S7 | ⏳ Pendente (P2). Contract inline §1.1 | — |
+| F-V27 | Academy: refinar 3 trilhas + aulas/avisos programados por data | C | S7 | ⏳ Pendente (P2). Contract inline §1.1 | Léo refinar desenho no Lovable |
+| F-V28 | Login alternativo com senha (emergência) | D | TBD | 🟡 Reavaliar — Resend Pro deve resolver a causa (limite diário). Contract inline §1.1 | Decisão: ainda necessário pós-Pro? |
 
 **Próximas ações (snapshot 2026-05-25):**
 - **F-V19 merge:** review final dos diffs → merge `feat/F-V19-fluxo-guru-pre-cadastro` em main.
 - **F-V19 produção:** logar no Guru (credenciais recebidas) → configurar webhook → testar 1 transação → ligar `SHOPIFY_SUBSCRIPTION_SYNC_LIVE=true` quando Léo enviar variant id.
 - **Follow-ups F-V19:** dashboard v2 ler `subscription_status` em vez de `status` legado; CA-13/14 fechar em QA pré-produção.
 - Aguardando: respostas aos TBDs ainda abertos (1, 2, 8, 9, 12, 15, 16, 20, 21, 23-27) + items 1.3 (mockup minha comunidade), 1.4 (NF Biohelp), 1.6 (GURU_OFFER_ID), 1.7 (Shopify variant assinatura).
+
+**Pedidos da call BioHelp&FlowCode (02/06):** registrados como F-V23–F-V28. Ordem sugerida: F-V23 (e-mail, mais urgente) → F-V24 (cancelamento) → F-V25 (busca) → F-V26 (banner Academy) → F-V27 (Academy trilhas) → F-V28 (login senha, reavaliar). Detalhe: `docs/wiki/context/F-V22.md` §follow-ups e SPECs F-V23/F-V24.
+
+## 1.1 Feature Contracts inline — features da call 02/06 (B/C/D)
+
+> F-V23 e F-V24 têm SPEC dedicada (links na tabela §1). Abaixo as demais.
+
+### F-V25 — Busca de cliente no admin (B)
+- **Pedido (Gabriel):** `/admin/community` só tem lista/paginação; não dá pra pesquisar um cliente. Atendimento trava.
+- **Escopo:** campo de busca (nome / e-mail / `ref_code` / telefone) na página `/admin/community`, com filtro server-side. Sem mudança de schema.
+- **Arquivos (proposto):** `app/admin/community/page.tsx` (+ query param `q`), `lib/admin/community*` (filtro). 
+- **CA:** CA-1 buscar por nome/e-mail/código retorna o cliente; CA-2 vazio mostra "nenhum resultado"; CA-3 não-admin bloqueado.
+- **Risco:** baixo. Não toca auth/pagamento.
+
+### F-V26 — Banner de avisos também na Academy (B)
+- **Pedido (Léo):** espelhar o banner de avisos (F-V22) na Academy, além da Visão Geral. "Abrir espaço pro banner" na Academy.
+- **Escopo:** renderizar o mesmo `AnnouncementBar` (via `getActiveAnnouncement()`) no topo de `/dashboard/academy`. Reusa F-V22 inteiro — só adiciona o render.
+- **Arquivos:** `app/dashboard/academy/page.tsx` (edição). 
+- **CA:** CA-1 aviso ativo aparece na Academy igual na Visão Geral; CA-2 sem aviso = sem barra.
+- **Liga com:** decisão aberta de proporção do banner (3:1) — resolver junto.
+
+### F-V27 — Academy: refinar trilhas + aulas/avisos programados (C)
+- **Pedido (Léo):** consolidar **3 trilhas** (Consumo/rotina · Revender produtos · Desenvolver comunidade) espelhando o desenho do Lovable; aula de boas-vindas (live) vira aula; e **aulas/avisos programados por data** ("no dia tal teremos conteúdo X") pra galera se programar, vídeo subido quando acontece.
+- **Escopo:** estende F-V09 (Academy CMS). (a) ajustar/seed das 3 trilhas; (b) campo de "data programada" + estado "em breve" em conteúdos/aulas futuras; (c) badge/aviso de aula futura na trilha.
+- **Arquivos (proposto):** `lib/content/*` (schema + queries — campo `scheduled_at`/`status`), `app/admin/academy/*` (form), `app/dashboard/academy/*` (exibição "em breve").
+- **CA:** CA-1 3 trilhas refletem o desenho; CA-2 admin marca aula como futura com data → membro vê "em breve · dia X"; CA-3 ao subir o vídeo, deixa de ser "em breve".
+- **Bloqueio:** Léo precisa refinar o desenho final no Lovable antes do seed das trilhas.
+
+### F-V28 — Login alternativo com senha (D) — 🟡 REAVALIAR
+- **Pedido (Gabriel):** clientes não recebiam o código (caía no spam / **limite diário do Resend free**). Quer login com senha provisória como emergência.
+- **Status:** **reavaliar** — o **upgrade pro Resend Pro (02/06)** remove o limite diário, que era a causa principal. Antes de implementar (mexe em **auth**, classe D), confirmar com o cliente se ainda é necessário pós-Pro + após configurar DKIM (anti-spam). Se for: Supabase Auth com senha (admin gera senha provisória no `/admin/community/[id]` → membro loga email+senha).
+- **Decisão pendente do cliente.**
 
 ---
 
