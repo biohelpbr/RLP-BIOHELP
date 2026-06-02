@@ -6,7 +6,7 @@ import {
   createServiceClient,
 } from "@/lib/supabase/server"
 import { markSubscriptionPaid } from "@/lib/subscriptions/actions"
-import { findOrCreateMemberFromCheckout } from "@/lib/subscriptions/auto-create"
+import { findMemberFromCheckout } from "@/lib/subscriptions/auto-create"
 
 /**
  * F-V19 RF-5 — /welcome claim.
@@ -49,22 +49,30 @@ export async function claimPreRegistration(input: ClaimInput): Promise<ClaimResu
     return { ok: false, error: "Token de transação ausente. Procure o suporte com seu comprovante." }
   }
 
-  // F-V19 hotfix 01/06: findOrCreateMemberFromCheckout cobre os dois caminhos:
-  // /convite → member já existe (lookup), e checkout direto → member criado
-  // com sponsor=HOUSE. Sem isso, /welcome falhava em "Pré-cadastro não encontrado"
-  // pra quem pagasse direto em checkout.bio-help.com/subscribe/<offer>.
+  // F-V19 hotfix 02/06 (security): /welcome usa lookup-only. Auto-create
+  // ficou exclusivo do webhook Guru (autenticado por api_token). Sem isso,
+  // qualquer URL `/welcome?email=X` criava conta+sessão sem validação ←
+  // vetor de auth bypass + spam.
+  //
+  // Race possível: redirect Guru chega ANTES do webhook activate criar o
+  // member. Cliente vê msg "aguardando confirmação" e atualiza em ~30s.
   if (!input.email) {
     return { ok: false, error: "Email não recebido do checkout. Contate o suporte." }
   }
-  const resolved = await findOrCreateMemberFromCheckout({
+  const resolved = await findMemberFromCheckout({
     email: input.email,
-    name: input.name ?? null,
-    phone: input.phone ?? null,
     externalId: input.external_id ?? null,
   })
   if (!resolved.ok) {
-    console.error("[claimPreRegistration] findOrCreate failed", resolved)
-    return { ok: false, error: "Erro ao localizar/criar membro. Contate o suporte." }
+    if (resolved.error === "not_found") {
+      return {
+        ok: false,
+        error:
+          "Sua compra ainda está sendo confirmada pelo Guru. Aguarde uns 30 segundos e atualize esta página. Se persistir, fale com o suporte com seu comprovante.",
+      }
+    }
+    console.error("[claimPreRegistration] findMember failed", resolved)
+    return { ok: false, error: "Erro ao localizar membro. Contate o suporte." }
   }
   const member = resolved.member
   if (!member.email) {

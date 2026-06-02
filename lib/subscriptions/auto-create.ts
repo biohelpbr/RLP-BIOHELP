@@ -9,8 +9,11 @@
  *   sponsor_id=HOUSE (sem comissão de afiliado) pra que /welcome e webhook
  *   consigam ativar e logar.
  *
- * Reutilizado em /welcome (actions.ts) e webhook Guru (route.ts) pra que ambos
- *   caminhos resolvam o mesmo membro — não tem race.
+ * SECURITY (hotfix 02/06): SÓ o webhook Guru pode auto-criar member, porque ele
+ *   valida api_token no payload (gate de autenticidade). O /welcome usa
+ *   `findMemberFromCheckout` (só lookup) — sem isso, qualquer URL
+ *   `/welcome?email=X` criava conta + sessão (atacante podia "logar como
+ *   email não-cadastrado" e ver o painel).
  *
  * Anti-SPEC: sponsor_id=HOUSE em vez de NULL preserva a invariante de v2
  *   "todo member tem sponsor". HOUSE_ACCOUNT_ID é a row fixa Biohelp House.
@@ -38,21 +41,25 @@ export interface FindOrCreateError {
   error: string
 }
 
-export async function findOrCreateMemberFromCheckout(
-  input: FindOrCreateInput,
+/**
+ * Lookup-only: NÃO cria member se não achar. Use em entrypoints PÚBLICOS
+ * (ex: /welcome) onde criar sob demanda viraria vetor de spam/auth bypass.
+ *
+ * Retorna { ok:false, error:"not_found" } se member não existe. Quem chama
+ * deve mostrar mensagem "aguardando confirmação" ou similar.
+ */
+export async function findMemberFromCheckout(
+  input: Pick<FindOrCreateInput, "email" | "externalId">,
 ): Promise<FindOrCreateResult | FindOrCreateError> {
   const email = input.email.trim().toLowerCase()
   if (!email) return { ok: false, error: "email_required" }
 
   const supabase = createServiceClient()
 
-  // 1. Lookup por external_id (Guru subscription id ou token de pré-cadastro).
   let member: MemberRow | null = null
   if (input.externalId) {
     member = await getMemberByExternalId(input.externalId)
   }
-
-  // 2. Lookup por email.
   if (!member) {
     const { data } = await supabase
       .from("members")
@@ -62,11 +69,28 @@ export async function findOrCreateMemberFromCheckout(
     member = (data as MemberRow | null) ?? null
   }
 
-  if (member) {
-    return { ok: true, member, created: false }
-  }
+  if (!member) return { ok: false, error: "not_found" }
+  return { ok: true, member, created: false }
+}
 
-  // 3. Não achou — auto-criar com HOUSE como sponsor.
+/**
+ * Lookup-or-create. SÓ chamar em contextos autenticados/confiáveis (webhook
+ * Guru com api_token validado). Em entrypoints públicos, usar
+ * findMemberFromCheckout.
+ */
+export async function findOrCreateMemberFromCheckout(
+  input: FindOrCreateInput,
+): Promise<FindOrCreateResult | FindOrCreateError> {
+  const found = await findMemberFromCheckout({
+    email: input.email,
+    externalId: input.externalId ?? null,
+  })
+  if (found.ok) return found
+  if (found.error !== "not_found") return found
+
+  const email = input.email.trim().toLowerCase()
+  const supabase = createServiceClient()
+
   const refCode = await generateRefCode()
   const name = (input.name?.trim() || email.split("@")[0] || "Cliente").slice(0, 120)
   const phone = input.phone?.replace(/\D/g, "") || null
@@ -93,7 +117,6 @@ export async function findOrCreateMemberFromCheckout(
     return { ok: false, error: insertErr?.message || "insert_failed" }
   }
 
-  // Log do caminho "direct_checkout" pra distinguir de /convite.
   await supabase.from("referral_events").insert({
     member_id: created.id,
     ref_code_used: "HOUSE",
