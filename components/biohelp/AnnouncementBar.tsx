@@ -32,13 +32,18 @@ export function AnnouncementBar({ announcement }: { announcement: AnnouncementRo
 
   // --- Modo banner (com imagem) ---
   if (image_url) {
+    // Responsivo: a imagem ocupa 100% da largura e a ALTURA segue um aspect-ratio
+    // por breakpoint (mais alto no mobile → quase sem corte; mais baixo/wide no
+    // desktop). object-cover + object-center mantém o título sempre visível.
+    // width/height evitam layout shift (CLS).
     const banner = (
       // eslint-disable-next-line @next/next/no-img-element -- URL externa (Supabase Storage)
       <img
         src={image_url}
         alt={message}
-        className="block h-40 w-full object-cover sm:h-52 lg:h-[300px]"
-        style={{ objectPosition: "center 62%" }}
+        width={1770}
+        height={967}
+        className="block w-full object-cover object-center aspect-[16/10] sm:aspect-[2/1] lg:aspect-[5/2]"
       />
     )
     return (
