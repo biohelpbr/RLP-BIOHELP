@@ -1,6 +1,8 @@
 # F-V23 — Disparo de e-mail nativo no admin (Resend Pro)
 
-**Classe:** C (outward-facing — envio em massa pra base real; exige confirmação antes de disparo) · **Status:** ⏳ Pendente (backlog, P0/P1) · **Registrado:** 2026-06-02 (call BioHelp&FlowCode)
+**Classe:** C (outward-facing — envio em massa pra base real; exige confirmação antes de disparo) · **Status:** 🚧 Implementado (branch `feat/F-V23-email-disparo`, em PR) · **Registrado:** 2026-06-02 · **Implementado:** 2026-06-03
+
+> **Infra confirmada (02/06):** Resend **Pro** ativo; domínio **`mail.bio-help.com` verificado** (DKIM+SPF+return-path OK — NÃO faltava DKIM, estava no subdomínio `mail.`); From dos códigos alinhado. Spam dos códigos = domínio novo + volume + limite diário (resolvido pelo Pro), não DNS. API key dedicada `rlp-biohelp-app` criada (Sending access). Pendente: setar `RESEND_API_KEY`/`RESEND_FROM` na Vercel + webhook do Resend (`RESEND_WEBHOOK_SECRET`).
 
 ## Origem
 Call 02/06 (Léo + Gabriel). Hoje a Biohelp não tem ferramenta de disparo de e-mail própria — manda pela Shopify. Léo quer disparar comunicados pela própria gestão (admin do RLP): "subiu vídeo novo → dispara", "vai ter live → dispara". **Foi o ponto classificado como mais urgente.** Resend já foi feito **upgrade pro Pro** (50k/mês, sem limite diário) em 02/06.
