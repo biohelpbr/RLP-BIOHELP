@@ -8,7 +8,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Rotas que requerem autenticação
-const protectedRoutes = ['/dashboard', '/admin']
+const protectedRoutes = ['/dashboard', '/admin', '/trocar-senha']
 
 // Rotas públicas (não requerem auth)
 const publicRoutes = ['/', '/login', '/join', '/auth/callback', '/admin-login']
@@ -70,6 +70,19 @@ export async function middleware(request: NextRequest) {
 
   if (isPainelDomain && pathname.startsWith('/admin') && !pathname.startsWith('/admin-login')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // F-V28: troca de senha obrigatória após login com senha provisória.
+  // Enquanto `app_metadata.must_reset_password` estiver setada, qualquer rota
+  // autenticada é desviada pra /trocar-senha (a flag é limpa ao salvar a nova).
+  const mustReset = user?.app_metadata?.must_reset_password === true
+  if (
+    user &&
+    mustReset &&
+    pathname !== '/trocar-senha' &&
+    !pathname.startsWith('/auth/')
+  ) {
+    return NextResponse.redirect(new URL('/trocar-senha', request.url))
   }
 
   // Verificar se é rota protegida.

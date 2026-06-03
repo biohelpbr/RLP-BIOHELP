@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { getCommunityMember } from "@/lib/admin/community"
 import { PAYOUT_METHOD_LABELS } from "@/lib/payouts/v2/schema"
 import { MemberCancelActions } from "./MemberCancelActions"
+import { MemberPasswordActions } from "./MemberPasswordActions"
 
 interface CommunityDetailProps {
   params: Promise<{ id: string }>
@@ -174,6 +175,15 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
             autoRenew={member.subscription_auto_renew}
             expiresAt={member.subscription_expires_at}
           />
+
+          <div className="border-t pt-3">
+            <h3 className="text-sm font-semibold">Acesso · senha provisória (F-V28)</h3>
+            <p className="mb-2 text-xs text-muted-foreground">
+              Use quando a parceira não recebe o código por e-mail. Gera uma senha de
+              emergência; ela troca no primeiro acesso.
+            </p>
+            <MemberPasswordActions memberId={member.id} />
+          </div>
         </BHCard>
       </div>
     </AdminShell>
