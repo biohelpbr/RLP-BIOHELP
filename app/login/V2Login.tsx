@@ -4,7 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowRight, CheckCircle, Mail } from "lucide-react"
+import { ArrowRight, CheckCircle, Mail, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,6 +24,9 @@ export default function V2Login() {
   const [sent, setSent] = React.useState(false)
   const [code, setCode] = React.useState("")
   const [verifying, setVerifying] = React.useState(false)
+  // F-V28: alterna entre login por código (OTP, padrão) e login por senha.
+  const [mode, setMode] = React.useState<"code" | "password">("code")
+  const [password, setPassword] = React.useState("")
 
   // F-V19 follow-up (hotfix 01/06): se o login foi iniciado em /admin-login,
   // o destino correto é /admin, não /dashboard.
@@ -45,31 +48,37 @@ export default function V2Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Gate server-side compartilhado (código e senha): só passa e-mail de member
+  // com subscription_status='paid' (ou admin). Bloqueio mostra CTA do Guru.
+  const passesGate = async (normalized: string): Promise<boolean> => {
+    const gateRes = await fetch("/api/auth/check-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: normalized }),
+    })
+    const gate = await gateRes.json().catch(() => ({}))
+    if (!gateRes.ok || !gate?.ok) {
+      if (gate?.code === "NOT_PAID" && gate?.subscribe_url) {
+        setSubscribeUrl(gate.subscribe_url)
+        setError(
+          "E-mail não encontrado. Você precisa fazer o cadastro e assinar o Nutrition Club para acessar o painel.",
+        )
+      } else {
+        setError(gate?.message || "Não foi possível validar o e-mail.")
+      }
+      return false
+    }
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSubscribeUrl(null)
     setLoading(true)
     try {
-      // Gate server-side: só envia OTP se o e-mail pertencer a um member
-      // com subscription_status='paid'. Evita Supabase OTP para emails
-      // não-cadastrados e força fluxo de checkout no Guru.
       const normalized = email.trim().toLowerCase()
-      const gateRes = await fetch("/api/auth/check-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: normalized }),
-      })
-      const gate = await gateRes.json().catch(() => ({}))
-      if (!gateRes.ok || !gate?.ok) {
-        if (gate?.code === "NOT_PAID" && gate?.subscribe_url) {
-          setSubscribeUrl(gate.subscribe_url)
-          setError(
-            "E-mail não encontrado. Você precisa fazer o cadastro e assinar o Nutrition Club para acessar o painel.",
-          )
-        } else {
-          setError(gate?.message || "Não foi possível validar o e-mail.")
-        }
+      if (!(await passesGate(normalized))) {
         setLoading(false)
         return
       }
@@ -127,6 +136,38 @@ export default function V2Login() {
       console.error("[V2Login] verify error", err)
       setError("Erro de conexão. Tente novamente.")
       setVerifying(false)
+    }
+  }
+
+  // F-V28: login com senha (alternativa de emergência ao código). Passa pelo
+  // mesmo gate de assinatura. O middleware força a troca da senha provisória.
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setSubscribeUrl(null)
+    setLoading(true)
+    try {
+      const normalized = email.trim().toLowerCase()
+      if (!(await passesGate(normalized))) {
+        setLoading(false)
+        return
+      }
+      const supabase = createClientSupabase()
+      const { error: signErr } = await supabase.auth.signInWithPassword({
+        email: normalized,
+        password,
+      })
+      if (signErr) {
+        setError("E-mail ou senha incorretos.")
+        setLoading(false)
+        return
+      }
+      const destination = isAdminLoginPath() ? "/admin" : "/dashboard"
+      window.location.assign(destination)
+    } catch (err) {
+      console.error("[V2Login] password login error", err)
+      setError("Erro de conexão. Tente novamente.")
+      setLoading(false)
     }
   }
 
@@ -218,26 +259,63 @@ export default function V2Login() {
         </div>
 
         <BHCard variant="elevated" className="animate-scale-in">
-          {/* Tab admin removida — acesso admin via URL oculta /admin-login */}
+          {/* F-V28: alternância login por código (padrão) / login por senha */}
+          <div className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("code")
+                setError(null)
+                setSubscribeUrl(null)
+              }}
+              className={cn(
+                "h-9 rounded-lg text-sm font-medium transition-colors",
+                mode === "code"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground",
+              )}
+            >
+              Entrar com código
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("password")
+                setError(null)
+                setSubscribeUrl(null)
+              }}
+              className={cn(
+                "h-9 rounded-lg text-sm font-medium transition-colors",
+                mode === "password"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground",
+              )}
+            >
+              Entrar com senha
+            </button>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive space-y-3">
-                <p>{error}</p>
-                {subscribeUrl && (
-                  <a
-                    href={subscribeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center w-full h-10 rounded-lg bh-gradient-purple text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
-                  >
-                    Assinar agora
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </a>
-                )}
-              </div>
-            )}
+          {error && (
+            <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive space-y-3">
+              <p>{error}</p>
+              {subscribeUrl && (
+                <a
+                  href={subscribeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center w-full h-10 rounded-lg bh-gradient-purple text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+                >
+                  Assinar agora
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+              )}
+            </div>
+          )}
 
+          <form
+            onSubmit={mode === "code" ? handleSubmit : handlePasswordSubmit}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">
                 Seu e-mail
@@ -262,18 +340,55 @@ export default function V2Login() {
               </div>
             </div>
 
+            {mode === "password" && (
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">
+                  Senha
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="sua senha"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      if (error) setError(null)
+                    }}
+                    className="pl-10 h-12 rounded-xl"
+                    required
+                    disabled={loading}
+                    autoComplete="current-password"
+                  />
+                </div>
+              </div>
+            )}
+
             <Button
               type="submit"
               className="w-full h-12 rounded-xl bh-gradient-purple text-primary-foreground font-semibold hover:opacity-90 transition-opacity group"
-              disabled={loading || !email.includes("@")}
+              disabled={
+                loading ||
+                !email.includes("@") ||
+                (mode === "password" && password.length < 1)
+              }
             >
-              {loading ? "Enviando…" : "Entrar na minha conta"}
+              {loading
+                ? mode === "code"
+                  ? "Enviando…"
+                  : "Entrando…"
+                : mode === "code"
+                ? "Entrar na minha conta"
+                : "Entrar com senha"}
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Você vai receber um código de acesso no seu e-mail. Sem senha.
+            {mode === "code"
+              ? "Você vai receber um código de acesso no seu e-mail. Sem senha."
+              : "Use a senha que você criou ou a senha provisória enviada pelo suporte."}
           </p>
         </BHCard>
 

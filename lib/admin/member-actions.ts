@@ -1,9 +1,13 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
+import { createAdminClient, createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { cancelAutoRenew, cancelSubscription } from "@/lib/subscriptions/actions"
 import { syncCustomerToShopify } from "@/lib/shopify/customer"
+import {
+  generateProvisionalPassword,
+  sendProvisionalPasswordEmail,
+} from "@/lib/auth/provisional-password"
 
 type ActionResult = { ok: true } | { ok: false; error: string }
 
@@ -29,6 +33,96 @@ export async function adminCancelRenewal(memberId: string): Promise<ActionResult
   revalidatePath(`/admin/community/${memberId}`)
   revalidatePath("/admin/community")
   return { ok: true }
+}
+
+type ProvisionalPasswordResult =
+  | { ok: true; password: string; emailSent: boolean }
+  | { ok: false; error: string }
+
+/**
+ * F-V28 — Gera uma SENHA PROVISÓRIA pro membro (admin sob demanda).
+ * Caminho de emergência quando a parceira não recebe o código OTP por e-mail.
+ *
+ * - Grava a senha no Supabase Auth user (cria/linka o auth_user se faltar — mesmo
+ *   padrão do /welcome) e marca `app_metadata.must_reset_password=true`, que o
+ *   middleware usa pra forçar a troca no primeiro acesso.
+ * - Retorna a senha em claro UMA vez (mostrada no admin pra repasse manual) e
+ *   também tenta enviá-la por e-mail (Resend). Falha de e-mail não derruba a ação.
+ */
+export async function adminGenerateProvisionalPassword(
+  memberId: string,
+): Promise<ProvisionalPasswordResult> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth
+
+  const supabase = createServiceClient()
+  const { data: member, error: memberErr } = await supabase
+    .from("members")
+    .select("id, email, name, auth_user_id")
+    .eq("id", memberId)
+    .single()
+
+  if (memberErr || !member?.email) {
+    return { ok: false, error: "Membro não encontrado ou sem e-mail." }
+  }
+
+  const admin = createAdminClient()
+  const email = (member.email as string).toLowerCase().trim()
+  const password = generateProvisionalPassword()
+
+  // Garante o auth_user (membros do Guru podem ter auth_user_id nulo até o 1º login).
+  let authUserId = member.auth_user_id as string | null
+  if (!authUserId) {
+    const { data: created, error: createErr } = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      app_metadata: { must_reset_password: true },
+      user_metadata: { member_id: member.id },
+    })
+    if (createErr || !created?.user) {
+      // Pode existir auth.user sem o link em members.auth_user_id. Faz lookup.
+      const { data: existing } = await admin.auth.admin.listUsers()
+      const found = existing?.users.find(
+        (u) => u.email?.toLowerCase() === email,
+      )
+      if (!found) {
+        console.error("[adminGenerateProvisionalPassword] createUser falhou", createErr?.message)
+        return { ok: false, error: "Erro ao preparar o usuário de autenticação." }
+      }
+      authUserId = found.id
+    } else {
+      authUserId = created.user.id
+    }
+
+    await supabase
+      .from("members")
+      .update({ auth_user_id: authUserId })
+      .eq("id", member.id)
+  }
+
+  // Se o auth_user já existia (ou veio do fallback de lookup), grava senha + flag.
+  const { error: updErr } = await admin.auth.admin.updateUserById(authUserId, {
+    password,
+    app_metadata: { must_reset_password: true },
+  })
+  if (updErr) {
+    console.error("[adminGenerateProvisionalPassword] updateUserById", updErr.message)
+    return { ok: false, error: "Erro ao definir a senha provisória." }
+  }
+
+  const mail = await sendProvisionalPasswordEmail(
+    email,
+    member.name as string | null,
+    password,
+  )
+
+  console.info("[adminGenerateProvisionalPassword] senha gerada", {
+    memberId: member.id,
+    emailSent: mail.ok,
+  })
+
+  return { ok: true, password, emailSent: mail.ok }
 }
 
 /**
