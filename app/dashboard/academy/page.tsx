@@ -5,8 +5,9 @@ import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
-import { BHCard } from "@/components/biohelp"
+import { AnnouncementBar, BHCard } from "@/components/biohelp"
 import { listPublishedTrails } from "@/lib/content/queries"
+import { getActiveAnnouncement } from "@/lib/announcements/queries"
 
 export default async function AcademyMemberPage() {
   if (!isV2Enabled()) redirect("/dashboard")
@@ -14,11 +15,17 @@ export default async function AcademyMemberPage() {
   const member = await getCurrentMember()
   if (!member) redirect("/login")
 
-  const trails = await listPublishedTrails()
+  // F-V26: espelha o banner de avisos (F-V22) também na Academy, igual ao V2Dashboard.
+  const [trails, announcement] = await Promise.all([
+    listPublishedTrails(),
+    getActiveAnnouncement(),
+  ])
 
   return (
     <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
+        {announcement && <AnnouncementBar announcement={announcement} />}
+
         <header>
           <h1 className="text-3xl font-bold text-foreground inline-flex items-center gap-2">
             <GraduationCap className="w-7 h-7 text-primary" />
