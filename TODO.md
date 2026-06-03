@@ -4,7 +4,7 @@
 > **Fonte de progresso histórica:** `docs/STATUS_IMPLEMENTACAO.md` (snapshot por sprint).
 > **Tabela de status das features v2:** `docs/sdd/PIVOT-V2.md` §2.
 
-**Última atualização:** 2026-06-02 (F-V22 avisos done + deploy; registradas F-V23–F-V28 da call BioHelp&FlowCode).
+**Última atualização:** 2026-06-03 (F-V23/24/25 done; **F-V28 login com senha done** — PR #27 mergeado).
 
 ---
 
@@ -39,7 +39,7 @@
 | F-V25 | Busca de cliente no admin (`/admin/community`) | B | S7 | ✅ **Done 03/06** — PR #24 mergeado (`2975fd7`). Busca por nome/email/ref_code/telefone | — |
 | F-V26 | Banner de avisos também na Academy (espelha F-V22) | B | S7 | ⏳ Pendente (P2). Contract inline §1.1 | — |
 | F-V27 | Academy: refinar 3 trilhas + aulas/avisos programados por data | C | S7 | ⏳ Pendente (P2). Contract inline §1.1 | Léo refinar desenho no Lovable |
-| F-V28 | Login alternativo com senha (emergência) | D | TBD | 🟡 Reavaliar — Resend Pro deve resolver a causa (limite diário). Contract inline §1.1 | Decisão: ainda necessário pós-Pro? |
+| F-V28 | Login alternativo com senha (emergência) | D | S7 | ✅ **Done 03/06** — PR #27 mergeado (`4773e74`). Admin gera senha provisória (mostrada + e-mail) no `/admin/community/[id]`; toggle código/senha na `/login`; troca obrigatória no 1º acesso (flag `app_metadata` + middleware → `/trocar-senha`). Sem migration. E2E 8/8 CAs. SPEC dedicada. | — |
 
 **Próximas ações (snapshot 2026-05-25):**
 - **F-V19 merge:** review final dos diffs → merge `feat/F-V19-fluxo-guru-pre-cadastro` em main.
@@ -74,10 +74,9 @@
 - **CA:** CA-1 3 trilhas refletem o desenho; CA-2 admin marca aula como futura com data → membro vê "em breve · dia X"; CA-3 ao subir o vídeo, deixa de ser "em breve".
 - **Bloqueio:** Léo precisa refinar o desenho final no Lovable antes do seed das trilhas.
 
-### F-V28 — Login alternativo com senha (D) — 🟡 REAVALIAR
-- **Pedido (Gabriel):** clientes não recebiam o código (caía no spam / **limite diário do Resend free**). Quer login com senha provisória como emergência.
-- **Status:** **reavaliar** — o **upgrade pro Resend Pro (02/06)** remove o limite diário, que era a causa principal. Antes de implementar (mexe em **auth**, classe D), confirmar com o cliente se ainda é necessário pós-Pro + após configurar DKIM (anti-spam). Se for: Supabase Auth com senha (admin gera senha provisória no `/admin/community/[id]` → membro loga email+senha).
-- **Decisão pendente do cliente.**
+### F-V28 — Login alternativo com senha (D) — ✅ DONE 03/06
+- **Pedido (Gabriel):** clientes não recebiam o código (caía no spam / limite diário do Resend free). Quer login com senha provisória como emergência.
+- **Entregue (PR #27, `4773e74`):** admin gera senha provisória no `/admin/community/[id]` (mostrada pra copiar + e-mail Resend); `/login` com toggle código/senha (`signInWithPassword`, mesmo gate `check-email`); troca obrigatória no 1º acesso via flag `app_metadata.must_reset_password` + middleware → `/trocar-senha`. Sem migration. E2E validado (8/8 CAs). SPEC: `docs/sdd/features/F-V28-login-senha/SPEC.md`.
 
 ---
 

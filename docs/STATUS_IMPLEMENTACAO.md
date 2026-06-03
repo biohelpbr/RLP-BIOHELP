@@ -14,6 +14,17 @@
 
 ---
 
+## 🚀 Snapshot 03/06/2026 — Sprint 7 (pós-call BioHelp&FlowCode)
+Features da call 02/06 entregues e mergeadas em main:
+- ✅ **F-V23** Disparo de e-mail nativo no admin (Resend Pro) — PR #23 (`eb0d75a`). ⚠️ spam por reputação do domínio (follow-up de warm-up).
+- ✅ **F-V24** Cancelamento/estorno manual no admin — PR #25 (`9a98b25`). Webhook Guru já cobria o automático.
+- ✅ **F-V25** Busca de cliente no `/admin/community` — PR #24 (`2975fd7`).
+- ✅ **F-V28** Login alternativo com senha — PR #27 (`4773e74`). Admin gera senha provisória (mostrada + e-mail) → toggle código/senha na `/login` → troca obrigatória no 1º acesso (flag `app_metadata` + middleware). Sem migration. E2E 8/8 CAs.
+- ⏳ **Pendentes S7:** F-V26 (banner Academy, PR aberto), F-V27 (Academy 3 trilhas — bloqueado no Lovable).
+- 🔎 **Follow-up novo:** pesquisar OTP de login via **SMS/WhatsApp** (e-mail cai no spam por reputação).
+
+---
+
 ---
 
 ## ⚠️ PIVÔ V2 — 28/04/2026 (em planejamento)

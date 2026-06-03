@@ -1,8 +1,8 @@
 # F-V28 — Login alternativo com senha (provisória + troca obrigatória)
 
 > **Classe:** D (mexe em auth)
-> **Status:** Em DoR → Em Implementação
-> **Branch:** `feat/F-V28-login-senha`
+> **Status:** ✅ Done (2026-06-03) — PR #27 mergeado (`4773e74`). E2E 8/8 CAs.
+> **Branch:** `feat/F-V28-login-senha` (mergeada e removida)
 > **Origem:** call BioHelp&FlowCode 02/06 (Gabriel). Reavaliada e aprovada p/ implementar em 03/06.
 
 ## 1. Problema

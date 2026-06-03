@@ -103,7 +103,7 @@
 | F-V25 | Busca de cliente no admin (`/admin/community`) | B | P1 | ✅ **Done 03/06/2026** — PR #24 (`2975fd7`). Busca ilike por nome/email/ref_code/telefone, form GET server-side. |
 | F-V26 | Banner de avisos também na Academy (espelha F-V22) | B | P2 | ⏳ **Registrada 02/06/2026 (call)** — pedido Léo. Reusa F-V22. Contract inline TODO §1.1. |
 | F-V27 | Academy: refinar 3 trilhas + aulas/avisos programados por data | C | P2 | ⏳ **Registrada 02/06/2026 (call)** — pedido Léo, estende F-V09. Bloqueio: Léo refinar desenho no Lovable. Contract inline TODO §1.1. |
-| F-V28 | Login alternativo com senha (emergência) | D | P2 | 🟡 **Reavaliar (02/06)** — Resend Pro deve resolver a causa (limite diário). Decisão do cliente: ainda necessário? Contract inline TODO §1.1. |
+| F-V28 | Login alternativo com senha (emergência) | D | P2 | ✅ **Done 03/06/2026** — PR #27 mergeado (`4773e74`). Admin gera senha provisória no `/admin/community/[id]` (mostrada + e-mail Resend); `/login` com toggle código/senha (`signInWithPassword`); troca obrigatória no 1º acesso via flag `app_metadata.must_reset_password` + middleware → `/trocar-senha`. Sem migration. E2E validado (8/8 CAs). SPEC: `docs/sdd/features/F-V28-login-senha/`. |
 
 **Legenda:** P0 = bloqueia o novo fluxo. P1 = essencial pro MVP v2. P2 = pós-MVP v2. ✅ = destravada / 🟡 = parcial / 🚫 = bloqueada / 🚧 = em implementação.
 
