@@ -1,6 +1,8 @@
 # F-V24 — Cancelamento / estorno (Guru → corta acesso RLP + Shopify)
 
-**Classe:** D (assinatura/pagamento/acesso — produção-crítico) · **Status:** ⏳ Pendente (backlog, P1) · **Registrado:** 2026-06-02 (call BioHelp&FlowCode)
+**Classe:** D (assinatura/pagamento/acesso — produção-crítico) · **Status:** ✅ Done (PR #25 mergeado em main 03/06) · **Registrado:** 2026-06-02 · **Implementado:** 2026-06-03
+
+> **Resolução:** o lado automático (webhook Guru) **já estava implementado** (`subscription_canceled`→`cancelAutoRenew`; `subscription_expired`→`cancelSubscription`+remove tag Shopify; refund→notifica admin). O TBD do payload Guru estava, na prática, resolvido. Este F adicionou o **cancelamento manual** no admin (`lib/admin/member-actions.ts` + botões em `/admin/community/[id]`). Sem migration (colunas `subscription_auto_renew`/`subscription_expires_at` já existiam). **Pendente:** testar o fluxo manual com um membro de teste em produção.
 
 ## Origem
 Call 02/06 (Gabriel + Léo). Quando um cliente desiste, o Gabriel cancela/estorna no **Guru**, mas no **RLP o membro continua ativo** (mantém acesso). Precisa sincronizar o cancelamento e dar uma forma manual no admin.
