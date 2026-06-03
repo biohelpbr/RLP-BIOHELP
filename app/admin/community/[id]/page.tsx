@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { ArrowLeft, Award, CircleDollarSign, Crown, Users } from "lucide-react"
+import { ArrowLeft, Award, CircleDollarSign, Clock, Crown, Users } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
@@ -36,7 +36,7 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
   const detail = await getCommunityMember(id)
   if (!detail) notFound()
 
-  const { member, sponsor, activeCount, payouts, leadsCount, salesCount } = detail
+  const { member, sponsor, activeCount, pendingCount, payouts, leadsCount, salesCount } = detail
 
   return (
     <AdminShell adminName={me.name ?? "Admin"}>
@@ -76,13 +76,20 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
           </div>
         </header>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <BHStat
             label="Afiliados ativos"
             value={activeCount}
-            subtitle="Proxy: status='active' (S3)"
+            subtitle="Assinatura paga (N1 direto)"
             icon={<Users className="w-5 h-5" />}
             variant="primary"
+          />
+          <BHStat
+            label="Afiliados pendentes"
+            value={pendingCount}
+            subtitle="Assinatura aguardando ativação"
+            icon={<Clock className="w-5 h-5" />}
+            variant="warning"
           />
           <BHStat
             label="Leads + Vendas (F-V14)"
@@ -124,7 +131,7 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
               </p>
             )}
             <p className="text-xs text-muted-foreground">
-              N1 (afiliados diretos): {activeCount} ativos.
+              N1 (afiliados diretos): {activeCount} ativos · {pendingCount} pendentes.
             </p>
           </BHCard>
 
