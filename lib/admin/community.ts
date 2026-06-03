@@ -39,8 +39,18 @@ export type CommunityMember = {
 export type CommunityFilters = {
   status?: "active" | "pending" | "inactive" | "all"
   tag?: string
+  /** Busca livre por nome / email / ref_code / telefone (F-V25). */
+  search?: string
   page?: number
   pageSize?: number
+}
+
+/**
+ * Sanitiza o termo de busca pro `.or()` do PostgREST (vírgula/parênteses são
+ * separadores de sintaxe e quebrariam a query). Remove caracteres perigosos.
+ */
+function sanitizeSearch(raw: string): string {
+  return raw.replace(/[,()%*\\]/g, " ").trim()
 }
 
 export type CommunityList = {
@@ -79,6 +89,14 @@ export async function listCommunity(filters: CommunityFilters = {}): Promise<Com
     // .contains() envia formato `cs.{...}` (incompatível com jsonb); usamos
     // .filter("cs", JSON.stringify([tag])) que envia `cs.["..."]`.
     query = query.filter("tags", "cs", JSON.stringify([filters.tag]))
+  }
+
+  // F-V25: busca livre (ilike) por nome / email / ref_code / telefone.
+  const term = filters.search ? sanitizeSearch(filters.search) : ""
+  if (term) {
+    query = query.or(
+      `name.ilike.%${term}%,email.ilike.%${term}%,ref_code.ilike.%${term}%,phone.ilike.%${term}%`,
+    )
   }
 
   const { data, error, count } = await query

@@ -1,17 +1,20 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { Award, Crown, Filter, Users } from "lucide-react"
+import { Award, Crown, Filter, Search, Users } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { listCommunity, type CommunityMember } from "@/lib/admin/community"
 
 interface CommunityPageProps {
   searchParams: Promise<{
     status?: string
     tag?: string
+    q?: string
     page?: string
   }>
 }
@@ -45,19 +48,22 @@ export default async function CommunityPage({ searchParams }: CommunityPageProps
   const sp = await searchParams
   const status = (sp.status as "all" | "active" | "pending" | "inactive" | undefined) ?? "all"
   const tag = sp.tag ?? ""
+  const search = (sp.q ?? "").trim()
   const page = Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1)
 
-  const result = await listCommunity({ status, tag: tag || undefined, page })
+  const result = await listCommunity({ status, tag: tag || undefined, search: search || undefined, page })
 
   const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
 
-  const buildHref = (overrides: Partial<{ status: string; tag: string; page: number }>) => {
+  const buildHref = (overrides: Partial<{ status: string; tag: string; q: string; page: number }>) => {
     const params = new URLSearchParams()
     const newStatus = overrides.status ?? status
     const newTag = overrides.tag ?? tag
+    const newSearch = overrides.q ?? search
     const newPage = overrides.page ?? page
     if (newStatus && newStatus !== "all") params.set("status", newStatus)
     if (newTag) params.set("tag", newTag)
+    if (newSearch) params.set("q", newSearch)
     if (newPage > 1) params.set("page", String(newPage))
     const qs = params.toString()
     return qs ? `/admin/community?${qs}` : "/admin/community"
@@ -69,12 +75,43 @@ export default async function CommunityPage({ searchParams }: CommunityPageProps
         <header className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">Comunidade</h1>
           <p className="text-muted-foreground">
-            {result.total} {result.total === 1 ? "membro" : "membros"} no clube.
+            {search ? (
+              <>
+                {result.total} {result.total === 1 ? "resultado" : "resultados"} para{" "}
+                <span className="font-medium">&quot;{search}&quot;</span>.
+              </>
+            ) : (
+              <>
+                {result.total} {result.total === 1 ? "membro" : "membros"} no clube.
+              </>
+            )}
           </p>
         </header>
 
         <BHCard variant="default" className="space-y-3">
-          <div className="flex items-center gap-2">
+          {/* F-V25: busca livre (GET form, server-side). Preserva status/tag via hidden. */}
+          <form action="/admin/community" method="get" className="flex flex-wrap items-center gap-2">
+            {status !== "all" && <input type="hidden" name="status" value={status} />}
+            {tag && <input type="hidden" name="tag" value={tag} />}
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                name="q"
+                defaultValue={search}
+                placeholder="Buscar por nome, e-mail, código ou telefone…"
+                className="pl-9"
+                aria-label="Buscar membro"
+              />
+            </div>
+            <Button type="submit" size="sm">Buscar</Button>
+            {search && (
+              <Button asChild type="button" variant="ghost" size="sm">
+                <Link href={buildHref({ q: "", page: 1 })}>Limpar</Link>
+              </Button>
+            )}
+          </form>
+
+          <div className="flex items-center gap-2 border-t border-border pt-3">
             <Filter className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium">Filtros</span>
           </div>
