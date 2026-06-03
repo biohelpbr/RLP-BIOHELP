@@ -3,6 +3,10 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-06-03
+
+- [2026-06-03] [RELEASE] **F-V23 Disparo de e-mail nativo no admin** deployado em `main` (PR #23 `eb0d75a`). `/admin/emails` (composer + segmentação + status), envio em lotes via `resend.batch.send`, From `comunidade@mail.bio-help.com`. Migration `email_campaigns`+`email_campaign_recipients` aplicada. Infra configurada via browser: API key `rlp-biohelp-app`, envs Vercel (`RESEND_API_KEY`/`RESEND_FROM`/`RESEND_WEBHOOK_SECRET`), webhook Resend (`/api/webhooks/resend`, 5 eventos). **Teste real OK** (envia/chega/renderiza). ⚠️ **Cai no spam por REPUTAÇÃO** do domínio (Gmail diz explicitamente que `send.mail.bio-help.com` tinha mensagens marcadas como spam antes — os códigos de auth). NÃO é DNS — DKIM/SPF/return-path/DMARC todos verificados e alinhados. **Follow-up:** recuperar reputação (Postmaster Tools + report-not-spam + warm-up) ANTES de blast pra base. Eduardo promovido a admin (linha em `roles`). Login admin = entrar por `admin.bio-help.com/admin-login` (não `/login`, senão middleware joga pro painel).
+
 ## 2026-06-02
 
 - [2026-06-02] [DECISION] **Call BioHelp&FlowCode (Léo + Gabriel)** — registrados 6 pedidos como features F-V23–F-V28 no TODO/PIVOT. **F-V23** disparo de e-mail nativo no admin (Resend **Pro contratado hoje**; mais urgente; precisa DKIM no Cloudflare p/ não cair no spam) · **F-V24** cancelamento/estorno (Guru webhook + manual; imediato corta acesso já, só-renovação mantém até fim do ciclo) · **F-V25** busca de cliente no admin · **F-V26** banner de avisos também na Academy (espelha F-V22) · **F-V27** Academy 3 trilhas + aulas/avisos programados por data · **F-V28** login com senha (🟡 reavaliar — Pro resolve a causa do "código não chega"). SPECs dedicadas: F-V23, F-V24. Demais: Feature Contract inline TODO §1.1. Causa do "código não chegava" = limite diário do Resend free (resolvido pelo Pro) + spam por DKIM ausente.

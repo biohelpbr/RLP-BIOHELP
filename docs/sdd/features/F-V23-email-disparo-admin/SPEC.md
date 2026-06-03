@@ -1,6 +1,8 @@
 # F-V23 — Disparo de e-mail nativo no admin (Resend Pro)
 
-**Classe:** C (outward-facing — envio em massa pra base real; exige confirmação antes de disparo) · **Status:** 🚧 Implementado (branch `feat/F-V23-email-disparo`, em PR) · **Registrado:** 2026-06-02 · **Implementado:** 2026-06-03
+**Classe:** C (outward-facing — envio em massa pra base real; exige confirmação antes de disparo) · **Status:** ✅ Done (deployado em main 03/06, teste real OK) · **Registrado:** 2026-06-02 · **Implementado:** 2026-06-03
+
+> **Teste real 03/06:** e-mail enviado de `comunidade@mail.bio-help.com` chegou e renderizou. **Caiu no spam por REPUTAÇÃO** (Gmail: "previous messages from send.mail.bio-help.com were marked as spam") — DNS/DKIM/SPF/DMARC todos OK. **Follow-up (não-bloqueador da feature):** recuperar reputação antes de disparar pra base — Google Postmaster Tools, "report not spam" dos 1ºs envios, aquecimento gradual (não blastar 257 de um domínio penalizado). Ver memória `project_email_deliverability`.
 
 > **Infra confirmada (02/06):** Resend **Pro** ativo; domínio **`mail.bio-help.com` verificado** (DKIM+SPF+return-path OK — NÃO faltava DKIM, estava no subdomínio `mail.`); From dos códigos alinhado. Spam dos códigos = domínio novo + volume + limite diário (resolvido pelo Pro), não DNS. API key dedicada `rlp-biohelp-app` criada (Sending access). Pendente: setar `RESEND_API_KEY`/`RESEND_FROM` na Vercel + webhook do Resend (`RESEND_WEBHOOK_SECRET`).
 
