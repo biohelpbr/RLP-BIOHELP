@@ -145,7 +145,7 @@ export async function getCommunityMember(id: string) {
   const supabase = createServiceClient()
   const { data: member } = await supabase
     .from("members")
-    .select("id, name, email, ref_code, subscription_status, created_at, sponsor_id, tags, phone, level")
+    .select("id, name, email, ref_code, subscription_status, subscription_auto_renew, subscription_expires_at, created_at, sponsor_id, tags, phone, level")
     .eq("id", id)
     .single()
   if (!member) return null
@@ -192,6 +192,9 @@ export async function getCommunityMember(id: string) {
       email: (member.email as string) ?? "",
       ref_code: (member.ref_code as string) ?? "",
       status: legacyFromSubscription(member.subscription_status),
+      subscription_status: (member.subscription_status as string | null) ?? null,
+      subscription_auto_renew: (member.subscription_auto_renew as boolean | null) ?? null,
+      subscription_expires_at: (member.subscription_expires_at as string | null) ?? null,
       created_at: (member.created_at as string) ?? "",
       sponsor_id: (member.sponsor_id as string | null) ?? null,
       tags: Array.isArray(member.tags) ? (member.tags as string[]) : [],

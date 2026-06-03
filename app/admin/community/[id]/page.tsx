@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getCommunityMember } from "@/lib/admin/community"
 import { PAYOUT_METHOD_LABELS } from "@/lib/payouts/v2/schema"
+import { MemberCancelActions } from "./MemberCancelActions"
 
 interface CommunityDetailProps {
   params: Promise<{ id: string }>
@@ -159,6 +160,21 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
             )}
           </BHCard>
         </div>
+
+        <BHCard variant="elevated" className="space-y-3">
+          <h2 className="text-lg font-semibold">Gestão da assinatura (F-V24)</h2>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium">Cancelar renovação</span> mantém o acesso até o fim do
+            ciclo. <span className="font-medium">Cancelar imediato</span> corta o acesso agora e
+            remove o preço de clube na Shopify — use após estornar no Guru.
+          </p>
+          <MemberCancelActions
+            memberId={member.id}
+            status={member.status}
+            autoRenew={member.subscription_auto_renew}
+            expiresAt={member.subscription_expires_at}
+          />
+        </BHCard>
       </div>
     </AdminShell>
   )
