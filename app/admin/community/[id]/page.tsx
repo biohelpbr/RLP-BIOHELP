@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { ArrowLeft, Award, CircleDollarSign, Crown, Users } from "lucide-react"
+import { ArrowLeft, Award, CircleDollarSign, Clock, Crown, Users } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getCommunityMember } from "@/lib/admin/community"
 import { PAYOUT_METHOD_LABELS } from "@/lib/payouts/v2/schema"
+import { MemberActivateActions } from "./MemberActivateActions"
 import { MemberCancelActions } from "./MemberCancelActions"
 import { MemberPasswordActions } from "./MemberPasswordActions"
 
@@ -36,7 +37,7 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
   const detail = await getCommunityMember(id)
   if (!detail) notFound()
 
-  const { member, sponsor, activeCount, payouts, leadsCount, salesCount } = detail
+  const { member, sponsor, activeCount, pendingCount, payouts, leadsCount, salesCount } = detail
 
   return (
     <AdminShell adminName={me.name ?? "Admin"}>
@@ -76,13 +77,20 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
           </div>
         </header>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <BHStat
             label="Afiliados ativos"
             value={activeCount}
-            subtitle="Proxy: status='active' (S3)"
+            subtitle="Assinatura paga (N1 direto)"
             icon={<Users className="w-5 h-5" />}
             variant="primary"
+          />
+          <BHStat
+            label="Afiliados pendentes"
+            value={pendingCount}
+            subtitle="Assinatura aguardando ativação"
+            icon={<Clock className="w-5 h-5" />}
+            variant="warning"
           />
           <BHStat
             label="Leads + Vendas (F-V14)"
@@ -124,7 +132,7 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
               </p>
             )}
             <p className="text-xs text-muted-foreground">
-              N1 (afiliados diretos): {activeCount} ativos.
+              N1 (afiliados diretos): {activeCount} ativos · {pendingCount} pendentes.
             </p>
           </BHCard>
 
@@ -163,8 +171,22 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
         </div>
 
         <BHCard variant="elevated" className="space-y-3">
-          <h2 className="text-lg font-semibold">Gestão da assinatura (F-V24)</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-lg font-semibold">Gestão da assinatura</h2>
+
+          <div>
+            <h3 className="text-sm font-semibold">Ativação manual</h3>
+            <p className="mb-2 text-xs text-muted-foreground">
+              Marca a assinatura como paga sem passar pelo checkout do Guru — para contas
+              internas e turma de vendas criadas à mão. Não cria senha de login; use a senha
+              provisória abaixo se o membro não conseguir entrar.
+            </p>
+            <MemberActivateActions
+              memberId={member.id}
+              subscriptionStatus={member.subscription_status}
+            />
+          </div>
+
+          <p className="border-t pt-3 text-sm text-muted-foreground">
             <span className="font-medium">Cancelar renovação</span> mantém o acesso até o fim do
             ciclo. <span className="font-medium">Cancelar imediato</span> corta o acesso agora e
             remove o preço de clube na Shopify — use após estornar no Guru.

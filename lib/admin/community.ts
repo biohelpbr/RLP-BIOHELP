@@ -150,7 +150,7 @@ export async function getCommunityMember(id: string) {
     .single()
   if (!member) return null
 
-  const [sponsorRes, countsRes, payoutsRes, leadsRes, salesRes] = await Promise.all([
+  const [sponsorRes, countsRes, pendingCountRes, payoutsRes, leadsRes, salesRes] = await Promise.all([
     member.sponsor_id
       ? supabase
           .from("members")
@@ -163,6 +163,15 @@ export async function getCommunityMember(id: string) {
       .select("active_count")
       .eq("member_id", id)
       .single(),
+    // Pedido Gabriel (call 03/06): além dos afiliados ativos, mostrar quantos
+    // afiliados diretos (N1) estão com assinatura `pending` aguardando ativação.
+    // Mesma população da view member_active_affiliate_count (sponsor_id = id),
+    // só que filtrando subscription_status='pending' em vez de 'paid'.
+    supabase
+      .from("members")
+      .select("*", { count: "exact", head: true })
+      .eq("sponsor_id", id)
+      .eq("subscription_status", "pending"),
     supabase
       .from("payout_requests")
       .select("id, amount, status, payout_method, created_at")
@@ -181,6 +190,7 @@ export async function getCommunityMember(id: string) {
 
   const sponsor = sponsorRes.data
   const counts = countsRes.data
+  const pendingCount = pendingCountRes.count ?? 0
   const payouts = payoutsRes.data
   const leadsCount = leadsRes.count ?? 0
   const salesCount = salesRes.count ?? 0
@@ -203,6 +213,7 @@ export async function getCommunityMember(id: string) {
     },
     sponsor: sponsor as { id: string; name: string; ref_code: string } | null,
     activeCount: Number(counts?.active_count ?? 0),
+    pendingCount,
     payouts: (payouts ?? []) as Array<{
       id: string
       amount: number

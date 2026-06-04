@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache"
 import { createAdminClient, createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
-import { cancelAutoRenew, cancelSubscription } from "@/lib/subscriptions/actions"
+import {
+  cancelAutoRenew,
+  cancelSubscription,
+  extendSubscription,
+  markSubscriptionPaid,
+} from "@/lib/subscriptions/actions"
 import { syncCustomerToShopify } from "@/lib/shopify/customer"
 import {
   generateProvisionalPassword,
@@ -29,6 +34,68 @@ export async function adminCancelRenewal(memberId: string): Promise<ActionResult
 
   const res = await cancelAutoRenew(memberId)
   if (!res.ok) return { ok: false, error: res.error }
+
+  revalidatePath(`/admin/community/${memberId}`)
+  revalidatePath("/admin/community")
+  return { ok: true }
+}
+
+/**
+ * Ativação MANUAL da assinatura (admin) — pedido call 03/06 (Gabriel: "tem como
+ * ativar um membro manualmente?"). Usado para a turma de vendas e contas criadas
+ * à mão que precisam ficar ativas sem passar pelo checkout do Guru.
+ *
+ * Replica o efeito da ativação via webhook: subscription_status='paid' (+ tags
+ * do sponsor), estende o ciclo de acesso e liga o auto-renovar, normaliza o
+ * status legado e sincroniza a tag `subscriber` na Shopify (best-effort).
+ *
+ * NÃO cria credencial de login — para o membro conseguir entrar, use a senha
+ * provisória (adminGenerateProvisionalPassword) ou o login por código.
+ */
+export async function adminActivateMember(memberId: string): Promise<ActionResult> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth
+
+  const paid = await markSubscriptionPaid(memberId)
+  if (!paid.ok) return { ok: false, error: paid.error }
+
+  const ext = await extendSubscription(memberId, 1)
+  if (!ext.ok) return { ok: false, error: ext.error }
+
+  const supabase = createServiceClient()
+  // Coerência do status legado (badge do detalhe lê `status`).
+  await supabase.from("members").update({ status: "active" }).eq("id", memberId)
+
+  // Sincroniza acesso na Shopify (aplica tag subscriber). Best-effort.
+  try {
+    const { data: m } = await supabase
+      .from("members")
+      .select("email, name, ref_code, sponsor_id")
+      .eq("id", memberId)
+      .single()
+    if (m?.email) {
+      let sponsorRefCode: string | null = null
+      if (m.sponsor_id) {
+        const { data: s } = await supabase
+          .from("members")
+          .select("ref_code")
+          .eq("id", m.sponsor_id as string)
+          .single()
+        sponsorRefCode = (s?.ref_code as string | null) ?? null
+      }
+      const nameParts = ((m.name as string | null) ?? "").split(" ")
+      await syncCustomerToShopify({
+        email: m.email as string,
+        firstName: nameParts[0] || "Parceira",
+        lastName: nameParts.slice(1).join(" ") || "",
+        refCode: (m.ref_code as string) ?? "",
+        sponsorRefCode,
+        status: "active",
+      })
+    }
+  } catch (e) {
+    console.error("[adminActivateMember] shopify sync (non-fatal)", e)
+  }
 
   revalidatePath(`/admin/community/${memberId}`)
   revalidatePath("/admin/community")

@@ -37,6 +37,7 @@ interface NavItem {
 const adminNavItems: NavItem[] = [
   { title: "Visão Geral", href: "/admin", icon: LayoutDashboard },
   { title: "Comunidade", href: "/admin/community", icon: Users },
+  { title: "Assinaturas", href: "/admin/orders", icon: BarChart3 },
   { title: "Crescimento", href: "/admin/growth", icon: TrendingUp },
   { title: "Consumo", href: "/admin/consumption", icon: ShoppingBag },
   { title: "Produtos", href: "/admin/products", icon: Package },

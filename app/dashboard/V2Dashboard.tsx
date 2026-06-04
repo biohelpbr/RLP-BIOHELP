@@ -3,7 +3,9 @@ import Link from "next/link"
 import {
   CalendarHeart,
   ExternalLink,
+  LifeBuoy,
   Link2,
+  MessageCircle,
   ShoppingCart,
   Sparkles,
   Users,
@@ -64,6 +66,16 @@ export default async function V2Dashboard() {
   // Verificado em 13/05/2026: em Vercel a env pode existir mas estar vazia.
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
 
+  // Comunidade no WhatsApp + atendimento (pedido call 03/06). Configuráveis por
+  // env var (sem novo deploy quando o link/numero mudar). Comunidade tem fallback
+  // pro link oficial do anexo; atendimento só renderiza quando configurado.
+  const communityUrl =
+    process.env.NEXT_PUBLIC_WHATSAPP_COMMUNITY_URL ||
+    "https://chat.whatsapp.com/JBXR9M2QEv1HXYwuDqgT0V"
+  // O atendimento é feito DENTRO da própria comunidade do WhatsApp — por padrão
+  // aponta pro mesmo link. Env var só pra um eventual canal de suporte separado.
+  const supportUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || communityUrl
+
   return (
     <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
@@ -111,6 +123,36 @@ export default async function V2Dashboard() {
             variant={isActive ? "success" : "warning"}
           />
         </div>
+
+        <BHCard variant="elevated" className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-[#25D366]/15 text-[#128C7E]">
+              <MessageCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold">Comunidade &amp; Atendimento</h2>
+              <p className="text-sm text-muted-foreground">
+                Entre na comunidade oficial no WhatsApp pra receber avisos, comunicados e
+                novidades. <span className="font-medium text-foreground">É também por ali que
+                você fala com o nosso atendimento</span> — é o mesmo grupo.
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button asChild className="w-full">
+              <a href={communityUrl} target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Entrar na comunidade
+              </a>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <a href={supportUrl} target="_blank" rel="noopener noreferrer">
+                <LifeBuoy className="w-4 h-4 mr-2" />
+                Atendimento (mesma comunidade)
+              </a>
+            </Button>
+          </div>
+        </BHCard>
 
         <div className="grid gap-4 lg:grid-cols-2">
           <BHCard variant="elevated" className="space-y-4">
