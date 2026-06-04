@@ -84,7 +84,18 @@ export async function listCommunity(filters: CommunityFilters = {}): Promise<Com
     query = query.eq("subscription_status", LEGACY_TO_SUB[filters.status])
   }
 
-  if (filters.tag) {
+  if (filters.tag === "FOUNDER") {
+    // FOUNDER é COMPUTADO (≥5 afiliados ativos — F-V06), NÃO uma tag em
+    // members.tags. O badge usa active_count>=5; o filtro precisa fazer o mesmo.
+    // Restringe a query aos member_ids elegíveis (view member_active_affiliate_count).
+    const { data: founders } = await supabase
+      .from("member_active_affiliate_count")
+      .select("member_id")
+      .gte("active_count", 5)
+    const founderIds = (founders ?? []).map((r) => r.member_id as string)
+    // Lista vazia → força 0 resultados sem quebrar o PostgREST (.in([]) é inválido).
+    query = query.in("id", founderIds.length > 0 ? founderIds : ["00000000-0000-0000-0000-000000000000"])
+  } else if (filters.tag) {
     // tags é jsonb — precisa serializar como JSON array, não Postgres array.
     // .contains() envia formato `cs.{...}` (incompatível com jsonb); usamos
     // .filter("cs", JSON.stringify([tag])) que envia `cs.["..."]`.
