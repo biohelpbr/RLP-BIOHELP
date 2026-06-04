@@ -72,7 +72,9 @@ export default async function V2Dashboard() {
   const communityUrl =
     process.env.NEXT_PUBLIC_WHATSAPP_COMMUNITY_URL ||
     "https://chat.whatsapp.com/JBXR9M2QEv1HXYwuDqgT0V"
-  const supportUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || ""
+  // O atendimento é feito DENTRO da própria comunidade do WhatsApp — por padrão
+  // aponta pro mesmo link. Env var só pra um eventual canal de suporte separado.
+  const supportUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || communityUrl
 
   return (
     <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
@@ -130,8 +132,9 @@ export default async function V2Dashboard() {
             <div>
               <h2 className="text-lg font-semibold">Comunidade &amp; Atendimento</h2>
               <p className="text-sm text-muted-foreground">
-                Entre na comunidade do WhatsApp pra receber avisos, comunicados e novidades.
-                Precisa de ajuda? Fale com o nosso atendimento.
+                Entre na comunidade oficial no WhatsApp pra receber avisos, comunicados e
+                novidades. <span className="font-medium text-foreground">É também por ali que
+                você fala com o nosso atendimento</span> — é o mesmo grupo.
               </p>
             </div>
           </div>
@@ -142,14 +145,12 @@ export default async function V2Dashboard() {
                 Entrar na comunidade
               </a>
             </Button>
-            {supportUrl ? (
-              <Button asChild variant="outline" className="w-full">
-                <a href={supportUrl} target="_blank" rel="noopener noreferrer">
-                  <LifeBuoy className="w-4 h-4 mr-2" />
-                  Falar com o atendimento
-                </a>
-              </Button>
-            ) : null}
+            <Button asChild variant="outline" className="w-full">
+              <a href={supportUrl} target="_blank" rel="noopener noreferrer">
+                <LifeBuoy className="w-4 h-4 mr-2" />
+                Atendimento (mesma comunidade)
+              </a>
+            </Button>
           </div>
         </BHCard>
 
