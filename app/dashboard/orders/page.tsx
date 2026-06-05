@@ -48,7 +48,8 @@ export default async function OrdersPage() {
   const [leads, sales] = await Promise.all([listLeads(member.id), listSales(member.id)])
   const stats = computeMonthlyStats(sales)
   const { opportunities, fresh } = splitOpportunities(leads)
-  const isActive = member.status === "active"
+  // F-V03: assinatura paga é a fonte de verdade, não o status legado.
+  const isActive = member.subscription_status === "paid"
 
   return (
     <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>

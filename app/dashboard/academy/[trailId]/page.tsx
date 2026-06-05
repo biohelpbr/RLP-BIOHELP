@@ -38,7 +38,7 @@ export default async function TrailDetailPage({
   const completed = await listMemberCompletedModules(member.id)
 
   return (
-    <PartnerShell memberName={member.name ?? "Você"} isActive={member.status === "active"} memberSubtitle={getMemberSubtitle(member)}>
+    <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6">
         <Link
           href="/dashboard/academy"

@@ -33,8 +33,11 @@ export interface SegmentMember {
   name: string | null
 }
 
-/** Status de assinatura que cada segmento cobre (canceled cobre variações). */
-const CANCELED_STATUSES = ["canceled", "cancelled", "expired"]
+// O enum `subscription_status_v2` só tem: pending | paid | cancelled.
+// Passar valores fora do enum (ex.: "canceled" com 1 L, "expired") faz o Postgres
+// REJEITAR a query inteira (invalid input value for enum) → o segmento "Cancelados"
+// retornava 0 mesmo havendo cancelados. Usar só o label válido.
+const CANCELED_STATUSES = ["cancelled"]
 
 function applySegment<T>(
   query: T & { eq: (c: string, v: string) => T; in: (c: string, v: string[]) => T },

@@ -36,7 +36,10 @@ export default async function ProfilePage() {
 
   const network = await getMemberNetworkV2(member.id)
   const sponsor = network?.sponsor ?? null
-  const isActive = member.status === "active"
+  // F-V03: "ativo" = assinatura paga (subscription_status), NÃO o status legado.
+  // Quem ativa pelo Guru fica paid mas status legado='inactive' → o perfil mostrava
+  // "Inativa" pra parceira pagante (bug Gabriel 05/06). Admin/home já liam o certo.
+  const isActive = member.subscription_status === "paid"
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("pt-BR", {
@@ -95,7 +98,7 @@ export default async function ProfilePage() {
               value={
                 isActive
                   ? "Ativa"
-                  : member.status === "pending"
+                  : member.subscription_status === "pending"
                   ? "Pendente"
                   : "Inativa"
               }
