@@ -30,7 +30,8 @@ export default async function StorePage() {
   // então o membro só precisa LOGAR com o mesmo email do clube — não tem CTA
   // separado de "Cadastrar".
   const shopLoginUrl = process.env.NEXT_PUBLIC_SHOPIFY_ACCOUNT_URL || "https://account.bio-help.com"
-  const isActive = member.status === "active"
+  // F-V03: assinatura paga é a fonte de verdade, não o status legado.
+  const isActive = member.subscription_status === "paid"
 
   // Cada card linka para uma coleção real da loja Biohelp (verificado em
   // 13/05/2026 — todos respondem HTTP 200 e contêm produtos). Para adicionar

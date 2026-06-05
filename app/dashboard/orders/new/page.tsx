@@ -25,7 +25,7 @@ export default async function OrdersNewPage({ searchParams }: OrdersNewPageProps
   const tipo = sp.tipo === "lead" ? "lead" : "venda"
 
   return (
-    <PartnerShell memberName={member.name} isActive={member.status === "active"} memberSubtitle={getMemberSubtitle(member)}>
+    <PartnerShell memberName={member.name} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
       <OrdersNewForm initialTipo={tipo} />
     </PartnerShell>
   )
