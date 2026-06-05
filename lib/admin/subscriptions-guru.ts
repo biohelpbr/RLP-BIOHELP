@@ -1,4 +1,5 @@
 import { createServiceClient } from "@/lib/supabase/server"
+import { isTestIdentity } from "@/lib/admin/test-data"
 
 /**
  * Dados de assinaturas (canal Guru) para o painel admin.
@@ -55,7 +56,7 @@ export async function getSubscriptionsGuruData(): Promise<SubscriptionsGuruData>
   const windowStart = daysAgoISO(DAYS_WINDOW)
 
   const [membersRes, eventsRes] = await Promise.all([
-    supabase.from("members").select("subscription_status"),
+    supabase.from("members").select("subscription_status, email, name"),
     supabase
       .from("admin_subscription_events")
       .select("id, received_at, business_kind, email, subscriber_name, error")
@@ -72,8 +73,12 @@ export async function getSubscriptionsGuruData(): Promise<SubscriptionsGuruData>
   }
 
   // Snapshot atual a partir de members (fonte de verdade de status — F-V03).
+  // Members de teste (QA/E2E/equipe) ficam fora dos números — W1 call 05/06.
+  const realMembers = (membersRes.data ?? []).filter(
+    (m) => !isTestIdentity(m.email as string | null, m.name as string | null)
+  )
   const now = { active: 0, pending: 0, cancelled: 0 }
-  for (const m of membersRes.data ?? []) {
+  for (const m of realMembers) {
     const s = (m.subscription_status as string | null) ?? "pending"
     if (s === "paid") now.active++
     else if (s === "pending") now.pending++

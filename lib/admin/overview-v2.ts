@@ -1,4 +1,5 @@
 import { createServiceClient } from "@/lib/supabase/server"
+import { isTestIdentity } from "@/lib/admin/test-data"
 
 export type AdminOverviewV2 = {
   members: {
@@ -48,7 +49,7 @@ export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
     // cancelled), não o campo legado `status`. Traduzimos pro vocabulário legado
     // (active|pending|inactive) — mesma regra de lib/admin/community.ts — pra
     // bater com /admin/community. Antes lia `status` e mostrava "Ativos: 0".
-    supabase.from("members").select("subscription_status, created_at"),
+    supabase.from("members").select("subscription_status, created_at, email, name"),
     supabase
       .from("payout_requests")
       .select("status, amount"),
@@ -74,7 +75,10 @@ export async function getAdminOverviewV2(): Promise<AdminOverviewV2> {
     return ZERO
   }
 
-  const members = membersRes.data ?? []
+  // Members de teste (QA/E2E/equipe) ficam fora dos números — W1 call 05/06.
+  const members = (membersRes.data ?? []).filter(
+    (m) => !isTestIdentity(m.email as string | null, m.name as string | null)
+  )
   const monthStart = monthStartDate()
 
   // subscription_status (v2) → vocabulário legado exibido na UI (igual community).
