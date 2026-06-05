@@ -8,13 +8,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { addModule } from "@/lib/content/actions"
 
-export function ModuleManager({ trailId }: { trailId: string }) {
+/**
+ * Adiciona aula no FIM da trilha (W6: ordem agora é pelas setas ↑/↓ da lista —
+ * o campo manual de ordem saiu pra simplificar o uso pelo admin).
+ * Aula de YouTube: basta colar o link (youtu.be/... ou youtube.com/watch?v=...).
+ */
+export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrder: number }) {
   const router = useRouter()
   const [title, setTitle] = useState("")
   const [kind, setKind] = useState<"youtube" | "pdf" | "text">("youtube")
   const [contentUrl, setContentUrl] = useState("")
   const [contentText, setContentText] = useState("")
-  const [order, setOrder] = useState("0")
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
 
@@ -28,7 +32,7 @@ export function ModuleManager({ trailId }: { trailId: string }) {
         kind,
         content_url: kind === "text" ? null : contentUrl.trim() || null,
         content_text: kind === "text" ? contentText : null,
-        display_order: Number(order) || 0,
+        display_order: nextOrder,
       })
       if (!res.ok) {
         setError(res.error)
@@ -37,14 +41,13 @@ export function ModuleManager({ trailId }: { trailId: string }) {
       setTitle("")
       setContentUrl("")
       setContentText("")
-      setOrder((n) => String((Number(n) || 0) + 1))
       router.refresh()
     })
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      <h3 className="text-base font-semibold">Adicionar módulo</h3>
+      <h3 className="text-base font-semibold">Adicionar aula</h3>
       <div className="grid sm:grid-cols-2 gap-3">
         <div>
           <Label htmlFor="m-title">Título</Label>
@@ -64,7 +67,7 @@ export function ModuleManager({ trailId }: { trailId: string }) {
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
           >
             <option value="youtube">YouTube</option>
-            <option value="pdf">PDF</option>
+            <option value="pdf">PDF / Link externo</option>
             <option value="text">Texto</option>
           </select>
         </div>
@@ -82,30 +85,27 @@ export function ModuleManager({ trailId }: { trailId: string }) {
         </div>
       ) : (
         <div>
-          <Label htmlFor="m-url">URL ({kind === "youtube" ? "YouTube" : "PDF"})</Label>
+          <Label htmlFor="m-url">
+            {kind === "youtube" ? "Link do YouTube" : "URL (PDF ou link externo)"}
+          </Label>
           <Input
             id="m-url"
             value={contentUrl}
             onChange={(e) => setContentUrl(e.target.value)}
             placeholder={
               kind === "youtube"
-                ? "https://www.youtube.com/watch?v=..."
-                : "https://.../arquivo.pdf"
+                ? "https://youtu.be/... ou https://www.youtube.com/watch?v=..."
+                : "https://..."
             }
             required
           />
+          {kind === "youtube" && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Cole o link do vídeo — ele vira aula com o player embutido.
+            </p>
+          )}
         </div>
       )}
-      <div>
-        <Label htmlFor="m-order">Ordem</Label>
-        <Input
-          id="m-order"
-          type="number"
-          min="0"
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
-        />
-      </div>
 
       {error && (
         <p className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-3">
@@ -120,7 +120,7 @@ export function ModuleManager({ trailId }: { trailId: string }) {
           ) : (
             <Plus className="w-4 h-4 mr-2" />
           )}
-          Adicionar módulo
+          Adicionar aula
         </Button>
       </div>
     </form>

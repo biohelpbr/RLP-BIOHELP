@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, FileText, PlayCircle, FileDigit } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
@@ -8,18 +8,8 @@ import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { getTrailWithModules } from "@/lib/content/queries"
 import { ModuleManager } from "../ModuleManager"
-
-const KIND_ICON = {
-  youtube: <PlayCircle className="w-4 h-4 text-bh-coral" />,
-  pdf: <FileDigit className="w-4 h-4 text-bh-blue" />,
-  text: <FileText className="w-4 h-4 text-bh-purple-medium" />,
-}
-
-const KIND_LABEL: Record<string, string> = {
-  youtube: "YouTube",
-  pdf: "PDF",
-  text: "Texto",
-}
+import { ModuleRow } from "../ModuleRow"
+import { TrailForm } from "../TrailForm"
 
 export default async function AdminTrailDetailPage({
   params,
@@ -62,32 +52,35 @@ export default async function AdminTrailDetailPage({
         </header>
 
         <BHCard variant="elevated" className="space-y-2">
-          <h2 className="text-lg font-semibold">Módulos ({modules.length})</h2>
+          <h2 className="text-lg font-semibold">Aulas ({modules.length})</h2>
+          <p className="text-xs text-muted-foreground">
+            Use as setas pra reordenar — a ordem aqui é a ordem que a parceira vê.
+          </p>
           {modules.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
-              Nenhum módulo ainda. Adicione abaixo.
+              Nenhuma aula ainda. Adicione abaixo.
             </p>
           ) : (
             <ul className="divide-y divide-border">
-              {modules.map((m) => (
-                <li key={m.id} className="py-3 flex items-center gap-3">
-                  <span>{KIND_ICON[m.kind]}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{m.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {KIND_LABEL[m.kind]} ·{" "}
-                      {m.kind === "text" ? (m.content_text ?? "").slice(0, 80) : m.content_url}
-                    </p>
-                  </div>
-                  <Badge variant="outline">#{m.display_order}</Badge>
-                </li>
+              {modules.map((m, i) => (
+                <ModuleRow
+                  key={m.id}
+                  module={m}
+                  isFirst={i === 0}
+                  isLast={i === modules.length - 1}
+                />
               ))}
             </ul>
           )}
         </BHCard>
 
         <BHCard variant="default">
-          <ModuleManager trailId={trail.id} />
+          <ModuleManager trailId={trail.id} nextOrder={modules.length} />
+        </BHCard>
+
+        <BHCard variant="default" className="space-y-3">
+          <h2 className="text-lg font-semibold">Editar trilha</h2>
+          <TrailForm trail={trail} />
         </BHCard>
       </div>
     </AdminShell>

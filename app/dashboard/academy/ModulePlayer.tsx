@@ -82,7 +82,8 @@ export function ModulePlayer({
           className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
         >
           <ExternalLink className="w-4 h-4" />
-          Abrir PDF
+          {/* W6: kind "pdf" também cobre links externos (ex.: gravação no Drive). */}
+          {module.content_url.toLowerCase().includes(".pdf") ? "Abrir PDF" : "Abrir conteúdo"}
         </a>
       )}
 
