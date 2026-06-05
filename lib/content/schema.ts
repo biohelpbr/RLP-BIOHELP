@@ -12,6 +12,8 @@ export const trailInputSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal("")),
+  // Academy UX 05/06: grande grupo temático da trilha (ex.: "Consumo e Rotina").
+  group_label: z.string().trim().max(80, "Grupo muito longo.").optional().nullable(),
   status: trailStatusSchema.default("draft"),
   display_order: z.coerce.number().int().min(0).default(0),
 })
@@ -23,6 +25,8 @@ export const moduleInputSchema = z
     kind: moduleKindSchema,
     content_url: z.string().url("URL inválida.").optional().nullable().or(z.literal("")),
     content_text: z.string().optional().nullable(),
+    // Academy UX 05/06: duração manual da aula em minutos (mostra "X min" pro membro).
+    duration_minutes: z.coerce.number().int().min(1, "Duração mínima: 1 minuto.").optional().nullable(),
     display_order: z.coerce.number().int().min(0).default(0),
   })
   .refine(
@@ -49,6 +53,7 @@ export const moduleUpdateSchema = z
     kind: moduleKindSchema,
     content_url: z.string().url("URL inválida.").optional().nullable().or(z.literal("")),
     content_text: z.string().optional().nullable(),
+    duration_minutes: z.coerce.number().int().min(1, "Duração mínima: 1 minuto.").optional().nullable(),
   })
   .refine(
     (d) =>

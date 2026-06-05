@@ -49,6 +49,9 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
   const [kind, setKind] = useState<ContentModule["kind"]>(module.kind)
   const [contentUrl, setContentUrl] = useState(module.content_url ?? "")
   const [contentText, setContentText] = useState(module.content_text ?? "")
+  const [duration, setDuration] = useState(
+    module.duration_minutes ? String(module.duration_minutes) : "",
+  )
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
 
@@ -85,6 +88,7 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
         kind,
         content_url: kind === "text" ? null : contentUrl.trim() || null,
         content_text: kind === "text" ? contentText : null,
+        duration_minutes: duration.trim() ? Number(duration) : null,
       })
       if (!res.ok) {
         setError(res.error)
@@ -102,7 +106,8 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
         <div className="flex-1 min-w-0">
           <p className="font-medium text-foreground">{module.title}</p>
           <p className="text-xs text-muted-foreground truncate">
-            {KIND_LABEL[module.kind]} ·{" "}
+            {KIND_LABEL[module.kind]}
+            {module.duration_minutes ? ` · ${module.duration_minutes} min` : ""} ·{" "}
             {module.kind === "text"
               ? (module.content_text ?? "").slice(0, 80)
               : module.content_url}
@@ -168,18 +173,32 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div>
-              <Label htmlFor={`e-kind-${module.id}`}>Tipo</Label>
-              <select
-                id={`e-kind-${module.id}`}
-                value={kind}
-                onChange={(e) => setKind(e.target.value as ContentModule["kind"])}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="youtube">YouTube</option>
-                <option value="pdf">PDF / Link externo</option>
-                <option value="text">Texto</option>
-              </select>
+            <div className="grid grid-cols-[1fr_auto] gap-3">
+              <div>
+                <Label htmlFor={`e-kind-${module.id}`}>Tipo</Label>
+                <select
+                  id={`e-kind-${module.id}`}
+                  value={kind}
+                  onChange={(e) => setKind(e.target.value as ContentModule["kind"])}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="youtube">YouTube</option>
+                  <option value="pdf">PDF / Link externo</option>
+                  <option value="text">Texto</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor={`e-duration-${module.id}`}>Duração (min)</Label>
+                <Input
+                  id={`e-duration-${module.id}`}
+                  type="number"
+                  min={1}
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  placeholder="3"
+                  className="w-24"
+                />
+              </div>
             </div>
           </div>
           {kind === "text" ? (

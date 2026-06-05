@@ -3,6 +3,7 @@ import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
+import { listTrailGroupLabels } from "@/lib/content/queries"
 import { TrailForm } from "../TrailForm"
 
 export default async function NewTrailPage() {
@@ -11,6 +12,8 @@ export default async function NewTrailPage() {
   const member = await getCurrentMember()
   if (!member) redirect("/login")
   if (!(await isCurrentUserAdmin())) redirect("/dashboard")
+
+  const groupSuggestions = await listTrailGroupLabels()
 
   return (
     <AdminShell adminName={member.name ?? "Admin"}>
@@ -22,7 +25,7 @@ export default async function NewTrailPage() {
           </p>
         </header>
         <BHCard variant="elevated">
-          <TrailForm />
+          <TrailForm groupSuggestions={groupSuggestions} />
         </BHCard>
       </div>
     </AdminShell>

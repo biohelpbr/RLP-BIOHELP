@@ -19,6 +19,7 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
   const [kind, setKind] = useState<"youtube" | "pdf" | "text">("youtube")
   const [contentUrl, setContentUrl] = useState("")
   const [contentText, setContentText] = useState("")
+  const [duration, setDuration] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
 
@@ -32,6 +33,7 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
         kind,
         content_url: kind === "text" ? null : contentUrl.trim() || null,
         content_text: kind === "text" ? contentText : null,
+        duration_minutes: duration.trim() ? Number(duration) : null,
         display_order: nextOrder,
       })
       if (!res.ok) {
@@ -41,6 +43,7 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
       setTitle("")
       setContentUrl("")
       setContentText("")
+      setDuration("")
       router.refresh()
     })
   }
@@ -58,18 +61,32 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
             required
           />
         </div>
-        <div>
-          <Label htmlFor="m-kind">Tipo</Label>
-          <select
-            id="m-kind"
-            value={kind}
-            onChange={(e) => setKind(e.target.value as "youtube" | "pdf" | "text")}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-          >
-            <option value="youtube">YouTube</option>
-            <option value="pdf">PDF / Link externo</option>
-            <option value="text">Texto</option>
-          </select>
+        <div className="grid grid-cols-[1fr_auto] gap-3">
+          <div>
+            <Label htmlFor="m-kind">Tipo</Label>
+            <select
+              id="m-kind"
+              value={kind}
+              onChange={(e) => setKind(e.target.value as "youtube" | "pdf" | "text")}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="youtube">YouTube</option>
+              <option value="pdf">PDF / Link externo</option>
+              <option value="text">Texto</option>
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="m-duration">Duração (min)</Label>
+            <Input
+              id="m-duration"
+              type="number"
+              min={1}
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              placeholder="3"
+              className="w-24"
+            />
+          </div>
         </div>
       </div>
       {kind === "text" ? (

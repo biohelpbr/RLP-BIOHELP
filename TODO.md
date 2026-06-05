@@ -42,6 +42,7 @@
 | F-V26 | Banner de avisos também na Academy (espelha F-V22) | B | S7 | ✅ **Done 05/06** — PR #26 mergeado (`a29c706`). `AnnouncementBar` via `getActiveAnnouncement()` no topo de `/dashboard/academy`. E2E 2/2 CAs | — |
 | F-V27 | Academy: refinar 3 trilhas + aulas/avisos programados por data | C | S7 | ⏳ Pendente (P2). Contract inline §1.1 | Léo refinar desenho no Lovable |
 | F-V28 | Login alternativo com senha (emergência) | D | S7 | ✅ **Done 03/06** — PR #27 mergeado (`4773e74`). Admin gera senha provisória (mostrada + e-mail) no `/admin/community/[id]`; toggle código/senha na `/login`; troca obrigatória no 1º acesso (flag `app_metadata` + middleware → `/trocar-senha`). Sem migration. E2E 8/8 CAs. SPEC dedicada. | — |
+| F-V29 | Academy UX refino (mockup Lovable do Leo): grandes grupos na home + lista de aulas compacta + player em modal reduzido + duração no CMS | C | S7 | ✅ **Done 05/06** — branch `feat/academy-ux-refino`. Migration `20260605_academy_group_duration` (group_label + duration_minutes, aplicada via MCP). Capa fallback = thumb da 1ª aula. E2E 5/5 CAs (`docs/sdd/features/F-V29-academy-ux-refino/E2E-RESULT.md`). Grupos "Consumo e Rotina" aplicados nos Módulos 1/2/3 (nomes finais a confirmar c/ Leo, editável no CMS) | — |
 
 **Próximas ações (snapshot 2026-05-25):**
 - **F-V19 merge:** review final dos diffs → merge `feat/F-V19-fluxo-guru-pre-cadastro` em main.
