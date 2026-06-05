@@ -5,6 +5,7 @@
 
 ## 2026-06-05
 
+- [2026-06-05] [RELEASE] **W2 Acesso admin pela UI** (PR #31 `41ecc3e`, call 05/06). Server action `adminSetAdminRole` (upsert/delete em `roles`) + seção "Acesso administrativo" e badge ADMIN no `/admin/community/[id]`, com guarda anti-lockout (não revoga o próprio acesso). Dados: rperioli (BH00031) já era admin (verificado); **Lais Moreira criada** (BH00326, sponsor=HOUSE, paid) + admin via a própria UI + senha provisória F-V28 enviada por e-mail (se cair no spam, regenerar pelo painel e repassar manual). E2E Playwright: conceder/revogar/reconceder + guarda, tudo verde.
 - [2026-06-05] [RELEASE] **W1 Limpeza de dados de teste nos números do admin** (PR #30 `4be124b`, call 05/06). Função SQL `is_test_subscriber(email, name)` + view `admin_subscription_events` ampliada (load-test, `@flowcode.cc`, `*+test*`, `pending+*`, `e2e-*`, nomes "teste", 6 e-mails da equipe pré-go-live) + espelho TS `lib/admin/test-data.ts` nas contagens de members (orders snapshot + overview). Nenhuma linha deletada (exclusão em view, reversível). Migration `20260605_w1-admin-exclude-test-data.sql` aplicada via MCP. Números reais pós-limpeza: 243 ativos / 295 ativações 30d / 66 cancelamentos. `/admin/community` intocado de propósito. E2E Playwright verde.
 
 ## 2026-06-03
