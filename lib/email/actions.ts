@@ -56,6 +56,47 @@ export async function createCampaign(input: unknown): Promise<ActionResult<{ id:
   return { ok: true, data: { id: data.id as string } }
 }
 
+/**
+ * W7 (call 05/06, auditoria "tudo é CMS") — edita uma campanha em RASCUNHO.
+ * Campanha já enviada é histórico (imutável); o guard `.eq("status",'draft')`
+ * garante que só rascunho muda.
+ */
+export async function updateCampaign(id: string, input: unknown): Promise<ActionResult> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth
+
+  const parsed = emailCampaignInputSchema.safeParse(input)
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    return { ok: false, error: issue.message, field: issue.path.join(".") }
+  }
+
+  const supabase = createServiceClient()
+  const { data, error } = await supabase
+    .from("email_campaigns")
+    .update({
+      subject: parsed.data.subject,
+      body: parsed.data.body,
+      segment: parsed.data.segment,
+    })
+    .eq("id", id)
+    .eq("status", "draft")
+    .select("id")
+    .maybeSingle()
+
+  if (error) {
+    console.error("[updateCampaign]", error)
+    return { ok: false, error: "Não foi possível salvar a campanha." }
+  }
+  if (!data) {
+    return { ok: false, error: "Só campanhas em rascunho podem ser editadas." }
+  }
+
+  revalidatePath("/admin/emails")
+  revalidatePath(`/admin/emails/${id}`)
+  return { ok: true }
+}
+
 /** Envia um e-mail de teste só pra um endereço (não registra na base). */
 export async function sendTestEmail(input: unknown): Promise<ActionResult> {
   const auth = await requireAdmin()
