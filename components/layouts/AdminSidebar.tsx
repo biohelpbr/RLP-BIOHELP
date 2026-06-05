@@ -16,6 +16,7 @@ import {
   Megaphone,
   Menu,
   Package,
+  Settings,
   ShoppingBag,
   TrendingUp,
   Users,
@@ -47,7 +48,9 @@ const adminNavItems: NavItem[] = [
   { title: "Financeiro", href: "/admin/finance", icon: DollarSign },
   { title: "Resgates", href: "/admin/payouts", icon: Wallet },
   { title: "Academy", href: "/admin/academy", icon: GraduationCap },
-  // Pós-MVP: Alertas, Configurações.
+  // W4 (call 05/06): Configurações saiu do pós-MVP — CMS de suporte/atendimento.
+  { title: "Configurações", href: "/admin/settings", icon: Settings },
+  // Pós-MVP: Alertas.
 ]
 
 interface AdminSidebarProps {
