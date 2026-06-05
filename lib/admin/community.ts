@@ -161,7 +161,7 @@ export async function getCommunityMember(id: string) {
     .single()
   if (!member) return null
 
-  const [sponsorRes, countsRes, pendingCountRes, payoutsRes, leadsRes, salesRes] = await Promise.all([
+  const [sponsorRes, countsRes, pendingCountRes, payoutsRes, leadsRes, salesRes, roleRes] = await Promise.all([
     member.sponsor_id
       ? supabase
           .from("members")
@@ -197,6 +197,13 @@ export async function getCommunityMember(id: string) {
       .from("member_sales")
       .select("*", { count: "exact", head: true })
       .eq("member_id", id),
+    // W2: o detalhe mostra/gerencia o acesso admin (tabela roles).
+    supabase
+      .from("roles")
+      .select("role")
+      .eq("member_id", id)
+      .eq("role", "admin")
+      .maybeSingle(),
   ])
 
   const sponsor = sponsorRes.data
@@ -234,5 +241,6 @@ export async function getCommunityMember(id: string) {
     }>,
     leadsCount,
     salesCount,
+    isAdmin: roleRes.data?.role === "admin",
   }
 }

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { ArrowLeft, Award, CircleDollarSign, Clock, Crown, Users } from "lucide-react"
+import { ArrowLeft, Award, CircleDollarSign, Clock, Crown, ShieldCheck, Users } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { getCommunityMember } from "@/lib/admin/community"
 import { PAYOUT_METHOD_LABELS } from "@/lib/payouts/v2/schema"
 import { MemberActivateActions } from "./MemberActivateActions"
+import { MemberAdminActions } from "./MemberAdminActions"
 import { MemberCancelActions } from "./MemberCancelActions"
 import { MemberPasswordActions } from "./MemberPasswordActions"
 
@@ -37,7 +38,8 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
   const detail = await getCommunityMember(id)
   if (!detail) notFound()
 
-  const { member, sponsor, activeCount, pendingCount, payouts, leadsCount, salesCount } = detail
+  const { member, sponsor, activeCount, pendingCount, payouts, leadsCount, salesCount, isAdmin } =
+    detail
 
   return (
     <AdminShell adminName={me.name ?? "Admin"}>
@@ -64,6 +66,12 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
             <Badge variant={member.status === "active" ? "default" : "outline"}>
               {member.status}
             </Badge>
+            {isAdmin && (
+              <Badge variant="destructive">
+                <ShieldCheck className="w-3 h-3 mr-1" />
+                ADMIN
+              </Badge>
+            )}
             {member.tags.map((t) => (
               <Badge key={t} variant="secondary">
                 {t === "manual:influenciador" ? (
@@ -197,6 +205,15 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
             autoRenew={member.subscription_auto_renew}
             expiresAt={member.subscription_expires_at}
           />
+
+          <div className="border-t pt-3">
+            <h3 className="text-sm font-semibold">Acesso administrativo</h3>
+            <p className="mb-2 text-xs text-muted-foreground">
+              Admin enxerga e edita todo o painel (`/admin/*`). Conceda apenas para a equipe
+              Biohelp. A mudança vale no próximo carregamento de página.
+            </p>
+            <MemberAdminActions memberId={member.id} isAdmin={isAdmin} isSelf={me.id === member.id} />
+          </div>
 
           <div className="border-t pt-3">
             <h3 className="text-sm font-semibold">Acesso · senha provisória (F-V28)</h3>
