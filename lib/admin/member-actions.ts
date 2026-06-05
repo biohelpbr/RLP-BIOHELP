@@ -1,7 +1,12 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { createAdminClient, createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
+import {
+  createAdminClient,
+  createServiceClient,
+  getCurrentMember,
+  isCurrentUserAdmin,
+} from "@/lib/supabase/server"
 import {
   cancelAutoRenew,
   cancelSubscription,
@@ -95,6 +100,51 @@ export async function adminActivateMember(memberId: string): Promise<ActionResul
     }
   } catch (e) {
     console.error("[adminActivateMember] shopify sync (non-fatal)", e)
+  }
+
+  revalidatePath(`/admin/community/${memberId}`)
+  revalidatePath("/admin/community")
+  return { ok: true }
+}
+
+/**
+ * W2 (call 05/06) — Conceder/revogar acesso ADMIN pela UI, sem SQL na mão.
+ * Grava em `roles` (role='admin'), a mesma tabela que `isCurrentUserAdmin()`
+ * lê no gate de toda página admin. Reversível (delete da linha).
+ *
+ * Guarda: um admin não pode revogar o PRÓPRIO acesso (evita lockout).
+ */
+export async function adminSetAdminRole(
+  memberId: string,
+  grant: boolean,
+): Promise<ActionResult> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth
+
+  const supabase = createServiceClient()
+
+  if (grant) {
+    const { error } = await supabase
+      .from("roles")
+      .upsert({ member_id: memberId, role: "admin" }, { onConflict: "member_id" })
+    if (error) {
+      console.error("[adminSetAdminRole] grant", error)
+      return { ok: false, error: "Erro ao conceder acesso admin." }
+    }
+  } else {
+    const me = await getCurrentMember()
+    if (me?.id === memberId) {
+      return { ok: false, error: "Você não pode remover o seu próprio acesso admin." }
+    }
+    const { error } = await supabase
+      .from("roles")
+      .delete()
+      .eq("member_id", memberId)
+      .eq("role", "admin")
+    if (error) {
+      console.error("[adminSetAdminRole] revoke", error)
+      return { ok: false, error: "Erro ao revogar acesso admin." }
+    }
   }
 
   revalidatePath(`/admin/community/${memberId}`)
