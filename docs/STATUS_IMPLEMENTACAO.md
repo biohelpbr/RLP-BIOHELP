@@ -1,5 +1,5 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** 05/06/2026 (call 05/06: blocos W1–W7 entregues + F-V26)
+**Data:** 05/06/2026 (call 05/06: blocos W1–W7 entregues + F-V26 + F-V29 Academy UX)
 **Sprint Atual:** ⏸️ Sprints v1 (1-7) CONGELADOS | ✅ Pivô V2 em produção
 **Status Geral:** ✅ V1 entregue (37/38 FRs) | ⚠️ V1 sendo descontinuado | 📋 14/22 TBDs respondidos | 🎨 Front Loveable absorvido como referência
 
@@ -23,7 +23,8 @@
 - ✅ **W6** Academy CMS completo — PR #35. Reordenar/editar/excluir trilhas e aulas; Módulo 3 com 15 aulas + trilha "Aula ao vivo".
 - ✅ **W7** Auditoria "tudo é CMS" — PR #36. Única lacuna (editar rascunho de e-mail) corrigida.
 - ✅ **F-V26** Banner de avisos na Academy — PR #26 (estava aberto desde 03/06; retomado e mergeado).
-- ⏳ **Pendente S7:** F-V27 (Academy 3 trilhas + aulas programadas — bloqueado: Léo refinar desenho no Lovable).
+- ✅ **F-V29** Academy UX refino (mockup Lovable do Leo) — PR #38. Grupos na home (`group_label`), lista de aulas compacta + player em modal, `duration_minutes` no CMS, capa fallback = thumb da 1ª aula. Migration `20260605_academy_group_duration`. E2E 5/5 CAs.
+- ⏳ **Pendente S7:** F-V27 restante (aulas/avisos programados por data — parte visual coberta pela F-V29; nomes finais dos grupos a confirmar c/ Leo no CMS).
 
 ---
 
