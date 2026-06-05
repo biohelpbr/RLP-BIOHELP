@@ -7,7 +7,8 @@ import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { getCampaign, getCampaignRecipients, countSegment, type RecipientRow } from "@/lib/email/queries"
-import { SEGMENT_LABEL } from "@/lib/email/schema"
+import { SEGMENT_LABEL, type EmailSegment } from "@/lib/email/schema"
+import { EmailComposer } from "../EmailComposer"
 import { SendCampaignButton } from "../SendCampaignButton"
 
 const REC_LABEL: Record<RecipientRow["status"], string> = {
@@ -38,6 +39,15 @@ export default async function EmailDetailPage({
     isDraft ? Promise.resolve([] as RecipientRow[]) : getCampaignRecipients(id),
     isDraft ? countSegment(campaign.segment) : Promise.resolve(campaign.total),
   ])
+
+  // W7: rascunho é editável — o composer precisa das contagens por segmento.
+  let counts: Record<EmailSegment, number> | null = null
+  if (isDraft) {
+    const segments: EmailSegment[] = ["all", "active", "pending", "canceled"]
+    counts = Object.fromEntries(
+      await Promise.all(segments.map(async (s) => [s, await countSegment(s)] as const)),
+    ) as Record<EmailSegment, number>
+  }
 
   return (
     <AdminShell adminName={member.name ?? "Admin"}>
@@ -70,6 +80,22 @@ export default async function EmailDetailPage({
               desfeito.
             </p>
             <SendCampaignButton id={campaign.id} recipients={draftCount} />
+          </BHCard>
+        )}
+
+        {isDraft && counts && (
+          <BHCard variant="elevated" className="space-y-3">
+            <h2 className="text-lg font-semibold">Editar rascunho</h2>
+            <EmailComposer
+              counts={counts}
+              adminEmail={member.email ?? ""}
+              campaign={{
+                id: campaign.id,
+                subject: campaign.subject,
+                body: campaign.body,
+                segment: campaign.segment,
+              }}
+            />
           </BHCard>
         )}
 

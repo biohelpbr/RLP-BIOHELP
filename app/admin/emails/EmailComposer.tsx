@@ -6,24 +6,29 @@ import { Loader2, Save, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createCampaign, sendTestEmail } from "@/lib/email/actions"
+import { createCampaign, sendTestEmail, updateCampaign } from "@/lib/email/actions"
 import { SEGMENT_LABEL, type EmailSegment } from "@/lib/email/schema"
 
 type Counts = Record<EmailSegment, number>
 
 const SEGMENTS: EmailSegment[] = ["all", "active", "pending", "canceled"]
 
+/** Rascunho existente (W7): preenche o composer em modo edição. */
+type DraftCampaign = { id: string; subject: string; body: string; segment: EmailSegment }
+
 export function EmailComposer({
   counts,
   adminEmail,
+  campaign,
 }: {
   counts: Counts
   adminEmail: string
+  campaign?: DraftCampaign
 }) {
   const router = useRouter()
-  const [subject, setSubject] = useState("")
-  const [body, setBody] = useState("")
-  const [segment, setSegment] = useState<EmailSegment>("all")
+  const [subject, setSubject] = useState(campaign?.subject ?? "")
+  const [body, setBody] = useState(campaign?.body ?? "")
+  const [segment, setSegment] = useState<EmailSegment>(campaign?.segment ?? "all")
   const [testTo, setTestTo] = useState(adminEmail)
   const [error, setError] = useState<string | null>(null)
   const [testMsg, setTestMsg] = useState<string | null>(null)
@@ -46,6 +51,17 @@ export function EmailComposer({
     setError(null)
     setTestMsg(null)
     start(async () => {
+      // W7: em modo edição salva o rascunho existente em vez de criar outro.
+      if (campaign) {
+        const res = await updateCampaign(campaign.id, { subject, body, segment })
+        if (!res.ok) {
+          setError(res.error)
+          return
+        }
+        setTestMsg("Rascunho salvo.")
+        router.refresh()
+        return
+      }
       const res = await createCampaign({ subject, body, segment })
       if (!res.ok) {
         setError(res.error)
@@ -140,7 +156,9 @@ export function EmailComposer({
 
       <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
         <p className="text-xs text-muted-foreground">
-          O disparo real é confirmado na próxima tela (após criar a campanha).
+          {campaign
+            ? "Salvar atualiza este rascunho — o disparo continua no botão acima."
+            : "O disparo real é confirmado na próxima tela (após criar a campanha)."}
         </p>
         <Button onClick={onCreate} disabled={pending || !subject || !body}>
           {pending ? (
@@ -148,8 +166,8 @@ export function EmailComposer({
           ) : (
             <Save className="mr-2 h-4 w-4" />
           )}
-          Criar campanha
-          <Send className="ml-2 h-4 w-4" />
+          {campaign ? "Salvar rascunho" : "Criar campanha"}
+          {!campaign && <Send className="ml-2 h-4 w-4" />}
         </Button>
       </div>
     </div>
