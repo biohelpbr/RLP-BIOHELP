@@ -3,6 +3,10 @@
 > Histórico cronológico vivo. Tipos: `[INGEST]`, `[RELEASE]`, `[BUGFIX]`, `[VALIDATION]`, `[DECISION]`, `[MVP]`, `[REORG]`.
 > Manter ≤ 200 linhas. Arquivar lotes antigos em `wiki/log-archive-YYYY-QN.md` quando estourar.
 
+## 2026-06-05
+
+- [2026-06-05] [RELEASE] **W1 Limpeza de dados de teste nos números do admin** (PR #30 `4be124b`, call 05/06). Função SQL `is_test_subscriber(email, name)` + view `admin_subscription_events` ampliada (load-test, `@flowcode.cc`, `*+test*`, `pending+*`, `e2e-*`, nomes "teste", 6 e-mails da equipe pré-go-live) + espelho TS `lib/admin/test-data.ts` nas contagens de members (orders snapshot + overview). Nenhuma linha deletada (exclusão em view, reversível). Migration `20260605_w1-admin-exclude-test-data.sql` aplicada via MCP. Números reais pós-limpeza: 243 ativos / 295 ativações 30d / 66 cancelamentos. `/admin/community` intocado de propósito. E2E Playwright verde.
+
 ## 2026-06-03
 
 - [2026-06-03] [RELEASE] **F-V28 Login alternativo com senha** (PR #27 `4773e74`) mergeado em main. Caminho de emergência pra quem não recebe o código OTP por e-mail. Admin gera **senha provisória** sob demanda no `/admin/community/[id]` (gerada via crypto `Bio-XXXX-XXXX`, **mostrada pra copiar + enviada por e-mail** Resend); `/login` ganha **toggle código/senha** (`signInWithPassword`, mesmo gate `/api/auth/check-email`); **troca obrigatória no 1º acesso** via flag `app_metadata.must_reset_password` (só service role escreve, **sem migration**) + gate no `middleware.ts` → `/trocar-senha` (troca mantém a sessão viva e cai direto no dashboard). OTP intacto (não-regressão). **E2E real validado** (Playwright + Supabase, conta `eduspires123`): gerar→e-mail→login senha→troca→dashboard, 8/8 CAs verdes. SPEC: `docs/sdd/features/F-V28-login-senha/`. **Follow-up registrado:** pesquisar OTP via SMS/WhatsApp (e-mail cai no spam por reputação).

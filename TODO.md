@@ -4,7 +4,9 @@
 > **Fonte de progresso histórica:** `docs/STATUS_IMPLEMENTACAO.md` (snapshot por sprint).
 > **Tabela de status das features v2:** `docs/sdd/PIVOT-V2.md` §2.
 
-**Última atualização:** 2026-06-03 (F-V23/24/25 done; **F-V28 login com senha done** — PR #27 mergeado).
+**Última atualização:** 2026-06-05 (call 05/06 → blocos W1–W7; **W1 limpeza de dados de teste done** — PR #30 mergeado).
+
+**Blocos da call 05/06 (W1–W7):** W1 limpar dados de teste dos números ✅ (PR #30) · W2 acessos admin (rperioli + Lais) + UI conceder/revogar ⏳ · W3 editar e-mail do membro ⏳ · W4 CMS suporte (`app_settings` + `/admin/settings`) ⏳ · W5 aba Comercial ⏳ · W6 Academy CMS completo (PRIORIDADE) ⏳ · W7 auditoria "tudo é CMS" ⏳.
 
 ---
 
