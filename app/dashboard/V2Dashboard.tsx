@@ -15,6 +15,7 @@ import { getMemberNetworkV2 } from "@/lib/network/v2"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { getNextPublishedEvent } from "@/lib/events/queries"
 import { getActiveAnnouncement } from "@/lib/announcements/queries"
+import { getSupportContact } from "@/lib/settings/queries"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { AnnouncementBar, BHCard, BHStat, CopyButton } from "@/components/biohelp"
 import { Button } from "@/components/ui/button"
@@ -54,10 +55,11 @@ export default async function V2Dashboard() {
     redirect("/login")
   }
 
-  const [network, nextEvent, announcement] = await Promise.all([
+  const [network, nextEvent, announcement, support] = await Promise.all([
     getMemberNetworkV2(member.id),
     getNextPublishedEvent(),
     getActiveAnnouncement(),
+    getSupportContact(),
   ])
   const directReportsCount = network?.direct_reports.length ?? 0
   // F-V03: "ativo" = assinatura paga (subscription_status), não o status legado.
@@ -66,15 +68,13 @@ export default async function V2Dashboard() {
   // Verificado em 13/05/2026: em Vercel a env pode existir mas estar vazia.
   const shopUrl = process.env.NEXT_PUBLIC_SHOPIFY_STORE_URL || "https://bio-help.com"
 
-  // Comunidade no WhatsApp + atendimento (pedido call 03/06). Configuráveis por
-  // env var (sem novo deploy quando o link/numero mudar). Comunidade tem fallback
-  // pro link oficial do anexo; atendimento só renderiza quando configurado.
+  // Comunidade no WhatsApp segue configurável por env var (link de grupo).
   const communityUrl =
     process.env.NEXT_PUBLIC_WHATSAPP_COMMUNITY_URL ||
     "https://chat.whatsapp.com/JBXR9M2QEv1HXYwuDqgT0V"
-  // O atendimento é feito DENTRO da própria comunidade do WhatsApp — por padrão
-  // aponta pro mesmo link. Env var só pra um eventual canal de suporte separado.
-  const supportUrl = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP_URL || communityUrl
+  // W4 (call 05/06): o atendimento vem do CMS de configurações (app_settings,
+  // editável em /admin/settings) — telefone + horário mudam sem deploy.
+  const supportUrl = `https://wa.me/${support.whatsapp_digits}`
 
   return (
     <PartnerShell memberName={member.name} isActive={isActive} memberSubtitle={getMemberSubtitle(member)}>
@@ -133,8 +133,9 @@ export default async function V2Dashboard() {
               <h2 className="text-lg font-semibold">Comunidade &amp; Atendimento</h2>
               <p className="text-sm text-muted-foreground">
                 Entre na comunidade oficial no WhatsApp pra receber avisos, comunicados e
-                novidades. <span className="font-medium text-foreground">É também por ali que
-                você fala com o nosso atendimento</span> — é o mesmo grupo.
+                novidades. Pra dúvidas e atendimento, fale com o suporte:{" "}
+                <span className="font-medium text-foreground">WhatsApp {support.phone}</span>{" "}
+                · {support.hours}.
               </p>
             </div>
           </div>
@@ -148,7 +149,7 @@ export default async function V2Dashboard() {
             <Button asChild variant="outline" className="w-full">
               <a href={supportUrl} target="_blank" rel="noopener noreferrer">
                 <LifeBuoy className="w-4 h-4 mr-2" />
-                Atendimento (mesma comunidade)
+                Suporte · {support.phone}
               </a>
             </Button>
           </div>
