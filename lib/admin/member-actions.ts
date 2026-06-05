@@ -152,6 +152,98 @@ export async function adminSetAdminRole(
   return { ok: true }
 }
 
+/**
+ * W3 (call 05/06, pedido Gabriel) — Alterar o E-MAIL de um membro pelo admin.
+ * Caso recorrente: parceira assina no Guru com e-mail digitado errado (ex.:
+ * Elaine Violini, resolvida via SQL em 03/06) e não consegue logar.
+ *
+ * - Trata o UNIQUE(email): se o novo e-mail já pertence a OUTRO member,
+ *   bloqueia com mensagem clara (merge continua manual — decisão humana).
+ * - Atualiza `members.email` e, quando houver `auth_user_id`, também o e-mail
+ *   no Supabase Auth (login OTP e por senha passam a aceitar o novo).
+ * - Reversível: trocar de volta pelo mesmo botão.
+ */
+export async function adminUpdateMemberEmail(
+  memberId: string,
+  newEmailRaw: string,
+): Promise<ActionResult> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth
+
+  const newEmail = newEmailRaw.toLowerCase().trim()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    return { ok: false, error: "E-mail inválido." }
+  }
+
+  const supabase = createServiceClient()
+  const { data: member, error: memberErr } = await supabase
+    .from("members")
+    .select("id, email, auth_user_id")
+    .eq("id", memberId)
+    .single()
+  if (memberErr || !member) {
+    return { ok: false, error: "Membro não encontrado." }
+  }
+  if ((member.email as string | null)?.toLowerCase() === newEmail) {
+    return { ok: false, error: "O membro já usa esse e-mail." }
+  }
+
+  // UNIQUE(email): outro member já usa o novo e-mail?
+  const { data: conflict } = await supabase
+    .from("members")
+    .select("id, ref_code, name")
+    .eq("email", newEmail)
+    .neq("id", memberId)
+    .maybeSingle()
+  if (conflict) {
+    return {
+      ok: false,
+      error: `O e-mail ${newEmail} já pertence a ${conflict.name ?? "outro membro"} (${conflict.ref_code}). Se for a mesma pessoa (conta duplicada), faça o merge manual antes de trocar.`,
+    }
+  }
+
+  // Atualiza o Supabase Auth PRIMEIRO (se falhar, não deixamos members
+  // dessincronizado do login).
+  if (member.auth_user_id) {
+    const adminAuth = createAdminClient()
+    const { error: authErr } = await adminAuth.auth.admin.updateUserById(
+      member.auth_user_id as string,
+      { email: newEmail, email_confirm: true },
+    )
+    if (authErr) {
+      console.error("[adminUpdateMemberEmail] auth update", authErr.message)
+      return { ok: false, error: `Erro ao atualizar o e-mail de login: ${authErr.message}` }
+    }
+  }
+
+  const { error: updErr } = await supabase
+    .from("members")
+    .update({ email: newEmail })
+    .eq("id", memberId)
+  if (updErr) {
+    console.error("[adminUpdateMemberEmail] members update", updErr)
+    // Tenta reverter o auth pra não deixar login e cadastro divergentes.
+    if (member.auth_user_id) {
+      const adminAuth = createAdminClient()
+      await adminAuth.auth.admin.updateUserById(member.auth_user_id as string, {
+        email: (member.email as string) ?? undefined,
+        email_confirm: true,
+      })
+    }
+    return { ok: false, error: "Erro ao salvar o novo e-mail no cadastro." }
+  }
+
+  console.info("[adminUpdateMemberEmail] e-mail alterado", {
+    memberId,
+    from: member.email,
+    to: newEmail,
+  })
+
+  revalidatePath(`/admin/community/${memberId}`)
+  revalidatePath("/admin/community")
+  return { ok: true }
+}
+
 type ProvisionalPasswordResult =
   | { ok: true; password: string; emailSent: boolean }
   | { ok: false; error: string }
