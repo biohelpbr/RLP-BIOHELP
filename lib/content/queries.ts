@@ -1,10 +1,13 @@
 import { createServiceClient } from "@/lib/supabase/server"
+import { youtubeThumbUrl } from "./youtube"
 
 export interface ContentTrail {
   id: string
   title: string
   description: string | null
   cover_url: string | null
+  // Academy UX 05/06: grande grupo temático (ex.: "Consumo e Rotina"). Null = sem grupo.
+  group_label: string | null
   status: "draft" | "published" | "archived"
   display_order: number
   created_at: string
@@ -17,6 +20,8 @@ export interface ContentModule {
   kind: "youtube" | "pdf" | "text"
   content_url: string | null
   content_text: string | null
+  // Academy UX 05/06: duração manual em minutos (null = não exibe).
+  duration_minutes: number | null
   display_order: number
   created_at: string
 }
@@ -40,6 +45,77 @@ export async function listPublishedTrails(): Promise<ContentTrail[]> {
     return []
   }
   return (data || []) as ContentTrail[]
+}
+
+export interface TrailWithMeta extends ContentTrail {
+  modules_count: number
+  total_minutes: number
+  /** Capa derivada da 1ª aula de vídeo quando a trilha não tem cover_url no CMS. */
+  fallback_thumb: string | null
+}
+
+/**
+ * Academy UX 05/06 — home do membro: trilhas publicadas + nº de aulas,
+ * duração total (quando preenchida no CMS) e thumbnail de fallback
+ * (1ª aula de YouTube) pra dar contexto visual no card.
+ */
+export async function listPublishedTrailsWithMeta(): Promise<TrailWithMeta[]> {
+  const supabase = createServiceClient()
+  const trails = await listPublishedTrails()
+  if (trails.length === 0) return []
+
+  const { data: modules } = await supabase
+    .from("content_modules")
+    .select("trail_id, duration_minutes, kind, content_url, display_order, created_at")
+    .in("trail_id", trails.map((t) => t.id))
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: true })
+
+  const count = new Map<string, number>()
+  const minutes = new Map<string, number>()
+  const thumb = new Map<string, string>()
+  type ModuleMetaRow = {
+    trail_id: string
+    duration_minutes: number | null
+    kind: string
+    content_url: string | null
+  }
+  ;((modules || []) as ModuleMetaRow[]).forEach((m) => {
+    count.set(m.trail_id, (count.get(m.trail_id) || 0) + 1)
+    minutes.set(m.trail_id, (minutes.get(m.trail_id) || 0) + (m.duration_minutes || 0))
+    if (!thumb.has(m.trail_id) && m.kind === "youtube") {
+      const t = youtubeThumbUrl(m.content_url)
+      if (t) thumb.set(m.trail_id, t)
+    }
+  })
+
+  return trails.map((t) => ({
+    ...t,
+    modules_count: count.get(t.id) || 0,
+    total_minutes: minutes.get(t.id) || 0,
+    fallback_thumb: thumb.get(t.id) ?? null,
+  }))
+}
+
+/**
+ * Academy UX 05/06 — grupos já usados nas trilhas, pra sugerir no form do admin
+ * (datalist) e o Leo reaproveitar os nomes sem digitar de novo.
+ */
+export async function listTrailGroupLabels(): Promise<string[]> {
+  const supabase = createServiceClient()
+  const { data, error } = await supabase
+    .from("content_trails")
+    .select("group_label")
+    .not("group_label", "is", null)
+
+  if (error) {
+    console.error("[listTrailGroupLabels]", error)
+    return []
+  }
+  const labels = (data || [])
+    .map((r: { group_label: string | null }) => r.group_label?.trim())
+    .filter((l): l is string => !!l)
+  return Array.from(new Set(labels)).sort((a, b) => a.localeCompare(b, "pt-BR"))
 }
 
 export async function listAdminTrails(): Promise<TrailWithStats[]> {

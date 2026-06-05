@@ -13,6 +13,7 @@ type FormState = {
   title: string
   description: string
   cover_url: string
+  group_label: string
   status: "draft" | "published" | "archived"
   display_order: string
 }
@@ -21,6 +22,7 @@ const initialState: FormState = {
   title: "",
   description: "",
   cover_url: "",
+  group_label: "",
   status: "draft",
   display_order: "0",
 }
@@ -28,8 +30,15 @@ const initialState: FormState = {
 /**
  * Form de trilha. Sem `trail` cria (W6: também serve pra EDITAR a trilha
  * existente no detalhe — call 05/06, CMS completo).
+ * `groupSuggestions`: grupos já usados, viram sugestões no campo de grupo.
  */
-export function TrailForm({ trail }: { trail?: ContentTrail }) {
+export function TrailForm({
+  trail,
+  groupSuggestions = [],
+}: {
+  trail?: ContentTrail
+  groupSuggestions?: string[]
+}) {
   const router = useRouter()
   const [state, setState] = useState<FormState>(
     trail
@@ -37,6 +46,7 @@ export function TrailForm({ trail }: { trail?: ContentTrail }) {
           title: trail.title,
           description: trail.description ?? "",
           cover_url: trail.cover_url ?? "",
+          group_label: trail.group_label ?? "",
           status: trail.status,
           display_order: String(trail.display_order),
         }
@@ -59,6 +69,7 @@ export function TrailForm({ trail }: { trail?: ContentTrail }) {
         title: state.title.trim(),
         description: state.description.trim() || null,
         cover_url: state.cover_url.trim() || null,
+        group_label: state.group_label.trim() || null,
         status: state.status,
         display_order: Number(state.display_order) || 0,
       }
@@ -103,6 +114,27 @@ export function TrailForm({ trail }: { trail?: ContentTrail }) {
           onChange={(e) => set("description", e.target.value)}
           className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
+      </div>
+      <div>
+        <Label htmlFor="group_label">Grande grupo</Label>
+        <Input
+          id="group_label"
+          value={state.group_label}
+          onChange={(e) => set("group_label", e.target.value)}
+          placeholder="Consumo e Rotina"
+          list="group-suggestions"
+        />
+        {groupSuggestions.length > 0 && (
+          <datalist id="group-suggestions">
+            {groupSuggestions.map((g) => (
+              <option key={g} value={g} />
+            ))}
+          </datalist>
+        )}
+        <p className="mt-1 text-xs text-muted-foreground">
+          Trilhas com o mesmo grupo aparecem juntas na Academy da parceira. Vazio = seção
+          &quot;Geral&quot;.
+        </p>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         <div>

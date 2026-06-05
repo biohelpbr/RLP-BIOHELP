@@ -50,6 +50,9 @@ export default async function AdminAcademyPage() {
                   className="py-3 flex flex-wrap items-center justify-between gap-3"
                 >
                   <div className="min-w-0 flex-1">
+                    {t.group_label && (
+                      <p className="text-xs font-medium text-primary">{t.group_label}</p>
+                    )}
                     <Link
                       href={`/admin/academy/${t.id}`}
                       className="font-semibold text-foreground hover:underline"

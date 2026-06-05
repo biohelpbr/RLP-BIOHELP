@@ -40,6 +40,7 @@ export async function createTrail(input: unknown): Promise<ActionResult<{ id: st
       title: parsed.data.title,
       description: parsed.data.description || null,
       cover_url: parsed.data.cover_url || null,
+      group_label: parsed.data.group_label || null,
       status: parsed.data.status,
       display_order: parsed.data.display_order,
     })
@@ -116,6 +117,7 @@ export async function addModule(input: unknown): Promise<ActionResult<{ id: stri
       kind: parsed.data.kind,
       content_url: parsed.data.content_url || null,
       content_text: parsed.data.content_text || null,
+      duration_minutes: parsed.data.duration_minutes ?? null,
       display_order: parsed.data.display_order,
     })
     .select("id")
@@ -174,6 +176,7 @@ export async function updateModule(
       kind: parsed.data.kind,
       content_url: parsed.data.content_url || null,
       content_text: parsed.data.content_text || null,
+      duration_minutes: parsed.data.duration_minutes ?? null,
     })
     .eq("id", moduleId)
 

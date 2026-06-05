@@ -6,7 +6,7 @@ import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
-import { getTrailWithModules } from "@/lib/content/queries"
+import { getTrailWithModules, listTrailGroupLabels } from "@/lib/content/queries"
 import { ModuleManager } from "../ModuleManager"
 import { ModuleRow } from "../ModuleRow"
 import { TrailForm } from "../TrailForm"
@@ -23,7 +23,10 @@ export default async function AdminTrailDetailPage({
   if (!(await isCurrentUserAdmin())) redirect("/dashboard")
 
   const { id } = await params
-  const data = await getTrailWithModules(id, { adminView: true })
+  const [data, groupSuggestions] = await Promise.all([
+    getTrailWithModules(id, { adminView: true }),
+    listTrailGroupLabels(),
+  ])
   if (!data) notFound()
 
   const { trail, modules } = data
@@ -80,7 +83,7 @@ export default async function AdminTrailDetailPage({
 
         <BHCard variant="default" className="space-y-3">
           <h2 className="text-lg font-semibold">Editar trilha</h2>
-          <TrailForm trail={trail} />
+          <TrailForm trail={trail} groupSuggestions={groupSuggestions} />
         </BHCard>
       </div>
     </AdminShell>
