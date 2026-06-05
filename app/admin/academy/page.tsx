@@ -8,6 +8,7 @@ import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { listAdminTrails } from "@/lib/content/queries"
+import { TrailRowActions } from "./TrailRowActions"
 
 export default async function AdminAcademyPage() {
   if (!isV2Enabled()) redirect("/admin")
@@ -43,7 +44,7 @@ export default async function AdminAcademyPage() {
             </p>
           ) : (
             <ul className="divide-y divide-border">
-              {trails.map((t) => (
+              {trails.map((t, i) => (
                 <li
                   key={t.id}
                   className="py-3 flex flex-wrap items-center justify-between gap-3"
@@ -71,9 +72,17 @@ export default async function AdminAcademyPage() {
                       </span>
                     </p>
                   </div>
-                  <Badge variant={t.status === "published" ? "default" : "outline"}>
-                    {t.status}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={t.status === "published" ? "default" : "outline"}>
+                      {t.status}
+                    </Badge>
+                    <TrailRowActions
+                      trailId={t.id}
+                      trailTitle={t.title}
+                      isFirst={i === 0}
+                      isLast={i === trails.length - 1}
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
