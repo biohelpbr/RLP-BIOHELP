@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import {
   BarChart3,
   CalendarHeart,
+  Handshake,
   ChevronLeft,
   DollarSign,
   GraduationCap,
@@ -39,6 +40,8 @@ const adminNavItems: NavItem[] = [
   { title: "Visão Geral", href: "/admin", icon: LayoutDashboard },
   { title: "Comunidade", href: "/admin/community", icon: Users },
   { title: "Assinaturas", href: "/admin/orders", icon: BarChart3 },
+  // W5 (call 05/06): acompanhamento do time de vendas (pendentes vs efetivadas).
+  { title: "Comercial", href: "/admin/comercial", icon: Handshake },
   { title: "Crescimento", href: "/admin/growth", icon: TrendingUp },
   { title: "Consumo", href: "/admin/consumption", icon: ShoppingBag },
   { title: "Produtos", href: "/admin/products", icon: Package },
