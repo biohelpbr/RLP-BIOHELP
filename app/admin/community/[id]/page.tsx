@@ -11,6 +11,7 @@ import { getCommunityMember } from "@/lib/admin/community"
 import { PAYOUT_METHOD_LABELS } from "@/lib/payouts/v2/schema"
 import { MemberActivateActions } from "./MemberActivateActions"
 import { MemberAdminActions } from "./MemberAdminActions"
+import { MemberEmailActions } from "./MemberEmailActions"
 import { MemberCancelActions } from "./MemberCancelActions"
 import { MemberPasswordActions } from "./MemberPasswordActions"
 
@@ -205,6 +206,16 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
             autoRenew={member.subscription_auto_renew}
             expiresAt={member.subscription_expires_at}
           />
+
+          <div className="border-t pt-3">
+            <h3 className="text-sm font-semibold">E-mail de acesso</h3>
+            <p className="mb-2 text-xs text-muted-foreground">
+              Atual: <span className="font-mono">{member.email || "(sem e-mail)"}</span>. Use
+              quando a parceira assinou com e-mail errado e não consegue logar — atualiza o
+              cadastro e o login (código e senha) de uma vez.
+            </p>
+            <MemberEmailActions memberId={member.id} currentEmail={member.email} />
+          </div>
 
           <div className="border-t pt-3">
             <h3 className="text-sm font-semibold">Acesso administrativo</h3>
