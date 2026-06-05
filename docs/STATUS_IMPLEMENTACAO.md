@@ -1,5 +1,5 @@
 # 📊 Status de Implementação — Biohelp LRP
-**Data:** 01/06/2026 (go-live day — F-V20 + admin login fix em main; DB limpo)
+**Data:** 05/06/2026 (call 05/06: blocos W1–W7 entregues + F-V26)
 **Sprint Atual:** ⏸️ Sprints v1 (1-7) CONGELADOS | ✅ Pivô V2 em produção
 **Status Geral:** ✅ V1 entregue (37/38 FRs) | ⚠️ V1 sendo descontinuado | 📋 14/22 TBDs respondidos | 🎨 Front Loveable absorvido como referência
 
@@ -11,6 +11,19 @@
 - ✅ **DB limpo:** 20 members + 17 orders + 13 commission_ledger + 5 payouts + 4 vendas + 16 auth.users + 2 cv HOUSE deletados. Mantidos: 4 members reais (ADMIN002/BH00014/BH00021/HOUSE) + 1886 guru_webhook_events (audit log). Member BH00022 re-criado pra smoke F-V20.
 - ✅ **Supabase URL Configuration:** Site URL `painel.bio-help.com` + Redirect URLs allow-list com 3 entries (painel/admin/preview Vercel).
 - ⏳ **Follow-ups pós go-live (radar baixo):** logo `/admin-login` não carrega (reportado por Gabriel + Léo); deploy v1 órfão ainda servindo na Site URL (UI antiga com tabs "Sou Parceira/Sou Admin Biohelp" + botão verde) — investigar e desligar.
+
+---
+
+## 🚀 Snapshot 05/06/2026 — Call BioHelp&FlowCode (blocos W1–W7, todos entregues no dia)
+- ✅ **W1** Números do admin sem dados de teste — PR #30. Função SQL `is_test_subscriber` + view + espelho TS `lib/admin/test-data.ts`. Reais: 243 ativos / 295 ativações 30d.
+- ✅ **W2** Conceder/revogar admin pela UI — PR #31. Lais Moreira criada (BH00326, admin, senha provisória F-V28).
+- ✅ **W3** Alterar e-mail do membro pela UI — PR #32 (trata UNIQUE; sincroniza auth.users).
+- ✅ **W4** CMS de configurações — PR #33. Tabela `app_settings` + `/admin/settings`; card de suporte do membro lê de lá (WhatsApp 51 98101-9332, Seg–Sex 9h–18h).
+- ✅ **W5** Aba `/admin/comercial` — PR #34. Pendentes vs vendas por vendedor (turma BH00028–31).
+- ✅ **W6** Academy CMS completo — PR #35. Reordenar/editar/excluir trilhas e aulas; Módulo 3 com 15 aulas + trilha "Aula ao vivo".
+- ✅ **W7** Auditoria "tudo é CMS" — PR #36. Única lacuna (editar rascunho de e-mail) corrigida.
+- ✅ **F-V26** Banner de avisos na Academy — PR #26 (estava aberto desde 03/06; retomado e mergeado).
+- ⏳ **Pendente S7:** F-V27 (Academy 3 trilhas + aulas programadas — bloqueado: Léo refinar desenho no Lovable).
 
 ---
 
