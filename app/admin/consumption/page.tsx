@@ -27,12 +27,11 @@ export default async function ConsumptionPage() {
       <div className="space-y-6">
         <header className="space-y-1">
           <h1 className="text-3xl font-bold text-foreground">
-            Consumo <span className="text-base font-normal text-muted-foreground">(vendas declaradas pelos membros)</span>
+            Consumo <span className="text-base font-normal text-muted-foreground">(pedidos reais da Shopify)</span>
           </h1>
           <p className="text-muted-foreground">
             {data.rows.length} {data.rows.length === 1 ? "produto" : "produtos"}{" "}
-            que membros registraram em <code className="text-xs">Minhas vendas</code>.
-            Para o consumo real da loja Shopify, use <code className="text-xs">/admin/orders</code>.
+            comprados nos pedidos pagos da loja (via webhook <code className="text-xs">orders/paid</code>).
           </p>
         </header>
 
@@ -55,8 +54,8 @@ export default async function ConsumptionPage() {
           <h2 className="text-lg font-semibold">Ranking por receita</h2>
           {data.rows.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
-              Nenhuma venda registrada ainda. Quando os membros começarem a usar
-              `/dashboard/orders` (F-V14), os produtos vendidos aparecem aqui.
+              Nenhum pedido pago ainda. Assim que entrar uma compra na loja
+              (webhook <code className="text-xs">orders/paid</code>), os produtos aparecem aqui.
             </p>
           ) : (
             <div className="overflow-x-auto">
@@ -98,28 +97,20 @@ export default async function ConsumptionPage() {
           <div className="text-sm text-muted-foreground space-y-2">
             <p>
               <span className="font-medium text-foreground">O que este painel mostra:</span>{" "}
-              vendas que cada membro <em>auto-registrou</em> via{" "}
-              <code className="text-xs">Minhas vendas</code> (CRM leve do membro).
-              É a visão declarativa — quem o membro acha que converteu.
+              os produtos efetivamente comprados nos <em>pedidos pagos</em> da loja
+              Shopify (tabelas <code className="text-xs">orders</code> +{" "}
+              <code className="text-xs">order_items</code>), populados pelo webhook{" "}
+              <code className="text-xs">orders/paid</code>.
             </p>
             <p>
-              <span className="font-medium text-foreground">O que NÃO mostra:</span>{" "}
-              pedidos reais da loja Shopify (esses ficam em{" "}
-              <code className="text-xs">/admin/orders</code> via webhook
-              <code className="text-xs ml-1">orders/paid</code>). Quando um produto comprado
-              na Shopify entra via webhook, ele aparece em <code>/admin/orders</code>{" "}
-              — não aqui.
+              <span className="font-medium text-foreground">Compradores únicos:</span>{" "}
+              quantos membros (ou clientes) distintos compraram cada produto —
+              base pra média por membro.
             </p>
             <p>
-              <span className="font-medium text-foreground">Por que ambos coexistem:</span>{" "}
-              o registro manual permite que o membro acompanhe vendas presenciais
-              (cliente conhecido, indicação por WhatsApp) <em>antes</em> da Shopify
-              processar — útil pra cross-reference e métricas por membro.
-            </p>
-            <p>
-              <span className="font-medium text-foreground">Preço de custo</span>{" "}
-              e <span className="font-medium text-foreground">contribuição líquida</span>{" "}
-              dependem do cadastro admin em <code className="text-xs">/admin/products</code>.
+              <span className="font-medium text-foreground">Histórico:</span>{" "}
+              pedidos novos entram automaticamente. Vendas anteriores ao go-live só
+              aparecem após um <em>backfill</em> (importação do histórico).
             </p>
           </div>
         </BHCard>
