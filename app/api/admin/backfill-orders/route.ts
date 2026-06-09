@@ -80,7 +80,8 @@ export async function GET(req: NextRequest) {
   const errorMsgs: string[] = []
 
   do {
-    const page = await shopifyGraphQL<GqlOrders>(ORDERS_QUERY, { q, cursor })
+    const page: { data: GqlOrders | null; errors: string[] } =
+      await shopifyGraphQL<GqlOrders>(ORDERS_QUERY, { q, cursor })
     const pageData = page.data
     if (page.errors.length || !pageData) {
       return NextResponse.json(
