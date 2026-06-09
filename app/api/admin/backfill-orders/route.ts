@@ -80,15 +80,16 @@ export async function GET(req: NextRequest) {
   const errorMsgs: string[] = []
 
   do {
-    const { data, errors: gqlErr } = await shopifyGraphQL<GqlOrders>(ORDERS_QUERY, { q, cursor })
-    if (gqlErr.length || !data) {
+    const page = await shopifyGraphQL<GqlOrders>(ORDERS_QUERY, { q, cursor })
+    const pageData = page.data
+    if (page.errors.length || !pageData) {
       return NextResponse.json(
-        { error: 'Falha na Shopify', detail: gqlErr, since, dica: 'pode faltar o escopo read_orders no app' },
+        { error: 'Falha na Shopify', detail: page.errors, since, dica: 'pode faltar o escopo read_orders no app' },
         { status: 502 }
       )
     }
 
-    for (const { node: o } of data.orders.edges) {
+    for (const { node: o } of pageData.orders.edges) {
       found++
       const email = String(o.email ?? '').toLowerCase().trim()
       const memberId = emailToMember.get(email) ?? null
@@ -141,7 +142,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    cursor = data.orders.pageInfo.hasNextPage ? data.orders.pageInfo.endCursor : null
+    cursor = pageData.orders.pageInfo.hasNextPage ? pageData.orders.pageInfo.endCursor : null
   } while (cursor)
 
   return NextResponse.json({
