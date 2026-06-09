@@ -16,17 +16,20 @@ export type ConsumptionData = {
 }
 
 /**
- * F-V16: agregação de produtos consumidos via vendas manuais (F-V14).
+ * Agregação de produtos consumidos a partir dos PEDIDOS REAIS da Shopify
+ * (`orders` + `order_items`), populados pelo webhook `orders/paid` (e pelo
+ * backfill de histórico). Substitui a antiga fonte manual `member_sales`.
  *
- * Em S3 a fonte é só `member_sales`. Em S4 (`OrdersAnalytics`) entra
- * Shopify orgânico via `orders` + `order_items`.
+ * Agrega por título de produto: quantidade, receita (preço unitário × qty),
+ * ticket médio e compradores únicos (member_id quando existe; senão e-mail).
  */
 export async function getConsumptionData(): Promise<ConsumptionData> {
   const supabase = createServiceClient()
   const { data, error } = await supabase
-    .from("member_sales")
-    .select("product_name, qty, paid_amount, customer_name")
-    .limit(2000)
+    .from("orders")
+    .select("member_id, customer_email, order_items ( title, quantity, price )")
+    .eq("status", "paid")
+    .limit(5000)
 
   if (error || !data) {
     console.error("[consumption.getConsumptionData]", error)
@@ -36,32 +39,34 @@ export async function getConsumptionData(): Promise<ConsumptionData> {
   type Bucket = {
     qty: number
     revenue: number
-    customers: Set<string>
+    buyers: Set<string>
   }
 
   const byProduct = new Map<string, Bucket>()
   let totalRevenue = 0
   let totalQty = 0
-  const allCustomers = new Set<string>()
+  const allBuyers = new Set<string>()
 
-  for (const sale of data) {
-    const name = ((sale.product_name as string | null)?.trim() || "(produto não informado)").toLowerCase()
-    const qty = Number(sale.qty ?? 1)
-    const revenue = Number(sale.paid_amount ?? 0)
-    const customer = ((sale.customer_name as string | null) ?? "").trim().toLowerCase()
+  for (const order of data as Array<{ member_id: string | null; customer_email: string | null; order_items: Array<{ title: string | null; quantity: number | null; price: number | null }> | null }>) {
+    const buyer = String(order.member_id || order.customer_email || "").toLowerCase().trim()
+    for (const item of order.order_items || []) {
+      const name = (item.title?.trim() || "(produto não informado)").toLowerCase()
+      const qty = Number(item.quantity ?? 1)
+      const revenue = Number(item.price ?? 0) * qty
 
-    let bucket = byProduct.get(name)
-    if (!bucket) {
-      bucket = { qty: 0, revenue: 0, customers: new Set() }
-      byProduct.set(name, bucket)
+      let bucket = byProduct.get(name)
+      if (!bucket) {
+        bucket = { qty: 0, revenue: 0, buyers: new Set() }
+        byProduct.set(name, bucket)
+      }
+      bucket.qty += qty
+      bucket.revenue += revenue
+      if (buyer) bucket.buyers.add(buyer)
+
+      totalRevenue += revenue
+      totalQty += qty
+      if (buyer) allBuyers.add(buyer)
     }
-    bucket.qty += qty
-    bucket.revenue += revenue
-    if (customer) bucket.customers.add(customer)
-
-    totalRevenue += revenue
-    totalQty += qty
-    if (customer) allCustomers.add(customer)
   }
 
   const rows: ProductConsumption[] = Array.from(byProduct.entries())
@@ -70,7 +75,7 @@ export async function getConsumptionData(): Promise<ConsumptionData> {
       qty: b.qty,
       revenue: b.revenue,
       averageTicket: b.qty > 0 ? b.revenue / b.qty : 0,
-      uniqueBuyers: b.customers.size,
+      uniqueBuyers: b.buyers.size,
     }))
     .sort((a, b) => b.revenue - a.revenue)
 
@@ -78,6 +83,6 @@ export async function getConsumptionData(): Promise<ConsumptionData> {
     rows,
     totalRevenue,
     totalQty,
-    totalUnique: allCustomers.size,
+    totalUnique: allBuyers.size,
   }
 }
