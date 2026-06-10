@@ -32,6 +32,21 @@ const KIND_LABEL: Record<string, string> = {
   text: "Texto",
 }
 
+// F-V27 — ISO (UTC) → valor de <input type="datetime-local"> (hora local).
+function toLocalInput(iso: string | null): string {
+  if (!iso) return ""
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ""
+  const pad = (n: number) => String(n).padStart(2, "0")
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function formatDate(iso: string | null): string {
+  if (!iso) return ""
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+}
+
 interface Props {
   module: ContentModule
   isFirst: boolean
@@ -52,6 +67,8 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
   const [duration, setDuration] = useState(
     module.duration_minutes ? String(module.duration_minutes) : "",
   )
+  const [comingSoon, setComingSoon] = useState(module.is_coming_soon)
+  const [availableAt, setAvailableAt] = useState(toLocalInput(module.available_at))
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
 
@@ -89,6 +106,8 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
         content_url: kind === "text" ? null : contentUrl.trim() || null,
         content_text: kind === "text" ? contentText : null,
         duration_minutes: duration.trim() ? Number(duration) : null,
+        is_coming_soon: comingSoon,
+        available_at: availableAt.trim() || null,
       })
       if (!res.ok) {
         setError(res.error)
@@ -104,7 +123,14 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
       <div className="flex items-center gap-3">
         <span>{KIND_ICON[module.kind]}</span>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-foreground">{module.title}</p>
+          <p className="font-medium text-foreground inline-flex items-center gap-2">
+            {module.title}
+            {module.is_coming_soon || module.available_at ? (
+              <span className="rounded-full bg-bh-purple-medium/15 px-2 py-0.5 text-[10px] font-medium text-bh-purple-medium">
+                Em breve{module.available_at ? ` · ${formatDate(module.available_at)}` : ""}
+              </span>
+            ) : null}
+          </p>
           <p className="text-xs text-muted-foreground truncate">
             {KIND_LABEL[module.kind]}
             {module.duration_minutes ? ` · ${module.duration_minutes} min` : ""} ·{" "}
@@ -228,6 +254,34 @@ export function ModuleRow({ module, isFirst, isLast }: Props) {
               />
             </div>
           )}
+          {/* F-V27: aula "em breve" — trava manual e/ou data de liberação automática. */}
+          <div className="space-y-2 rounded-md border border-border bg-background/60 p-3">
+            <label className="inline-flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={comingSoon}
+                onChange={(e) => setComingSoon(e.target.checked)}
+              />
+              Marcar como &quot;Em breve&quot; (trava manual até desmarcar)
+            </label>
+            <div>
+              <Label htmlFor={`e-available-${module.id}`}>
+                Liberar automaticamente em (opcional)
+              </Label>
+              <Input
+                id={`e-available-${module.id}`}
+                type="datetime-local"
+                value={availableAt}
+                onChange={(e) => setAvailableAt(e.target.value)}
+                className="w-full sm:w-64"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Com data, a aula abre sozinha quando chega o horário. Sem data, fica travada só
+                pelo checkbox acima.
+              </p>
+            </div>
+          </div>
+
           <div className="flex justify-end">
             <Button type="button" size="sm" onClick={onSave} disabled={pending}>
               {pending ? (

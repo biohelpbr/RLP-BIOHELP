@@ -9,6 +9,12 @@ export interface ContentTrail {
   // Academy UX 05/06: grande grupo temático (ex.: "Consumo e Rotina"). Null = sem grupo.
   group_label: string | null
   status: "draft" | "published" | "archived"
+  // F-V27: open = entra direto (hoje); locked = fricção positiva (ativação por membro).
+  access_mode: "open" | "locked"
+  // F-V27: textos editáveis da trava (usados só quando access_mode='locked'). Null = fallback.
+  lock_cta_label: string | null
+  lock_modal_title: string | null
+  lock_modal_body: string | null
   display_order: number
   created_at: string
 }
@@ -22,9 +28,16 @@ export interface ContentModule {
   content_text: string | null
   // Academy UX 05/06: duração manual em minutos (null = não exibe).
   duration_minutes: number | null
+  // F-V27: aula "em breve" — libera sozinha quando available_at chega, OU trava manual.
+  available_at: string | null
+  is_coming_soon: boolean
   display_order: number
   created_at: string
 }
+
+// F-V27: regra pura de "em breve" mora em ./gating (reusável no client). Re-export
+// por conveniência de quem já importa de queries.
+export { isModuleComingSoon } from "./gating"
 
 export interface TrailWithStats extends ContentTrail {
   modules_count: number
@@ -197,4 +210,37 @@ export async function listMemberCompletedModules(memberId: string): Promise<Set<
     .eq("member_id", memberId)
     .not("completed_at", "is", null)
   return new Set(((data || []) as Array<{ module_id: string }>).map((v) => v.module_id))
+}
+
+/**
+ * F-V27 — trilhas travadas que ESTE membro já ativou (member_trail_activations).
+ * O gating real da trava roda em código (service_role ignora RLS), então a home e
+ * o detalhe consultam isto pra decidir entre card "Bloqueada" e o conteúdo.
+ */
+export async function listMemberActivatedTrailIds(memberId: string): Promise<Set<string>> {
+  const supabase = createServiceClient()
+  const { data } = await supabase
+    .from("member_trail_activations")
+    .select("trail_id")
+    .eq("member_id", memberId)
+  return new Set(((data || []) as Array<{ trail_id: string }>).map((r) => r.trail_id))
+}
+
+/**
+ * F-V27 — true se o membro pode ver o conteúdo da trilha: trilha aberta, OU
+ * trilha travada que ele já ativou. Admin sempre passa (checar antes de chamar).
+ */
+export async function isTrailUnlockedForMember(
+  trail: ContentTrail,
+  memberId: string,
+): Promise<boolean> {
+  if (trail.access_mode !== "locked") return true
+  const supabase = createServiceClient()
+  const { data } = await supabase
+    .from("member_trail_activations")
+    .select("id")
+    .eq("trail_id", trail.id)
+    .eq("member_id", memberId)
+    .maybeSingle()
+  return !!data
 }

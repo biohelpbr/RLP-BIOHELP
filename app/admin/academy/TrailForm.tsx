@@ -15,6 +15,10 @@ type FormState = {
   cover_url: string
   group_label: string
   status: "draft" | "published" | "archived"
+  access_mode: "open" | "locked"
+  lock_cta_label: string
+  lock_modal_title: string
+  lock_modal_body: string
   display_order: string
 }
 
@@ -24,7 +28,19 @@ const initialState: FormState = {
   cover_url: "",
   group_label: "",
   status: "draft",
+  access_mode: "open",
+  lock_cta_label: "",
+  lock_modal_title: "",
+  lock_modal_body: "",
   display_order: "0",
+}
+
+// F-V27: fallbacks da trava — viram placeholder no form e default no membro
+// quando o admin deixa em branco. Cópia validada pelo cliente (10/06).
+const LOCK_DEFAULTS = {
+  cta: "Quero indicar e desenvolver",
+  title: "Você escolheu um novo caminho",
+  body: "A partir desse momento vamos te ensinar tudo. Você quer mesmo?",
 }
 
 /**
@@ -48,6 +64,10 @@ export function TrailForm({
           cover_url: trail.cover_url ?? "",
           group_label: trail.group_label ?? "",
           status: trail.status,
+          access_mode: trail.access_mode ?? "open",
+          lock_cta_label: trail.lock_cta_label ?? "",
+          lock_modal_title: trail.lock_modal_title ?? "",
+          lock_modal_body: trail.lock_modal_body ?? "",
           display_order: String(trail.display_order),
         }
       : initialState,
@@ -71,6 +91,11 @@ export function TrailForm({
         cover_url: state.cover_url.trim() || null,
         group_label: state.group_label.trim() || null,
         status: state.status,
+        access_mode: state.access_mode,
+        // Trava só guarda texto quando travada; aberta limpa os campos.
+        lock_cta_label: state.access_mode === "locked" ? state.lock_cta_label.trim() || null : null,
+        lock_modal_title: state.access_mode === "locked" ? state.lock_modal_title.trim() || null : null,
+        lock_modal_body: state.access_mode === "locked" ? state.lock_modal_body.trim() || null : null,
         display_order: Number(state.display_order) || 0,
       }
       if (trail) {
@@ -159,6 +184,70 @@ export function TrailForm({
             <option value="archived">Arquivada</option>
           </select>
         </div>
+      </div>
+
+      {/* F-V27: acesso da trilha — aberta (entra direto) vs travada (fricção positiva). */}
+      <div className="space-y-3 rounded-md border border-input p-4">
+        <Label>Acesso</Label>
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-6">
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="access_mode"
+              value="open"
+              checked={state.access_mode === "open"}
+              onChange={() => set("access_mode", "open")}
+            />
+            Aberta — a parceira entra direto
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="access_mode"
+              value="locked"
+              checked={state.access_mode === "locked"}
+              onChange={() => set("access_mode", "locked")}
+            />
+            Travada — fricção positiva (ativação por parceira)
+          </label>
+        </div>
+
+        {state.access_mode === "locked" && (
+          <div className="space-y-3 border-t border-input pt-3">
+            <p className="text-xs text-muted-foreground">
+              Cada parceira vê o card bloqueado, abre o modal e ativa pra ela mesma. Vazio = usa o
+              texto padrão.
+            </p>
+            <div>
+              <Label htmlFor="lock_cta_label">Texto do botão (card bloqueado)</Label>
+              <Input
+                id="lock_cta_label"
+                value={state.lock_cta_label}
+                onChange={(e) => set("lock_cta_label", e.target.value)}
+                placeholder={LOCK_DEFAULTS.cta}
+              />
+            </div>
+            <div>
+              <Label htmlFor="lock_modal_title">Título do modal</Label>
+              <Input
+                id="lock_modal_title"
+                value={state.lock_modal_title}
+                onChange={(e) => set("lock_modal_title", e.target.value)}
+                placeholder={LOCK_DEFAULTS.title}
+              />
+            </div>
+            <div>
+              <Label htmlFor="lock_modal_body">Texto do modal</Label>
+              <textarea
+                id="lock_modal_body"
+                value={state.lock_modal_body}
+                onChange={(e) => set("lock_modal_body", e.target.value)}
+                placeholder={LOCK_DEFAULTS.body}
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {error && (

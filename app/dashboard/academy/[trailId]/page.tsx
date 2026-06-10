@@ -8,8 +8,11 @@ import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHCard } from "@/components/biohelp"
 import {
   getTrailWithModules,
+  isTrailUnlockedForMember,
   listMemberCompletedModules,
 } from "@/lib/content/queries"
+import { isModuleComingSoon } from "@/lib/content/gating"
+import { LockedTrailCard } from "../LockedTrailCard"
 import { LessonList } from "./LessonList"
 
 export default async function TrailDetailPage({
@@ -27,8 +30,36 @@ export default async function TrailDetailPage({
   if (!data) notFound()
 
   const { trail, modules } = data
+
+  // F-V27: trilha travada e não ativada por esta parceira → mostra o card de
+  // fricção positiva no lugar do conteúdo (gating em código; service_role ignora RLS).
+  const unlocked = await isTrailUnlockedForMember(trail, member.id)
+  if (!unlocked) {
+    return (
+      <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
+        <div className="space-y-6 max-w-md">
+          <Link
+            href="/dashboard/academy"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar pra Academy
+          </Link>
+          <LockedTrailCard trail={trail} />
+        </div>
+      </PartnerShell>
+    )
+  }
+
+  // F-V27: aulas "em breve" viram teaser — sem expor content_url/text no payload.
+  const now = new Date()
+  const safeModules = modules.map((m) =>
+    isModuleComingSoon(m, now) ? { ...m, content_url: null, content_text: null } : m,
+  )
   const completed = await listMemberCompletedModules(member.id)
-  const completedInTrail = modules.filter((m) => completed.has(m.id)).length
+  // Progresso só conta aulas já liberadas (em breve não pesa no denominador).
+  const releasedModules = safeModules.filter((m) => !isModuleComingSoon(m, now))
+  const completedInTrail = releasedModules.filter((m) => completed.has(m.id)).length
 
   return (
     <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
@@ -51,30 +82,30 @@ export default async function TrailDetailPage({
           </div>
 
           {/* Academy UX 05/06: progresso da trilha no topo, no lugar dos vídeos gigantes. */}
-          {modules.length > 0 && (
+          {releasedModules.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground">
-                {completedInTrail} de {modules.length}{" "}
-                {modules.length === 1 ? "aula assistida" : "aulas assistidas"}
+                {completedInTrail} de {releasedModules.length}{" "}
+                {releasedModules.length === 1 ? "aula assistida" : "aulas assistidas"}
               </p>
               <div className="h-1.5 w-full max-w-xs rounded-full bg-muted">
                 <div
                   className="h-full rounded-full bg-primary transition-all duration-300"
-                  style={{ width: `${modules.length ? Math.round((completedInTrail / modules.length) * 100) : 0}%` }}
+                  style={{ width: `${releasedModules.length ? Math.round((completedInTrail / releasedModules.length) * 100) : 0}%` }}
                 />
               </div>
             </div>
           )}
         </header>
 
-        {modules.length === 0 ? (
+        {safeModules.length === 0 ? (
           <BHCard variant="elevated">
             <p className="text-sm text-muted-foreground py-6 text-center">
               Esta trilha ainda não tem aulas publicadas.
             </p>
           </BHCard>
         ) : (
-          <LessonList modules={modules} completedIds={Array.from(completed)} />
+          <LessonList modules={safeModules} completedIds={Array.from(completed)} />
         )}
       </div>
     </PartnerShell>
