@@ -9,6 +9,7 @@ import {
   type PreRegistrationResult,
 } from "@/lib/subscriptions/schemas"
 import { onMemberStatusChange } from "@/lib/tags/hook-on-status-change"
+import { onNewSubscriberWelcome } from "@/lib/subscriptions/welcome-hook"
 import { generateRefCode } from "@/lib/utils/ref-code"
 import { sendToAbsolut } from "@/lib/crm/absolut"
 
@@ -61,6 +62,11 @@ export async function markSubscriptionPaid(memberId: string): Promise<Result> {
     sponsorId: (current.sponsor_id as string | null) ?? null,
     newStatus: "paid",
   })
+
+  // Hook F-V30: e-mail de boas-vindas ao novo assinante (transição pending→paid).
+  // Ponto único por onde TODO novo assinante passa (Guru + Shopify + manual).
+  // Isolado e controlado por WELCOME_EMAIL_MODE (off/dryrun/live) — nunca derruba isto.
+  await onNewSubscriberWelcome({ memberId })
 
   return { ok: true, changed: true }
 }
