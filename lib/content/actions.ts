@@ -42,6 +42,10 @@ export async function createTrail(input: unknown): Promise<ActionResult<{ id: st
       cover_url: parsed.data.cover_url || null,
       group_label: parsed.data.group_label || null,
       status: parsed.data.status,
+      access_mode: parsed.data.access_mode,
+      lock_cta_label: parsed.data.lock_cta_label || null,
+      lock_modal_title: parsed.data.lock_modal_title || null,
+      lock_modal_body: parsed.data.lock_modal_body || null,
       display_order: parsed.data.display_order,
     })
     .select("id")
@@ -118,6 +122,8 @@ export async function addModule(input: unknown): Promise<ActionResult<{ id: stri
       content_url: parsed.data.content_url || null,
       content_text: parsed.data.content_text || null,
       duration_minutes: parsed.data.duration_minutes ?? null,
+      is_coming_soon: parsed.data.is_coming_soon,
+      available_at: parsed.data.available_at ?? null,
       display_order: parsed.data.display_order,
     })
     .select("id")
@@ -177,6 +183,8 @@ export async function updateModule(
       content_url: parsed.data.content_url || null,
       content_text: parsed.data.content_text || null,
       duration_minutes: parsed.data.duration_minutes ?? null,
+      is_coming_soon: parsed.data.is_coming_soon,
+      available_at: parsed.data.available_at ?? null,
     })
     .eq("id", moduleId)
 
@@ -310,5 +318,39 @@ export async function markView(
   }
 
   revalidatePath("/dashboard/academy")
+  return { ok: true }
+}
+
+/**
+ * F-V27 — "fricção positiva": a parceira ativa pra ela mesma uma trilha travada.
+ * Idempotente pelo UNIQUE(trail_id, member_id) — clicar duas vezes não duplica nem
+ * dá erro. Guard: só ativa trilha realmente `locked` (não faz sentido p/ aberta).
+ */
+export async function activateTrail(trailId: string): Promise<ActionResult> {
+  const member = await getCurrentMember()
+  if (!member) return { ok: false, error: "Sessão expirada. Faça login novamente." }
+
+  const supabase = createServiceClient()
+
+  const { data: trail, error: trailErr } = await supabase
+    .from("content_trails")
+    .select("id, access_mode, status")
+    .eq("id", trailId)
+    .maybeSingle()
+  if (trailErr || !trail) return { ok: false, error: "Trilha não encontrada." }
+  if (trail.status !== "published") return { ok: false, error: "Trilha indisponível." }
+  if (trail.access_mode !== "locked") return { ok: false, error: "Esta trilha não precisa de ativação." }
+
+  // Idempotente: ignora violação de UNIQUE (já ativada) tratando como sucesso.
+  const { error } = await supabase
+    .from("member_trail_activations")
+    .insert({ trail_id: trailId, member_id: member.id })
+  if (error && error.code !== "23505") {
+    console.error("[activateTrail]", error)
+    return { ok: false, error: "Não foi possível ativar a trilha." }
+  }
+
+  revalidatePath("/dashboard/academy")
+  revalidatePath(`/dashboard/academy/${trailId}`)
   return { ok: true }
 }

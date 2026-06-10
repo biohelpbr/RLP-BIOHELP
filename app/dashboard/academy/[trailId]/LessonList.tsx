@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Check, ExternalLink, FileDigit, FileText, Loader2, Play } from "lucide-react"
+import { Check, Clock, ExternalLink, FileDigit, FileText, Loader2, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { markView } from "@/lib/content/actions"
+import { isModuleComingSoon } from "@/lib/content/gating"
 import { youtubeEmbedUrl, youtubeThumbUrl } from "@/lib/content/youtube"
 import type { ContentModule } from "@/lib/content/queries"
 
@@ -25,6 +26,17 @@ function lessonMeta(m: ContentModule): string {
   const parts: string[] = [KIND_LABEL[m.kind]]
   if (m.duration_minutes) parts.unshift(`${m.duration_minutes} min`)
   return parts.join(" · ")
+}
+
+// F-V27 — rótulo do teaser "Em breve" (+ data quando houver).
+function comingSoonLabel(m: ContentModule): string {
+  if (m.available_at) {
+    const d = new Date(m.available_at)
+    if (!Number.isNaN(d.getTime())) {
+      return `Em breve · ${d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}`
+    }
+  }
+  return "Em breve"
 }
 
 /**
@@ -63,6 +75,29 @@ export function LessonList({
     <>
       <div className="rounded-2xl border border-border bg-card bh-shadow-lg divide-y divide-border overflow-hidden">
         {modules.map((m) => {
+          // F-V27: aula "em breve" — teaser não clicável, sem player.
+          if (isModuleComingSoon(m)) {
+            return (
+              <div
+                key={m.id}
+                className="flex w-full items-center gap-3 sm:gap-4 p-3 sm:p-4 opacity-70"
+              >
+                <div className="relative flex w-24 sm:w-32 aspect-video shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
+                  <Clock className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <p className="font-medium text-sm sm:text-base text-foreground line-clamp-2">
+                    {m.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{KIND_LABEL[m.kind]}</p>
+                </div>
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-bh-purple-medium/10 px-2.5 py-0.5 text-xs font-medium text-bh-purple-medium">
+                  <Clock className="h-3 w-3" />
+                  {comingSoonLabel(m)}
+                </span>
+              </div>
+            )
+          }
           const done = completed.has(m.id)
           const thumb = m.kind === "youtube" ? youtubeThumbUrl(m.content_url) : null
           return (

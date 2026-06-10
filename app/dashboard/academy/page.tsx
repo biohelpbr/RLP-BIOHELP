@@ -6,8 +6,13 @@ import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { AnnouncementBar, BHCard } from "@/components/biohelp"
-import { listPublishedTrailsWithMeta, type TrailWithMeta } from "@/lib/content/queries"
+import {
+  listPublishedTrailsWithMeta,
+  listMemberActivatedTrailIds,
+  type TrailWithMeta,
+} from "@/lib/content/queries"
 import { getActiveAnnouncement } from "@/lib/announcements/queries"
+import { LockedTrailCard } from "./LockedTrailCard"
 
 /**
  * Academy UX 05/06 — agrupa as trilhas pelos "grandes grupos" definidos no CMS
@@ -47,9 +52,11 @@ export default async function AcademyMemberPage() {
   if (!member) redirect("/login")
 
   // F-V26: espelha o banner de avisos (F-V22) também na Academy, igual ao V2Dashboard.
-  const [trails, announcement] = await Promise.all([
+  // F-V27: + ativações da parceira pra decidir trilha travada vs liberada.
+  const [trails, announcement, activatedIds] = await Promise.all([
     listPublishedTrailsWithMeta(),
     getActiveAnnouncement(),
+    listMemberActivatedTrailIds(member.id),
   ])
 
   const sections = groupTrails(trails)
@@ -82,7 +89,12 @@ export default async function AcademyMemberPage() {
                 <h2 className="text-xl font-semibold text-foreground">{section.label}</h2>
               )}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {section.trails.map((t) => (
+                {section.trails.map((t) => {
+                  // F-V27: travada e ainda não ativada por esta parceira → card "Bloqueada".
+                  if (t.access_mode === "locked" && !activatedIds.has(t.id)) {
+                    return <LockedTrailCard key={t.id} trail={t} />
+                  }
+                  return (
                   <Link key={t.id} href={`/dashboard/academy/${t.id}`} className="group block">
                     <BHCard
                       variant="elevated"
@@ -116,7 +128,8 @@ export default async function AcademyMemberPage() {
                       </div>
                     </BHCard>
                   </Link>
-                ))}
+                  )
+                })}
               </div>
             </section>
           ))
