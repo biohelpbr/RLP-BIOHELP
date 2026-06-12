@@ -8,11 +8,10 @@ import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { BHCard } from "@/components/biohelp"
 import {
   getTrailWithModules,
-  isTrailUnlockedForMember,
   listMemberCompletedModules,
 } from "@/lib/content/queries"
+import { getAdminGroup, isGroupUnlockedForMember } from "@/lib/content/groups"
 import { isModuleComingSoon } from "@/lib/content/gating"
-import { LockedTrailCard } from "../LockedTrailCard"
 import { LessonList } from "./LessonList"
 
 export default async function TrailDetailPage({
@@ -31,24 +30,13 @@ export default async function TrailDetailPage({
 
   const { trail, modules } = data
 
-  // F-V27: trilha travada e não ativada por esta parceira → mostra o card de
-  // fricção positiva no lugar do conteúdo (gating em código; service_role ignora RLS).
-  const unlocked = await isTrailUnlockedForMember(trail, member.id)
-  if (!unlocked) {
-    return (
-      <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
-        <div className="space-y-6 max-w-md">
-          <Link
-            href="/dashboard/academy"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar pra Academy
-          </Link>
-          <LockedTrailCard trail={trail} />
-        </div>
-      </PartnerShell>
-    )
+  // F-V31: a trava agora é no Grande Grupo. Protege deep-link: se a trilha pertence
+  // a um grupo travado e não ativado, manda pra página do grupo (que mostra a trava).
+  if (trail.group_id) {
+    const group = await getAdminGroup(trail.group_id)
+    if (group && !(await isGroupUnlockedForMember(group, member.id))) {
+      redirect(`/dashboard/academy/grupo/${trail.group_id}`)
+    }
   }
 
   // F-V27: aulas "em breve" viram teaser — sem expor content_url/text no payload.
@@ -65,11 +53,11 @@ export default async function TrailDetailPage({
     <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
       <div className="space-y-6 max-w-3xl">
         <Link
-          href="/dashboard/academy"
+          href={trail.group_id ? `/dashboard/academy/grupo/${trail.group_id}` : "/dashboard/academy"}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" />
-          Voltar pra Academy
+          Voltar
         </Link>
 
         <header className="space-y-3">
