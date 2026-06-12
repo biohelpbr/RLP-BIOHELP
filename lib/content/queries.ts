@@ -7,7 +7,10 @@ export interface ContentTrail {
   description: string | null
   cover_url: string | null
   // Academy UX 05/06: grande grupo temático (ex.: "Consumo e Rotina"). Null = sem grupo.
+  // F-V31: DEPRECATED — substituído por group_id (entidade academy_groups). Mantido p/ rollback.
   group_label: string | null
+  // F-V31: módulo pertence a um Grande Grupo (academy_groups). Null = legado/sem grupo.
+  group_id: string | null
   status: "draft" | "published" | "archived"
   // F-V27: open = entra direto (hoje); locked = fricção positiva (ativação por membro).
   access_mode: "open" | "locked"

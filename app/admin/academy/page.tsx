@@ -1,15 +1,19 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { Eye, Plus, Layers } from "lucide-react"
+import { Layers, Plus, Lock } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { listAdminTrails } from "@/lib/content/queries"
-import { TrailRowActions } from "./TrailRowActions"
+import { listAdminGroups } from "@/lib/content/groups"
+import { GroupRowActions } from "./GroupRowActions"
 
+/**
+ * F-V31 — CMS da Academy: gerencia os Grandes Grupos (camadas). Cada grupo abre
+ * sua tela de edição + trilhas + materiais.
+ */
 export default async function AdminAcademyPage() {
   if (!isV2Enabled()) redirect("/admin")
 
@@ -17,7 +21,7 @@ export default async function AdminAcademyPage() {
   if (!member) redirect("/login")
   if (!(await isCurrentUserAdmin())) redirect("/dashboard")
 
-  const trails = await listAdminTrails()
+  const groups = await listAdminGroups()
 
   return (
     <AdminShell adminName={member.name ?? "Admin"}>
@@ -26,64 +30,51 @@ export default async function AdminAcademyPage() {
           <div>
             <h1 className="text-3xl font-bold text-foreground">Academy</h1>
             <p className="text-muted-foreground">
-              Trilhas de conteúdo (vídeos YouTube, PDFs, textos) entregues globalmente aos membros.
+              Grandes Grupos (camadas) → módulos → aulas. Crie os grupos e organize o conteúdo dentro deles.
             </p>
           </div>
           <Button asChild>
-            <Link href="/admin/academy/new" className="inline-flex items-center gap-2">
+            <Link href="/admin/academy/grupo/new" className="inline-flex items-center gap-2">
               <Plus className="w-4 h-4" />
-              Nova trilha
+              Novo grupo
             </Link>
           </Button>
         </header>
 
         <BHCard variant="elevated">
-          {trails.length === 0 ? (
+          {groups.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
-              Nenhuma trilha cadastrada ainda. Crie a primeira pra começar.
+              Nenhum Grande Grupo ainda. Crie o primeiro pra começar.
             </p>
           ) : (
             <ul className="divide-y divide-border">
-              {trails.map((t, i) => (
-                <li
-                  key={t.id}
-                  className="py-3 flex flex-wrap items-center justify-between gap-3"
-                >
+              {groups.map((g, i) => (
+                <li key={g.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    {t.group_label && (
-                      <p className="text-xs font-medium text-primary">{t.group_label}</p>
-                    )}
-                    <Link
-                      href={`/admin/academy/${t.id}`}
-                      className="font-semibold text-foreground hover:underline"
-                    >
-                      {t.title}
+                    <Link href={`/admin/academy/grupo/${g.id}`} className="font-semibold text-foreground hover:underline">
+                      {g.title}
                     </Link>
-                    {t.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-1">
-                        {t.description}
-                      </p>
+                    {g.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-1">{g.description}</p>
                     )}
-                    <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-3">
-                      <span className="inline-flex items-center gap-1">
-                        <Layers className="w-3 h-3" />
-                        {t.modules_count} módulo(s)
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        {t.views_count} visualização(ões)
-                      </span>
+                    <p className="text-xs text-muted-foreground mt-1 inline-flex items-center gap-1">
+                      <Layers className="w-3 h-3" />
+                      {g.trails_count} módulo(s)
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={t.status === "published" ? "default" : "outline"}>
-                      {t.status}
-                    </Badge>
-                    <TrailRowActions
-                      trailId={t.id}
-                      trailTitle={t.title}
+                    {g.access_mode === "locked" && (
+                      <Badge variant="outline" className="inline-flex items-center gap-1">
+                        <Lock className="w-3 h-3" />
+                        Travado
+                      </Badge>
+                    )}
+                    <GroupRowActions
+                      groupId={g.id}
+                      groupTitle={g.title}
+                      trailsCount={g.trails_count}
                       isFirst={i === 0}
-                      isLast={i === trails.length - 1}
+                      isLast={i === groups.length - 1}
                     />
                   </div>
                 </li>

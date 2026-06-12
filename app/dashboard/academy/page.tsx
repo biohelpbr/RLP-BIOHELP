@@ -1,68 +1,37 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { GraduationCap, PlayCircle } from "lucide-react"
+import { ArrowRight, GraduationCap } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember } from "@/lib/supabase/server"
 import { getMemberSubtitle } from "@/lib/members/subtitle"
 import { PartnerShell } from "@/components/layouts/PartnerShell"
 import { AnnouncementBar, BHCard } from "@/components/biohelp"
-import {
-  listPublishedTrailsWithMeta,
-  listMemberActivatedTrailIds,
-  type TrailWithMeta,
-} from "@/lib/content/queries"
+import { listPublishedGroups, listMemberActivatedGroupIds } from "@/lib/content/groups"
 import { getActiveAnnouncement } from "@/lib/announcements/queries"
-import { LockedTrailCard } from "./LockedTrailCard"
+import { LockedGroupCard } from "./LockedGroupCard"
 
 /**
- * Academy UX 05/06 — agrupa as trilhas pelos "grandes grupos" definidos no CMS
- * (`group_label`). Grupos aparecem na ordem da primeira trilha de cada um;
- * trilhas sem grupo caem na seção "Geral", no fim.
+ * F-V31 — Home da Academy por "camadas" (Grandes Grupos). Mostra os grupos como
+ * cards; clicar abre os módulos. Grupo travado e não ativado → card "Bloqueada".
  */
-function groupTrails(trails: TrailWithMeta[]): Array<{ label: string | null; trails: TrailWithMeta[] }> {
-  const sections = new Map<string, TrailWithMeta[]>()
-  const ungrouped: TrailWithMeta[] = []
-  for (const t of trails) {
-    const label = t.group_label?.trim()
-    if (!label) {
-      ungrouped.push(t)
-      continue
-    }
-    const list = sections.get(label) ?? []
-    list.push(t)
-    sections.set(label, list)
-  }
-  const out: Array<{ label: string | null; trails: TrailWithMeta[] }> = []
-  sections.forEach((list, label) => out.push({ label, trails: list }))
-  if (ungrouped.length > 0) out.push({ label: out.length > 0 ? "Geral" : null, trails: ungrouped })
-  return out
-}
-
-function trailMeta(t: TrailWithMeta): string | null {
-  const parts: string[] = []
-  if (t.modules_count > 0) parts.push(`${t.modules_count} ${t.modules_count === 1 ? "aula" : "aulas"}`)
-  if (t.total_minutes > 0) parts.push(`${t.total_minutes} min`)
-  return parts.length > 0 ? parts.join(" · ") : null
-}
-
 export default async function AcademyMemberPage() {
   if (!isV2Enabled()) redirect("/dashboard")
 
   const member = await getCurrentMember()
   if (!member) redirect("/login")
 
-  // F-V26: espelha o banner de avisos (F-V22) também na Academy, igual ao V2Dashboard.
-  // F-V27: + ativações da parceira pra decidir trilha travada vs liberada.
-  const [trails, announcement, activatedIds] = await Promise.all([
-    listPublishedTrailsWithMeta(),
+  const [groups, announcement, activatedIds] = await Promise.all([
+    listPublishedGroups(),
     getActiveAnnouncement(),
-    listMemberActivatedTrailIds(member.id),
+    listMemberActivatedGroupIds(member.id),
   ])
 
-  const sections = groupTrails(trails)
-
   return (
-    <PartnerShell memberName={member.name ?? "Você"} isActive={member.subscription_status === "paid"} memberSubtitle={getMemberSubtitle(member)}>
+    <PartnerShell
+      memberName={member.name ?? "Você"}
+      isActive={member.subscription_status === "paid"}
+      memberSubtitle={getMemberSubtitle(member)}
+    >
       <div className="space-y-8">
         {announcement && <AnnouncementBar announcement={announcement} />}
 
@@ -72,67 +41,41 @@ export default async function AcademyMemberPage() {
             Academy
           </h1>
           <p className="text-muted-foreground">
-            Trilhas com vídeos, PDFs e textos curtos preparados pra você.
+            Escolha por onde começar. Cada caminho tem vídeos, materiais e passos pra você evoluir.
           </p>
         </header>
 
-        {trails.length === 0 ? (
+        {groups.length === 0 ? (
           <BHCard variant="elevated">
             <p className="text-sm text-muted-foreground py-6 text-center">
-              Nenhuma trilha publicada ainda. Volte em breve!
+              Nenhum conteúdo publicado ainda. Volte em breve!
             </p>
           </BHCard>
         ) : (
-          sections.map((section, idx) => (
-            <section key={section.label ?? `section-${idx}`} className="space-y-4">
-              {section.label && (
-                <h2 className="text-xl font-semibold text-foreground">{section.label}</h2>
-              )}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {section.trails.map((t) => {
-                  // F-V27: travada e ainda não ativada por esta parceira → card "Bloqueada".
-                  if (t.access_mode === "locked" && !activatedIds.has(t.id)) {
-                    return <LockedTrailCard key={t.id} trail={t} />
-                  }
-                  return (
-                  <Link key={t.id} href={`/dashboard/academy/${t.id}`} className="group block">
-                    <BHCard
-                      variant="elevated"
-                      className="h-full transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:shadow-lg overflow-hidden p-0"
-                    >
-                      {t.cover_url || t.fallback_thumb ? (
-                        <div className="relative h-36 w-full bg-muted">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={t.cover_url ?? t.fallback_thumb ?? ""}
-                            alt={t.title}
-                            className="absolute inset-0 w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                      ) : (
-                        <div className="h-36 w-full bg-gradient-to-br from-primary/15 to-accent/20 flex items-center justify-center">
-                          <PlayCircle className="w-10 h-10 text-primary/40" />
-                        </div>
-                      )}
-                      <div className="p-4 space-y-1.5">
-                        <h3 className="font-semibold text-foreground line-clamp-2">{t.title}</h3>
-                        {t.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {t.description}
-                          </p>
-                        )}
-                        {trailMeta(t) && (
-                          <p className="text-xs text-muted-foreground pt-1">{trailMeta(t)}</p>
-                        )}
-                      </div>
-                    </BHCard>
-                  </Link>
-                  )
-                })}
-              </div>
-            </section>
-          ))
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {groups.map((g) => {
+              // F-V31: grupo travado e ainda não ativado por esta parceira → "Bloqueada".
+              if (g.access_mode === "locked" && !activatedIds.has(g.id)) {
+                return <LockedGroupCard key={g.id} group={g} />
+              }
+              return (
+                <Link key={g.id} href={`/dashboard/academy/grupo/${g.id}`} className="group block h-full">
+                  <div className="flex h-full flex-col rounded-xl border border-border bg-card p-5 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-primary/40 group-hover:shadow-md">
+                    <h3 className="font-semibold text-foreground">{g.title}</h3>
+                    {g.description && (
+                      <p className="mt-1 flex-1 text-sm text-muted-foreground line-clamp-3">
+                        {g.description}
+                      </p>
+                    )}
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                      Acessar
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         )}
       </div>
     </PartnerShell>

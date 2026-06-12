@@ -12,37 +12,36 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { BHCard } from "@/components/biohelp"
-import { activateTrail } from "@/lib/content/actions"
-import type { ContentTrail } from "@/lib/content/queries"
+import { activateGroup } from "@/lib/content/group-actions"
+import type { AcademyGroup } from "@/lib/content/groups"
 
-// F-V27 — fricção positiva: card "Bloqueada" + modal de escolha consciente.
-// Fallbacks da cópia validada com o cliente (10/06) quando o admin deixa vazio.
+// F-V31 — fricção positiva no nível do Grande Grupo. Fallbacks da cópia validada
+// com o cliente quando o admin deixa os textos vazios.
 const LOCK_DEFAULTS = {
   cta: "Quero indicar e desenvolver",
   title: "Você escolheu um novo caminho",
   body: "A partir desse momento vamos te ensinar tudo. Você quer mesmo?",
 }
 
-type LockTrail = Pick<
-  ContentTrail,
+type LockGroup = Pick<
+  AcademyGroup,
   "id" | "title" | "description" | "lock_cta_label" | "lock_modal_title" | "lock_modal_body"
 >
 
-export function LockedTrailCard({ trail }: { trail: LockTrail }) {
+export function LockedGroupCard({ group }: { group: LockGroup }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
 
-  const ctaLabel = trail.lock_cta_label?.trim() || LOCK_DEFAULTS.cta
-  const modalTitle = trail.lock_modal_title?.trim() || LOCK_DEFAULTS.title
-  const modalBody = trail.lock_modal_body?.trim() || LOCK_DEFAULTS.body
+  const ctaLabel = group.lock_cta_label?.trim() || LOCK_DEFAULTS.cta
+  const modalTitle = group.lock_modal_title?.trim() || LOCK_DEFAULTS.title
+  const modalBody = group.lock_modal_body?.trim() || LOCK_DEFAULTS.body
 
   function onActivate() {
     setError(null)
     start(async () => {
-      const res = await activateTrail(trail.id)
+      const res = await activateGroup(group.id)
       if (!res.ok) {
         setError(res.error)
         return
@@ -54,24 +53,19 @@ export function LockedTrailCard({ trail }: { trail: LockTrail }) {
 
   return (
     <>
-      <BHCard variant="elevated" className="flex h-full flex-col overflow-hidden p-0">
-        <div className="flex h-36 w-full items-center justify-center bg-gradient-to-br from-bh-purple-medium/15 to-accent/20">
-          <Lock className="h-9 w-9 text-bh-purple-medium/50" />
-        </div>
-        <div className="flex flex-1 flex-col gap-1.5 p-4">
-          <span className="inline-flex w-fit items-center gap-1 rounded-full bg-bh-purple-medium/10 px-2 py-0.5 text-[11px] font-medium text-bh-purple-medium">
-            <Lock className="h-3 w-3" />
-            Bloqueada
-          </span>
-          <h3 className="font-semibold text-foreground line-clamp-2">{trail.title}</h3>
-          {trail.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">{trail.description}</p>
-          )}
-          <Button type="button" className="mt-3 w-full" onClick={() => setOpen(true)}>
-            {ctaLabel}
-          </Button>
-        </div>
-      </BHCard>
+      <div className="flex h-full flex-col rounded-xl border border-border bg-card p-5">
+        <span className="inline-flex w-fit items-center gap-1 rounded-full bg-bh-purple-medium/10 px-2 py-0.5 text-[11px] font-medium text-bh-purple-medium">
+          <Lock className="h-3 w-3" />
+          Bloqueada
+        </span>
+        <h3 className="mt-2 font-semibold text-foreground">{group.title}</h3>
+        {group.description && (
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{group.description}</p>
+        )}
+        <Button type="button" variant="outline" className="mt-4 w-full" onClick={() => setOpen(true)}>
+          {ctaLabel}
+        </Button>
+      </div>
 
       <Dialog open={open} onOpenChange={(o) => !o && setOpen(false)}>
         <DialogContent className="sm:max-w-md">
