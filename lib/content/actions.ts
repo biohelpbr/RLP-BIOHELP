@@ -41,6 +41,7 @@ export async function createTrail(input: unknown): Promise<ActionResult<{ id: st
       description: parsed.data.description || null,
       cover_url: parsed.data.cover_url || null,
       group_label: parsed.data.group_label || null,
+      group_id: parsed.data.group_id || null,
       status: parsed.data.status,
       access_mode: parsed.data.access_mode,
       lock_cta_label: parsed.data.lock_cta_label || null,
