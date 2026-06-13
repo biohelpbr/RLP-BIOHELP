@@ -51,12 +51,17 @@ export default async function AdminEmailsPage() {
               via Resend.
             </p>
           </div>
-          <Button asChild>
-            <Link href="/admin/emails/new" className="inline-flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Nova campanha
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href="/admin/emails/fluxo">Fluxo de boas-vindas</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/admin/emails/new" className="inline-flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Nova campanha
+              </Link>
+            </Button>
+          </div>
         </header>
 
         <BHCard variant="elevated">
