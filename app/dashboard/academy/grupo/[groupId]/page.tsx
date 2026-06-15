@@ -64,6 +64,16 @@ export default async function GroupPage({
           {group.description && <p className="text-muted-foreground mt-1">{group.description}</p>}
         </header>
 
+        {/* F-V33: banner do grupo (ex.: calendário do mês dos encontros ao vivo). */}
+        {group.banner_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={group.banner_url}
+            alt={`Banner — ${group.title}`}
+            className="w-full rounded-2xl border border-border object-cover"
+          />
+        )}
+
         {/* Módulos do grupo */}
         {trails.length === 0 ? (
           <BHCard variant="elevated">

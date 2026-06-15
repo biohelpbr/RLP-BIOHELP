@@ -40,6 +40,7 @@ export async function createGroup(input: unknown): Promise<ActionResult<{ id: st
     .insert({
       title: parsed.data.title,
       description: parsed.data.description || null,
+      banner_url: parsed.data.banner_url || null,
       access_mode: parsed.data.access_mode,
       lock_cta_label: parsed.data.lock_cta_label || null,
       lock_modal_title: parsed.data.lock_modal_title || null,

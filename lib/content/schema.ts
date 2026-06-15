@@ -102,6 +102,8 @@ export type ModuleUpdateInput = z.infer<typeof moduleUpdateSchema>
 export const academyGroupInputSchema = z.object({
   title: z.string().trim().min(2, "Título obrigatório."),
   description: z.string().trim().optional().nullable(),
+  // F-V33: URL da imagem de banner (calendário do mês etc.). Vazio = sem banner.
+  banner_url: z.string().url("URL de banner inválida.").optional().nullable().or(z.literal("")),
   access_mode: trailAccessModeSchema.default("open"),
   // Textos da trava (usados só quando locked). Vazio = fallback padrão.
   lock_cta_label: z.string().trim().max(80, "Texto do botão muito longo.").optional().nullable(),
