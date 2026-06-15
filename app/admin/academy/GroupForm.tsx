@@ -12,6 +12,7 @@ import type { AcademyGroup } from "@/lib/content/groups"
 type FormState = {
   title: string
   description: string
+  banner_url: string
   access_mode: "open" | "locked"
   lock_cta_label: string
   lock_modal_title: string
@@ -21,6 +22,7 @@ type FormState = {
 const initial: FormState = {
   title: "",
   description: "",
+  banner_url: "",
   access_mode: "open",
   lock_cta_label: "",
   lock_modal_title: "",
@@ -42,6 +44,7 @@ export function GroupForm({ group }: { group?: AcademyGroup }) {
       ? {
           title: group.title,
           description: group.description ?? "",
+          banner_url: group.banner_url ?? "",
           access_mode: group.access_mode ?? "open",
           lock_cta_label: group.lock_cta_label ?? "",
           lock_modal_title: group.lock_modal_title ?? "",
@@ -66,6 +69,7 @@ export function GroupForm({ group }: { group?: AcademyGroup }) {
       const payload = {
         title: state.title.trim(),
         description: state.description.trim() || null,
+        banner_url: state.banner_url.trim() || null,
         access_mode: state.access_mode,
         lock_cta_label: locked ? state.lock_cta_label.trim() || null : null,
         lock_modal_title: locked ? state.lock_modal_title.trim() || null : null,
@@ -106,6 +110,26 @@ export function GroupForm({ group }: { group?: AcademyGroup }) {
           className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           placeholder="Tudo começa pelo consumo com consistência..."
         />
+      </div>
+      <div>
+        <Label htmlFor="g-banner">Banner (URL da imagem) — opcional</Label>
+        <Input
+          id="g-banner"
+          value={state.banner_url}
+          onChange={(e) => set("banner_url", e.target.value)}
+          placeholder="https://... (ex.: arte do calendário do mês)"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Aparece no topo do grupo. Bom pra publicar o calendário dos encontros ao vivo.
+        </p>
+        {state.banner_url.trim() && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={state.banner_url.trim()}
+            alt="Prévia do banner"
+            className="mt-2 max-h-40 w-full rounded-lg border border-border object-cover"
+          />
+        )}
       </div>
 
       <div className="space-y-3 rounded-md border border-input p-4">

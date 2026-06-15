@@ -20,6 +20,8 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
   const [contentUrl, setContentUrl] = useState("")
   const [contentText, setContentText] = useState("")
   const [duration, setDuration] = useState("")
+  const [comingSoon, setComingSoon] = useState(false)
+  const [availableAt, setAvailableAt] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
 
@@ -34,6 +36,8 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
         content_url: kind === "text" ? null : contentUrl.trim() || null,
         content_text: kind === "text" ? contentText : null,
         duration_minutes: duration.trim() ? Number(duration) : null,
+        is_coming_soon: comingSoon,
+        available_at: availableAt.trim() || null,
         display_order: nextOrder,
       })
       if (!res.ok) {
@@ -44,6 +48,8 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
       setContentUrl("")
       setContentText("")
       setDuration("")
+      setComingSoon(false)
+      setAvailableAt("")
       router.refresh()
     })
   }
@@ -97,7 +103,8 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
             value={contentText}
             onChange={(e) => setContentText(e.target.value)}
             className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            required
+            required={!comingSoon}
+            disabled={comingSoon}
           />
         </div>
       ) : (
@@ -110,19 +117,50 @@ export function ModuleManager({ trailId, nextOrder }: { trailId: string; nextOrd
             value={contentUrl}
             onChange={(e) => setContentUrl(e.target.value)}
             placeholder={
-              kind === "youtube"
-                ? "https://youtu.be/... ou https://www.youtube.com/watch?v=..."
-                : "https://..."
+              comingSoon
+                ? "Aula em breve — pode deixar vazio e colar o link depois"
+                : kind === "youtube"
+                  ? "https://youtu.be/... ou https://www.youtube.com/watch?v=..."
+                  : "https://..."
             }
-            required
+            required={!comingSoon}
+            disabled={comingSoon}
           />
-          {kind === "youtube" && (
+          {kind === "youtube" && !comingSoon && (
             <p className="mt-1 text-xs text-muted-foreground">
               Cole o link do vídeo — ele vira aula com o player embutido.
             </p>
           )}
         </div>
       )}
+
+      {/* F-V33: lançar aula futura como "Em breve" (só com título; link entra depois). */}
+      <div className="space-y-2 rounded-md border border-border bg-muted/30 p-3">
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={comingSoon}
+            onChange={(e) => setComingSoon(e.target.checked)}
+          />
+          Marcar como &quot;Em breve&quot; (aula futura — pode salvar só com o título)
+        </label>
+        {comingSoon && (
+          <div>
+            <Label htmlFor="m-available">Liberar automaticamente em (opcional)</Label>
+            <Input
+              id="m-available"
+              type="datetime-local"
+              value={availableAt}
+              onChange={(e) => setAvailableAt(e.target.value)}
+              className="w-full sm:w-64"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Com data, a aula abre sozinha no horário. Sem data, fica como &quot;Em breve&quot; até
+              você desmarcar.
+            </p>
+          </div>
+        )}
+      </div>
 
       {error && (
         <p className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-md p-3">

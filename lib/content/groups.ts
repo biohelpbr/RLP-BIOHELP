@@ -10,6 +10,8 @@ export interface AcademyGroup {
   id: string
   title: string
   description: string | null
+  // F-V33: imagem de banner no topo do grupo (ex.: calendário de encontros ao vivo).
+  banner_url: string | null
   access_mode: "open" | "locked"
   lock_cta_label: string | null
   lock_modal_title: string | null
