@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
 import { createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
-import { DEFAULT_FLOW_KEY, type FlowStep } from "./flow"
+import { DEFAULT_FLOW_KEY, renderFlowStepHtml, type FlowStep } from "./flow"
+import { getResend, getFrom } from "./resend"
 
 type ActionResult<T = void> =
   | { ok: true; data?: T }
@@ -39,6 +40,53 @@ export async function listAdminFlowSteps(flowKey = DEFAULT_FLOW_KEY): Promise<Fl
     return []
   }
   return (data || []) as FlowStep[]
+}
+
+const testSchema = z.object({
+  stepId: z.string().uuid(),
+  to: z.string().trim().email("E-mail de teste inválido."),
+})
+
+/**
+ * F-V32 — envia ESTE passo, renderizado, pro e-mail informado, AGORA.
+ * Independe do modo/delay/idempotência: é um envio manual de admin pra preview.
+ * Não grava em email_flow_sends e não atinge assinante real. Assunto prefixado
+ * com [TESTE]. Permite a equipe revisar os 7 e-mails sem esperar 30 dias.
+ */
+export async function sendFlowStepTest(input: unknown): Promise<ActionResult> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth
+
+  const parsed = testSchema.safeParse(input)
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    return { ok: false, error: issue.message, field: issue.path.join(".") }
+  }
+
+  const supabase = createServiceClient()
+  const { data: step } = await supabase
+    .from("email_flow_steps")
+    .select("subject, body")
+    .eq("id", parsed.data.stepId)
+    .maybeSingle()
+  if (!step) return { ok: false, error: "Passo não encontrado." }
+
+  try {
+    const resend = getResend()
+    // Sem link de descadastro real no teste (não há member): rodapé informativo.
+    const html = renderFlowStepHtml(step.body as string, null)
+    const { error } = await resend.emails.send({
+      from: getFrom(),
+      to: parsed.data.to,
+      subject: `[TESTE] ${step.subject}`,
+      html,
+    })
+    if (error) return { ok: false, error: `Falha no envio de teste: ${error.message}` }
+  } catch (e) {
+    console.error("[sendFlowStepTest]", e)
+    return { ok: false, error: "Erro ao enviar o teste (verifique a RESEND_API_KEY)." }
+  }
+  return { ok: true }
 }
 
 export async function createFlowStep(input: unknown): Promise<ActionResult<{ id: string }>> {

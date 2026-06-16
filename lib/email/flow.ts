@@ -69,7 +69,7 @@ export async function listEnabledSteps(flowKey = DEFAULT_FLOW_KEY): Promise<Flow
  * Monta o HTML final do passo: corpo do admin + rodapé com link de descadastro.
  * Suporta o placeholder {{unsubscribe}} no corpo; se não usado, injeta no rodapé.
  */
-function buildStepHtml(body: string, unsubUrl: string | null): string {
+export function renderFlowStepHtml(body: string, unsubUrl: string | null): string {
   const content = body.includes("<") ? body : body.replace(/\n/g, "<br>")
   const unsubLink = unsubUrl
     ? `<a href="${unsubUrl}" style="color:#9a9a9a;">descadastrar destes e-mails</a>`
@@ -148,7 +148,7 @@ export async function sendStepToMember(args: {
       return { status: "skipped" }
     }
 
-    const html = buildStepHtml(step.body, unsubscribeUrl(memberId))
+    const html = renderFlowStepHtml(step.body, unsubscribeUrl(memberId))
     const resend = getResend()
     const { data, error } = await resend.emails.send({
       from: getFrom(),
@@ -206,12 +206,23 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
   if (steps.length === 0) return summary
 
   const supabase = createServiceClient()
-  // Assinantes pagos, com data de pagamento, não descadastrados, com e-mail.
+  // CORTE DE DATA: só entram na régua quem virou assinante a partir de
+  // EMAIL_FLOW_START_DATE (ISO). Protege os assinantes atuais de receber a
+  // sequência inteira de uma vez no 1º cron. Sem a env = ninguém entra (fail-safe).
+  const startIso = (process.env.EMAIL_FLOW_START_DATE || "").trim()
+  const start = startIso ? new Date(startIso) : null
+  if (!start || Number.isNaN(start.getTime())) {
+    console.warn("[runNewSubscriberFlow] EMAIL_FLOW_START_DATE ausente/inválida — nada a fazer")
+    return summary
+  }
+
+  // Assinantes pagos, com data de pagamento >= corte, não descadastrados, com e-mail.
   const { data: members, error } = await supabase
     .from("members")
     .select("id, email, name, subscription_paid_at")
     .eq("subscription_status", "paid")
     .not("subscription_paid_at", "is", null)
+    .gte("subscription_paid_at", start.toISOString())
     .is("email_unsubscribed_at", null)
     .not("email", "is", null)
   if (error) {

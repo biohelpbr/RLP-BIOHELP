@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Plus, Save, Trash2, X } from "lucide-react"
+import { Loader2, Plus, Save, Send, Trash2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +13,7 @@ import {
   updateFlowStep,
   deleteFlowStep,
   toggleFlowStep,
+  sendFlowStepTest,
 } from "@/lib/email/flow-actions"
 import type { FlowStep } from "@/lib/email/flow"
 
@@ -37,8 +38,25 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
   const [adding, setAdding] = useState(false)
   const [draft, setDraft] = useState<Draft>(emptyDraft(1))
   const [error, setError] = useState<string | null>(null)
+  const [testEmail, setTestEmail] = useState("")
+  const [testMsg, setTestMsg] = useState<string | null>(null)
+  const [testingId, setTestingId] = useState<string | null>(null)
 
   const nextOrder = (steps.reduce((max, s) => Math.max(max, s.step_order), 0) || 0) + 1
+
+  function sendTest(s: FlowStep) {
+    setTestMsg(null)
+    if (!testEmail.trim()) {
+      setTestMsg("Digite um e-mail pra receber o teste.")
+      return
+    }
+    setTestingId(s.id)
+    startTransition(async () => {
+      const res = await sendFlowStepTest({ stepId: s.id, to: testEmail.trim() })
+      setTestingId(null)
+      setTestMsg(res.ok ? `✅ Passo ${s.step_order} enviado pra ${testEmail.trim()}.` : `❌ ${res.error}`)
+    })
+  }
 
   function openAdd() {
     setDraft(emptyDraft(nextOrder))
@@ -169,6 +187,29 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
 
   return (
     <div className="space-y-4">
+      {/* Barra de teste: digite um e-mail e clique "Testar" em qualquer passo. */}
+      {steps.length > 0 && (
+        <BHCard variant="elevated">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="min-w-[220px] flex-1">
+              <Label htmlFor="test-email">Testar os e-mails</Label>
+              <Input
+                id="test-email"
+                type="email"
+                placeholder="seu@email.com"
+                value={testEmail}
+                onChange={(e) => setTestEmail(e.target.value)}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Digite um e-mail e clique em <strong>Testar</strong> em cada passo abaixo — ele chega
+              na hora, sem afetar nenhum assinante.
+            </p>
+          </div>
+          {testMsg && <p className="mt-2 text-sm text-foreground">{testMsg}</p>}
+        </BHCard>
+      )}
+
       {steps.length === 0 && !adding && (
         <BHCard variant="elevated">
           <p className="py-6 text-center text-sm text-muted-foreground">
@@ -199,6 +240,20 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => sendTest(s)}
+                  disabled={pending}
+                  className="inline-flex items-center gap-1.5"
+                >
+                  {testingId === s.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                  Testar
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => toggle(s)} disabled={pending}>
                   {s.enabled ? "Desativar" : "Ativar"}
                 </Button>
