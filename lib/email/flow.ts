@@ -67,10 +67,19 @@ export async function listEnabledSteps(flowKey = DEFAULT_FLOW_KEY): Promise<Flow
 
 /**
  * Monta o HTML final do passo: corpo do admin + rodapé com link de descadastro.
- * Suporta o placeholder {{unsubscribe}} no corpo; se não usado, injeta no rodapé.
+ * Placeholders suportados no corpo:
+ *   {{nome}}        → primeiro nome do membro ("Olá, !" vira "Olá!" quando vazio)
+ *   {{unsubscribe}} → link de descadastro (senão vai no rodapé)
  */
-export function renderFlowStepHtml(body: string, unsubUrl: string | null): string {
-  const content = body.includes("<") ? body : body.replace(/\n/g, "<br>")
+export function renderFlowStepHtml(
+  body: string,
+  unsubUrl: string | null,
+  firstName?: string | null,
+): string {
+  const raw = body.includes("<") ? body : body.replace(/\n/g, "<br>")
+  // {{nome}} → primeiro nome; limpa "Olá, !" quando não há nome.
+  const fn = (firstName || "").trim().split(/\s+/)[0] || ""
+  const content = raw.replace(/\{\{nome\}\}/g, fn).replace(/Olá,\s*!/g, "Olá!")
   const unsubLink = unsubUrl
     ? `<a href="${unsubUrl}" style="color:#9a9a9a;">descadastrar destes e-mails</a>`
     : "descadastrar (link indisponível)"
@@ -148,7 +157,7 @@ export async function sendStepToMember(args: {
       return { status: "skipped" }
     }
 
-    const html = renderFlowStepHtml(step.body, unsubscribeUrl(memberId))
+    const html = renderFlowStepHtml(step.body, unsubscribeUrl(memberId), args.name)
     const resend = getResend()
     const { data, error } = await resend.emails.send({
       from: getFrom(),

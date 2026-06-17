@@ -68,6 +68,16 @@ export async function markSubscriptionPaid(memberId: string): Promise<Result> {
   // Isolado e controlado por WELCOME_EMAIL_MODE (off/dryrun/live) — nunca derruba isto.
   await onNewSubscriberWelcome({ memberId })
 
+  // Hook F-V32: D+0 do fluxo de boas-vindas na hora da entrada (substitui o F-V30
+  // quando EMAIL_FLOW_MODE=live + WELCOME_EMAIL_MODE=off). Isolado/idempotente —
+  // nunca lança. Os passos D+5..D+30 saem pelo cron diário.
+  try {
+    const { fireStepZero } = await import("@/lib/email/flow")
+    await fireStepZero(memberId)
+  } catch (err) {
+    console.error("[markSubscriptionPaid] fireStepZero isolated failure", err)
+  }
+
   return { ok: true, changed: true }
 }
 

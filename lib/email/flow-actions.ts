@@ -74,7 +74,8 @@ export async function sendFlowStepTest(input: unknown): Promise<ActionResult> {
   try {
     const resend = getResend()
     // Sem link de descadastro real no teste (não há member): rodapé informativo.
-    const html = renderFlowStepHtml(step.body as string, null)
+    // Nome de exemplo pra mostrar como fica o {{nome}}.
+    const html = renderFlowStepHtml(step.body as string, null, "Maria")
     const { error } = await resend.emails.send({
       from: getFrom(),
       to: parsed.data.to,
