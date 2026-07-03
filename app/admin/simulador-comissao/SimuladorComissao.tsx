@@ -40,10 +40,15 @@ export function SimuladorComissao() {
             <Users className="h-5 w-5 text-primary" /> Indicação (clube)
           </h2>
 
+          <p className="text-sm text-muted-foreground">
+            Quando um <b>novo membro</b> entra no clube, quem indicou ganha comissão. Escolha a
+            regra e veja o valor.
+          </p>
+
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Modelo</label>
+            <label className="text-xs font-medium text-muted-foreground">Qual regra?</label>
             <div className="inline-flex overflow-hidden rounded-md border border-border">
-              {(["v1", "v2"] as const).map((m) => (
+              {(["v2", "v1"] as const).map((m) => (
                 <button
                   key={m}
                   type="button"
@@ -52,16 +57,20 @@ export function SimuladorComissao() {
                     model === m ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted"
                   }`}
                 >
-                  {m === "v1" ? "V1 (R$80/R$40)" : "V2 (R$400)"}
+                  {m === "v2" ? "Nova (V2) — R$400" : "Antiga (V1) — R$80/R$40"}
                 </button>
               ))}
             </div>
+            <p className="text-xs text-muted-foreground">
+              A <b>Nova (V2)</b> é a que estamos implementando (novos membros). A Antiga é a dos
+              membros atuais.
+            </p>
           </div>
 
           {model === "v1" ? (
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">
-                Indicações ativas antes desta ({activeCount} → esta é a {activeCount + 1}ª)
+                Quantas indicações essa pessoa já fez? (esta será a {activeCount + 1}ª)
               </label>
               <input
                 type="number"
@@ -70,16 +79,25 @@ export function SimuladorComissao() {
                 onChange={(e) => setActiveCount(Math.max(0, Number(e.target.value)))}
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               />
+              <p className="text-xs text-muted-foreground">
+                Até a 20ª indicação paga R$80; da 21ª em diante, R$40.
+              </p>
             </div>
           ) : (
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={avoBuilder}
-                onChange={(e) => setAvoBuilder(e.target.checked)}
-              />
-              <Crown className="h-4 w-4 text-primary" /> O avô (quem indicou o indicador) é Builder
-            </label>
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={avoBuilder}
+                  onChange={(e) => setAvoBuilder(e.target.checked)}
+                />
+                <Crown className="h-4 w-4 text-primary" /> O “avô” é Builder?
+              </label>
+              <p className="text-xs text-muted-foreground">
+                “Avô” = quem indicou o indicador. Se ele for Builder, ganha R$200 extra; se não,
+                os R$200 ficam com a Biohelp.
+              </p>
+            </div>
           )}
 
           <div className="space-y-1 rounded-lg bg-muted/50 p-3">
@@ -100,10 +118,15 @@ export function SimuladorComissao() {
             <ShoppingBag className="h-5 w-5 text-primary" /> Afiliado (loja)
           </h2>
 
+          <p className="text-sm text-muted-foreground">
+            Quando alguém compra na loja pelo link/cupom de um afiliado, ele ganha comissão.
+            Preencha e veja o valor.
+          </p>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">
-                GMV do mês (faixa: {affiliateTierPct(gmv)}%)
+                Quanto o afiliado já vendeu no mês? — faixa: {affiliateTierPct(gmv)}%
               </label>
               <input
                 type="number"
@@ -114,7 +137,9 @@ export function SimuladorComissao() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Venda líquida (R$)</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Valor desta venda (já com desconto)
+              </label>
               <input
                 type="number"
                 min={0}
@@ -124,6 +149,9 @@ export function SimuladorComissao() {
               />
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">
+            Faixa da comissão: até R$10 mil de vendas no mês = 10%; acima de R$10 mil = 15%.
+          </p>
 
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={temOrig} onChange={(e) => setTemOrig(e.target.checked)} />

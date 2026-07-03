@@ -26,8 +26,9 @@ export default async function SimuladorComissaoPage() {
             Simulador de comissão
           </h1>
           <p className="text-muted-foreground">
-            Monte um cenário e veja quanto cada pessoa recebe — sem afetar nada. Serve para
-            validar as regras (Indicação V1/V2 + Builder e Afiliados).
+            Esta é uma calculadora de conferência. Preencha um cenário nas caixas abaixo e veja,
+            na hora, quanto cada pessoa recebe. Não paga ninguém e não altera nada — serve só para
+            confirmar se as regras de comissão estão certas.
           </p>
         </header>
 
