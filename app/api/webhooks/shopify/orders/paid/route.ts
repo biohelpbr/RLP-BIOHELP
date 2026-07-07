@@ -43,7 +43,8 @@ import {
   type MemberForCommission,
   type FastTrackWindow
 } from '@/lib/commissions/calculator'
-import { isV2Enabled } from '@/lib/utils/featureFlags'
+import { isV2Enabled, isAffiliateCaptureEnabled } from '@/lib/utils/featureFlags'
+import { captureAffiliateSale } from '@/lib/affiliates/capture'
 import { hookOnOrderPaid } from '@/lib/events/hook-on-order-paid'
 import { hookOnOrderPaidSubscription } from '@/lib/subscriptions/hook-on-order-paid'
 
@@ -564,6 +565,26 @@ export async function POST(request: NextRequest) {
   } catch (creatineErr) {
     // Log mas não falha o webhook
     console.error('[webhook] Erro ao processar cupom creatina:', creatineErr)
+  }
+
+  // =====================================================
+  // 16b. [F-V35] CAPTURA DE ATRIBUIÇÃO DE AFILIADO (isolado, gated, non-fatal)
+  // Cupom = ref_code do afiliado → grava a venda. NÃO paga nada (fase 1).
+  // Anti-SPEC §4: falha aqui NUNCA derruba o 200 nem o resto do webhook.
+  // =====================================================
+  if (isAffiliateCaptureEnabled()) {
+    try {
+      await captureAffiliateSale({
+        shopifyOrderId: String(extractedData.shopifyOrderId),
+        orderId: newOrder?.id ?? null,
+        customerEmail: extractedData.customerEmail,
+        buyerMemberId: member?.id ?? null,
+        totalAmount: Number(extractedData.totalAmount) || 0,
+        discountCodes: extractedData.discountCodes ?? [],
+      })
+    } catch (affErr) {
+      console.error('[webhook] Erro na captura de afiliado (non-fatal):', affErr)
+    }
   }
 
   // =====================================================

@@ -29,7 +29,9 @@ const TYPE_LABELS: Record<CommissionType, string> = {
   leadership: 'Leadership Bônus',
   royalty: 'Royalty',
   adjustment: 'Ajuste Manual',
-  reversal: 'Reversão'
+  reversal: 'Reversão',
+  affiliate_sale: 'Afiliado — venda',
+  affiliate_perpetual: 'Afiliado — perpétua'
 }
 
 export async function GET(request: NextRequest) {
