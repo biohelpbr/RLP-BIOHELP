@@ -3,6 +3,22 @@
 import { revalidatePath } from "next/cache"
 import { createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { computeAffiliateCommissions, type AffiliateCommissionSummary } from "./commission"
+import { bulkCreateAffiliateCoupons, type BulkCouponResult } from "@/lib/shopify/affiliate-coupons"
+
+/**
+ * F-V35 — cria/simula os cupons de afiliado no Shopify em massa.
+ * `execute=false` = dry-run (não toca no Shopify). Só admin.
+ */
+export async function bulkAffiliateCouponsAction(input: {
+  scope: "all" | "active"
+  execute: boolean
+  limit?: number
+}): Promise<{ ok: true; data: BulkCouponResult } | { ok: false; error: string }> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "Apenas administradores." }
+  const data = await bulkCreateAffiliateCoupons(input)
+  if (data.error && !data.alreadyExists && !data.executed) return { ok: false, error: data.error }
+  return { ok: true, data }
+}
 
 type MemberRef = { ref_code: string | null; name: string | null }
 
