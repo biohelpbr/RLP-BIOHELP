@@ -548,6 +548,8 @@ export type CommissionType =
   | 'royalty'           // Royalty (Head forma Head)
   | 'adjustment'        // Ajuste manual (admin)
   | 'reversal'          // Reversão (refund)
+  | 'affiliate_sale'       // F-V35 · comissão da venda (faixa GMV) ao Afiliado Atual
+  | 'affiliate_perpetual'  // F-V35 · perpétua 10% ao Afiliado Originador
 
 // Tabela commission_ledger
 export interface CommissionLedger {
@@ -753,7 +755,9 @@ export const COMMISSION_TYPE_LABELS: Record<CommissionType, string> = {
   leadership: 'Leadership Bônus',
   royalty: 'Royalty',
   adjustment: 'Ajuste Manual',
-  reversal: 'Reversão'
+  reversal: 'Reversão',
+  affiliate_sale: 'Afiliado — venda',
+  affiliate_perpetual: 'Afiliado — perpétua'
 }
 
 // Valores dos Bônus 3

@@ -7,6 +7,7 @@ import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { listAffiliatesGmvForMonth, currentReferenceMonth } from "@/lib/affiliates/gmv"
+import { CloseCommissionsButton } from "./CloseCommissionsButton"
 
 const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
@@ -25,6 +26,12 @@ export default async function AfiliadosPage() {
   const rows = await listAffiliatesGmvForMonth(month)
   const mesLabel = new Date(month).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
   const totalGmv = rows.reduce((s, r) => s + r.gmv, 0)
+
+  // Mês anterior (o que se fecha "após a virada").
+  const nowD = new Date()
+  const prevD = new Date(nowD.getFullYear(), nowD.getMonth() - 1, 1)
+  const prevMonth = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, "0")}-01`
+  const prevLabel = prevD.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
 
   return (
     <AdminShell adminName={me.name ?? "Admin"}>
@@ -86,9 +93,20 @@ export default async function AfiliadosPage() {
           )}
         </BHCard>
 
+        <BHCard variant="elevated">
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-foreground">Fechamento de comissão</h2>
+            <p className="text-sm text-muted-foreground">
+              Simule e lance as comissões de afiliado do mês fechado ({prevLabel}). A simulação
+              não grava; o lançamento entra no extrato dos afiliados (idempotente por mês).
+            </p>
+            <CloseCommissionsButton referenceMonth={prevMonth} monthLabel={prevLabel} />
+          </div>
+        </BHCard>
+
         <p className="text-xs text-muted-foreground">
           Faixa: até R$10 mil de GMV no mês = 10%; acima = 15%. Experience: GMV do mês acima de
-          R$50 mil. A comissão em si (venda + perpétua) é calculada no fechamento (fase 3).
+          R$50 mil. Comissão da venda vai pro Afiliado Atual; perpétua (10%) pro Originador.
         </p>
       </div>
     </AdminShell>
