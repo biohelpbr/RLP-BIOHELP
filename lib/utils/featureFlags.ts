@@ -17,8 +17,15 @@ export const featureFlags = {
 
   /** Desliga cron jobs do v1 (close-monthly-cv, network-compression). Acionar com LRP_V2. */
   CRON_DISABLED_V2: isTrue(process.env.CRON_DISABLED_V2),
+
+  /** F-V35: captura de atribuição de afiliado no webhook de pedido. Default OFF.
+   *  Só grava em tabelas novas (não paga nada). Ligar cedo pra acumular histórico. */
+  AFFILIATE_CAPTURE: isTrue(process.env.AFFILIATE_CAPTURE),
 } as const
 
 export const isV2Enabled = (): boolean => featureFlags.LRP_V2
 
 export const isV1CronDisabled = (): boolean => featureFlags.CRON_DISABLED_V2
+
+/** F-V35 — gate da captura de atribuição de afiliado. */
+export const isAffiliateCaptureEnabled = (): boolean => featureFlags.AFFILIATE_CAPTURE
