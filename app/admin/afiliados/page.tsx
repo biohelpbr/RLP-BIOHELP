@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { listAffiliatesGmvForMonth, currentReferenceMonth } from "@/lib/affiliates/gmv"
 import { CloseCommissionsButton } from "./CloseCommissionsButton"
 import { CustomerLookup } from "./CustomerLookup"
+import { BulkCouponsButton } from "./BulkCouponsButton"
 
 const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
@@ -102,6 +103,18 @@ export default async function AfiliadosPage() {
               não grava; o lançamento entra no extrato dos afiliados (idempotente por mês).
             </p>
             <CloseCommissionsButton referenceMonth={prevMonth} monthLabel={prevLabel} />
+          </div>
+        </BHCard>
+
+        <BHCard variant="elevated">
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-foreground">Cupons no Shopify</h2>
+            <p className="text-sm text-muted-foreground">
+              Cria em massa os cupons de afiliado (cada cupom = o código BH00… do afiliado, 10%).
+              &quot;Simular&quot; só conta; &quot;Criar&quot; escreve na loja. Dica: rode primeiro com um
+              limite pequeno pra validar.
+            </p>
+            <BulkCouponsButton />
           </div>
         </BHCard>
 
