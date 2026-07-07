@@ -24,10 +24,21 @@ Cada membro é afiliado; o cupom dele é o próprio `ref_code` (`BH00…`). Vend
 
 ## Fases
 
-1. **Captura de atribuição (esta entrega):** ler o cupom no webhook `orders/paid`, ligar ao afiliado (`ref_code`), gravar a venda + definir Originador. Sem cálculo de comissão ainda — é o dado que se perde se não ligar já.
-2. GMV mensal + faixas + status Experience.
-3. Comissão (venda + perpétua) no fechamento + saque.
-4. Painel admin (GMV, Experience, Originador/Atual, ajustes).
+1. ✅ **Captura de atribuição:** webhook `orders/paid` lê o cupom, liga ao afiliado (`ref_code`), grava a venda (`affiliate_sales`) + define Originador (`affiliate_customer_origin`). Flag `AFFILIATE_CAPTURE`.
+2. ✅ **GMV mensal + faixas + Experience:** `lib/affiliates/gmv.ts` + painel `/admin/afiliados` (só leitura).
+3. ✅ **Comissão (venda + perpétua):** `computeAffiliateCommissions(mês)` (dry-run + commit, idempotente por mês) → `commission_ledger` → saque existente. Ação/botão de fechamento no painel.
+4. ✅ **Painel admin — consulta Originador/Atual** por cliente (`lookupCustomerAffiliates`).
+
+### TBDs / refinamentos (não bloqueiam)
+- **Decaimento da perpétua** (perder após 3 meses sem venda): hoje "destravou" = bateu 50k em algum mês. [TBD-decay]
+- **Experience automático** (tag por GMV>50k): hoje é computado/exibido; não grava tag.
+- **reference_month** da venda usa a data de processamento do webhook (≈ data do pagamento). Retry cross-mês é edge.
+- **Ajuste manual** de comissão: reutiliza o tipo `adjustment` existente (não há UI dedicada nova).
+
+## Dependências pra ligar em produção
+- Migrations aplicadas (captura + comissão).
+- Flag `AFFILIATE_CAPTURE=true` (pra acumular dado) + cupons `BH00…` criados no Shopify.
+- Para pagar de fato: Cashin fora do mock (hoje em mock — nenhum PIX real sai).
 
 ## Contrato de arquivos (fase 1)
 
