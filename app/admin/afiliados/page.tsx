@@ -8,6 +8,7 @@ import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { listAffiliatesGmvForMonth, currentReferenceMonth } from "@/lib/affiliates/gmv"
 import { CloseCommissionsButton } from "./CloseCommissionsButton"
+import { CustomerLookup } from "./CustomerLookup"
 
 const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
@@ -101,6 +102,16 @@ export default async function AfiliadosPage() {
               não grava; o lançamento entra no extrato dos afiliados (idempotente por mês).
             </p>
             <CloseCommissionsButton referenceMonth={prevMonth} monthLabel={prevLabel} />
+          </div>
+        </BHCard>
+
+        <BHCard variant="elevated">
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-foreground">Consultar cliente</h2>
+            <p className="text-sm text-muted-foreground">
+              Veja o Afiliado Originador e o histórico de vendas (Afiliado Atual) de um cliente.
+            </p>
+            <CustomerLookup />
           </div>
         </BHCard>
 
