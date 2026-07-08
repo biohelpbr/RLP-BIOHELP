@@ -12,6 +12,8 @@ import { onMemberStatusChange } from "@/lib/tags/hook-on-status-change"
 import { onNewSubscriberWelcome } from "@/lib/subscriptions/welcome-hook"
 import { generateRefCode } from "@/lib/utils/ref-code"
 import { sendToAbsolut } from "@/lib/crm/absolut"
+import { isAffiliateCaptureEnabled } from "@/lib/utils/featureFlags"
+import { deactivateAffiliateCoupon } from "@/lib/shopify/affiliate-coupons"
 
 type Result =
   | { ok: true; changed: boolean }
@@ -90,7 +92,7 @@ export async function cancelSubscription(memberId: string): Promise<Result> {
   const supabase = createServiceClient()
   const { data: current, error: readErr } = await supabase
     .from("members")
-    .select("id, sponsor_id, subscription_status")
+    .select("id, sponsor_id, subscription_status, ref_code")
     .eq("id", memberId)
     .single()
 
@@ -117,6 +119,19 @@ export async function cancelSubscription(memberId: string): Promise<Result> {
     sponsorId: (current.sponsor_id as string | null) ?? null,
     newStatus: "cancelled",
   })
+
+  // F-V35: ao inativar (via webhook expired, cron ou cancelamento manual), o
+  // cupom de afiliado (cupom == ref_code BH00…) deixa de funcionar no Shopify.
+  // Isolado/non-fatal — nunca derruba o fluxo de cancelamento.
+  const refCode = (current.ref_code as string | null) ?? null
+  if (isAffiliateCaptureEnabled() && refCode?.startsWith("BH")) {
+    try {
+      const r = await deactivateAffiliateCoupon(refCode)
+      if (r.error) console.error("[cancelSubscription] deactivateAffiliateCoupon", refCode, r.error)
+    } catch (e) {
+      console.error("[cancelSubscription] deactivateAffiliateCoupon threw", refCode, e)
+    }
+  }
 
   return { ok: true, changed: true }
 }
