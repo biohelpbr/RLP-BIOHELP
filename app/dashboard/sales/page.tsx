@@ -95,13 +95,43 @@ const Icons = {
   ),
 }
 
+interface AffiliateSale {
+  shopify_order_id: string
+  customer_email: string
+  coupon_code: string
+  gross_amount: number
+  is_self_purchase: boolean
+  created_at: string
+}
+
+interface AffiliateSummary {
+  isAffiliate: boolean
+  refCode: string | null
+  referenceMonth: string
+  faturamento: number
+  salesCount: number
+  tierPct: number
+  estimatedCommission: number
+  experience: boolean
+  sales: AffiliateSale[]
+}
+
+/** Mascara o e-mail do cliente (privacidade): ab***@dominio.com */
+function maskEmail(email: string): string {
+  const [user, domain] = (email || '').split('@')
+  if (!domain) return email || '—'
+  const head = user.slice(0, 2)
+  return `${head}${'*'.repeat(Math.max(1, user.length - 2))}@${domain}`
+}
+
 export default function SalesPage() {
   const router = useRouter()
   const [data, setData] = useState<OrdersData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'own' | 'network'>('own')
+  const [activeTab, setActiveTab] = useState<'own' | 'network' | 'affiliate'>('own')
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
+  const [affiliate, setAffiliate] = useState<AffiliateSummary | null>(null)
 
   useEffect(() => {
     async function fetchOrders() {
@@ -122,6 +152,15 @@ export default function SalesPage() {
     }
     fetchOrders()
   }, [router])
+
+  // F-V35: visão do próprio afiliado (faturamento + comissão estimada). Só
+  // aparece quando o membro tem cupom de afiliado (isAffiliate).
+  useEffect(() => {
+    fetch('/api/members/me/affiliate')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => { if (json?.isAffiliate) setAffiliate(json) })
+      .catch(() => {})
+  }, [])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -285,11 +324,20 @@ export default function SalesPage() {
           Vendas da Rede
           <span className={styles.tabBadge}>{networkOrders.length}</span>
         </button>
+        {affiliate && (
+          <button
+            className={`${styles.tab} ${activeTab === 'affiliate' ? styles.tabActive : ''}`}
+            onClick={() => { setActiveTab('affiliate'); setExpandedOrder(null) }}
+          >
+            Afiliado
+            <span className={styles.tabBadge}>{affiliate.salesCount}</span>
+          </button>
+        )}
       </div>
 
       {/* Table Card */}
       <div className={styles.tableCard}>
-        {activeTab === 'own' ? (
+        {activeTab === 'own' && (
           ownOrders.length === 0 ? (
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>{Icons.empty}</div>
@@ -375,7 +423,8 @@ export default function SalesPage() {
               </tbody>
             </table>
           )
-        ) : (
+        )}
+        {activeTab === 'network' && (
           networkOrders.length === 0 ? (
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>{Icons.users}</div>
@@ -468,6 +517,103 @@ export default function SalesPage() {
               </tbody>
             </table>
           )
+        )}
+        {activeTab === 'affiliate' && affiliate && (
+          <div>
+            {/* Cards: faturamento (GMV), faixa, comissão estimada */}
+            <div className={styles.summaryGrid} style={{ marginBottom: 16 }}>
+              <div className={styles.summaryCardPrimary}>
+                <div className={styles.summaryHeader}>
+                  <span className={styles.summaryLabelPrimary}>Faturamento do mês</span>
+                </div>
+                <p className={styles.summaryValuePrimary}>{formatCurrency(affiliate.faturamento)}</p>
+                <p className={styles.summarySubtext}>
+                  {affiliate.salesCount} venda(s) com o seu cupom
+                </p>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={styles.summaryHeader}>
+                  <span className={styles.summaryLabel}>Sua faixa</span>
+                </div>
+                <p className={styles.summaryValue}>{affiliate.tierPct}%</p>
+                <p className={styles.summarySubtext}>
+                  {affiliate.tierPct >= 15 ? 'acima de R$10 mil no mês' : 'até R$10 mil no mês'}
+                </p>
+              </div>
+              <div className={styles.summaryCard}>
+                <div className={styles.summaryHeader}>
+                  <span className={styles.summaryLabel}>Comissão estimada</span>
+                </div>
+                <p className={styles.summaryValue}>{formatCurrency(affiliate.estimatedCommission)}</p>
+                <p className={styles.summarySubtext}>a apurar no fechamento</p>
+              </div>
+            </div>
+
+            {/* Aviso: faturamento ≠ o que a afiliada recebe */}
+            <div
+              style={{
+                background: 'rgba(234, 179, 8, 0.08)',
+                border: '1px solid rgba(234, 179, 8, 0.3)',
+                borderRadius: 8,
+                padding: '12px 14px',
+                fontSize: '0.85rem',
+                lineHeight: 1.5,
+                marginBottom: 16,
+              }}
+            >
+              <strong>Faturamento não é o valor a receber.</strong> É o total vendido com o seu
+              cupom. A sua comissão é <strong>{affiliate.tierPct}%</strong> desse valor (estimativa
+              acima) e só vira valor a receber no <strong>fechamento do mês</strong> — aí aparece em{' '}
+              <Link href="/dashboard/commissions" style={{ textDecoration: 'underline' }}>
+                Minhas Comissões
+              </Link>.
+            </div>
+
+            {affiliate.sales.length === 0 ? (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>{Icons.empty}</div>
+                <p className={styles.emptyText}>Nenhuma venda com o seu cupom neste mês</p>
+                <p className={styles.emptySubtext}>
+                  Quando alguém comprar usando o seu cupom, a venda aparece aqui.
+                </p>
+              </div>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th>Cupom</th>
+                    <th>Valor</th>
+                    <th>Conta?</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {affiliate.sales.map((s) => (
+                    <tr key={s.shopify_order_id}>
+                      <td>
+                        <span className={styles.date}>{formatDate(s.created_at)}</span>
+                      </td>
+                      <td>{maskEmail(s.customer_email)}</td>
+                      <td>
+                        <span className={styles.orderNumber}>{s.coupon_code}</span>
+                      </td>
+                      <td>
+                        <span className={styles.amount}>{formatCurrency(s.gross_amount)}</span>
+                      </td>
+                      <td>
+                        {s.is_self_purchase ? (
+                          <span style={{ opacity: 0.6, fontSize: '0.8rem' }}>Autocompra (não conta)</span>
+                        ) : (
+                          'Sim'
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         )}
       </div>
     </div>
