@@ -613,6 +613,44 @@ export default function SalesPage() {
                 </tbody>
               </table>
             )}
+
+            {/* Regra da comissão — pra a afiliada não ter dúvida */}
+            <div
+              style={{
+                marginTop: 20,
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 8,
+                padding: '14px 16px',
+              }}
+            >
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 8px' }}>
+                Como funciona a sua comissão
+              </h3>
+              <ul style={{ margin: 0, paddingLeft: 18, fontSize: '0.85rem', lineHeight: 1.7 }}>
+                <li>
+                  <strong>Comissão de venda:</strong> 10% do seu faturamento no mês. Se passar de{' '}
+                  <strong>R$ 10 mil</strong> no mês, sobe pra <strong>15%</strong> sobre o total.
+                </li>
+                <li>
+                  <strong>Autocompra não conta:</strong> comprar com o seu próprio cupom não entra no
+                  faturamento nem gera comissão.
+                </li>
+                <li>
+                  <strong>Comissão perpétua (10%):</strong> clientes que você trouxe e que depois
+                  compram por outro afiliado ainda te geram 10% — isso desbloqueia ao atingir{' '}
+                  <strong>R$ 50 mil</strong> de faturamento em um mês (Experience).
+                </li>
+                <li>
+                  <strong>Pagamento:</strong> a comissão é apurada no <strong>fechamento do mês</strong>{' '}
+                  e aparece em{' '}
+                  <Link href="/dashboard/commissions" style={{ textDecoration: 'underline' }}>
+                    Minhas Comissões
+                  </Link>
+                  .
+                </li>
+              </ul>
+            </div>
           </div>
         )}
       </div>
