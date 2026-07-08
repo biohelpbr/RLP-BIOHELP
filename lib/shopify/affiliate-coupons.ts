@@ -16,7 +16,7 @@ const PRICE_RULE_TITLE = "Afiliados — 10%"
 
 type Rest<T> = { status: number; data: T | null; error: string | null }
 
-async function rest<T>(endpoint: string, method: "GET" | "POST", body?: unknown): Promise<Rest<T>> {
+async function rest<T>(endpoint: string, method: "GET" | "POST" | "DELETE", body?: unknown): Promise<Rest<T>> {
   const domain = process.env.SHOPIFY_STORE_DOMAIN
   const token = await getShopifyAccessToken()
   if (!domain || !token) return { status: 0, data: null, error: "Sem credenciais Shopify" }
@@ -117,4 +117,39 @@ export async function bulkCreateAffiliateCoupons(opts: {
 
   base.executed = true
   return base
+}
+
+export interface DeactivateCouponResult {
+  code: string
+  found: boolean
+  deleted: boolean
+  error?: string
+}
+
+/**
+ * F-V35 — desativa (remove) o cupom de um afiliado no Shopify.
+ *
+ * Usado quando a assinatura do afiliado ENCERRA (subscription_expired): o cupom
+ * dele deixa de funcionar. Idempotente: se o cupom não existe, retorna
+ * found=false sem erro. Só roda com credenciais de PROD (Vercel).
+ */
+export async function deactivateAffiliateCoupon(refCode: string): Promise<DeactivateCouponResult> {
+  const code = (refCode || "").trim()
+  const out: DeactivateCouponResult = { code, found: false, deleted: false }
+  if (!code) return out
+
+  const lookup = await rest<{ discount_code?: { id: number; price_rule_id: number } }>(
+    `/discount_codes/lookup.json?code=${encodeURIComponent(code)}`,
+    "GET",
+  )
+  // 404 (ou sem discount_code) = cupom não existe → nada a fazer.
+  if (lookup.status === 404 || !lookup.data?.discount_code) return out
+  if (lookup.error) return { ...out, error: `lookup falhou: ${lookup.error}` }
+
+  const { id, price_rule_id } = lookup.data.discount_code
+  out.found = true
+  const del = await rest(`/price_rules/${price_rule_id}/discount_codes/${id}.json`, "DELETE")
+  if (del.error) return { ...out, error: `delete falhou: ${del.error}` }
+  out.deleted = true
+  return out
 }

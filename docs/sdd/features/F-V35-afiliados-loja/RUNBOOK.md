@@ -4,21 +4,34 @@ Checklist operacional para ligar o programa de afiliados em produção. O
 **desenvolvimento está concluído** (fases 1-4 + criação em massa de cupons);
 o que segue é operação/deploy — depende de credenciais e ações no Vercel/Shopify.
 
-## Estado atual (07/07/2026)
-- ✅ Código do módulo na `main` (PR #51 mergeado): captura, GMV, comissão, painel.
+## Estado atual (08/07/2026)
+- ✅ Código do módulo na `main` (PR #51 + PR #52 mergeados): captura, GMV, comissão, painel, criação em massa de cupons.
 - ✅ Migrations aplicadas em prod (affiliate_sales, affiliate_customer_origin, tipos no ledger).
-- ⏳ Criação em massa de cupons: branch `feat/F-V35-cupons-massa` (aguardando push/merge — bloqueio de permissão da conta git).
-- ⏸️ Flag `AFFILIATE_CAPTURE` = OFF.
+- ✅ **Criação em massa de cupons rodada em prod e validada** (cliente: "parece q deu certo", 08/07).
+- ⏸️ Flag `AFFILIATE_CAPTURE` = OFF → **captura ainda não grava nada**; sem ela o painel fica vazio.
+
+## Pendentes vivos
+1. ✅ **`AFFILIATE_CAPTURE=true` ligado na Vercel + redeploy** (08/07). Captura ativa.
+   Verificação (Supabase SQL):
+   ```sql
+   select count(*) from affiliate_sales;              -- cresce conforme cupons usados
+   select count(*) from affiliate_customer_origin;    -- originador first-touch
+   ```
+2. ✅ **Cupom desativa no cancelamento — construído** (08/07, decisão do cliente = sim).
+   A desativação está centralizada em `cancelSubscription()` (`lib/subscriptions/actions.ts`),
+   que é o chokepoint dos 3 caminhos de inativação: webhook Guru `subscription_expired`,
+   cron `inactivate-expired-subscriptions` e cancelamento manual no admin. Ao virar
+   `cancelled`, chama `deactivateAffiliateCoupon(ref_code)` (Shopify DELETE do discount
+   code) — gate `AFFILIATE_CAPTURE`, try/catch isolado, non-fatal, idempotente.
+   **Semântica:** dispara no ENCERRAMENTO real (member vira inativo), não no clique de
+   cancelar auto-renovação — até expirar a pessoa segue assinante ativa e o cupom vale.
+   ⏳ Falta: merge desta branch + deploy.
 
 ## Passo a passo do go-live
 
-1. **Push + merge** da branch `feat/F-V35-cupons-massa` (conta com permissão: `lgouveac`).
-2. **Vercel** → env `AFFILIATE_CAPTURE=true` → **Redeploy** (flag só vale após redeploy).
-3. **Criar os cupons** (painel `/admin/afiliados` → "Cupons no Shopify"):
-   - Simular (escopo "ativos") → conferir contagem.
-   - Rodar com **limite 5** → validar na loja Shopify (os 5 internos).
-   - Rodar geral (ativos, depois todos).
-   - Obs.: roda com as credenciais Shopify de **prod** (client credentials na Vercel).
+1. ✅ ~~Push + merge da branch~~ — feito (PR #52).
+2. **Vercel** → env `AFFILIATE_CAPTURE=true` → **Redeploy** (flag só vale após redeploy). ⏸️ pendente.
+3. ✅ ~~Criar os cupons~~ — feito e validado em prod (08/07). Reexecutar só para novos afiliados.
 4. **Combos** (time Shopify): preço +10% (o cupom nivela); vendidos só via link do afiliado.
 5. **Distribuir os links** aos afiliados: `https://<loja>/discount/BH00…` (aplica o cupom sozinho).
 

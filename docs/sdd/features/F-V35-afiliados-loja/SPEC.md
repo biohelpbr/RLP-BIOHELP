@@ -1,6 +1,7 @@
 # F-V35 — Programa de Afiliados (loja)
 
-Status: Em desenvolvimento · Início: 2026-07-06 · Branch: `feat/F-V35-afiliados-loja`
+Status: **Done (dev)** — 2026-07-08 · Início: 2026-07-06 · PRs #51 + #52 na `main`
+Go-live pendente (não-código): ligar `AFFILIATE_CAPTURE` na Vercel + decisão do cliente sobre cupom no cancelamento. Ver `RUNBOOK.md`.
 Classe: D (módulo novo, financeiro, atrás de flag, migration aditiva)
 
 ## Objetivo
