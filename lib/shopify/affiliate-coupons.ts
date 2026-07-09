@@ -14,6 +14,14 @@ import { getShopifyAccessToken } from "./token"
 const API_VERSION = "2024-10"
 const PRICE_RULE_TITLE = "Afiliados — 10%"
 
+/**
+ * Coleção "Loja Biohelp" (varejo) — o 10% do afiliado só vale nela, deixando os
+ * produtos do club de fora (lá o preço já é final). Sem isso, o desconto entra
+ * como "Desconto no pedido" e pega tudo, inclusive o club (Gabriel, 09/07).
+ * Override por env se a coleção mudar.
+ */
+const STORE_COLLECTION_ID = Number(process.env.SHOPIFY_STORE_COLLECTION_ID || "282660405338")
+
 type Rest<T> = { status: number; data: T | null; error: string | null }
 
 async function rest<T>(endpoint: string, method: "GET" | "POST" | "DELETE", body?: unknown): Promise<Rest<T>> {
@@ -92,8 +100,10 @@ export async function bulkCreateAffiliateCoupons(opts: {
     price_rule: {
       title: PRICE_RULE_TITLE,
       target_type: "line_item",
-      target_selection: "all",
-      allocation_method: "across",
+      // "Desconto de produto" restrito à coleção Loja Biohelp (não pega o club).
+      target_selection: "entitled",
+      allocation_method: "each",
+      entitled_collection_ids: [STORE_COLLECTION_ID],
       value_type: "percentage",
       value: "-10.0",
       customer_selection: "all",
