@@ -3,7 +3,12 @@
 import { revalidatePath } from "next/cache"
 import { createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { computeAffiliateCommissions, type AffiliateCommissionSummary } from "./commission"
-import { bulkCreateAffiliateCoupons, type BulkCouponResult } from "@/lib/shopify/affiliate-coupons"
+import {
+  bulkCreateAffiliateCoupons,
+  applyAffiliateCollectionToPriceRule,
+  type BulkCouponResult,
+  type FixPriceRuleResult,
+} from "@/lib/shopify/affiliate-coupons"
 
 /**
  * F-V35 — cria/simula os cupons de afiliado no Shopify em massa.
@@ -17,6 +22,19 @@ export async function bulkAffiliateCouponsAction(input: {
   if (!(await isCurrentUserAdmin())) return { ok: false, error: "Apenas administradores." }
   const data = await bulkCreateAffiliateCoupons(input)
   if (data.error && !data.alreadyExists && !data.executed) return { ok: false, error: data.error }
+  return { ok: true, data }
+}
+
+/**
+ * F-V35 — corrige a price rule existente pra "Desconto de produto" na coleção
+ * Loja Biohelp (conserta todos os cupons de uma vez). Só admin.
+ */
+export async function applyAffiliateCollectionAction(): Promise<
+  { ok: true; data: FixPriceRuleResult } | { ok: false; error: string }
+> {
+  if (!(await isCurrentUserAdmin())) return { ok: false, error: "Apenas administradores." }
+  const data = await applyAffiliateCollectionToPriceRule()
+  if (!data.ok) return { ok: false, error: data.error ?? "falha ao atualizar a price rule" }
   return { ok: true, data }
 }
 

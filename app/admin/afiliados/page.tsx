@@ -10,6 +10,7 @@ import { listAffiliatesGmvForMonth, currentReferenceMonth } from "@/lib/affiliat
 import { CloseCommissionsButton } from "./CloseCommissionsButton"
 import { CustomerLookup } from "./CustomerLookup"
 import { BulkCouponsButton } from "./BulkCouponsButton"
+import { ApplyCollectionButton } from "./ApplyCollectionButton"
 
 const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
@@ -115,6 +116,16 @@ export default async function AfiliadosPage() {
               limite pequeno pra validar.
             </p>
             <BulkCouponsButton />
+
+            <div className="mt-4 border-t border-border pt-4">
+              <p className="mb-2 text-sm text-muted-foreground">
+                <strong>Corrigir tipo do desconto:</strong> troca a price rule existente de
+                &quot;Desconto no pedido&quot; para &quot;Desconto de produto&quot; restrito à coleção
+                Loja Biohelp — assim o 10% não pega nos produtos do club. Conserta todos os cupons de
+                uma vez.
+              </p>
+              <ApplyCollectionButton />
+            </div>
           </div>
         </BHCard>
 

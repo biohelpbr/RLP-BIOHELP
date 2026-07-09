@@ -24,7 +24,7 @@ const STORE_COLLECTION_ID = Number(process.env.SHOPIFY_STORE_COLLECTION_ID || "2
 
 type Rest<T> = { status: number; data: T | null; error: string | null }
 
-async function rest<T>(endpoint: string, method: "GET" | "POST" | "DELETE", body?: unknown): Promise<Rest<T>> {
+async function rest<T>(endpoint: string, method: "GET" | "POST" | "PUT" | "DELETE", body?: unknown): Promise<Rest<T>> {
   const domain = process.env.SHOPIFY_STORE_DOMAIN
   const token = await getShopifyAccessToken()
   if (!domain || !token) return { status: 0, data: null, error: "Sem credenciais Shopify" }
@@ -127,6 +127,57 @@ export async function bulkCreateAffiliateCoupons(opts: {
 
   base.executed = true
   return base
+}
+
+export interface FixPriceRuleResult {
+  ok: boolean
+  priceRuleId: string | null
+  targetSelection?: string
+  entitledCollectionIds?: number[]
+  error?: string
+}
+
+/**
+ * F-V35 — corrige a price rule "Afiliados — 10%" JÁ existente: de "Desconto no
+ * pedido" (target_selection=all, pegava o club) para "Desconto de produto"
+ * (entitled) restrito à coleção Loja Biohelp. Um PUT conserta todos os cupons de
+ * uma vez (todos herdam a mesma price rule). Só roda com credenciais de PROD.
+ */
+export async function applyAffiliateCollectionToPriceRule(): Promise<FixPriceRuleResult> {
+  // Acha a price rule via um cupom de afiliado conhecido (todos apontam pra ela).
+  const codes = await fetchAffiliateCodes("all", 1)
+  if (!codes.length) return { ok: false, priceRuleId: null, error: "nenhum cupom de afiliado encontrado" }
+
+  const lookup = await rest<{ discount_code?: { price_rule_id: number } }>(
+    `/discount_codes/lookup.json?code=${encodeURIComponent(codes[0])}`,
+    "GET",
+  )
+  const priceRuleId = lookup.data?.discount_code?.price_rule_id
+  if (!priceRuleId) {
+    return { ok: false, priceRuleId: null, error: `price rule não encontrada (cupom ${codes[0]}): ${lookup.error ?? ""}` }
+  }
+
+  const put = await rest<{ price_rule: { id: number; target_selection: string; entitled_collection_ids: number[] } }>(
+    `/price_rules/${priceRuleId}.json`,
+    "PUT",
+    {
+      price_rule: {
+        id: priceRuleId,
+        target_selection: "entitled",
+        allocation_method: "each",
+        entitled_collection_ids: [STORE_COLLECTION_ID],
+      },
+    },
+  )
+  if (put.error || !put.data?.price_rule) {
+    return { ok: false, priceRuleId: String(priceRuleId), error: put.error ?? "resposta vazia do Shopify" }
+  }
+  return {
+    ok: true,
+    priceRuleId: String(priceRuleId),
+    targetSelection: put.data.price_rule.target_selection,
+    entitledCollectionIds: put.data.price_rule.entitled_collection_ids,
+  }
 }
 
 export interface DeactivateCouponResult {
