@@ -17,13 +17,20 @@ import {
 } from "@/lib/email/flow-actions"
 import type { FlowStep } from "@/lib/email/flow"
 
-type Draft = { step_order: string; delay_days: string; subject: string; body: string }
+type Draft = {
+  step_order: string
+  delay_days: string
+  subject: string
+  body: string
+  whatsapp_template_id: string
+}
 
 const emptyDraft = (nextOrder: number): Draft => ({
   step_order: String(nextOrder),
   delay_days: "",
   subject: "",
   body: "",
+  whatsapp_template_id: "",
 })
 
 function delayLabel(d: number): string {
@@ -71,6 +78,7 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
       delay_days: String(s.delay_days),
       subject: s.subject,
       body: s.body,
+      whatsapp_template_id: s.whatsapp_template_id ?? "",
     })
     setError(null)
     setEditingId(s.id)
@@ -91,6 +99,7 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
         delay_days: draft.delay_days === "" ? 0 : draft.delay_days,
         subject: draft.subject,
         body: draft.body,
+        whatsapp_template_id: draft.whatsapp_template_id,
       }
       const res = editingId
         ? await updateFlowStep(editingId, payload)
@@ -170,6 +179,20 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
           value={draft.body}
           onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))}
         />
+      </div>
+      <div>
+        <Label htmlFor="whatsapp_template_id">WhatsApp — ID do template (Octopods)</Label>
+        <Input
+          id="whatsapp_template_id"
+          inputMode="numeric"
+          placeholder="ex.: 89245 · vazio = só e-mail neste passo"
+          value={draft.whatsapp_template_id}
+          onChange={(e) => setDraft((d) => ({ ...d, whatsapp_template_id: e.target.value }))}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Preencha com o ID do template no Octopods (≠ ID na Meta) pra também enviar WhatsApp
+          neste passo. A variável do corpo recebe o primeiro nome do membro.
+        </p>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex gap-2">

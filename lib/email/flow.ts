@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/server"
 import { getResend, getFrom } from "./resend"
 import { unsubscribeUrl } from "./unsubscribe"
+import { sendOctopodsTemplate, firstNameOf, normalizeBrPhone } from "@/lib/whatsapp/octopods"
 
 /**
  * F-V32 — motor do fluxo de e-mails (drip por gatilho "novo assinante").
@@ -47,6 +48,22 @@ export interface FlowStep {
   subject: string
   body: string
   enabled: boolean
+  /** F-V36 — ID do template no Octopods; null = passo sem WhatsApp. */
+  whatsapp_template_id: string | null
+}
+
+/** F-V36 — modo do canal WhatsApp (independente do e-mail). */
+export function getWhatsAppMode(): FlowMode {
+  const v = (process.env.WHATSAPP_FLOW_MODE || "off").toLowerCase()
+  return v === "dryrun" || v === "live" ? v : "off"
+}
+
+/** Allowlist de telefones (E.164) pra teste do WhatsApp em live. Vazio = todos. */
+function whatsappAllowlist(): string[] {
+  return (process.env.WHATSAPP_FLOW_TEST_RECIPIENTS || "")
+    .split(",")
+    .map((s) => normalizeBrPhone(s.trim()))
+    .filter((s): s is string => Boolean(s))
 }
 
 /** Passos habilitados do fluxo, em ordem. */
@@ -116,13 +133,14 @@ export async function sendStepToMember(args: {
     if (args.mode === "off") return { status: "noop" }
     const supabase = createServiceClient()
 
-    // Idempotência: já existe linha pra (member, flow, step)? então não reenvia.
+    // Idempotência: já existe linha pra (member, flow, step, canal e-mail)? não reenvia.
     const { data: prior } = await supabase
       .from("email_flow_sends")
       .select("id")
       .eq("member_id", memberId)
       .eq("flow_key", step.flow_key)
       .eq("step_order", step.step_order)
+      .eq("channel", "email")
       .maybeSingle()
     if (prior) return { status: "noop" }
 
@@ -131,6 +149,7 @@ export async function sendStepToMember(args: {
         member_id: memberId,
         flow_key: step.flow_key,
         step_order: step.step_order,
+        channel: "email",
         status: status === "noop" ? "skipped" : status,
         email,
         error: error ?? null,
@@ -178,6 +197,85 @@ export async function sendStepToMember(args: {
   }
 }
 
+/**
+ * F-V36 — envia (ou ensaia) o WhatsApp de UM passo pra UM membro via Octopods,
+ * idempotente via email_flow_sends (channel='whatsapp'). Espelha sendStepToMember.
+ * Só age se o passo tiver whatsapp_template_id. Nunca lança.
+ */
+export async function sendStepWhatsAppToMember(args: {
+  memberId: string
+  phone: string | null
+  name: string | null
+  step: FlowStep
+  mode: FlowMode
+}): Promise<StepResult> {
+  const { memberId, step } = args
+  try {
+    if (args.mode === "off") return { status: "noop" }
+    if (!step.whatsapp_template_id) return { status: "noop" } // passo sem WhatsApp
+    const supabase = createServiceClient()
+
+    // Idempotência por canal whatsapp.
+    const { data: prior } = await supabase
+      .from("email_flow_sends")
+      .select("id")
+      .eq("member_id", memberId)
+      .eq("flow_key", step.flow_key)
+      .eq("step_order", step.step_order)
+      .eq("channel", "whatsapp")
+      .maybeSingle()
+    if (prior) return { status: "noop" }
+
+    const record = async (status: StepResult["status"], error?: string) => {
+      const { error: insErr } = await supabase.from("email_flow_sends").insert({
+        member_id: memberId,
+        flow_key: step.flow_key,
+        step_order: step.step_order,
+        channel: "whatsapp",
+        status: status === "noop" ? "skipped" : status,
+        email: null,
+        error: error ?? null,
+      })
+      if (insErr && insErr.code !== "23505") console.error("[sendStepWhatsApp.record]", insErr)
+    }
+
+    const phone = normalizeBrPhone(args.phone)
+    if (!phone) {
+      await record("skipped", "telefone inválido/ausente")
+      return { status: "skipped", error: "telefone inválido/ausente" }
+    }
+
+    if (args.mode === "dryrun") {
+      console.info(`[whatsapp][DRYRUN] would_send step=${step.step_order} to=${phone} member=${memberId}`)
+      await record("dryrun")
+      return { status: "dryrun" }
+    }
+
+    // live + allowlist de telefones
+    const allow = whatsappAllowlist()
+    if (allow.length > 0 && !allow.includes(phone)) {
+      await record("skipped", "fora da allowlist")
+      return { status: "skipped" }
+    }
+
+    const r = await sendOctopodsTemplate({
+      templateId: step.whatsapp_template_id,
+      destinationPhone: phone,
+      bodyVars: [firstNameOf(args.name)],
+    })
+    if (!r.ok) {
+      await record("failed", r.error || "falha no envio")
+      return { status: "failed", error: r.error }
+    }
+    await record("sent")
+    console.info(`[whatsapp][SENT] step=${step.step_order} to=${phone} member=${memberId}`)
+    return { status: "sent" }
+  } catch (err) {
+    console.error("[sendStepWhatsAppToMember] exception", err)
+    return { status: "failed", error: "exceção no envio" }
+  }
+}
+
 export interface FlowRunSummary {
   mode: FlowMode
   candidates: number
@@ -187,6 +285,15 @@ export interface FlowRunSummary {
   skipped: number
   failed: number
   noop: number
+  /** F-V36 — canal WhatsApp (Octopods). */
+  whatsapp: {
+    mode: FlowMode
+    sent: number
+    dryrun: number
+    skipped: number
+    failed: number
+    noop: number
+  }
 }
 
 /**
@@ -198,6 +305,7 @@ export interface FlowRunSummary {
  */
 export async function runNewSubscriberFlow(now: Date = new Date()): Promise<FlowRunSummary> {
   const mode = getFlowMode()
+  const waMode = getWhatsAppMode()
   const summary: FlowRunSummary = {
     mode,
     candidates: 0,
@@ -207,8 +315,10 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
     skipped: 0,
     failed: 0,
     noop: 0,
+    whatsapp: { mode: waMode, sent: 0, dryrun: 0, skipped: 0, failed: 0, noop: 0 },
   }
-  if (mode === "off") return summary
+  // Roda se e-mail OU whatsapp estiver ligado.
+  if (mode === "off" && waMode === "off") return summary
 
   const steps = await listEnabledSteps()
   summary.steps = steps.length
@@ -228,7 +338,7 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
   // Assinantes pagos, com data de pagamento >= corte, não descadastrados, com e-mail.
   const { data: members, error } = await supabase
     .from("members")
-    .select("id, email, name, subscription_paid_at")
+    .select("id, email, name, phone, subscription_paid_at")
     .eq("subscription_status", "paid")
     .not("subscription_paid_at", "is", null)
     .gte("subscription_paid_at", start.toISOString())
@@ -243,6 +353,7 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
     id: string
     email: string | null
     name: string | null
+    phone: string | null
     subscription_paid_at: string | null
   }>
   summary.candidates = rows.length
@@ -261,6 +372,16 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
         mode,
       })
       summary[res.status === "noop" ? "noop" : res.status] += 1
+
+      // F-V36 — canal WhatsApp (só age se o passo tiver template + waMode != off).
+      const wa = await sendStepWhatsAppToMember({
+        memberId: m.id,
+        phone: m.phone,
+        name: m.name,
+        step,
+        mode: waMode,
+      })
+      summary.whatsapp[wa.status === "noop" ? "noop" : wa.status] += 1
     }
   }
   return summary
@@ -273,22 +394,33 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
  */
 export async function fireStepZero(memberId: string): Promise<StepResult> {
   const mode = getFlowMode()
-  if (mode === "off") return { status: "noop" }
+  const waMode = getWhatsAppMode()
+  if (mode === "off" && waMode === "off") return { status: "noop" }
   const steps = await listEnabledSteps()
   const zero = steps.find((s) => s.step_order === 1 || s.delay_days === 0)
   if (!zero) return { status: "noop" }
   const supabase = createServiceClient()
   const { data: m } = await supabase
     .from("members")
-    .select("id, email, name, email_unsubscribed_at")
+    .select("id, email, name, phone, email_unsubscribed_at")
     .eq("id", memberId)
     .single()
   if (!m || !m.email || m.email_unsubscribed_at) return { status: "noop" }
-  return sendStepToMember({
+
+  const emailRes = await sendStepToMember({
     memberId,
     email: m.email as string,
     name: (m.name as string | null) ?? null,
     step: zero,
     mode,
   })
+  // F-V36 — dispara o WhatsApp do D+0 também (non-fatal, canal separado).
+  await sendStepWhatsAppToMember({
+    memberId,
+    phone: (m.phone as string | null) ?? null,
+    name: (m.name as string | null) ?? null,
+    step: zero,
+    mode: waMode,
+  })
+  return emailRes
 }

@@ -23,6 +23,11 @@ const stepSchema = z.object({
   subject: z.string().trim().min(2, "Assunto obrigatório."),
   body: z.string().trim().min(2, "Corpo obrigatório."),
   enabled: z.coerce.boolean().default(true),
+  // F-V36 — ID do template no Octopods (vazio = passo sem WhatsApp).
+  whatsapp_template_id: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() ? v.trim() : null),
+    z.string().nullable(),
+  ),
 })
 
 const ADMIN_PATH = "/admin/emails/fluxo"
@@ -110,6 +115,7 @@ export async function createFlowStep(input: unknown): Promise<ActionResult<{ id:
       subject: parsed.data.subject,
       body: parsed.data.body,
       enabled: parsed.data.enabled,
+      whatsapp_template_id: parsed.data.whatsapp_template_id,
     })
     .select("id")
     .single()
