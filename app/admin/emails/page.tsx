@@ -53,6 +53,9 @@ export default async function AdminEmailsPage() {
           </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="outline">
+              <Link href="/admin/emails/entregas">Entregas</Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/admin/emails/fluxo">Fluxo de boas-vindas</Link>
             </Button>
             <Button asChild>
