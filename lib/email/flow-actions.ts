@@ -6,6 +6,7 @@ import { z } from "zod"
 import { createServiceClient, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { DEFAULT_FLOW_KEY, renderFlowStepHtml, type FlowStep } from "./flow"
 import { getResend, getFrom } from "./resend"
+import { sendOctopodsTemplate, normalizeBrPhone } from "@/lib/whatsapp/octopods"
 
 type ActionResult<T = void> =
   | { ok: true; data?: T }
@@ -92,6 +93,45 @@ export async function sendFlowStepTest(input: unknown): Promise<ActionResult> {
     console.error("[sendFlowStepTest]", e)
     return { ok: false, error: "Erro ao enviar o teste (verifique a RESEND_API_KEY)." }
   }
+  return { ok: true }
+}
+
+const waTestSchema = z.object({
+  stepId: z.string().uuid(),
+  phone: z.string().trim().min(8, "Telefone inválido."),
+})
+
+/**
+ * F-V36 — envia o WhatsApp DESTE passo pro telefone informado, AGORA.
+ * Independe de modo/idempotência: teste manual de admin pra validar o Octopods
+ * (token, template, formato do número). Não grava em email_flow_sends.
+ */
+export async function sendFlowStepWhatsAppTest(input: unknown): Promise<ActionResult> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return auth
+
+  const parsed = waTestSchema.safeParse(input)
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    return { ok: false, error: issue.message, field: issue.path.join(".") }
+  }
+
+  const phone = normalizeBrPhone(parsed.data.phone)
+  if (!phone) return { ok: false, error: "Telefone inválido (use DDD + número).", field: "phone" }
+
+  const supabase = createServiceClient()
+  const { data: step } = await supabase
+    .from("email_flow_steps")
+    .select("whatsapp_template_id")
+    .eq("id", parsed.data.stepId)
+    .maybeSingle()
+  if (!step) return { ok: false, error: "Passo não encontrado." }
+  const templateId = (step as { whatsapp_template_id: string | null }).whatsapp_template_id
+  if (!templateId) return { ok: false, error: "Este passo não tem template de WhatsApp configurado." }
+
+  // Nome de exemplo pra variável do corpo (mostra como fica).
+  const r = await sendOctopodsTemplate({ templateId, destinationPhone: phone, bodyVars: ["Maria"] })
+  if (!r.ok) return { ok: false, error: `Falha no envio (Octopods ${r.status}): ${r.error ?? ""}` }
   return { ok: true }
 }
 

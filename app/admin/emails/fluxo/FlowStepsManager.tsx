@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Plus, Save, Send, Trash2, X } from "lucide-react"
+import { Loader2, MessageCircle, Plus, Save, Send, Trash2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,6 +14,7 @@ import {
   deleteFlowStep,
   toggleFlowStep,
   sendFlowStepTest,
+  sendFlowStepWhatsAppTest,
 } from "@/lib/email/flow-actions"
 import type { FlowStep } from "@/lib/email/flow"
 
@@ -48,6 +49,8 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
   const [testEmail, setTestEmail] = useState("")
   const [testMsg, setTestMsg] = useState<string | null>(null)
   const [testingId, setTestingId] = useState<string | null>(null)
+  const [testPhone, setTestPhone] = useState("")
+  const [waTestingId, setWaTestingId] = useState<string | null>(null)
 
   const nextOrder = (steps.reduce((max, s) => Math.max(max, s.step_order), 0) || 0) + 1
 
@@ -62,6 +65,24 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
       const res = await sendFlowStepTest({ stepId: s.id, to: testEmail.trim() })
       setTestingId(null)
       setTestMsg(res.ok ? `✅ Passo ${s.step_order} enviado pra ${testEmail.trim()}.` : `❌ ${res.error}`)
+    })
+  }
+
+  function sendWaTest(s: FlowStep) {
+    setTestMsg(null)
+    if (!testPhone.trim()) {
+      setTestMsg("Digite um telefone (DDD + número) pra receber o teste de WhatsApp.")
+      return
+    }
+    setWaTestingId(s.id)
+    startTransition(async () => {
+      const res = await sendFlowStepWhatsAppTest({ stepId: s.id, phone: testPhone.trim() })
+      setWaTestingId(null)
+      setTestMsg(
+        res.ok
+          ? `✅ WhatsApp do passo ${s.step_order} enviado pra ${testPhone.trim()}.`
+          : `❌ ${res.error}`,
+      )
     })
   }
 
@@ -224,9 +245,20 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
                 onChange={(e) => setTestEmail(e.target.value)}
               />
             </div>
+            <div className="min-w-[200px] flex-1">
+              <Label htmlFor="test-phone">Testar WhatsApp (telefone)</Label>
+              <Input
+                id="test-phone"
+                inputMode="tel"
+                placeholder="51 98644 2929"
+                value={testPhone}
+                onChange={(e) => setTestPhone(e.target.value)}
+              />
+            </div>
             <p className="text-xs text-muted-foreground">
-              Digite um e-mail e clique em <strong>Testar</strong> em cada passo abaixo — ele chega
-              na hora, sem afetar nenhum assinante.
+              Digite um e-mail e/ou telefone e clique em <strong>Testar</strong> /{" "}
+              <strong>Testar WhatsApp</strong> em cada passo — chega na hora, sem afetar nenhum
+              assinante. O botão de WhatsApp só aparece nos passos com template configurado.
             </p>
           </div>
           {testMsg && <p className="mt-2 text-sm text-foreground">{testMsg}</p>}
@@ -277,6 +309,22 @@ export function FlowStepsManager({ steps }: { steps: FlowStep[] }) {
                   )}
                   Testar
                 </Button>
+                {s.whatsapp_template_id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => sendWaTest(s)}
+                    disabled={pending}
+                    className="inline-flex items-center gap-1.5"
+                  >
+                    {waTestingId === s.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <MessageCircle className="h-4 w-4" />
+                    )}
+                    Testar WhatsApp
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" onClick={() => toggle(s)} disabled={pending}>
                   {s.enabled ? "Desativar" : "Ativar"}
                 </Button>
