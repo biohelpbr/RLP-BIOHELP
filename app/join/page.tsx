@@ -4,6 +4,7 @@ import * as React from "react"
 import { Suspense, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import {
   AlertTriangle,
   ArrowRight,
@@ -132,9 +133,14 @@ function JoinForm() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-6 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bh-gradient-purple bh-shadow-purple-glow mb-4">
-            <span className="text-primary-foreground font-bold text-3xl">B</span>
-          </div>
+          <Image
+            src="/logo-oficial.png"
+            alt="Biohelp Nutrition Club"
+            width={200}
+            height={56}
+            className="h-12 w-auto mx-auto mb-4"
+            priority
+          />
           <h1 className="text-3xl font-bold text-foreground mb-2">Criar conta</h1>
           <p className="text-muted-foreground">Preencha seus dados para começar.</p>
         </div>
@@ -332,9 +338,14 @@ function JoinLoading() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-bh-lavender-soft via-background to-bh-blue-soft flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bh-gradient-purple mb-4">
-          <span className="text-primary-foreground font-bold text-3xl">B</span>
-        </div>
+        <Image
+          src="/logo-oficial.png"
+          alt="Biohelp Nutrition Club"
+          width={200}
+          height={56}
+          className="h-12 w-auto mx-auto mb-4"
+          priority
+        />
         <p className="text-muted-foreground">Carregando…</p>
       </div>
     </div>
