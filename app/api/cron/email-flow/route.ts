@@ -14,7 +14,7 @@
 
 import { NextRequest, NextResponse } from "next/server"
 
-import { runNewSubscriberFlow, getFlowMode } from "@/lib/email/flow"
+import { runNewSubscriberFlow, getFlowMode, getWhatsAppMode } from "@/lib/email/flow"
 
 export const dynamic = "force-dynamic"
 
@@ -40,9 +40,14 @@ export async function GET(request: NextRequest) {
     })
   }
 
-  // Gate extra do próprio fluxo: mode 'off' = inerte (não percorre nada).
-  if (getFlowMode() === "off") {
-    return NextResponse.json({ ok: true, skipped: true, reason: "EMAIL_FLOW_MODE=off" })
+  // Gate extra do próprio fluxo: só é inerte se AMBOS os canais estiverem off.
+  // (WhatsApp tem modo próprio — F-V36; não pode depender só do EMAIL_FLOW_MODE.)
+  if (getFlowMode() === "off" && getWhatsAppMode() === "off") {
+    return NextResponse.json({
+      ok: true,
+      skipped: true,
+      reason: "EMAIL_FLOW_MODE=off e WHATSAPP_FLOW_MODE=off",
+    })
   }
 
   const summary = await runNewSubscriberFlow()
