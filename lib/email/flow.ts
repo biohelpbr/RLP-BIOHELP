@@ -388,9 +388,10 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
 }
 
 /**
- * F-V32 — dispara o passo D+0 na hora em que o membro vira assinante.
- * (Absorção do F-V30 — NÃO ligado ainda no markSubscriptionPaid; será o último
- * passo, depois do motor provado e do conteúdo do Leo cadastrado.)
+ * F-V32/F-V36 — dispara o passo D+0 (boas-vindas: e-mail + WhatsApp) NA HORA em
+ * que o membro vira assinante. Ligado em markSubscriptionPaid (ponto único de
+ * todo novo assinante: Guru + Shopify + manual). Event-driven, não depende do
+ * cron — o cron diário só cobre os passos atrasados (D+5..D+30).
  */
 export async function fireStepZero(memberId: string): Promise<StepResult> {
   const mode = getFlowMode()
