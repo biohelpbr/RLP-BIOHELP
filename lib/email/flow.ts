@@ -198,6 +198,27 @@ export async function sendStepToMember(args: {
 }
 
 /**
+ * F-V36 — cópia de monitoramento (fase de teste): manda uma cópia de cada
+ * WhatsApp do fluxo pro número em WHATSAPP_FLOW_OBSERVER, pra o admin conferir
+ * que está funcionando sem depender do próprio assinante. Non-fatal; NÃO grava
+ * em email_flow_sends (é só observação). Vazio = desligado.
+ */
+async function sendWhatsAppObserverCopy(
+  templateId: string,
+  name: string | null,
+  recipientPhone: string,
+): Promise<void> {
+  const observer = normalizeBrPhone(process.env.WHATSAPP_FLOW_OBSERVER)
+  if (!observer || observer === recipientPhone) return
+  try {
+    await sendOctopodsTemplate({ templateId, destinationPhone: observer, bodyVars: [firstNameOf(name)] })
+    console.info(`[whatsapp][OBSERVER] cópia enviada to=${observer} (template ${templateId})`)
+  } catch (e) {
+    console.error("[whatsapp][observer] falhou", e)
+  }
+}
+
+/**
  * F-V36 — envia (ou ensaia) o WhatsApp de UM passo pra UM membro via Octopods,
  * idempotente via email_flow_sends (channel='whatsapp'). Espelha sendStepToMember.
  * Só age se o passo tiver whatsapp_template_id. Nunca lança.
@@ -255,6 +276,8 @@ export async function sendStepWhatsAppToMember(args: {
     const allow = whatsappAllowlist()
     if (allow.length > 0 && !allow.includes(phone)) {
       await record("skipped", "fora da allowlist")
+      // Observador ainda recebe a cópia (monitorar mesmo os pulados no piloto).
+      await sendWhatsAppObserverCopy(step.whatsapp_template_id, args.name, phone)
       return { status: "skipped" }
     }
 
@@ -263,6 +286,8 @@ export async function sendStepWhatsAppToMember(args: {
       destinationPhone: phone,
       bodyVars: [firstNameOf(args.name)],
     })
+    // Cópia de monitoramento pro observador (fase de teste), non-fatal.
+    await sendWhatsAppObserverCopy(step.whatsapp_template_id, args.name, phone)
     if (!r.ok) {
       await record("failed", r.error || "falha no envio")
       return { status: "failed", error: r.error }
