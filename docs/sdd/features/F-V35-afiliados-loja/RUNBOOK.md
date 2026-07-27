@@ -4,11 +4,15 @@ Checklist operacional para ligar o programa de afiliados em produção. O
 **desenvolvimento está concluído** (fases 1-4 + criação em massa de cupons);
 o que segue é operação/deploy — depende de credenciais e ações no Vercel/Shopify.
 
-## Estado atual (08/07/2026)
-- ✅ Código do módulo na `main` (PR #51 + PR #52 mergeados): captura, GMV, comissão, painel, criação em massa de cupons.
-- ✅ Migrations aplicadas em prod (affiliate_sales, affiliate_customer_origin, tipos no ledger).
-- ✅ **Criação em massa de cupons rodada em prod e validada** (cliente: "parece q deu certo", 08/07).
-- ⏸️ Flag `AFFILIATE_CAPTURE` = OFF → **captura ainda não grava nada**; sem ela o painel fica vazio.
+## Estado atual (27/07/2026)
+- ✅ Módulo completo na `main` e **em produção** (captura, GMV, comissão, painel, cupons).
+- ✅ `AFFILIATE_CAPTURE=true` ligado; captura gravando.
+- ✅ **Bugfix crítico (27/07, PR #65):** captura não pegava comprador **não-membro** → 11 de 17 vendas perdidas. Corrigido + **backfill das 11** feito. `affiliate_sales` = 17 (13 reais, GMV R$3.338). Detalhes no `log.md`.
+- ✅ **Cupom automático no onboarding** (PR #66) + ferramenta incremental (PR #64, 14 faltantes criados) → afiliado novo nunca fica sem cupom.
+- ✅ Price rule = "Desconto de produto" na coleção Loja Biohelp (não pega o club) (PRs #55/#56).
+- ✅ Cupom desativa no cancelamento (PR #53).
+- ⏳ **Fechamento de comissão de julho ainda NÃO rodou** (ledger de afiliado zerado). Rodar em `/admin/afiliados` → "Fechamento de comissão" após a virada. Confirmar data com o cliente.
+- 🔎 Follow-up menor: Originador/perpétua first-touch dos 11 backfillados não foi refeito (volume pequeno; só afeta perpétua futura).
 
 ## Pendentes vivos
 1. ✅ **`AFFILIATE_CAPTURE=true` ligado na Vercel + redeploy** (08/07). Captura ativa.
