@@ -64,7 +64,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', 'https://painel.bio-help.com'))
   }
 
-  if (isAdminDomain && !pathname.startsWith('/admin') && pathname !== '/login' && !pathname.startsWith('/auth/') && pathname !== '/welcome') {
+  // Arquivos estáticos do /public (logo-oficial.png etc.) têm extensão e NÃO
+  // podem ser redirecionados — senão o otimizador do Next não busca a fonte e a
+  // logo quebra no admin.bio-help.com (o matcher só exclui _next/*, não /public).
+  const isPublicFile = /\.[a-zA-Z0-9]+$/.test(pathname)
+  if (
+    isAdminDomain &&
+    !isPublicFile &&
+    !pathname.startsWith('/admin') &&
+    pathname !== '/login' &&
+    !pathname.startsWith('/auth/') &&
+    pathname !== '/welcome'
+  ) {
     return NextResponse.redirect(new URL('/admin', request.url))
   }
 

@@ -7,28 +7,21 @@ import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
 import { Badge } from "@/components/ui/badge"
 import { listAdminFlowSteps } from "@/lib/email/flow-actions"
-import { getFlowMode } from "@/lib/email/flow"
+import { getFlowMode, getWhatsAppMode } from "@/lib/email/flow"
 import { FlowStepsManager } from "./FlowStepsManager"
 
-const MODE_INFO: Record<
-  ReturnType<typeof getFlowMode>,
-  { label: string; tone: "default" | "outline" | "destructive"; help: string }
-> = {
-  off: {
-    label: "Desligado",
-    tone: "outline",
-    help: "O fluxo está inerte: nada é enviado. Edite os passos à vontade — eles só disparam quando o modo virar dryrun/live.",
-  },
-  dryrun: {
-    label: "Ensaio (dry-run)",
-    tone: "default",
-    help: "Modo de ensaio: registra os envios no log SEM enviar e-mail de verdade. Bom pra validar antes do live.",
-  },
-  live: {
-    label: "Ativo (live)",
-    tone: "destructive",
-    help: "AO VIVO: os e-mails estão sendo enviados de verdade aos assinantes.",
-  },
+type Mode = ReturnType<typeof getFlowMode>
+
+const MODE_LABEL: Record<Mode, { label: string; tone: "default" | "outline" | "destructive" }> = {
+  off: { label: "Desligado", tone: "outline" },
+  dryrun: { label: "Ensaio (dry-run)", tone: "default" },
+  live: { label: "Ativo (live)", tone: "destructive" },
+}
+
+function modeHelp(mode: Mode, canal: string): string {
+  if (mode === "live") return `AO VIVO: ${canal} sendo enviado de verdade aos assinantes.`
+  if (mode === "dryrun") return `Ensaio: registra no log SEM enviar ${canal} de verdade.`
+  return `${canal} desligado: nada é enviado por este canal.`
 }
 
 export default async function AdminEmailFlowPage() {
@@ -38,8 +31,10 @@ export default async function AdminEmailFlowPage() {
   if (!(await isCurrentUserAdmin())) redirect("/dashboard")
 
   const steps = await listAdminFlowSteps()
-  const mode = getFlowMode()
-  const info = MODE_INFO[mode]
+  const emailMode = getFlowMode()
+  const waMode = getWhatsAppMode()
+  const emailInfo = MODE_LABEL[emailMode]
+  const waInfo = MODE_LABEL[waMode]
 
   return (
     <AdminShell adminName={member.name ?? "Admin"}>
@@ -55,7 +50,8 @@ export default async function AdminEmailFlowPage() {
         <header className="space-y-2">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold text-foreground">Fluxo de boas-vindas</h1>
-            <Badge variant={info.tone}>Modo: {info.label}</Badge>
+            <Badge variant={emailInfo.tone}>E-mail: {emailInfo.label}</Badge>
+            <Badge variant={waInfo.tone}>WhatsApp: {waInfo.label}</Badge>
           </div>
           <p className="text-muted-foreground">
             Sequência automática que começa quando alguém vira assinante. Cada passo sai após o
@@ -64,10 +60,15 @@ export default async function AdminEmailFlowPage() {
         </header>
 
         <BHCard variant="default">
-          <p className="text-sm text-muted-foreground">{info.help}</p>
+          <p className="text-sm text-muted-foreground">
+            <strong>E-mail:</strong> {modeHelp(emailMode, "e-mail")}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            <strong>WhatsApp:</strong> {modeHelp(waMode, "WhatsApp")}
+          </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            O modo é controlado pela variável de ambiente <code>EMAIL_FLOW_MODE</code> (off / dryrun
-            / live) — alterada no deploy, não por aqui.
+            Os canais são independentes: <code>EMAIL_FLOW_MODE</code> e{" "}
+            <code>WHATSAPP_FLOW_MODE</code> (off / dryrun / live), alterados no deploy — não por aqui.
           </p>
         </BHCard>
 
