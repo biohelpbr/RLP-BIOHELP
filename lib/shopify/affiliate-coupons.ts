@@ -46,12 +46,47 @@ export interface BulkCouponResult {
   scope: "all" | "active"
   executed: boolean
   totalAffiliates: number
+  /** Quantos afiliados já têm cupom no Shopify. */
+  existingCount: number
+  /** Quantos ainda faltam criar (é o que "Criar" cria). */
+  missingCount: number
   priceRuleId: string | null
   batchesSent: number
   codesQueued: number
+  /** Amostra dos que FALTAM criar. */
   sample: string[]
   alreadyExists: boolean
   error?: string
+}
+
+/** Acha o id da price rule "Afiliados — 10%" já existente (por título). */
+async function findAffiliatePriceRuleId(): Promise<number | null> {
+  const r = await rest<{ price_rules?: Array<{ id: number; title: string }> }>(
+    "/price_rules.json?limit=250",
+    "GET",
+  )
+  const found = (r.data?.price_rules || []).find((p) => p.title === PRICE_RULE_TITLE)
+  return found?.id ?? null
+}
+
+/** Lista TODOS os códigos de cupom já existentes sob a price rule (paginado). */
+async function listExistingCouponCodes(priceRuleId: number): Promise<Set<string>> {
+  const domain = process.env.SHOPIFY_STORE_DOMAIN
+  const token = await getShopifyAccessToken()
+  const out = new Set<string>()
+  if (!domain || !token) return out
+  let nextUrl: string | null =
+    `https://${domain}/admin/api/${API_VERSION}/price_rules/${priceRuleId}/discount_codes.json?limit=250`
+  for (let guard = 0; nextUrl && guard < 30; guard++) {
+    const res: Response = await fetch(nextUrl, { headers: { "X-Shopify-Access-Token": token } })
+    if (!res.ok) break
+    const json = (await res.json()) as { discount_codes?: Array<{ code: string }> }
+    for (const dc of json.discount_codes || []) out.add(dc.code)
+    const link: string | null = res.headers.get("link") ?? res.headers.get("Link")
+    const match: RegExpExecArray | null = link ? /<([^>]+)>;\s*rel="next"/.exec(link) : null
+    nextUrl = match ? match[1] : null
+  }
+  return out
 }
 
 /** Busca os ref_codes dos afiliados (todos ou só pagantes). */
@@ -78,45 +113,57 @@ export async function bulkCreateAffiliateCoupons(opts: {
     scope: opts.scope,
     executed: false,
     totalAffiliates: codes.length,
+    existingCount: 0,
+    missingCount: 0,
     priceRuleId: null,
     batchesSent: 0,
     codesQueued: 0,
-    sample: codes.slice(0, 10),
+    sample: [],
     alreadyExists: false,
   }
-  if (!opts.execute || codes.length === 0) return base
+  if (codes.length === 0) return base
 
-  // Guarda anti-duplicata: se o 1º código já existe no Shopify, não recria tudo.
-  const lookup = await rest<{ discount_code?: unknown }>(
-    `/discount_codes/lookup.json?code=${encodeURIComponent(codes[0])}`,
-    "GET",
-  )
-  if (lookup.status === 200 && lookup.data?.discount_code) {
-    return { ...base, alreadyExists: true, error: `cupom ${codes[0]} já existe — parece já ter rodado` }
+  // Diagnóstico (read-only): acha a price rule existente e os cupons já criados,
+  // pra calcular quem FALTA. Vale pro dry-run e pro execute — nunca recria o que existe.
+  let priceRuleId = await findAffiliatePriceRuleId()
+  const existing = priceRuleId ? await listExistingCouponCodes(priceRuleId) : new Set<string>()
+  const missing = codes.filter((c) => !existing.has(c))
+  base.priceRuleId = priceRuleId ? String(priceRuleId) : null
+  base.existingCount = codes.length - missing.length
+  base.missingCount = missing.length
+  base.sample = missing.slice(0, 10)
+
+  // dry-run: só o diagnóstico (quantos faltam), sem escrever.
+  if (!opts.execute) return base
+
+  if (missing.length === 0) {
+    return { ...base, executed: true, alreadyExists: true, error: "todos os afiliados já têm cupom" }
   }
 
-  // 1) Price rule "Afiliados — 10%".
-  const pr = await rest<{ price_rule: { id: number } }>("/price_rules.json", "POST", {
-    price_rule: {
-      title: PRICE_RULE_TITLE,
-      target_type: "line_item",
-      // "Desconto de produto" restrito à coleção Loja Biohelp (não pega o club).
-      target_selection: "entitled",
-      allocation_method: "each",
-      entitled_collection_ids: [STORE_COLLECTION_ID],
-      value_type: "percentage",
-      value: "-10.0",
-      customer_selection: "all",
-      starts_at: new Date().toISOString(),
-    },
-  })
-  if (!pr.data?.price_rule?.id) return { ...base, error: `falha na price rule: ${pr.error}` }
-  const priceRuleId = pr.data.price_rule.id
-  base.priceRuleId = String(priceRuleId)
+  // Cria a price rule só se ainda não existe (1ª vez).
+  if (!priceRuleId) {
+    const pr = await rest<{ price_rule: { id: number } }>("/price_rules.json", "POST", {
+      price_rule: {
+        title: PRICE_RULE_TITLE,
+        target_type: "line_item",
+        // "Desconto de produto" restrito à coleção Loja Biohelp (não pega o club).
+        target_selection: "entitled",
+        allocation_method: "each",
+        entitled_collection_ids: [STORE_COLLECTION_ID],
+        value_type: "percentage",
+        value: "-10.0",
+        customer_selection: "all",
+        starts_at: new Date().toISOString(),
+      },
+    })
+    if (!pr.data?.price_rule?.id) return { ...base, error: `falha na price rule: ${pr.error}` }
+    priceRuleId = pr.data.price_rule.id
+    base.priceRuleId = String(priceRuleId)
+  }
 
-  // 2) Códigos em lote (até 100 por batch).
-  for (let i = 0; i < codes.length; i += 100) {
-    const chunk = codes.slice(i, i + 100).map((code) => ({ code }))
+  // Cria em lote SÓ os que faltam (até 100 por batch).
+  for (let i = 0; i < missing.length; i += 100) {
+    const chunk = missing.slice(i, i + 100).map((code) => ({ code }))
     const b = await rest(`/price_rules/${priceRuleId}/batch.json`, "POST", { discount_codes: chunk })
     if (b.error) {
       return { ...base, executed: true, error: `batch ${i / 100 + 1} falhou: ${b.error}` }

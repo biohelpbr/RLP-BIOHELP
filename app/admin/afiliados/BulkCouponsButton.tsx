@@ -63,26 +63,37 @@ export function BulkCouponsButton() {
           {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Ticket className="mr-2 h-4 w-4" />}
           Simular
         </Button>
-        {res && !res.executed && res.totalAffiliates > 0 && (
+        {res && !res.executed && res.missingCount > 0 && (
           <Button type="button" size="sm" onClick={() => run(true)} disabled={pending}>
-            Criar {res.totalAffiliates} cupons no Shopify
+            Criar {res.missingCount} cupons faltantes
           </Button>
         )}
       </div>
 
       {res && (
         <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
-          {res.alreadyExists ? (
-            <p className="text-muted-foreground">Parece que já rodou: o cupom {res.sample[0]} já existe no Shopify.</p>
-          ) : res.executed ? (
-            <p className="flex items-center gap-2 text-foreground">
-              <CheckCircle2 className="h-4 w-4 text-primary" />
-              Enviados {res.batchesSent} lote(s) · {res.codesQueued} cupons na fila (price rule {res.priceRuleId}).
-            </p>
+          {res.executed ? (
+            res.alreadyExists ? (
+              <p className="flex items-center gap-2 text-foreground">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                Todos os {res.totalAffiliates} afiliados já têm cupom. Nada a criar.
+              </p>
+            ) : (
+              <p className="flex items-center gap-2 text-foreground">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                Criados {res.codesQueued} cupons novos em {res.batchesSent} lote(s) (price rule {res.priceRuleId}).
+              </p>
+            )
           ) : (
             <p>
-              <strong>{res.totalAffiliates}</strong> afiliados ({scope === "all" ? "todos" : "ativos"}). Ex.:{" "}
-              <span className="font-mono text-xs">{res.sample.join(", ")}</span>
+              <strong>{res.totalAffiliates}</strong> afiliados ({scope === "all" ? "todos" : "ativos"}) ·{" "}
+              <strong>{res.existingCount}</strong> já têm cupom ·{" "}
+              <strong className={res.missingCount > 0 ? "text-primary" : ""}>{res.missingCount}</strong> faltando.
+              {res.missingCount > 0 && (
+                <>
+                  {" "}Ex.: <span className="font-mono text-xs">{res.sample.join(", ")}</span>
+                </>
+              )}
             </p>
           )}
         </div>
