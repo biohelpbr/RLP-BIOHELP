@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
     })
     
     // Criar pedido mesmo sem membro (para rastreamento)
-    await supabase.from('orders').insert({
+    const { data: guestOrder } = await supabase.from('orders').insert({
       shopify_order_id: shopifyOrderId,
       shopify_order_number: extractedData.shopifyOrderNumber,
       member_id: null,
@@ -156,8 +156,26 @@ export async function POST(request: NextRequest) {
       status: 'paid',
       paid_at: new Date().toISOString(),
       shopify_data: extractedData.rawData
-    })
-    
+    }).select('id').single()
+
+    // [F-V35] Captura de afiliado TAMBÉM quando o comprador NÃO é membro (cliente
+    // comum usando o cupom de um afiliado). Este é o caso mais comum — sem isto a
+    // venda nunca é atribuída. Isolado/non-fatal (Anti-SPEC §4).
+    if (isAffiliateCaptureEnabled()) {
+      try {
+        await captureAffiliateSale({
+          shopifyOrderId: String(shopifyOrderId),
+          orderId: guestOrder?.id ?? null,
+          customerEmail: extractedData.customerEmail,
+          buyerMemberId: null,
+          totalAmount: Number(extractedData.totalAmount) || 0,
+          discountCodes: extractedData.discountCodes ?? [],
+        })
+      } catch (affErr) {
+        console.error('[webhook] Captura de afiliado (não-membro, non-fatal):', affErr)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Order saved but member not found',
