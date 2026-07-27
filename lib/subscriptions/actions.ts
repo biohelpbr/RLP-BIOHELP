@@ -31,7 +31,7 @@ export async function markSubscriptionPaid(memberId: string): Promise<Result> {
 
   const { data: current, error: readErr } = await supabase
     .from("members")
-    .select("id, sponsor_id, subscription_status")
+    .select("id, sponsor_id, subscription_status, ref_code")
     .eq("id", memberId)
     .single()
 
@@ -78,6 +78,21 @@ export async function markSubscriptionPaid(memberId: string): Promise<Result> {
     await fireStepZero(memberId)
   } catch (err) {
     console.error("[markSubscriptionPaid] fireStepZero isolated failure", err)
+  }
+
+  // F-V35: garante o cupom de afiliado no Shopify no onboarding (nunca falta
+  // cupom pra afiliado novo). Isolado/non-fatal, idempotente, gate do programa.
+  if (isAffiliateCaptureEnabled()) {
+    const refCode = (current.ref_code as string | null) ?? null
+    if (refCode?.startsWith("BH")) {
+      try {
+        const { ensureAffiliateCoupon } = await import("@/lib/shopify/affiliate-coupons")
+        const r = await ensureAffiliateCoupon(refCode)
+        if (r.error) console.error("[markSubscriptionPaid] ensureAffiliateCoupon", refCode, r.error)
+      } catch (err) {
+        console.error("[markSubscriptionPaid] ensureAffiliateCoupon isolated failure", refCode, err)
+      }
+    }
   }
 
   return { ok: true, changed: true }

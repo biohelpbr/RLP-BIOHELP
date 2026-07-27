@@ -176,6 +176,57 @@ export async function bulkCreateAffiliateCoupons(opts: {
   return base
 }
 
+export interface EnsureCouponResult {
+  code: string
+  created: boolean
+  alreadyExists: boolean
+  error?: string
+}
+
+/**
+ * F-V35 — garante que UM afiliado tenha cupom no Shopify (cria se faltar).
+ * Chamado no onboarding (quando o membro vira assinante) pra o cupom nunca faltar.
+ * Idempotente (se já existe, não recria). Só roda com credenciais de PROD.
+ */
+export async function ensureAffiliateCoupon(refCode: string): Promise<EnsureCouponResult> {
+  const code = (refCode || "").trim()
+  const out: EnsureCouponResult = { code, created: false, alreadyExists: false }
+  if (!code.toUpperCase().startsWith("BH")) return out
+
+  // Já existe? (idempotência)
+  const lookup = await rest<{ discount_code?: unknown }>(
+    `/discount_codes/lookup.json?code=${encodeURIComponent(code)}`,
+    "GET",
+  )
+  if (lookup.status === 200 && lookup.data?.discount_code) return { ...out, alreadyExists: true }
+
+  // Acha a price rule "Afiliados — 10%" (cria se for a 1ª vez).
+  let priceRuleId = await findAffiliatePriceRuleId()
+  if (!priceRuleId) {
+    const pr = await rest<{ price_rule: { id: number } }>("/price_rules.json", "POST", {
+      price_rule: {
+        title: PRICE_RULE_TITLE,
+        target_type: "line_item",
+        target_selection: "entitled",
+        allocation_method: "each",
+        entitled_collection_ids: [STORE_COLLECTION_ID],
+        value_type: "percentage",
+        value: "-10.0",
+        customer_selection: "all",
+        starts_at: new Date().toISOString(),
+      },
+    })
+    if (!pr.data?.price_rule?.id) return { ...out, error: `falha na price rule: ${pr.error}` }
+    priceRuleId = pr.data.price_rule.id
+  }
+
+  const c = await rest(`/price_rules/${priceRuleId}/discount_codes.json`, "POST", {
+    discount_code: { code },
+  })
+  if (c.error) return { ...out, error: c.error }
+  return { ...out, created: true }
+}
+
 export interface FixPriceRuleResult {
   ok: boolean
   priceRuleId: string | null
