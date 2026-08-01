@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation"
-import { LifeBuoy } from "lucide-react"
+import { LifeBuoy, PartyPopper } from "lucide-react"
 import { isV2Enabled } from "@/lib/utils/featureFlags"
 import { getCurrentMember, isCurrentUserAdmin } from "@/lib/supabase/server"
 import { AdminShell } from "@/components/layouts/AdminShell"
 import { BHCard } from "@/components/biohelp"
-import { getSupportContact } from "@/lib/settings/queries"
+import { getSupportContact, getCreatorsHubLinks } from "@/lib/settings/queries"
 import { SupportContactForm } from "./SupportContactForm"
+import { CreatorsHubLinksForm } from "./CreatorsHubLinksForm"
 
 /**
  * W4 (call 05/06) — /admin/settings: CMS de configurações do app.
@@ -19,7 +20,10 @@ export default async function AdminSettingsPage() {
   if (!member) redirect("/login")
   if (!(await isCurrentUserAdmin())) redirect("/dashboard")
 
-  const support = await getSupportContact()
+  const [support, creatorsHub] = await Promise.all([
+    getSupportContact(),
+    getCreatorsHubLinks(),
+  ])
 
   return (
     <AdminShell adminName={member.name ?? "Admin"}>
@@ -45,6 +49,22 @@ export default async function AdminSettingsPage() {
             </div>
           </div>
           <SupportContactForm initial={support} />
+        </BHCard>
+
+        <BHCard variant="elevated" className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+              <PartyPopper className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold">Página de obrigado (Creators Hub)</h2>
+              <p className="text-sm text-muted-foreground">
+                Links dos 3 passos que a pessoa vê logo após a compra, em{" "}
+                <code>/obrigado</code>.
+              </p>
+            </div>
+          </div>
+          <CreatorsHubLinksForm initial={creatorsHub} />
         </BHCard>
       </div>
     </AdminShell>

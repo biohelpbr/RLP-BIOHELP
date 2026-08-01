@@ -284,7 +284,16 @@ export async function createPreRegistration(
   // Pré-população confirmada 22/05 logando no painel Guru:
   //   ?email, ?name, ?phone_number. CPF ("doc" no Guru) é coletado no checkout.
   // utm_term carrega pre_registration_token (Guru ecoa em source.utm_term no webhook).
-  const offerId = process.env.GURU_OFFER_ID_CLUBE_MENSAL ?? "PLACEHOLDER"
+  // Oferta do checkout: o admin manda (editável em /admin/settings, sem deploy).
+  // Cai pra env/legado só se a configuração estiver vazia.
+  let offerId = process.env.GURU_OFFER_ID_CLUBE_MENSAL ?? "PLACEHOLDER"
+  try {
+    const { getCreatorsHubLinks } = await import("@/lib/settings/queries")
+    const configured = (await getCreatorsHubLinks()).checkout_offer
+    if (configured) offerId = configured
+  } catch (err) {
+    console.error("[createPreRegistration] checkout_offer isolated failure", err)
+  }
   const params = new URLSearchParams({
     email: parsed.data.email,
     name: parsed.data.name,

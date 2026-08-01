@@ -21,6 +21,44 @@ export const DEFAULT_SUPPORT_CONTACT: SupportContact = {
   hours: "Segunda a sexta, 9h às 18h",
 }
 
+/** Links dos 3 passos da página de obrigado (Creators Hub), editáveis no admin. */
+export type CreatorsHubLinks = {
+  /** Convite do grupo de WhatsApp (chat.whatsapp.com/...). Vazio = botão desabilitado. */
+  whatsapp_group_url: string
+  /** Acesso à plataforma/painel. */
+  plataforma_url: string
+  /** Botão "Verificar e-mail" (webmail). */
+  email_url: string
+  /**
+   * Oferta do checkout Guru — o trecho final da URL
+   * `checkout.bio-help.com/subscribe/<oferta>`. Vazio = usa a env/legado.
+   */
+  checkout_offer: string
+}
+
+export const DEFAULT_CREATORS_HUB_LINKS: CreatorsHubLinks = {
+  // Grupo ainda não criado pelo cliente (27/07) — vazio deixa o botão inativo.
+  whatsapp_group_url: "",
+  // As aulas ficam na MemberKit (cliente, 27/07), não no painel.
+  plataforma_url: "https://sellers-club-2026.memberkit.com.br/",
+  email_url: "https://mail.google.com/",
+  // Oferta do Creators Hub (cliente, 27/07).
+  checkout_offer: "membership-creators-hub",
+}
+
+export async function getCreatorsHubLinks(): Promise<CreatorsHubLinks> {
+  const value = await getAppSetting<Partial<CreatorsHubLinks>>("creators_hub_links")
+  if (!value) return DEFAULT_CREATORS_HUB_LINKS
+  return {
+    whatsapp_group_url: value.whatsapp_group_url?.trim() || "",
+    plataforma_url:
+      value.plataforma_url?.trim() || DEFAULT_CREATORS_HUB_LINKS.plataforma_url,
+    email_url: value.email_url?.trim() || DEFAULT_CREATORS_HUB_LINKS.email_url,
+    checkout_offer:
+      value.checkout_offer?.trim() || DEFAULT_CREATORS_HUB_LINKS.checkout_offer,
+  }
+}
+
 export async function getAppSetting<T>(key: string): Promise<T | null> {
   const supabase = createServiceClient()
   const { data, error } = await supabase
