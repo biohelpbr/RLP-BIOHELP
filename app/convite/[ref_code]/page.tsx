@@ -42,18 +42,19 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
             className="pointer-events-none absolute -top-28 left-1/2 -z-10 w-[min(120vw,1100px)] max-w-none -translate-x-1/2 mix-blend-multiply select-none"
           />
 
-          {/* Header: logo + topbar */}
-          <header className="flex items-center justify-between pt-8 pb-2">
+          {/* Header: marca Creators Hub */}
+          <header className="flex items-center gap-3 pt-8 pb-2">
             <Image
-              src="/logo-oficial.png"
-              alt="Biohelp Nutrition Club"
-              width={140}
-              height={40}
-              className="h-7 w-auto"
+              src="/creators-hub-mark.svg"
+              alt=""
+              aria-hidden
+              width={44}
+              height={44}
+              className="h-11 w-11"
               priority
             />
-            <span className="hidden sm:block text-[11px] font-semibold tracking-[0.15em] text-neutral-800">
-              {CONVITE_COPY.topBar}
+            <span className="whitespace-pre-line text-[1.35rem] font-extrabold leading-[1.05] tracking-tight text-neutral-900">
+              {CONVITE_COPY.brandName}
             </span>
           </header>
 
@@ -61,20 +62,19 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
           <h1 className="mt-12 text-3xl md:text-[2.6rem] font-extrabold leading-[1.1] tracking-tight">
             {CONVITE_COPY.headlineLine1}
             <br />
-            {CONVITE_COPY.headlineLine2}
+            <span className="text-[#5B3DF5]">{CONVITE_COPY.headlineAccent}</span>
             <br />
-            {CONVITE_COPY.headlineLine3pre}
-            <span className="text-blue-600">{CONVITE_COPY.headlineLine3accent}</span>
+            {CONVITE_COPY.headlineLine3}
           </h1>
 
           {/* Sponsor badge */}
           <div className="mt-8 inline-flex items-center gap-3 rounded-full border-[1.5px] border-neutral-900 bg-white/70 py-2.5 pl-2.5 pr-6 backdrop-blur-sm">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#5B3DF5]">
               <User className="h-5 w-5 text-white" />
             </span>
             <span className="text-sm text-neutral-700">
               {CONVITE_COPY.sponsorPrefix}{" "}
-              <strong className="font-bold text-blue-700">{sponsorName}</strong>
+              <strong className="font-bold text-[#5B3DF5]">{sponsorName}</strong>
             </span>
           </div>
         </section>
@@ -82,7 +82,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         {/* Form card */}
         <div className="relative z-10 mt-10 md:mt-6 rounded-2xl border border-neutral-200 bg-white p-6 md:p-8">
           <h2 className="text-xl font-bold text-neutral-900">{CONVITE_COPY.formTitle}</h2>
-          <p className="mt-1 text-sm text-blue-500">{CONVITE_COPY.formSubtitle}</p>
+          <p className="mt-1 text-sm text-[#5B3DF5]">{CONVITE_COPY.formSubtitle}</p>
           <div className="mt-6">
             <ConviteForm refCode={sponsor.ref_code as string} />
           </div>
@@ -110,7 +110,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
           <h2 className="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight">
             {CONVITE_COPY.bottomHeadline}
             <br />
-            <span className="text-blue-600">{CONVITE_COPY.bottomHighlight}</span>
+            <span className="text-[#5B3DF5]">{CONVITE_COPY.bottomHighlight}</span>
           </h2>
 
           {/* Benefits grid */}
@@ -138,7 +138,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         {/* Tagline */}
         <p className="mt-16 text-center text-xs font-bold tracking-[0.1em] text-neutral-800">
           {CONVITE_COPY.footerTaglinePre}
-          <span className="text-blue-600">{CONVITE_COPY.footerTaglineAccent}</span>
+          <span className="text-[#5B3DF5]">{CONVITE_COPY.footerTaglineAccent}</span>
         </p>
 
         {/* Footer logo */}

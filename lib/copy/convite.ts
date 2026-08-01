@@ -1,13 +1,14 @@
 /**
  * F-V19: Texto institucional da landing `/convite/[ref_code]`.
- * Design v3 — réplica exata do form.pdf oficial Biohelp (28/05/2026).
+ * Design v4 — Creators Hub (27/07/2026): marca própria do funil de convite,
+ * headline de renda e acento roxo. O clube segue sendo o Biohelp (termos).
  */
 export const CONVITE_COPY = {
+  brandName: "Creators\nHub",
   topBar: "COMUNIDADE • PROSPERIDADE • WELLNESS",
-  headlineLine1: "O primeiro clube onde consumo",
-  headlineLine2: "inteligente se transforma",
-  headlineLine3pre: "em ",
-  headlineLine3accent: "comunidade e crescimento",
+  headlineLine1: "Construa uma renda de",
+  headlineAccent: "R$ 3k a R$ 15k por mês",
+  headlineLine3: "sem sair de casa!",
   sponsorPrefix: "Seu acesso foi liberado por",
   formTitle: "Preencha seus dados para continuar",
   formSubtitle:
