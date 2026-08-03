@@ -24,21 +24,16 @@ export function ConviteCreatorsHub({ refCode }: { refCode: string }) {
             className="pointer-events-none absolute -top-28 left-1/2 -z-10 w-[min(120vw,1100px)] max-w-none -translate-x-1/2 mix-blend-multiply select-none"
           />
 
-          {/* Marca Creators Hub */}
-          <header className="flex items-center gap-2.5 pt-8 pb-2">
+          {/* Marca Creators Hub (arquivo oficial do cliente) */}
+          <header className="pt-8 pb-2">
             <Image
-              src="/creators-hub-mark.svg"
-              alt=""
-              aria-hidden
-              width={44}
-              height={44}
-              className="h-10 w-10"
+              src="/creators-hub-logo.png"
+              alt="creators hub"
+              width={1291}
+              height={229}
+              className="h-9 w-auto"
               priority
             />
-            <span className="text-[1.5rem] leading-none tracking-tight text-[#26262A]">
-              <span className="font-bold">{CREATORS_HUB_COPY.brandBold}</span>
-              <span className="font-light"> {CREATORS_HUB_COPY.brandLight}</span>
-            </span>
           </header>
 
           <h1 className="mt-12 text-3xl md:text-[2.6rem] font-extrabold leading-[1.1] tracking-tight">

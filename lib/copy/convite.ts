@@ -52,9 +52,6 @@ export function renderSponsorBadge(sponsorName: string | null | undefined): stri
  * termos e selo de segurança são compartilhados.
  */
 export const CREATORS_HUB_COPY = {
-  /** Marca oficial: minúsculas, uma linha — "creators" pesado + "hub" leve. */
-  brandBold: "creators",
-  brandLight: "hub",
   headlineLine1: "Construa uma renda de",
   headlineAccent: "R$ 3k a R$ 15k por mês",
   headlineLine3: "sem sair de casa!",
