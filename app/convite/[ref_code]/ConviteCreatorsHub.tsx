@@ -58,20 +58,10 @@ export function ConviteCreatorsHub({ refCode }: { refCode: string }) {
           </div>
         </div>
 
-        <div className="mt-5">
+        <div className="mt-5 pb-16">
           <p className="text-xs font-bold tracking-wide text-neutral-900">
             {CONVITE_COPY.securityTitle}
           </p>
-        </div>
-
-        <div className="mt-14 flex justify-center pb-12">
-          <Image
-            src="/logo-oficial.png"
-            alt="Biohelp Nutrition Club"
-            width={120}
-            height={34}
-            className="h-6 w-auto opacity-70"
-          />
         </div>
       </div>
     </div>
