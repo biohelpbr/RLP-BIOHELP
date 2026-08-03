@@ -153,16 +153,6 @@ export default async function ObrigadoPage() {
           <p className="text-xs leading-relaxed text-neutral-500">{OBRIGADO_COPY.footerNote}</p>
         </div>
 
-        {/* Clube por trás */}
-        <div className="mt-12 flex justify-center">
-          <Image
-            src="/logo-oficial.png"
-            alt="Biohelp Nutrition Club"
-            width={120}
-            height={34}
-            className="h-6 w-auto opacity-70"
-          />
-        </div>
       </div>
     </div>
   )
