@@ -1,7 +1,10 @@
 import Image from "next/image"
+import { Suspense } from "react"
 import { GraduationCap, Info, Mail, ExternalLink } from "lucide-react"
 
-import { CONVITE_COPY } from "@/lib/copy/convite"
+import { AtivacaoSilenciosa } from "./AtivacaoSilenciosa"
+
+import { CREATORS_HUB_COPY } from "@/lib/copy/convite"
 import { OBRIGADO_COPY } from "@/lib/copy/obrigado"
 import { getCreatorsHubLinks } from "@/lib/settings/queries"
 
@@ -53,6 +56,10 @@ export default async function ObrigadoPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white font-archivo text-neutral-900">
+      {/* Ativa a conta por baixo dos panos (mesma lógica da /welcome). */}
+      <Suspense fallback={null}>
+        <AtivacaoSilenciosa />
+      </Suspense>
       <div className="relative mx-auto w-full max-w-3xl px-6 pb-16 md:px-10">
         <section className="relative isolate">
           <Image
@@ -77,7 +84,7 @@ export default async function ObrigadoPage() {
               priority
             />
             <span className="whitespace-pre-line text-[1.35rem] font-extrabold leading-[1.05] tracking-tight text-neutral-900">
-              {CONVITE_COPY.brandName}
+              {CREATORS_HUB_COPY.brandName}
             </span>
           </header>
 

@@ -1,14 +1,13 @@
 /**
  * F-V19: Texto institucional da landing `/convite/[ref_code]`.
- * Design v4 — Creators Hub (27/07/2026): marca própria do funil de convite,
- * headline de renda e acento roxo. O clube segue sendo o Biohelp (termos).
+ * Design v3 — réplica exata do form.pdf oficial Biohelp (28/05/2026).
  */
 export const CONVITE_COPY = {
-  brandName: "Creators\nHub",
   topBar: "COMUNIDADE • PROSPERIDADE • WELLNESS",
-  headlineLine1: "Construa uma renda de",
-  headlineAccent: "R$ 3k a R$ 15k por mês",
-  headlineLine3: "sem sair de casa!",
+  headlineLine1: "O primeiro clube onde consumo",
+  headlineLine2: "inteligente se transforma",
+  headlineLine3pre: "em ",
+  headlineLine3accent: "comunidade e crescimento",
   sponsorPrefix: "Seu acesso foi liberado por",
   formTitle: "Preencha seus dados para continuar",
   formSubtitle:
@@ -45,3 +44,16 @@ export function renderSponsorBadge(sponsorName: string | null | undefined): stri
   const name = (sponsorName ?? "").trim() || "alguém especial"
   return `${CONVITE_COPY.sponsorPrefix} ${name}`
 }
+
+/**
+ * Funil Creators Hub (28/07/2026) — marca e headline próprias.
+ * Só vale para os códigos em `creators_hub_links.ref_codes`; os demais convites
+ * continuam com a CONVITE_COPY acima (Nutrition Club). Campos de formulário,
+ * termos e selo de segurança são compartilhados.
+ */
+export const CREATORS_HUB_COPY = {
+  brandName: "Creators\nHub",
+  headlineLine1: "Construa uma renda de",
+  headlineAccent: "R$ 3k a R$ 15k por mês",
+  headlineLine3: "sem sair de casa!",
+} as const
