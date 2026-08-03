@@ -40,6 +40,30 @@ export function createServiceClient() {
 }
 
 /**
+ * Cliente de LEITURA para páginas públicas que podem ser cacheadas (ISR).
+ *
+ * Igual ao createServiceClient, mas SEM o `cache: 'no-store'` global. Aquele
+ * override é proposital lá — garante recompute correto em agregações — mas ele
+ * marca a rota inteira como dinâmica, impedindo o Next de gerar a página
+ * estática. Em landing de campanha isso custa uma função por visita.
+ *
+ * Use só para leitura de dados pouco voláteis, sempre dentro de `unstable_cache`
+ * (que controla a revalidação). Nunca para escrita nem para agregação.
+ */
+export function createPublicReadClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
+
+/**
  * Cria cliente Supabase Admin para operações de Auth
  * Usado para criar/gerenciar usuários via Admin API
  */

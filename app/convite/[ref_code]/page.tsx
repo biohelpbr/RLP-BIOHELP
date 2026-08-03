@@ -1,14 +1,31 @@
 import { unstable_cache } from "next/cache"
 import { notFound } from "next/navigation"
 
-import { createServiceClient } from "@/lib/supabase/server"
-import { isCreatorsHubRefCode } from "@/lib/settings/queries"
+import { createPublicReadClient } from "@/lib/supabase/server"
+import { DEFAULT_CREATORS_HUB_LINKS, type CreatorsHubLinks } from "@/lib/settings/queries"
 
 import { ConviteBiohelp } from "./ConviteBiohelp"
 import { ConviteCreatorsHub } from "./ConviteCreatorsHub"
 
 interface ConvitePageProps {
   params: Promise<{ ref_code: string }>
+}
+
+/**
+ * ISR: a página passa a ser gerada uma vez e servida da borda da Vercel,
+ * regenerando a cada 60s. Sem isto a rota é dinâmica (ƒ) e roda uma função por
+ * visita — o que não escala em pico de campanha.
+ */
+export const revalidate = 60
+export const dynamicParams = true
+
+/**
+ * Vazio de propósito: nenhuma página é gerada no build (são centenas de códigos
+ * e eles mudam). Com `dynamicParams`, a primeira visita a cada código gera a
+ * página, e as seguintes vêm prontas da borda até a revalidação.
+ */
+export function generateStaticParams() {
+  return [] as { ref_code: string }[]
 }
 
 /**
@@ -25,20 +42,36 @@ interface ConvitePageProps {
  */
 const carregarConvite = unstable_cache(
   async (refCode: string) => {
-    const supabase = createServiceClient()
-    const { data: sponsor } = await supabase
-      .from("members")
-      .select("ref_code, name, subscription_status")
-      .eq("ref_code", refCode)
-      .maybeSingle()
+    // Cliente sem `no-store` — ver createPublicReadClient. Com o service client
+    // padrão a rota volta a ser dinâmica e o ISR não acontece.
+    const supabase = createPublicReadClient()
+
+    const [{ data: sponsor }, { data: setting }] = await Promise.all([
+      supabase
+        .from("members")
+        .select("ref_code, name, subscription_status")
+        .eq("ref_code", refCode)
+        .maybeSingle(),
+      supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "creators_hub_links")
+        .maybeSingle(),
+    ])
 
     if (!sponsor || sponsor.subscription_status === "cancelled") return null
+
+    const salvos = (setting?.value ?? null) as Partial<CreatorsHubLinks> | null
+    const codigos =
+      Array.isArray(salvos?.ref_codes) && salvos.ref_codes.length > 0
+        ? salvos.ref_codes.map((c) => String(c).trim())
+        : DEFAULT_CREATORS_HUB_LINKS.ref_codes
 
     const codigo = sponsor.ref_code as string
     return {
       refCode: codigo,
       sponsorName: (sponsor.name as string | null) ?? "alguém especial",
-      creatorsHub: await isCreatorsHubRefCode(codigo),
+      creatorsHub: codigos.some((c) => c.toUpperCase() === codigo.toUpperCase()),
     }
   },
   ["convite-landing"],
