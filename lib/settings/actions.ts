@@ -95,6 +95,12 @@ export async function updateCreatorsHubLinks(input: {
     }
   }
 
+  // O upsert reescreve o bloco inteiro. `ref_codes` (quem usa o funil Creators
+  // Hub) não é editável neste formulário, então precisa ser lido e regravado —
+  // senão salvar o link do WhatsApp apagaria a lista silenciosamente.
+  const { getCreatorsHubLinks } = await import("./queries")
+  const atual = await getCreatorsHubLinks()
+
   const supabase = createServiceClient()
   const { error } = await supabase.from("app_settings").upsert(
     {
@@ -104,6 +110,7 @@ export async function updateCreatorsHubLinks(input: {
         plataforma_url: plat.url,
         email_url: mail.url,
         checkout_offer: offer,
+        ref_codes: atual.ref_codes,
       },
       updated_at: new Date().toISOString(),
     },
