@@ -13,7 +13,20 @@ const protectedRoutes = ['/dashboard', '/admin', '/trocar-senha']
 // Rotas públicas (não requerem auth)
 const publicRoutes = ['/', '/login', '/join', '/auth/callback', '/admin-login']
 
+/**
+ * Páginas 100% públicas e anônimas: landing de convite e pós-checkout.
+ * Ninguém chega nelas logado, então verificar sessão é chamada desperdiçada ao
+ * Supabase em CADA visita — e é justamente onde o tráfego de campanha bate.
+ * Sair antes do getUser() deixa a página cacheável na borda da Vercel.
+ */
+const anonymousRoutes = ['/convite', '/obrigado']
+
 export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname
+  if (anonymousRoutes.some((r) => path === r || path.startsWith(r + '/'))) {
+    return NextResponse.next()
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
