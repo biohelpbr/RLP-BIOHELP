@@ -73,18 +73,19 @@ export default async function ObrigadoPage() {
           />
 
           {/* Marca */}
-          <header className="flex items-center gap-3 pt-8 pb-2">
+          <header className="flex items-center gap-2.5 pt-8 pb-2">
             <Image
               src="/creators-hub-mark.svg"
               alt=""
               aria-hidden
               width={44}
               height={44}
-              className="h-11 w-11"
+              className="h-10 w-10"
               priority
             />
-            <span className="whitespace-pre-line text-[1.35rem] font-extrabold leading-[1.05] tracking-tight text-neutral-900">
-              {CREATORS_HUB_COPY.brandName}
+            <span className="text-[1.5rem] leading-none tracking-tight text-[#26262A]">
+              <span className="font-bold">{CREATORS_HUB_COPY.brandBold}</span>
+              <span className="font-light"> {CREATORS_HUB_COPY.brandLight}</span>
             </span>
           </header>
 
