@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache"
 import { notFound } from "next/navigation"
 
 import { createServiceClient } from "@/lib/supabase/server"
@@ -11,6 +12,40 @@ interface ConvitePageProps {
 }
 
 /**
+ * Resolve tudo que a landing precisa (padrinho + funil) com cache de 60s.
+ *
+ * Por quê: esta é a página que recebe o tráfego de campanha, e o conteúdo dela
+ * praticamente não muda. Sem cache, cada visitante gerava 2 consultas ao banco
+ * — o gargalo em pico de lançamento. `createServiceClient` força `no-store` em
+ * todo fetch (proposital, pra não quebrar agregações em outras telas), então o
+ * cache tem que ser aqui, na função, e não na rota.
+ *
+ * Efeito colateral aceito: mudanças (padrinho cancelado, lista de códigos do
+ * Creators Hub editada no admin) levam até 60s pra refletir.
+ */
+const carregarConvite = unstable_cache(
+  async (refCode: string) => {
+    const supabase = createServiceClient()
+    const { data: sponsor } = await supabase
+      .from("members")
+      .select("ref_code, name, subscription_status")
+      .eq("ref_code", refCode)
+      .maybeSingle()
+
+    if (!sponsor || sponsor.subscription_status === "cancelled") return null
+
+    const codigo = sponsor.ref_code as string
+    return {
+      refCode: codigo,
+      sponsorName: (sponsor.name as string | null) ?? "alguém especial",
+      creatorsHub: await isCreatorsHubRefCode(codigo),
+    }
+  },
+  ["convite-landing"],
+  { revalidate: 60, tags: ["convite"] },
+)
+
+/**
  * Landing de convite. Dois funis convivem (cliente, 28/07):
  *   • Creators Hub — só para os códigos em `creators_hub_links.ref_codes`
  *     (hoje ADMIN002). Visual novo + oferta própria + página de obrigado.
@@ -20,23 +55,11 @@ interface ConvitePageProps {
 export default async function ConvitePage({ params }: ConvitePageProps) {
   const { ref_code } = await params
 
-  const supabase = createServiceClient()
-  const { data: sponsor } = await supabase
-    .from("members")
-    .select("ref_code, name, subscription_status")
-    .eq("ref_code", ref_code)
-    .maybeSingle()
+  const convite = await carregarConvite(ref_code)
+  if (!convite) notFound()
 
-  if (!sponsor || sponsor.subscription_status === "cancelled") {
-    notFound()
+  if (convite.creatorsHub) {
+    return <ConviteCreatorsHub refCode={convite.refCode} />
   }
-
-  const refCode = sponsor.ref_code as string
-
-  if (await isCreatorsHubRefCode(refCode)) {
-    return <ConviteCreatorsHub refCode={refCode} />
-  }
-
-  const sponsorName = (sponsor.name as string | null) ?? "alguém especial"
-  return <ConviteBiohelp refCode={refCode} sponsorName={sponsorName} />
+  return <ConviteBiohelp refCode={convite.refCode} sponsorName={convite.sponsorName} />
 }
