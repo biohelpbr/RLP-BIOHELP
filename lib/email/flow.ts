@@ -363,7 +363,7 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
   // Assinantes pagos, com data de pagamento >= corte, não descadastrados, com e-mail.
   const { data: members, error } = await supabase
     .from("members")
-    .select("id, email, name, phone, subscription_paid_at")
+    .select("id, email, name, phone, sponsor_id, subscription_paid_at")
     .eq("subscription_status", "paid")
     .not("subscription_paid_at", "is", null)
     .gte("subscription_paid_at", start.toISOString())
@@ -379,12 +379,24 @@ export async function runNewSubscriberFlow(now: Date = new Date()): Promise<Flow
     email: string | null
     name: string | null
     phone: string | null
+    sponsor_id: string | null
     subscription_paid_at: string | null
   }>
   summary.candidates = rows.length
 
+  // Funil Creators Hub (cliente, 02/08): esses membros não recebem nada — nem
+  // e-mail, nem WhatsApp. Uma consulta só, fora do laço.
+  let hubSponsors = new Set<string>()
+  try {
+    const { getCreatorsHubSponsorIds } = await import("@/lib/settings/queries")
+    hubSponsors = await getCreatorsHubSponsorIds()
+  } catch (err) {
+    console.error("[runNewSubscriberFlow] checagem Creators Hub (non-fatal)", err)
+  }
+
   for (const m of rows) {
     if (!m.email || !m.subscription_paid_at) continue
+    if (m.sponsor_id && hubSponsors.has(m.sponsor_id)) continue // funil Creators Hub
     const paidAt = new Date(m.subscription_paid_at).getTime()
     const ageDays = (now.getTime() - paidAt) / 86_400_000
     for (const step of steps) {

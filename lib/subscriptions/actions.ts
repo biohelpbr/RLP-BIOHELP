@@ -65,19 +65,38 @@ export async function markSubscriptionPaid(memberId: string): Promise<Result> {
     newStatus: "paid",
   })
 
-  // Hook F-V30: e-mail de boas-vindas ao novo assinante (transição pending→paid).
-  // Ponto único por onde TODO novo assinante passa (Guru + Shopify + manual).
-  // Isolado e controlado por WELCOME_EMAIL_MODE (off/dryrun/live) — nunca derruba isto.
-  await onNewSubscriberWelcome({ memberId })
-
-  // Hook F-V32: D+0 do fluxo de boas-vindas na hora da entrada (substitui o F-V30
-  // quando EMAIL_FLOW_MODE=live + WELCOME_EMAIL_MODE=off). Isolado/idempotente —
-  // nunca lança. Os passos D+5..D+30 saem pelo cron diário.
+  // Funil Creators Hub (cliente, 02/08): quem entrou por esses convites NÃO
+  // recebe nenhuma comunicação de boas-vindas — nem e-mail, nem WhatsApp. Quem
+  // comunica é a MemberKit. Vale pro D+0 aqui e pros D+5..D+30 no cron.
+  // Em caso de falha na checagem, assume o comportamento normal (comunica).
+  let semComunicacao = false
   try {
-    const { fireStepZero } = await import("@/lib/email/flow")
-    await fireStepZero(memberId)
+    const sponsorId = (current.sponsor_id as string | null) ?? null
+    if (sponsorId) {
+      const { getCreatorsHubSponsorIds } = await import("@/lib/settings/queries")
+      semComunicacao = (await getCreatorsHubSponsorIds()).has(sponsorId)
+    }
   } catch (err) {
-    console.error("[markSubscriptionPaid] fireStepZero isolated failure", err)
+    console.error("[markSubscriptionPaid] checagem Creators Hub (non-fatal)", err)
+  }
+
+  if (!semComunicacao) {
+    // Hook F-V30: e-mail de boas-vindas ao novo assinante (transição pending→paid).
+    // Ponto único por onde TODO novo assinante passa (Guru + Shopify + manual).
+    // Isolado e controlado por WELCOME_EMAIL_MODE (off/dryrun/live) — nunca derruba isto.
+    await onNewSubscriberWelcome({ memberId })
+
+    // Hook F-V32: D+0 do fluxo de boas-vindas na hora da entrada (substitui o F-V30
+    // quando EMAIL_FLOW_MODE=live + WELCOME_EMAIL_MODE=off). Isolado/idempotente —
+    // nunca lança. Os passos D+5..D+30 saem pelo cron diário.
+    try {
+      const { fireStepZero } = await import("@/lib/email/flow")
+      await fireStepZero(memberId)
+    } catch (err) {
+      console.error("[markSubscriptionPaid] fireStepZero isolated failure", err)
+    }
+  } else {
+    console.info(`[markSubscriptionPaid] Creators Hub — sem boas-vindas (member ${memberId})`)
   }
 
   // F-V35: garante o cupom de afiliado no Shopify no onboarding (nunca falta
@@ -284,7 +303,22 @@ export async function createPreRegistration(
   // Pré-população confirmada 22/05 logando no painel Guru:
   //   ?email, ?name, ?phone_number. CPF ("doc" no Guru) é coletado no checkout.
   // utm_term carrega pre_registration_token (Guru ecoa em source.utm_term no webhook).
-  const offerId = process.env.GURU_OFFER_ID_CLUBE_MENSAL ?? "PLACEHOLDER"
+  // Oferta do checkout: o admin manda (editável em /admin/settings, sem deploy).
+  // Cai pra env/legado só se a configuração estiver vazia.
+  // Oferta padrão = Nutrition Club. Só os convites do funil Creators Hub
+  // (lista em creators_hub_links.ref_codes) vão pra oferta nova — cliente 28/07.
+  let offerId = process.env.GURU_OFFER_ID_CLUBE_MENSAL ?? "PLACEHOLDER"
+  try {
+    const { getCreatorsHubLinks, isCreatorsHubRefCode } = await import(
+      "@/lib/settings/queries"
+    )
+    if (await isCreatorsHubRefCode(sponsor.ref_code as string)) {
+      const configured = (await getCreatorsHubLinks()).checkout_offer
+      if (configured) offerId = configured
+    }
+  } catch (err) {
+    console.error("[createPreRegistration] checkout_offer isolated failure", err)
+  }
   const params = new URLSearchParams({
     email: parsed.data.email,
     name: parsed.data.name,

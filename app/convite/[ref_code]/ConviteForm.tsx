@@ -99,7 +99,7 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
             placeholder="Como devemos te chamar?"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#5B3DF5]/40 focus:border-transparent transition"
             required
             disabled={submitting}
             autoComplete="name"
@@ -119,7 +119,7 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
             placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#5B3DF5]/40 focus:border-transparent transition"
             required
             disabled={submitting}
             autoComplete="email"
@@ -140,7 +140,7 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
             placeholder="(11) 99999-9999 ou +1 555 0100"
             value={phoneMasked}
             onChange={(e) => setPhoneMasked(sanitizePhone(e.target.value))}
-            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#5B3DF5]/40 focus:border-transparent transition"
             required
             disabled={submitting}
             autoComplete="tel"
@@ -161,7 +161,7 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
             placeholder="000.000.000-00"
             value={cpfMasked}
             onChange={(e) => setCpfMasked(maskCpf(e.target.value))}
-            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full h-12 pl-11 pr-4 rounded-xl border border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#5B3DF5]/40 focus:border-transparent transition"
             required
             disabled={submitting}
             autoComplete="off"
@@ -175,7 +175,7 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
           checked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
           disabled={submitting}
-          className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-400"
+          className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-[#5B3DF5] focus:ring-2 focus:ring-[#5B3DF5]/40"
           required
         />
         <span className="text-sm text-neutral-700 leading-relaxed">
@@ -185,7 +185,7 @@ export function ConviteForm({ refCode }: ConviteFormProps) {
 
       <button
         type="submit"
-        className="w-full h-12 rounded-xl bg-violet-400 enabled:hover:bg-violet-500 text-white font-semibold text-sm transition-all duration-200 disabled:opacity-100 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+        className="w-full h-12 rounded-xl bg-[#5B3DF5] enabled:hover:bg-[#4B31D6] text-white font-semibold text-sm transition-all duration-200 disabled:opacity-100 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
         disabled={!isValid || submitting}
       >
         {submitting ? CONVITE_COPY.submittingLabel : CONVITE_COPY.submitLabel}

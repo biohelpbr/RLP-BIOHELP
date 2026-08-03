@@ -154,5 +154,28 @@ export async function claimPreRegistration(input: ClaimInput): Promise<ClaimResu
     return { ok: false, error: "Erro ao estabelecer sessão. Tente novamente." }
   }
 
-  return { ok: true, redirect_to: "/dashboard", member_id: member.id }
+  // Funil Creators Hub (cliente 28/07): quem entrou por um convite do funil novo
+  // termina na página de pós-checkout (3 passos) em vez do dashboard. A ativação
+  // acima é a mesma pra todo mundo — muda só o destino final. Isolado/non-fatal:
+  // qualquer falha aqui cai no /dashboard de sempre.
+  let redirectTo = "/dashboard"
+  try {
+    const supabase = createServiceClient()
+    const { data: row } = await supabase
+      .from("members")
+      .select("sponsor:members!sponsor_id(ref_code)")
+      .eq("id", member.id)
+      .maybeSingle()
+    const sponsor = (row as { sponsor?: { ref_code: string | null } | { ref_code: string | null }[] } | null)
+      ?.sponsor
+    const sponsorRef = (Array.isArray(sponsor) ? sponsor[0] : sponsor)?.ref_code ?? ""
+    const { isCreatorsHubRefCode } = await import("@/lib/settings/queries")
+    if (sponsorRef && (await isCreatorsHubRefCode(sponsorRef))) {
+      redirectTo = "/obrigado"
+    }
+  } catch (err) {
+    console.error("[claimPreRegistration] destino Creators Hub (non-fatal)", err)
+  }
+
+  return { ok: true, redirect_to: redirectTo, member_id: member.id }
 }
