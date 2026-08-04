@@ -46,7 +46,7 @@ const carregarConvite = unstable_cache(
     // padrão a rota volta a ser dinâmica e o ISR não acontece.
     const supabase = createPublicReadClient()
 
-    const [{ data: sponsor }, { data: setting }] = await Promise.all([
+    const [rSponsor, rSetting] = await Promise.all([
       supabase
         .from("members")
         .select("ref_code, name, subscription_status")
@@ -59,7 +59,16 @@ const carregarConvite = unstable_cache(
         .maybeSingle(),
     ])
 
+    // CRÍTICO: erro de consulta NÃO é "código inexistente". Se retornássemos
+    // null aqui, o unstable_cache guardaria um 404 por 60s pra TODO visitante
+    // (aconteceu em produção, 04/08). Lançar faz o ISR manter a última versão
+    // boa da página; o 404 fica reservado pra ausência real de dados.
+    if (rSponsor.error) throw new Error(`convite: falha ao consultar padrinho (${rSponsor.error.message})`)
+    const sponsor = rSponsor.data
     if (!sponsor || sponsor.subscription_status === "cancelled") return null
+
+    // Settings com erro não derruba a página: cai nos defaults.
+    const setting = rSetting.error ? null : rSetting.data
 
     const salvos = (setting?.value ?? null) as Partial<CreatorsHubLinks> | null
     const codigos =
