@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import {
   BarChart3,
   Calculator,
+  FileText,
   Store,
   CalendarHeart,
   Handshake,
@@ -54,6 +55,7 @@ const adminNavItems: NavItem[] = [
   { title: "Resgates", href: "/admin/payouts", icon: Wallet },
   { title: "Afiliados", href: "/admin/afiliados", icon: Store },
   { title: "Simulador comissão", href: "/admin/simulador-comissao", icon: Calculator },
+  { title: "Relatórios", href: "/admin/relatorios", icon: FileText },
   { title: "Academy", href: "/admin/academy", icon: GraduationCap },
   // W4 (call 05/06): Configurações saiu do pós-MVP — CMS de suporte/atendimento.
   { title: "Configurações", href: "/admin/settings", icon: Settings },
