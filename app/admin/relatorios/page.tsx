@@ -65,7 +65,29 @@ export default async function RelatoriosPage({ searchParams }: Props) {
     return { ...r, sponsorName: s?.name ?? "—", sponsorRef: s?.ref_code ?? "" }
   })
 
+  // Quem se cadastrou no período e NÃO comprou (pra recontato).
+  const { data: dataPend } = await supabase
+    .from("members")
+    .select("name, email, phone, created_at, sponsor:members!sponsor_id(name, ref_code)")
+    .eq("subscription_status", "pending")
+    .gte("created_at", brtParaUtc(de))
+    .lte("created_at", brtParaUtc(ate, true))
+    .order("created_at", { ascending: false })
+    .limit(2000)
+  type RowP = {
+    name: string | null
+    email: string
+    phone: string | null
+    created_at: string
+    sponsor: { name: string | null; ref_code: string | null } | { name: string | null; ref_code: string | null }[] | null
+  }
+  const pendentes = ((dataPend || []) as RowP[]).map((r) => {
+    const s = Array.isArray(r.sponsor) ? r.sponsor[0] : r.sponsor
+    return { ...r, sponsorName: s?.name ?? "—", sponsorRef: s?.ref_code ?? "" }
+  })
+
   const csvHref = `/api/admin/relatorio-assinaturas?de=${de}&ate=${ate}`
+  const csvPendHref = `/api/admin/relatorio-assinaturas?de=${de}&ate=${ate}&tipo=pendentes`
 
   return (
     <AdminShell adminName={me.name ?? "Admin"}>
@@ -105,7 +127,8 @@ export default async function RelatoriosPage({ searchParams }: Props) {
               </a>
             </Button>
             <p className="ml-auto text-sm text-muted-foreground">
-              <strong className="text-foreground">{rows.length}</strong> assinatura(s) no período
+              <strong className="text-foreground">{rows.length}</strong> compraram ·{" "}
+              <strong className="text-foreground">{pendentes.length}</strong> cadastraram sem comprar
             </p>
           </form>
         </BHCard>
@@ -141,6 +164,60 @@ export default async function RelatoriosPage({ searchParams }: Props) {
                       </td>
                       <td className="py-2 whitespace-nowrap">
                         {new Date(r.subscription_paid_at).toLocaleString("pt-BR", {
+                          day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
+                          timeZone: "America/Sao_Paulo",
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </BHCard>
+
+        <BHCard variant="elevated">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-bold text-foreground">
+              Cadastraram e não compraram ({pendentes.length})
+            </h2>
+            <Button asChild variant="outline" size="sm">
+              <a href={csvPendHref} className="inline-flex items-center gap-1.5">
+                <FileDown className="h-4 w-4" />
+                Baixar CSV
+              </a>
+            </Button>
+          </div>
+          {pendentes.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              Nenhum cadastro pendente no período.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-xs uppercase text-muted-foreground">
+                    <th className="py-2 pr-3">Nome</th>
+                    <th className="py-2 pr-3">E-mail</th>
+                    <th className="py-2 pr-3">Telefone</th>
+                    <th className="py-2 pr-3">Veio pelo link de</th>
+                    <th className="py-2">Cadastro</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendentes.map((r, i) => (
+                    <tr key={i} className="border-b border-border/50">
+                      <td className="py-2 pr-3 font-medium text-foreground">{r.name || "—"}</td>
+                      <td className="py-2 pr-3 text-muted-foreground">{r.email}</td>
+                      <td className="py-2 pr-3">{r.phone || "—"}</td>
+                      <td className="py-2 pr-3">
+                        {r.sponsorName}{" "}
+                        {r.sponsorRef && (
+                          <span className="font-mono text-xs text-muted-foreground">({r.sponsorRef})</span>
+                        )}
+                      </td>
+                      <td className="py-2 whitespace-nowrap">
+                        {new Date(r.created_at).toLocaleString("pt-BR", {
                           day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
                           timeZone: "America/Sao_Paulo",
                         })}

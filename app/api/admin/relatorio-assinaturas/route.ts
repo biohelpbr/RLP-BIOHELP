@@ -24,14 +24,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Parâmetros de/ate no formato YYYY-MM-DD." }, { status: 400 })
   }
 
+  // tipo=pendentes → quem se cadastrou no período e não comprou (recorte por
+  // data de cadastro). Default → assinaturas confirmadas (por data de pagamento).
+  const pendentes = sp.get("tipo") === "pendentes"
+  const campoData = pendentes ? "created_at" : "subscription_paid_at"
+
   const supabase = createServiceClient()
   const { data, error } = await supabase
     .from("members")
-    .select("name, email, phone, subscription_paid_at, sponsor:members!sponsor_id(name, ref_code)")
-    .eq("subscription_status", "paid")
-    .gte("subscription_paid_at", `${de}T00:00:00-03:00`)
-    .lte("subscription_paid_at", `${ate}T23:59:59.999-03:00`)
-    .order("subscription_paid_at", { ascending: false })
+    .select(`name, email, phone, ${campoData}, sponsor:members!sponsor_id(name, ref_code)`)
+    .eq("subscription_status", pendentes ? "pending" : "paid")
+    .gte(campoData, `${de}T00:00:00-03:00`)
+    .lte(campoData, `${ate}T23:59:59.999-03:00`)
+    .order(campoData, { ascending: false })
     .limit(5000)
 
   if (error) {
@@ -40,11 +45,12 @@ export async function GET(request: NextRequest) {
   }
 
   const esc = (v: string) => `"${(v || "").replace(/"/g, '""')}"`
-  const linhas = ["Nome;E-mail;Telefone;Indicado por;Código;Data do pagamento (Brasília)"]
+  const cabecalhoData = pendentes ? "Data do cadastro (Brasília)" : "Data do pagamento (Brasília)"
+  const linhas = [`Nome;E-mail;Telefone;Indicado por;Código;${cabecalhoData}`]
   for (const r of (data || []) as Array<Record<string, unknown>>) {
     const s0 = r.sponsor as { name?: string; ref_code?: string } | { name?: string; ref_code?: string }[] | null
     const s = Array.isArray(s0) ? s0[0] : s0
-    const dt = new Date(String(r.subscription_paid_at)).toLocaleString("pt-BR", {
+    const dt = new Date(String(r[campoData])).toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo",
     })
     linhas.push(
@@ -64,7 +70,7 @@ export async function GET(request: NextRequest) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="assinaturas-${de}-a-${ate}.csv"`,
+      "Content-Disposition": `attachment; filename="${pendentes ? "nao-compraram" : "assinaturas"}-${de}-a-${ate}.csv"`,
     },
   })
 }
