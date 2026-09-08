@@ -30,11 +30,17 @@ export default async function AfiliadosPage() {
   const mesLabel = new Date(month).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
   const totalGmv = rows.reduce((s, r) => s + r.gmv, 0)
 
-  // Mês anterior (o que se fecha "após a virada").
+  // Meses fecháveis: do anterior pra trás. Antes só o mês anterior era
+  // oferecido, então um mês que passou sem fechar ficava inalcançável pela UI
+  // (foi o caso de julho/26, descoberto quando uma parceira cobrou a comissão).
   const nowD = new Date()
-  const prevD = new Date(nowD.getFullYear(), nowD.getMonth() - 1, 1)
-  const prevMonth = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, "0")}-01`
-  const prevLabel = prevD.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+  const mesesFechaveis = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(nowD.getFullYear(), nowD.getMonth() - 1 - i, 1)
+    return {
+      value: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`,
+      label: d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }),
+    }
+  })
 
   return (
     <AdminShell adminName={me.name ?? "Admin"}>
@@ -100,10 +106,10 @@ export default async function AfiliadosPage() {
           <div className="space-y-2">
             <h2 className="text-lg font-bold text-foreground">Fechamento de comissão</h2>
             <p className="text-sm text-muted-foreground">
-              Simule e lance as comissões de afiliado do mês fechado ({prevLabel}). A simulação
-              não grava; o lançamento entra no extrato dos afiliados (idempotente por mês).
+              Escolha o mês, simule e lance as comissões de afiliado. A simulação não grava; o
+              lançamento entra no extrato das parceiras (idempotente — um mês só fecha uma vez).
             </p>
-            <CloseCommissionsButton referenceMonth={prevMonth} monthLabel={prevLabel} />
+            <CloseCommissionsButton meses={mesesFechaveis} />
           </div>
         </BHCard>
 

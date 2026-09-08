@@ -13,20 +13,22 @@ const brl = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
 
 /**
- * F-V35 fase 3 — fechar comissão do mês (dry-run → confirmar).
- * `referenceMonth` = mês a fechar (YYYY-MM-01), normalmente o mês anterior.
+ * F-V35 fase 3 — fechar comissão de um mês (dry-run → confirmar).
+ * Recebe a lista de meses fecháveis (do anterior pra trás): antes só dava pra
+ * fechar o mês anterior, então um mês esquecido ficava sem jeito de recuperar.
  */
 export function CloseCommissionsButton({
-  referenceMonth,
-  monthLabel,
+  meses,
 }: {
-  referenceMonth: string
-  monthLabel: string
+  meses: { value: string; label: string }[]
 }) {
+  const [referenceMonth, setReferenceMonth] = useState(meses[0]?.value ?? "")
   const [preview, setPreview] = useState<AffiliateCommissionSummary | null>(null)
   const [done, setDone] = useState<AffiliateCommissionSummary | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
+
+  const monthLabel = meses.find((m) => m.value === referenceMonth)?.label ?? referenceMonth
 
   function onPreview() {
     setError(null); setDone(null)
@@ -52,6 +54,24 @@ export function CloseCommissionsButton({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
+        <select
+          value={referenceMonth}
+          onChange={(e) => {
+            setReferenceMonth(e.target.value)
+            setPreview(null)
+            setDone(null)
+            setError(null)
+          }}
+          disabled={pending}
+          className="h-9 rounded-md border border-border bg-background px-3 text-sm capitalize"
+          aria-label="Mês a fechar"
+        >
+          {meses.map((m) => (
+            <option key={m.value} value={m.value} className="capitalize">
+              {m.label}
+            </option>
+          ))}
+        </select>
         <Button type="button" variant="outline" size="sm" onClick={onPreview} disabled={pending}>
           {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Calculator className="mr-2 h-4 w-4" />}
           Simular fechamento de {monthLabel}
