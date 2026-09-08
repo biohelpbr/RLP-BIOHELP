@@ -68,6 +68,39 @@ interface MemberCVData {
   orders: OrderItem[]
 }
 
+/**
+ * Comissões da parceira. O endpoint /api/admin/members/[id] já devolvia tudo
+ * isso, mas a tela só consumia /cv — então o admin não tinha onde ver "quanto
+ * fulana tem a receber" e cada pergunta de parceira virava consulta no banco.
+ */
+interface CommissionItem {
+  id: string
+  commission_type: string
+  amount: number
+  description: string | null
+  reference_month: string | null
+  available_at: string | null
+  created_at: string
+}
+
+interface PayoutItem {
+  id: string
+  amount: number
+  status: string
+  created_at: string
+}
+
+interface MemberCommissionData {
+  balance: {
+    total_earned: number
+    total_withdrawn: number
+    available_balance: number
+    pending_balance: number
+  }
+  recent_commissions: CommissionItem[]
+  recent_payouts: PayoutItem[]
+}
+
 // Ícones SVG
 const Icons = {
   arrowLeft: (
@@ -177,6 +210,7 @@ export default function MemberDetailPage() {
   const id = params.id as string
   const router = useRouter()
   const [data, setData] = useState<MemberCVData | null>(null)
+  const [commissions, setCommissions] = useState<MemberCommissionData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
@@ -219,6 +253,15 @@ export default function MemberDetailPage() {
       
       const result = await response.json()
       setData(result)
+
+      // Comissões vêm de outro endpoint. Falha aqui não pode derrubar a ficha
+      // inteira — a tela de CV continua útil sem o bloco de comissão.
+      try {
+        const rc = await fetch(`/api/admin/members/${id}`)
+        if (rc.ok) setCommissions(await rc.json())
+      } catch (e) {
+        console.error('Erro ao carregar comissões:', e)
+      }
     } catch (err) {
       console.error('Erro:', err)
       setError('Erro ao carregar dados do membro')
@@ -367,6 +410,18 @@ export default function MemberDetailPage() {
     }).format(value)
   }
 
+  const getCommissionTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      subscription_activation: 'Indicação',
+      affiliate_sale: 'Venda loja',
+      affiliate_perpetual: 'Perpétua',
+      fast_track_30: 'Fast-Track 30',
+      fast_track_20: 'Fast-Track 20',
+      manual_adjustment: 'Ajuste manual',
+    }
+    return labels[type] || type
+  }
+
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active': return 'Ativa'
@@ -506,6 +561,116 @@ export default function MemberDetailPage() {
           <p className={styles.adjustHint}>Adicionar ou remover CV</p>
         </div>
       </div>
+
+      {/* Comissões — o que a parceira tem a receber (F-V37) */}
+      {commissions && (
+        <>
+          <div className={styles.cvGrid}>
+            <div className={styles.cvCard}>
+              <div className={styles.cvCardHeader}>
+                <span className={styles.cvCardIcon}>{Icons.trendingUp}</span>
+                <span className={styles.cvCardLabel}>Disponível a receber</span>
+              </div>
+              <div className={styles.cvCardValue}>
+                {formatCurrency(commissions.balance.available_balance ?? 0)}
+              </div>
+              <div className={styles.cvCardSub}>já liberado pra saque</div>
+            </div>
+
+            <div className={styles.cvCard}>
+              <div className={styles.cvCardHeader}>
+                <span className={styles.cvCardIcon}>{Icons.clock}</span>
+                <span className={styles.cvCardLabel}>Aguardando liberação</span>
+              </div>
+              <div className={styles.cvCardValue}>
+                {formatCurrency(commissions.balance.pending_balance ?? 0)}
+              </div>
+              <div className={styles.cvCardSub}>ainda no prazo de carência</div>
+            </div>
+
+            <div className={styles.cvCard}>
+              <div className={styles.cvCardHeader}>
+                <span className={styles.cvCardIcon}>{Icons.fileText}</span>
+                <span className={styles.cvCardLabel}>Total ganho</span>
+              </div>
+              <div className={styles.cvCardValue}>
+                {formatCurrency(commissions.balance.total_earned ?? 0)}
+              </div>
+              <div className={styles.cvCardSub}>desde o início</div>
+            </div>
+
+            <div className={styles.cvCard}>
+              <div className={styles.cvCardHeader}>
+                <span className={styles.cvCardIcon}>{Icons.check}</span>
+                <span className={styles.cvCardLabel}>Já sacado</span>
+              </div>
+              <div className={styles.cvCardValue}>
+                {formatCurrency(commissions.balance.total_withdrawn ?? 0)}
+              </div>
+              <div className={styles.cvCardSub}>
+                {commissions.recent_payouts.length > 0
+                  ? `${commissions.recent_payouts.length} saque(s)`
+                  : 'nenhum saque'}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.sections}>
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionIcon}>{Icons.fileText}</span>
+                <h2>Extrato de Comissões</h2>
+                <span className={styles.sectionCount}>
+                  {commissions.recent_commissions.length} últimos lançamentos
+                </span>
+              </div>
+
+              {commissions.recent_commissions.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <p>Nenhuma comissão lançada para esta parceira</p>
+                </div>
+              ) : (
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Liberação</th>
+                        <th className={styles.textRight}>Valor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {commissions.recent_commissions.map((c) => (
+                        <tr key={c.id}>
+                          <td>{formatDate(c.created_at)}</td>
+                          <td>
+                            <span className={styles.typeBadge}>
+                              {getCommissionTypeLabel(c.commission_type)}
+                            </span>
+                          </td>
+                          <td>{c.description || '—'}</td>
+                          <td>
+                            {c.available_at
+                              ? new Date(c.available_at) <= new Date()
+                                ? 'liberada'
+                                : formatDate(c.available_at)
+                              : '—'}
+                          </td>
+                          <td className={`${styles.textRight} ${styles.cvPositive}`}>
+                            {formatCurrency(c.amount)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Tabs Content */}
       <div className={styles.sections}>
