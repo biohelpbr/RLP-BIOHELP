@@ -88,6 +88,29 @@ export async function GET(request: NextRequest) {
     const month = monthParam || defaultMonth
     const referenceMonth = `${month}-01`
 
+    // Busca por parceira (nome ou e-mail). Resolve pra member_ids antes, porque
+    // PostgREST não filtra por coluna da tabela relacionada num embed.
+    // Quando há busca, o recorte de mês é IGNORADO de propósito: quem procura
+    // "Luana" quer o histórico dela, não adivinhar em que mês caiu a comissão.
+    const qParam = (searchParams.get('q') || '').trim()
+    let idsDaBusca: string[] | null = null
+    if (qParam) {
+      const { data: encontrados } = await supabase
+        .from('members')
+        .select('id')
+        .or(`name.ilike.%${qParam}%,email.ilike.%${qParam}%,ref_code.ilike.%${qParam}%`)
+        .limit(200)
+      idsDaBusca = (encontrados || []).map((m: { id: string }) => m.id)
+      // Nenhuma parceira bate: devolve vazio em vez de listar o mês inteiro.
+      if (idsDaBusca.length === 0) {
+        return NextResponse.json({
+          commissions: [],
+          pagination: { total: 0, limit: limitParam, offset: offsetParam, hasMore: false },
+          summary: { total_amount: 0, by_type: {} },
+        })
+      }
+    }
+
     // 4. Buscar comissões
     let query = supabase
       .from('commission_ledger')
@@ -108,9 +131,14 @@ export async function GET(request: NextRequest) {
         source_member:members!source_member_id(name),
         source_order:orders!source_order_id(shopify_order_number)
       `, { count: 'exact' })
-      .eq('reference_month', referenceMonth)
       .order('created_at', { ascending: false })
       .range(offsetParam, offsetParam + limitParam - 1)
+
+    if (idsDaBusca) {
+      query = query.in('member_id', idsDaBusca)
+    } else {
+      query = query.eq('reference_month', referenceMonth)
+    }
 
     if (memberIdParam) {
       query = query.eq('member_id', memberIdParam)

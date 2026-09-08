@@ -96,6 +96,10 @@ export default function AdminCommissionsPage() {
   })
   const [selectedType, setSelectedType] = useState<string>('')
   const [page, setPage] = useState(0)
+  // Busca por parceira: `busca` é o que o admin digita, `termo` é o que já foi
+  // aplicado (debounce), pra não disparar uma consulta por tecla.
+  const [busca, setBusca] = useState('')
+  const [termo, setTermo] = useState('')
   const limit = 50
 
   const handleLogout = async () => {
@@ -117,6 +121,9 @@ export default function AdminCommissionsPage() {
         if (selectedType) {
           url += `&type=${selectedType}`
         }
+        if (termo) {
+          url += `&q=${encodeURIComponent(termo)}`
+        }
         
         const res = await fetch(url)
         if (res.status === 401) {
@@ -137,7 +144,16 @@ export default function AdminCommissionsPage() {
       }
     }
     fetchCommissions()
-  }, [router, selectedMonth, selectedType, page])
+  }, [router, selectedMonth, selectedType, page, termo])
+
+  // Debounce da busca: aplica 400ms depois da última tecla.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setTermo(busca.trim())
+      setPage(0)
+    }, 400)
+    return () => clearTimeout(t)
+  }, [busca])
 
   // Formatar valor em BRL
   const formatCurrency = (value: number) => {
@@ -229,6 +245,18 @@ export default function AdminCommissionsPage() {
         <div className={styles.filtersCard}>
           <div className={styles.filtersRow}>
             <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Buscar parceira</label>
+              <input
+                type="text"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Nome, e-mail ou código (ex.: Luana, BH00027)"
+                className={styles.filterSelect}
+                style={{ minWidth: 280 }}
+              />
+            </div>
+
+            <div className={styles.filterGroup}>
               <label className={styles.filterLabel}>Mês</label>
               <select
                 value={selectedMonth}
@@ -269,6 +297,31 @@ export default function AdminCommissionsPage() {
                 <option value="reversal">Reversão</option>
               </select>
             </div>
+
+            {termo && (
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>&nbsp;</label>
+                <span style={{ fontSize: 13, color: '#666', lineHeight: '2.4' }}>
+                  Buscando <strong>&quot;{termo}&quot;</strong> — histórico completo (filtro de mês
+                  desativado).{' '}
+                  <button
+                    type="button"
+                    onClick={() => setBusca('')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#5B3DF5',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      padding: 0,
+                      font: 'inherit',
+                    }}
+                  >
+                    limpar
+                  </button>
+                </span>
+              </div>
+            )}
 
             {loading && (
               <div className={styles.loadingIndicator}>
