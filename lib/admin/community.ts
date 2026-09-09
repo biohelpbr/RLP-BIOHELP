@@ -161,7 +161,17 @@ export async function getCommunityMember(id: string) {
     .single()
   if (!member) return null
 
-  const [sponsorRes, countsRes, pendingCountRes, payoutsRes, leadsRes, salesRes, roleRes] = await Promise.all([
+  const [
+    sponsorRes,
+    countsRes,
+    pendingCountRes,
+    payoutsRes,
+    leadsRes,
+    salesRes,
+    roleRes,
+    balanceRes,
+    ledgerRes,
+  ] = await Promise.all([
     member.sponsor_id
       ? supabase
           .from("members")
@@ -204,6 +214,19 @@ export async function getCommunityMember(id: string) {
       .eq("member_id", id)
       .eq("role", "admin")
       .maybeSingle(),
+    // Comissões: "quanto essa parceira tem a receber" era a pergunta que mais
+    // caía no suporte e não tinha resposta em tela nenhuma.
+    supabase
+      .from("commission_balances")
+      .select("total_earned, total_withdrawn, available_balance, pending_balance")
+      .eq("member_id", id)
+      .maybeSingle(),
+    supabase
+      .from("commission_ledger")
+      .select("id, commission_type, amount, description, reference_month, available_at, created_at")
+      .eq("member_id", id)
+      .order("created_at", { ascending: false })
+      .limit(20),
   ])
 
   const sponsor = sponsorRes.data
@@ -241,6 +264,26 @@ export async function getCommunityMember(id: string) {
     }>,
     leadsCount,
     salesCount,
+    balance: (balanceRes.data ?? {
+      total_earned: 0,
+      total_withdrawn: 0,
+      available_balance: 0,
+      pending_balance: 0,
+    }) as {
+      total_earned: number
+      total_withdrawn: number
+      available_balance: number
+      pending_balance: number
+    },
+    commissions: (ledgerRes.data ?? []) as Array<{
+      id: string
+      commission_type: string
+      amount: number
+      description: string | null
+      reference_month: string | null
+      available_at: string | null
+      created_at: string
+    }>,
     isAdmin: roleRes.data?.role === "admin",
   }
 }

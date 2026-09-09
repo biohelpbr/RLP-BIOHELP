@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import {
   BarChart3,
   Calculator,
+  CircleDollarSign,
   FileText,
   Store,
   CalendarHeart,
@@ -53,6 +54,7 @@ const adminNavItems: NavItem[] = [
   { title: "E-mails", href: "/admin/emails", icon: Mail },
   { title: "Financeiro", href: "/admin/finance", icon: DollarSign },
   { title: "Resgates", href: "/admin/payouts", icon: Wallet },
+  { title: "Comissões", href: "/admin/commissions", icon: CircleDollarSign },
   { title: "Afiliados", href: "/admin/afiliados", icon: Store },
   { title: "Simulador comissão", href: "/admin/simulador-comissao", icon: Calculator },
   { title: "Relatórios", href: "/admin/relatorios", icon: FileText },
