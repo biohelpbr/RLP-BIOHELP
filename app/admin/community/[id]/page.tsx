@@ -28,6 +28,16 @@ const fmtBRL = (n: number) =>
 
 const fmtDate = (iso: string) => (iso ? new Date(iso).toLocaleDateString("pt-BR") : "—")
 
+const COMMISSION_LABELS: Record<string, string> = {
+  subscription_activation: "Indicação",
+  affiliate_sale: "Venda loja",
+  affiliate_perpetual: "Perpétua",
+  fast_track_30: "Fast-Track 30",
+  fast_track_20: "Fast-Track 20",
+  adjustment: "Ajuste",
+  reversal: "Reversão",
+}
+
 export default async function CommunityDetailPage({ params }: CommunityDetailProps) {
   if (!isV2Enabled()) redirect("/admin")
 
@@ -39,8 +49,18 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
   const detail = await getCommunityMember(id)
   if (!detail) notFound()
 
-  const { member, sponsor, activeCount, pendingCount, payouts, leadsCount, salesCount, isAdmin } =
-    detail
+  const {
+    member,
+    sponsor,
+    activeCount,
+    pendingCount,
+    payouts,
+    leadsCount,
+    salesCount,
+    balance,
+    commissions,
+    isAdmin,
+  } = detail
 
   return (
     <AdminShell adminName={me.name ?? "Admin"}>
@@ -120,6 +140,88 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
             variant="success"
           />
         </div>
+
+        {/* Comissão: o "quanto ela tem a receber" que antes só existia no banco. */}
+        <BHCard variant="elevated" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold">Comissões</h2>
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/admin/commissions?q=${encodeURIComponent(member.ref_code || member.email)}`}>
+                Ver extrato completo
+              </Link>
+            </Button>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <BHStat
+              label="Disponível a receber"
+              value={fmtBRL(Number(balance.available_balance ?? 0))}
+              subtitle="já liberado pra saque"
+              icon={<CircleDollarSign className="w-5 h-5" />}
+              variant="primary"
+            />
+            <BHStat
+              label="Aguardando liberação"
+              value={fmtBRL(Number(balance.pending_balance ?? 0))}
+              subtitle="ainda em carência"
+              icon={<Clock className="w-5 h-5" />}
+              variant="warning"
+            />
+            <BHStat
+              label="Total ganho"
+              value={fmtBRL(Number(balance.total_earned ?? 0))}
+              subtitle="desde o início"
+              icon={<Award className="w-5 h-5" />}
+              variant="accent"
+            />
+            <BHStat
+              label="Já sacado"
+              value={fmtBRL(Number(balance.total_withdrawn ?? 0))}
+              subtitle="resgates pagos"
+              icon={<ShieldCheck className="w-5 h-5" />}
+              variant="success"
+            />
+          </div>
+
+          {commissions.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              Nenhuma comissão lançada para esta parceira.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-xs uppercase text-muted-foreground">
+                    <th className="py-2 pr-3">Data</th>
+                    <th className="py-2 pr-3">Tipo</th>
+                    <th className="py-2 pr-3">Descrição</th>
+                    <th className="py-2 pr-3">Liberação</th>
+                    <th className="py-2 text-right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {commissions.map((c) => (
+                    <tr key={c.id} className="border-b border-border/50">
+                      <td className="py-2 pr-3 whitespace-nowrap">{fmtDate(c.created_at)}</td>
+                      <td className="py-2 pr-3">
+                        <Badge variant="secondary">{COMMISSION_LABELS[c.commission_type] ?? c.commission_type}</Badge>
+                      </td>
+                      <td className="py-2 pr-3 text-muted-foreground">{c.description || "—"}</td>
+                      <td className="py-2 pr-3 whitespace-nowrap">
+                        {c.available_at
+                          ? new Date(c.available_at) <= new Date()
+                            ? "liberada"
+                            : fmtDate(c.available_at)
+                          : "—"}
+                      </td>
+                      <td className="py-2 text-right font-medium">{fmtBRL(Number(c.amount))}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </BHCard>
 
         <div className="grid gap-4 lg:grid-cols-2">
           <BHCard variant="elevated" className="space-y-3">
