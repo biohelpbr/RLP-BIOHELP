@@ -103,12 +103,21 @@ export async function GET(
       .select('id, name, email, status, level', { count: 'exact' })
       .eq('sponsor_id', memberId)
 
-    // Buscar saldo de comissões
-    const { data: balance } = await supabase
-      .from('commission_balances')
-      .select('*')
-      .eq('member_id', memberId)
-      .single()
+    // Buscar saldo de comissões pela RPC — a mesma fonte do painel da parceira.
+    // A tabela commission_balances ignora a carência Net-15, então exibia como
+    // disponível valor que a parceira ainda não podia sacar.
+    const { data: balanceRows } = await supabase.rpc('get_available_balance', {
+      p_member_id: memberId,
+    })
+    const b = Array.isArray(balanceRows) ? balanceRows[0] : balanceRows
+    const balance = b
+      ? {
+          total_earned: Number(b.total_earned ?? 0),
+          total_withdrawn: Number(b.total_withdrawn ?? 0),
+          available_balance: Number(b.available_for_withdrawal ?? 0),
+          pending_balance: Number(b.pending_balance ?? 0),
+        }
+      : null
 
     // Buscar sync Shopify
     const { data: shopifySync } = await supabase

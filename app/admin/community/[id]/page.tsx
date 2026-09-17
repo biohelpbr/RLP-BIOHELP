@@ -153,17 +153,19 @@ export default async function CommunityDetailPage({ params }: CommunityDetailPro
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Os dois primeiros cards precisam bater com o painel da parceira:
+                mesma RPC, mesmos rótulos. Ver nota em lib/admin/community.ts. */}
             <BHStat
-              label="Disponível a receber"
+              label="Disponível"
               value={fmtBRL(Number(balance.available_balance ?? 0))}
-              subtitle="já liberado pra saque"
+              subtitle="liberado para resgate imediato"
               icon={<CircleDollarSign className="w-5 h-5" />}
               variant="primary"
             />
             <BHStat
-              label="Aguardando liberação"
+              label="Pendente (Net-15)"
               value={fmtBRL(Number(balance.pending_balance ?? 0))}
-              subtitle="ainda em carência"
+              subtitle="fechamento dia 1º; liberado até dia 10"
               icon={<Clock className="w-5 h-5" />}
               variant="warning"
             />
