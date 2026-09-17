@@ -216,11 +216,13 @@ export async function getCommunityMember(id: string) {
       .maybeSingle(),
     // Comissões: "quanto essa parceira tem a receber" era a pergunta que mais
     // caía no suporte e não tinha resposta em tela nenhuma.
-    supabase
-      .from("commission_balances")
-      .select("total_earned, total_withdrawn, available_balance, pending_balance")
-      .eq("member_id", id)
-      .maybeSingle(),
+    //
+    // Fonte: a RPC get_available_balance, a MESMA que o painel da parceira usa.
+    // A tabela commission_balances não serve aqui: o available_balance dela é
+    // só (ganho − sacado) e ignora a carência Net-15, então o admin exibia como
+    // "liberado pra saque" valor que a parceira ainda não podia sacar (caso
+    // 17/09: admin dizia R$720 disponíveis, painel dela dizia R$0 — o certo).
+    supabase.rpc("get_available_balance", { p_member_id: id }),
     supabase
       .from("commission_ledger")
       .select("id, commission_type, amount, description, reference_month, available_at, created_at")
@@ -264,17 +266,29 @@ export async function getCommunityMember(id: string) {
     }>,
     leadsCount,
     salesCount,
-    balance: (balanceRes.data ?? {
-      total_earned: 0,
-      total_withdrawn: 0,
-      available_balance: 0,
-      pending_balance: 0,
-    }) as {
-      total_earned: number
-      total_withdrawn: number
-      available_balance: number
-      pending_balance: number
-    },
+    // A RPC devolve um array de uma linha (RETURNS TABLE).
+    // `available_for_withdrawal` é o que a parceira pode sacar HOJE — já
+    // descontados os saques pagos e os pedidos em processamento. É esse o
+    // número que precisa bater com o painel dela, não `available_balance`
+    // (que é só o total já fora da carência, sem descontar saque).
+    balance: (() => {
+      const b = (Array.isArray(balanceRes.data) ? balanceRes.data[0] : balanceRes.data) as
+        | {
+            total_earned: number
+            total_withdrawn: number
+            available_balance: number
+            pending_balance: number
+            available_for_withdrawal: number
+          }
+        | null
+        | undefined
+      return {
+        total_earned: Number(b?.total_earned ?? 0),
+        total_withdrawn: Number(b?.total_withdrawn ?? 0),
+        available_balance: Number(b?.available_for_withdrawal ?? 0),
+        pending_balance: Number(b?.pending_balance ?? 0),
+      }
+    })(),
     commissions: (ledgerRes.data ?? []) as Array<{
       id: string
       commission_type: string
