@@ -43,11 +43,35 @@ interface LinhaLedger {
   percentage: number
   network_level: number
   reference_month: string
+  available_at: string
   description: string
 }
 
 const mesRef = (d: Date) =>
   `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-01`
+
+/**
+ * Quando a comissão de um mês fica liberada pra saque: Net-15 = dia 15 do mês
+ * SEGUINTE ao mês de referência.
+ *
+ * ATENÇÃO: hoje este valor é SOBRESCRITO no insert. O trigger BEFORE INSERT
+ * `set_commission_available_at` (20260119_sprint5_payout_updates.sql) recalcula
+ * available_at a partir de created_at, sem checar se já veio preenchido. Isso
+ * está certo pra comissão lançada no próprio mês, mas erra em lançamento
+ * retroativo: o backfill de 10/09 lançou julho e agosto — já vencidos — com
+ * liberação em 15/10, travando R$26.520 (reportado em 21/09, corrigido por
+ * scripts/corrige-carencia-backfill.mjs).
+ *
+ * Mantido aqui de propósito: passa a valer assim que o trigger ganhar o guard
+ * `IF NEW.available_at IS NULL` (migration pendente). Até lá, o cron só lança
+ * o mês corrente, onde trigger e esta fórmula coincidem.
+ */
+function liberacaoNet15(referenceMonth: string): string {
+  const [ano, mes] = referenceMonth.slice(0, 7).split("-").map(Number)
+  const mesSeguinte = mes === 12 ? 1 : mes + 1
+  const anoSeguinte = mes === 12 ? ano + 1 : ano
+  return `${anoSeguinte}-${String(mesSeguinte).padStart(2, "0")}-15T00:00:00Z`
+}
 
 /**
  * Meses devidos por uma assinatura: a ativação e cada aniversário já vencido.
@@ -170,6 +194,7 @@ export async function runRecurringCommissions(
             percentage: 0,
             network_level: 1,
             reference_month: ref,
+            available_at: liberacaoNet15(ref),
             description: `Mensalidade indicação — ${ind.name ?? ind.id} — ${ref.slice(0, 7)}`,
           })
         }
